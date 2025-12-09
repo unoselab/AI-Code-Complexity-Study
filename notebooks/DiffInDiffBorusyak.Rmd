@@ -33,11 +33,32 @@ panel_data <- fread("../data/panel_event_monthly.csv")
 
 # Load repo metrics data for cursor adoption percentages
 repo_metrics <- fread("../data/repo_metrics.csv")
+repos_data <- fread("../data/repos.csv")
+matching_data <- fread("../data/matching.csv")
+lang_map <- setNames(repos_data$repo_primary_language, repos_data$repo_name)
+
+# Build treatment-to-control mapping from matching data
+treatment_repos <- matching_data[matching_data$group == "treatment", ]
+get_matched_controls <- function(treat_repo_names) {
+    matched <- treatment_repos[treatment_repos$repo_name %in% treat_repo_names, ]
+    controls <- unique(c(matched$matched_control_1, matched$matched_control_2, matched$matched_control_3))
+    controls[!is.na(controls) & controls != ""]
+}
 
 # Convert variables to DiD required format
 # Keep original repo names (strings) for mapping
 panel_data$repo_name_str <- panel_data$repo_name
 panel_data$repo_name <- as.numeric(factor(panel_data$repo_name))
+
+panel_data$primary_language <- lang_map[panel_data$repo_name_str]
+panel_data$lang_group <- case_when(
+    panel_data$primary_language %in% c("JavaScript", "TypeScript") ~ "JS/TS",
+    panel_data$primary_language == "Python" ~ "Python",
+    panel_data$primary_language == "Go" ~ "Go",
+    panel_data$primary_language == "Rust" ~ "Rust",
+    TRUE ~ "Other"
+)
+
 panel_data$time <- as.numeric(gsub("-", "", panel_data$time))
 panel_data$event[!is.na(panel_data$event)] <- as.numeric(
     gsub("-", "", panel_data$event[!is.na(panel_data$event)]))
@@ -209,11 +230,11 @@ event_study_plot <- ggplot(plot_data, aes(x = time, y = estimate)) +
     # Error bars for significant effects (solid)
     geom_errorbar(data = subset(plot_data, is_significant),
                   aes(ymin = conf.low, ymax = conf.high),
-                  width = 0, linetype = "solid") +
+                  width = 0.5, linetype = "solid") +
     # Error bars for non-significant effects (dotted)
     geom_errorbar(data = subset(plot_data, !is_significant),
                   aes(ymin = conf.low, ymax = conf.high),
-                  width = 0, linetype = "dotted") +
+                  width = 0.5, linetype = "dotted") +
     geom_hline(yintercept = 0, linetype = "dashed") +
     geom_vline(xintercept = -0.5, linetype = "dashed") +
     scale_x_continuous(limits = c(-6, 6), breaks = -6:6) +
@@ -236,27 +257,50 @@ ggsave("../plots/dynamic_effects_borusyak.pdf",
   device = CairoPDF, family = "DejaVu Sans")
 ```
 
-## Compare Event Studies Across Five Settings
+## Compare Event Studies Across Settings
 
-```{r compare_event_study, fig.width=11, fig.height=2.5}
+```{r compare_event_study, fig.width=10, fig.height=10}
+# Helper function to filter treatment repos by condition and get matched controls
+filter_with_matched_controls <- function(dt, treat_condition) {
+    treat_subset <- dt[dt$treated == 1 & treat_condition, ]
+    treat_repo_names <- unique(treat_subset$repo_name_str)
+    matched_controls <- get_matched_controls(treat_repo_names)
+    dt[(dt$treated == 1 & dt$repo_name_str %in% treat_repo_names) |
+       (dt$treated == 0 & dt$repo_name_str %in% matched_controls), ]
+}
+
 # Build filtered variants directly from the already prepared `panel_data`
 build_setting_variant <- function(data, setting_label) {
     dt <- data
-    if (setting_label == "Active Months (>0 commits)") {
-        # commits is log-transformed; > 0 corresponds to raw commits >= 1
+
+    if (setting_label == "Orginal") {
+        # No filtering
+    } else if (setting_label == "Active Months (>0 commits)") {
         dt <- dt[dt$commits > 0, ]
     } else if (setting_label == "Very Active (>=10 commits)") {
-        # commits is log-transformed; threshold at log(11)
         dt <- dt[dt$commits >= log(11), ]
     } else if (setting_label == "Truncated to 2025-06") {
-        # `time` is numeric YYYYMM after preprocessing (e.g., 202506)
         dt <- dt[dt$time <= 202506, ]
     } else if (setting_label == "High Adoption (>=80%)") {
-        # Only include treated repos with >=80% cursor adoption + never treated (control group)
-        # Lookup using simple mapping from original repo_name strings
         adoption_vec <- adoption_pct[dt$repo_name_str]
         adoption_vec[is.na(adoption_vec)] <- 0
-        dt <- dt[dt$treated == 0 | (dt$treated == 1 & adoption_vec >= 80), ]
+        dt <- filter_with_matched_controls(dt, adoption_vec >= 80)
+    } else if (setting_label == "High Confidence") {
+        dt <- filter_with_matched_controls(dt, dt$high_confidence == TRUE)
+    } else if (setting_label == "Low Confidence") {
+        dt <- filter_with_matched_controls(dt, dt$high_confidence == FALSE)
+    } else if (setting_label == "Cursor and Others") {
+        dt <- filter_with_matched_controls(dt, dt$other_agents == TRUE)
+    } else if (setting_label == "Only Cursor") {
+        dt <- filter_with_matched_controls(dt, dt$other_agents == FALSE)
+    } else if (setting_label == "JS/TS") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "JS/TS")
+    } else if (setting_label == "Python") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "Python")
+    } else if (setting_label == "Go") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "Go")
+    } else if (setting_label == "Rust") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "Rust")
     }
     dt
 }
@@ -266,7 +310,11 @@ settings <- c(
     "Active Months (>0 commits)",
     "Very Active (>=10 commits)",
     "Truncated to 2025-06",
-    "High Adoption (>=80%)"
+    "High Adoption (>=80%)",
+    "High Confidence",
+    "Low Confidence",
+    "Cursor and Others",
+    "Only Cursor"
 )
 
 # Run dynamic DiD for each outcome and each setting, collect results
@@ -295,48 +343,69 @@ collect_dynamic_results <- function(outcomes, settings) {
 
 dyn_all <- collect_dynamic_results(outcome_vars, settings)
 
-# Prepare data for plotting (exclude static treat term)
+# Count treatment and control repos for each setting
+count_setting_stats <- function(setting_name) {
+    data_s <- build_setting_variant(panel_data, setting_name)
+    n_treat <- length(unique(data_s$repo_name[data_s$event > 0]))
+    n_control <- length(unique(data_s$repo_name[data_s$event == 0]))
+    n_obs <- nrow(data_s)
+    list(treat = n_treat, control = n_control, obs = n_obs)
+}
+setting_stats <- lapply(settings, count_setting_stats)
+settings_with_counts <- paste0(settings, " (n=", sapply(setting_stats, `[[`, "treat"),
+                               "+", sapply(setting_stats, `[[`, "control"),
+                               ", obs=", sapply(setting_stats, `[[`, "obs"), ")")
+names(settings_with_counts) <- settings
+
 plot_dyn <- dyn_all[dyn_all$term != "treat", ]
 plot_dyn$time <- as.numeric(plot_dyn$term)
 
-# Map outcome codes to nice labels and enforce facet order (matches outcome_vars)
 label_map <- setNames(outcome_names, outcome_vars)
 plot_dyn$outcome_label <- label_map[plot_dyn$outcome]
 plot_dyn$outcome_label <- factor(plot_dyn$outcome_label, levels = outcome_names)
-
-# Keep legend order consistent with settings vector
-plot_dyn$setting <- factor(plot_dyn$setting, levels = settings)
-
-# Add significance indicator (CI not crossing 0 implies ~ p < 0.05)
+# Update setting labels with counts
+plot_dyn$setting_label <- settings_with_counts[plot_dyn$setting]
+plot_dyn$setting_label <- factor(plot_dyn$setting_label, levels = settings_with_counts)
 plot_dyn$significant <- (plot_dyn$conf.low > 0) | (plot_dyn$conf.high < 0)
 
-# Overlayed event study by setting, faceted by outcome (styled like DiffInDiffAll.Rmd)
-dynamic_plot <- ggplot(plot_dyn, aes(x = time, y = estimate, color = setting)) +
-    # Significant points (filled)
-    geom_point(data = subset(plot_dyn, significant),
-               position = position_dodge(width = 0.5), size = 1.5, shape = 19) +
-    # Non-significant points (hollow)
-    geom_point(data = subset(plot_dyn, !significant),
-               position = position_dodge(width = 0.5), size = 1.5, shape = 21, fill = "transparent") +
-    # Error bars for significant effects (solid)
-    geom_errorbar(data = subset(plot_dyn, significant),
-                  aes(ymin = conf.low, ymax = conf.high),
-                  position = position_dodge(width = 0.5),
-                  width = 0, linetype = "solid") +
-    # Error bars for non-significant effects (dotted)
-    geom_errorbar(data = subset(plot_dyn, !significant),
-                  aes(ymin = conf.low, ymax = conf.high),
-                  position = position_dodge(width = 0.5),
-                  width = 0, linetype = "dotted") +
+# Add columns for aesthetics
+plot_dyn$linetype_sig <- ifelse(plot_dyn$significant, "solid", "dotted")
+plot_dyn$shape_sig <- ifelse(plot_dyn$significant, 19, 21)  # filled vs hollow
+
+# Create shared position dodge
+pos <- position_dodge(width = 0.5)
+
+# Overlayed event study by setting, faceted by outcome
+dynamic_plot <- ggplot(plot_dyn, aes(x = time, y = estimate, color = setting_label)) +
+    # Error bars (single layer with linetype mapped to significance)
+    geom_errorbar(aes(ymin = conf.low, ymax = conf.high, linetype = linetype_sig),
+                  position = pos, width = 0.4) +
+    # Points (single layer with shape mapped to significance)
+    geom_point(aes(shape = significant, fill = after_scale(ifelse(significant, color, NA))),
+               position = pos, size = 1.5) +
+    scale_shape_manual(values = c("TRUE" = 19, "FALSE" = 21), guide = "none") +
     geom_hline(yintercept = 0, linetype = "dashed") +
     geom_vline(xintercept = -0.5, linetype = "dashed") +
     scale_x_continuous(limits = c(-6, 6), breaks = -6:6) +
+    scale_linetype_identity() +
+    scale_color_manual(values = setNames(c(
+        "#000000",  # Orginal - Black
+        "#E69F00",  # Active Months - Orange
+        "#56B4E9",  # Very Active - Sky blue
+        "#009E73",  # Truncated - Green
+        "#F0E442",  # High Adoption - Yellow
+        "#0072B2",  # High Confidence - Blue
+        "#D55E00",  # Low Confidence - Vermillion
+        "#CC79A7",  # Cursor and Others - Pink
+        "#999999"   # Only Cursor - Grey
+    ), settings_with_counts)) +
     labs(
         x = "Months Relative to Cursor Adoption",
         y = "Treatment Effect",
         color = "Setting",
         caption = "Filled dots: p < 0.05 (significant), Hollow dots: p ≥ 0.05 (non-significant)"
     ) +
+    guides(color = guide_legend(nrow = 4)) +
     theme_minimal() +
     theme(
         legend.position = "bottom",
@@ -344,11 +413,90 @@ dynamic_plot <- ggplot(plot_dyn, aes(x = time, y = estimate, color = setting)) +
         legend.margin = margin(b = 3),
         legend.box.margin = margin(t = -5)
     ) +
-    facet_wrap(~ outcome_label, scales = "free_y", nrow = 1, ncol = 5)
+    facet_wrap(~ outcome_label, scales = "free_y", nrow = 5, ncol = 1)
 
 print(dynamic_plot)
 
 ggsave("../plots/dynamic_effects_comparison.pdf",
-  plot = dynamic_plot, width = 11, height = 2.5,
+  plot = dynamic_plot, width = 10, height = 10,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+## Compare Event Studies Across Programming Languages
+
+```{r compare_languages, fig.width=8, fig.height=10}
+lang_settings <- c("Orginal", "JS/TS", "Python", "Go", "Rust")
+
+lang_dyn_all <- collect_dynamic_results(outcome_vars, lang_settings)
+
+# Count treatment and control repos for each language setting
+count_lang_stats <- function(setting_name) {
+    data_s <- build_setting_variant(panel_data, setting_name)
+    n_treat <- length(unique(data_s$repo_name[data_s$event > 0]))
+    n_control <- length(unique(data_s$repo_name[data_s$event == 0]))
+    n_obs <- nrow(data_s)
+    list(treat = n_treat, control = n_control, obs = n_obs)
+}
+lang_stats <- lapply(lang_settings, count_lang_stats)
+lang_settings_with_counts <- paste0(lang_settings, " (n=", sapply(lang_stats, `[[`, "treat"),
+                                    "+", sapply(lang_stats, `[[`, "control"),
+                                    ", obs=", sapply(lang_stats, `[[`, "obs"), ")")
+names(lang_settings_with_counts) <- lang_settings
+
+plot_lang <- lang_dyn_all[lang_dyn_all$term != "treat", ]
+plot_lang$time <- as.numeric(plot_lang$term)
+
+plot_lang$outcome_label <- label_map[plot_lang$outcome]
+plot_lang$outcome_label <- factor(plot_lang$outcome_label, levels = outcome_names)
+
+# Update setting labels with counts
+plot_lang$setting_label <- lang_settings_with_counts[plot_lang$setting]
+plot_lang$setting_label <- factor(plot_lang$setting_label, levels = lang_settings_with_counts)
+plot_lang$significant <- (plot_lang$conf.low > 0) | (plot_lang$conf.high < 0)
+plot_lang$linetype_sig <- ifelse(plot_lang$significant, "solid", "dotted")
+
+# Create shared position dodge
+pos_lang <- position_dodge(width = 0.5)
+
+# Create language comparison plot
+lang_plot <- ggplot(plot_lang, aes(x = time, y = estimate, color = setting_label)) +
+    # Error bars (single layer with linetype mapped to significance)
+    geom_errorbar(aes(ymin = conf.low, ymax = conf.high, linetype = linetype_sig),
+                  position = pos_lang, width = 0.4) +
+    # Points (single layer with shape mapped to significance)
+    geom_point(aes(shape = significant, fill = after_scale(ifelse(significant, color, NA))),
+               position = pos_lang, size = 1.5) +
+    scale_shape_manual(values = c("TRUE" = 19, "FALSE" = 21), guide = "none") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(limits = c(-6, 6), breaks = -6:6) +
+    scale_linetype_identity() +
+    scale_color_manual(values = setNames(c(
+        "#000000",  # Orginal - Black
+        "#E69F00",  # JS/TS - Orange
+        "#0072B2",  # Python - Blue
+        "#009E73",  # Go - Green
+        "#CC79A7"   # Rust - Pink
+    ), lang_settings_with_counts)) +
+    labs(
+        x = "Months Relative to Cursor Adoption",
+        y = "Treatment Effect",
+        color = "Language Group",
+        caption = "Filled dots: p < 0.05 (significant), Hollow dots: p ≥ 0.05 (non-significant)"
+    ) +
+    guides(color = guide_legend(nrow = 2)) +
+    theme_minimal() +
+    theme(
+        legend.position = "bottom",
+        plot.caption = element_text(hjust = 0.5, size = 10, margin = margin(t = 3)),
+        legend.margin = margin(b = 3),
+        legend.box.margin = margin(t = -5)
+    ) +
+    facet_wrap(~ outcome_label, scales = "free_y", nrow = 5, ncol = 1)
+
+print(lang_plot)
+
+ggsave("../plots/dynamic_effects_languages.pdf",
+  plot = lang_plot, width = 8, height = 10,
   device = CairoPDF, family = "DejaVu Sans")
 ```
