@@ -31,9 +31,9 @@ glimpse(matching_data)
 ## Descriptive Statistics Table
 
 ```{r descriptive_statistics_table, results='asis'}
-# Define all metrics including propensity score
+# Define all metrics (excluding propensity score)
 all_metrics <- c(
-    "propensity_score", "age_days", "users_involved", "n_stars", "n_forks",
+    "age_days", "users_involved", "n_stars", "n_forks",
     "n_releases", "n_pulls", "n_issues", "n_comments", "total_events"
 )
 
@@ -85,7 +85,7 @@ for (metric in all_metrics) {
 }
 
 # Define metrics that need log transformation
-log_metrics <- c("Propensity score", "Age days", "Users involved", "N stars", "N forks",
+log_metrics <- c("Age days", "Users involved", "N stars", "N forks",
                 "N releases", "N pulls", "N issues", "N comments", "Total events")
 
 # Prepare data with appropriate transformations
@@ -135,67 +135,68 @@ stats_table_formatted %>%
   scroll_box(width = "100%", height = "600px")
 ```
 
-## Log-Transformed Box Plots by Metric and Group
+## Balance Table: Treatment vs Matched Control
 
-```{r log_boxplots, fig.width=14, fig.height=8}
-# Create log-transformed box plots excluding propensity score
-box_plot_data <- combined_data %>%
-  # Filter out propensity score
-  filter(Metric != "Propensity score") %>%
+```{r balance_table, results='asis'}
+# Calculate balance statistics between Treatment and Matched Control
+balance_stats <- combined_data %>%
+  filter(Group %in% c("Treatment", "Matched Control")) %>%
+  group_by(Metric, Group) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    Median = median(Value, na.rm = TRUE),
+    Var = var(Value, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = Group,
+    values_from = c(Mean, Median, Var),
+    names_sep = "_"
+  ) %>%
   mutate(
-    # Apply log transformation with small constant for zeros
-    Value_log = log10(Value_transformed),
-    # Create cleaner metric labels
-    Metric_clean = case_when(
-      Metric == "Age days" ~ "Age (Days)",
-      Metric == "Users involved" ~ "Users Involved",
-      Metric == "N stars" ~ "Stars",
-      Metric == "N forks" ~ "Forks",
-      Metric == "N releases" ~ "Releases",
-      Metric == "N pulls" ~ "Pull Requests",
-      Metric == "N issues" ~ "Issues",
-      Metric == "N comments" ~ "Comments",
-      Metric == "Total events" ~ "Total Events",
-      TRUE ~ Metric
-    ),
-    # Reorder groups for better visualization
-    Group = factor(Group, levels = c("Treatment", "Matched Control", "All Candidates"))
-  )
+    Norm_Diff = (`Mean_Treatment` - `Mean_Matched Control`) /
+                sqrt((`Var_Treatment` + `Var_Matched Control`) / 2),
+    `Treatment Mean` = round(`Mean_Treatment`, 2),
+    `Control Mean` = round(`Mean_Matched Control`, 2),
+    `Treatment Median` = round(`Median_Treatment`, 2),
+    `Control Median` = round(`Median_Matched Control`, 2),
+    `Norm. Diff` = round(Norm_Diff, 3)
+  ) %>%
+  select(Metric, `Treatment Mean`, `Control Mean`, `Treatment Median`, `Control Median`, `Norm. Diff`)
 
-# Create the single combined box plot with log transformation
-box_plot <- ggplot(box_plot_data, aes(x = Metric_clean, y = Value_log, fill = Group)) +
-  geom_boxplot(alpha = 0.7, outlier.alpha = 0.5, position = position_dodge(width = 0.8)) +
-  scale_fill_manual(values = c(
-    "Treatment" = "#0072B2",      # Colorblind-friendly blue
-    "Matched Control" = "#009E73", # Colorblind-friendly green
-    "All Candidates" = "#CC79A7"     # Colorblind-friendly pink
-  )) +
-  labs(
-    x = "Metric",
-    y = "Log10 Transformed Values",
-    title = "Distribution of Repository Metrics by Group (Log Scale)",
-    fill = "Group"
-  ) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    plot.title = element_text(hjust = 0.5, face = "bold"),
-    legend.position = "bottom"
-  ) +
-  scale_y_continuous(expand = c(0, 0))
-
-print(box_plot)
-
-# Save the plot
-ggsave("../plots/log_boxplots_combined.pdf",
-  plot = box_plot, width = 14, height = 8, device = CairoPDF, family = "DejaVu Sans")
+# Create the balance table
+balance_stats %>%
+  kable("html", caption = "Balance Statistics: Treatment vs Matched Control (|Norm. Diff| < 0.25 indicates acceptable balance, < 0.1 means good balance)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                full_width = FALSE) %>%
+  column_spec(1, bold = TRUE)
 ```
 
 ## Visualizing Propensity Score Distributions
 
 ```{r propensity_distributions, fig.width=5, fig.height=2.5}
-# Filter data for propensity score only
-ps_data <- combined_data %>%
-  filter(Metric == "Propensity score")
+ps_treatment <- matching_data %>%
+  filter(group == "treatment") %>%
+  select(repo_name, propensity_score) %>%
+  mutate(Group = "Treatment", Value = propensity_score)
+
+matched_control_repos <- c(
+  unique(na.omit(matching_data$matched_control_1)),
+  unique(na.omit(matching_data$matched_control_2)),
+  unique(na.omit(matching_data$matched_control_3))
+) %>% unique()
+
+ps_matched_control <- matching_data %>%
+  filter(repo_name %in% matched_control_repos) %>%
+  select(repo_name, propensity_score) %>%
+  mutate(Group = "Matched Control", Value = propensity_score)
+
+ps_all_candidates <- matching_data %>%
+  filter(group == "control") %>%
+  select(repo_name, propensity_score) %>%
+  mutate(Group = "All Candidates", Value = propensity_score)
+
+ps_data <- bind_rows(ps_treatment, ps_matched_control, ps_all_candidates)
 
 # Create density plot
 plot <- ggplot(ps_data, aes(x = Value, fill = Group)) +
