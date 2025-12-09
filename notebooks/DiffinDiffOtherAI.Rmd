@@ -28,7 +28,7 @@ library(Cairo)
 ## Loading and Preparing the Data
 
 ```{r load_data}
-panel_data <- fread("../data/panel_event_monthly_modified.csv")
+panel_data <- fread("../data/panel_event_monthly.csv")
 
 # panel_data <- panel_data[panel_data$commits > 0]
 
@@ -307,7 +307,7 @@ for (var in outcome_vars) {
         horizon = -6:6,
         pretrends = -6:-2
     )
-    
+
     borusyak_dynamic_all[[var]] <- did_imputation(
         data = panel_data_all,
         yname = var,
@@ -318,7 +318,7 @@ for (var in outcome_vars) {
         horizon = -6:6,
         pretrends = -6:-2
     )
-    
+
     borusyak_dynamic_agent_notmodified[[var]] <- did_imputation(
         data = panel_data_agent_notmodified,
         yname = var,
@@ -377,7 +377,7 @@ dynamic_plot <- ggplot(dynamic_effects, aes(x = time, y = estimate, color = meth
                   position = position_dodge(width = 0.5), width = 0, linetype = "dotted") +
     geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
     geom_vline(xintercept = -0.5, linetype = "dashed", color = "blue") +
-    
+
     scale_color_manual(values = c(
         "Original" = "#000000",            # Original Black
         "Only Cursor" = "#009E73",         # Colorblind-friendly green
