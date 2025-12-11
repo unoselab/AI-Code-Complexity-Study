@@ -302,7 +302,7 @@ kable(static_table_wide,
 
 ## Dynamic Treatment Effects (Event Study) Comparison
 
-```{r dynamic_effects, fig.width=11, fig.height=2.5}
+```{r dynamic_effects, fig.width=15, fig.height=2.5}
 # Extract dynamic effects from each method
 extract_dynamic_effects <- function(results, method_name, variables = NULL) {
     effects_list <- list()
@@ -469,7 +469,7 @@ dynamic_plot <- ggplot(dynamic_effects, aes(x = time, y = estimate, color = meth
 print(dynamic_plot)
 
 ggsave("../plots/dynamic_effects.pdf",
-  plot = dynamic_plot, width = 11, height = 2.5,
+  plot = dynamic_plot, width = 15, height = 2.5,
   device = CairoPDF, family = "DejaVu Sans")
 ```
 

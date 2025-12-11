@@ -237,7 +237,8 @@ event_study_plot <- ggplot(plot_data, aes(x = time, y = estimate)) +
                   width = 0.5, linetype = "dotted") +
     geom_hline(yintercept = 0, linetype = "dashed") +
     geom_vline(xintercept = -0.5, linetype = "dashed") +
-    scale_x_continuous(limits = c(-6, 6), breaks = -6:6) +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) +
     labs(
         x = "Months Relative to Cursor Adoption",
@@ -257,9 +258,9 @@ ggsave("../plots/dynamic_effects_borusyak.pdf",
   device = CairoPDF, family = "DejaVu Sans")
 ```
 
-## Compare Event Studies Across Settings
+## Summary Statistics for All Settings
 
-```{r compare_event_study, fig.width=10, fig.height=10}
+```{r summary_stats_table}
 # Helper function to filter treatment repos by condition and get matched controls
 filter_with_matched_controls <- function(dt, treat_condition) {
     treat_subset <- dt[dt$treated == 1 & treat_condition, ]
@@ -272,7 +273,6 @@ filter_with_matched_controls <- function(dt, treat_condition) {
 # Build filtered variants directly from the already prepared `panel_data`
 build_setting_variant <- function(data, setting_label) {
     dt <- data
-
     if (setting_label == "Orginal") {
         # No filtering
     } else if (setting_label == "Active Months (>0 commits)") {
@@ -286,13 +286,13 @@ build_setting_variant <- function(data, setting_label) {
         adoption_vec[is.na(adoption_vec)] <- 0
         dt <- filter_with_matched_controls(dt, adoption_vec >= 80)
     } else if (setting_label == "High Confidence") {
-        dt <- filter_with_matched_controls(dt, dt$high_confidence == TRUE)
+        dt <- dt[dt$high_confidence == TRUE | is.na(dt$high_confidence), ]
     } else if (setting_label == "Low Confidence") {
-        dt <- filter_with_matched_controls(dt, dt$high_confidence == FALSE)
+        dt <- dt[dt$high_confidence == FALSE | is.na(dt$high_confidence), ]
     } else if (setting_label == "Cursor and Others") {
-        dt <- filter_with_matched_controls(dt, dt$other_agents == TRUE)
+        dt <- dt[dt$other_agents == TRUE | is.na(dt$other_agents), ]
     } else if (setting_label == "Only Cursor") {
-        dt <- filter_with_matched_controls(dt, dt$other_agents == FALSE)
+        dt <- dt[dt$other_agents == FALSE | is.na(dt$other_agents), ]
     } else if (setting_label == "JS/TS") {
         dt <- filter_with_matched_controls(dt, dt$lang_group == "JS/TS")
     } else if (setting_label == "Python") {
@@ -305,12 +305,79 @@ build_setting_variant <- function(data, setting_label) {
     dt
 }
 
-settings <- c(
+# Comprehensive function to calculate statistics for a setting
+calculate_setting_stats <- function(setting_name, data) {
+    data_s <- build_setting_variant(data, setting_name)
+
+    # Count unique treatment and control repos
+    n_treat <- length(unique(data_s$repo_name[data_s$event > 0]))
+    n_control <- length(unique(data_s$repo_name[data_s$event == 0]))
+
+    # Total observations
+    n_obs <- nrow(data_s)
+
+    # Post-treatment observations (time >= event for treated units)
+    post_treat_obs <- sum(data_s$treated == 1 & data_s$time >= data_s$event)
+
+    data.frame(
+        Setting = setting_name,
+        Treatment_Repos = n_treat,
+        Control_Repos = n_control,
+        Total_Observations = n_obs,
+        Post_Treatment_Obs = post_treat_obs,
+        stringsAsFactors = FALSE
+    )
+}
+
+# All settings from the notebook
+all_settings <- c(
     "Orginal",
+    "High Adoption (>=80%)",
     "Active Months (>0 commits)",
     "Very Active (>=10 commits)",
+    "High Confidence",
+    "Low Confidence",
+    "Cursor and Others",
+    "Only Cursor",
     "Truncated to 2025-06",
+    "JS/TS",
+    "Python",
+    "Go",
+    "Rust"
+)
+
+# Calculate stats for all settings
+stats_list <- lapply(all_settings, calculate_setting_stats, data = panel_data)
+stats_df <- dplyr::bind_rows(stats_list)
+
+# Format the table nicely
+knitr::kable(stats_df,
+    col.names = c("Setting", "# Treatment Repos", "# Control Repos",
+                  "# Total Observations", "# Post-Treatment Obs"),
+    format = "html",
+    caption = "Summary Statistics for All Analysis Settings",
+    align = c("l", "r", "r", "r", "r"),
+    format.args = list(big.mark = ",")
+) %>%
+    kableExtra::kable_styling(
+        bootstrap_options = c("striped", "hover", "condensed"),
+        full_width = FALSE,
+        position = "left"
+    ) %>%
+    kableExtra::row_spec(0, bold = TRUE) %>%
+    kableExtra::pack_rows("Main Settings", 1, 8) %>%
+    kableExtra::pack_rows("Language-Specific Settings", 9, 12)
+```
+
+## Compare Event Studies Across Settings
+
+```{r compare_event_study, fig.width=10, fig.height=10}
+settings <- c(
+    "Orginal",
     "High Adoption (>=80%)",
+    "Active Months (>0 commits)",
+    "Very Active (>=10 commits)",
+    # "Truncated to 2025-06",
     "High Confidence",
     "Low Confidence",
     "Cursor and Others",
@@ -360,12 +427,18 @@ names(settings_with_counts) <- settings
 plot_dyn <- dyn_all[dyn_all$term != "treat", ]
 plot_dyn$time <- as.numeric(plot_dyn$term)
 
+plot_dyn <- plot_dyn[plot_dyn$time >= -6 & plot_dyn$time <= 6, ]
+
 label_map <- setNames(outcome_names, outcome_vars)
 plot_dyn$outcome_label <- label_map[plot_dyn$outcome]
+# Remove rows with NA outcome_label (outcomes not in our list)
+plot_dyn <- plot_dyn[!is.na(plot_dyn$outcome_label), ]
 plot_dyn$outcome_label <- factor(plot_dyn$outcome_label, levels = outcome_names)
-# Update setting labels with counts
+# Update setting labels with counts and enforce order
 plot_dyn$setting_label <- settings_with_counts[plot_dyn$setting]
-plot_dyn$setting_label <- factor(plot_dyn$setting_label, levels = settings_with_counts)
+plot_dyn$setting_label <- factor(plot_dyn$setting_label, levels = settings_with_counts, ordered = TRUE)
+# Also keep original setting as ordered factor for consistent dodging
+plot_dyn$setting <- factor(plot_dyn$setting, levels = settings, ordered = TRUE)
 plot_dyn$significant <- (plot_dyn$conf.low > 0) | (plot_dyn$conf.high < 0)
 
 # Add columns for aesthetics
@@ -386,19 +459,19 @@ dynamic_plot <- ggplot(plot_dyn, aes(x = time, y = estimate, color = setting_lab
     scale_shape_manual(values = c("TRUE" = 19, "FALSE" = 21), guide = "none") +
     geom_hline(yintercept = 0, linetype = "dashed") +
     geom_vline(xintercept = -0.5, linetype = "dashed") +
-    scale_x_continuous(limits = c(-6, 6), breaks = -6:6) +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
     scale_linetype_identity() +
     scale_color_manual(values = setNames(c(
         "#000000",  # Orginal - Black
-        "#E69F00",  # Active Months - Orange
-        "#56B4E9",  # Very Active - Sky blue
-        "#009E73",  # Truncated - Green
-        "#F0E442",  # High Adoption - Yellow
+        "#E69F00",  # High Adoption - Orange
+        "#56B4E9",  # Active Months - Sky blue
+        "#009E73",  # Very Active - Green
         "#0072B2",  # High Confidence - Blue
         "#D55E00",  # Low Confidence - Vermillion
         "#CC79A7",  # Cursor and Others - Pink
         "#999999"   # Only Cursor - Grey
-    ), settings_with_counts)) +
+    ), settings_with_counts), drop = FALSE) +
     labs(
         x = "Months Relative to Cursor Adoption",
         y = "Treatment Effect",
@@ -413,7 +486,7 @@ dynamic_plot <- ggplot(plot_dyn, aes(x = time, y = estimate, color = setting_lab
         legend.margin = margin(b = 3),
         legend.box.margin = margin(t = -5)
     ) +
-    facet_wrap(~ outcome_label, scales = "free_y", nrow = 5, ncol = 1)
+    facet_wrap(~ outcome_label, scales = "free_y", ncol = 1)
 
 print(dynamic_plot)
 
@@ -445,13 +518,18 @@ names(lang_settings_with_counts) <- lang_settings
 
 plot_lang <- lang_dyn_all[lang_dyn_all$term != "treat", ]
 plot_lang$time <- as.numeric(plot_lang$term)
+plot_lang <- plot_lang[plot_lang$time >= -6 & plot_lang$time <= 6, ]
 
 plot_lang$outcome_label <- label_map[plot_lang$outcome]
+# Remove rows with NA outcome_label (outcomes not in our list)
+plot_lang <- plot_lang[!is.na(plot_lang$outcome_label), ]
 plot_lang$outcome_label <- factor(plot_lang$outcome_label, levels = outcome_names)
 
-# Update setting labels with counts
+# Update setting labels with counts and enforce order
 plot_lang$setting_label <- lang_settings_with_counts[plot_lang$setting]
-plot_lang$setting_label <- factor(plot_lang$setting_label, levels = lang_settings_with_counts)
+plot_lang$setting_label <- factor(plot_lang$setting_label, levels = lang_settings_with_counts, ordered = TRUE)
+# Also keep original setting as ordered factor for consistent dodging
+plot_lang$setting <- factor(plot_lang$setting, levels = lang_settings, ordered = TRUE)
 plot_lang$significant <- (plot_lang$conf.low > 0) | (plot_lang$conf.high < 0)
 plot_lang$linetype_sig <- ifelse(plot_lang$significant, "solid", "dotted")
 
@@ -469,7 +547,8 @@ lang_plot <- ggplot(plot_lang, aes(x = time, y = estimate, color = setting_label
     scale_shape_manual(values = c("TRUE" = 19, "FALSE" = 21), guide = "none") +
     geom_hline(yintercept = 0, linetype = "dashed") +
     geom_vline(xintercept = -0.5, linetype = "dashed") +
-    scale_x_continuous(limits = c(-6, 6), breaks = -6:6) +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
     scale_linetype_identity() +
     scale_color_manual(values = setNames(c(
         "#000000",  # Orginal - Black
@@ -477,7 +556,7 @@ lang_plot <- ggplot(plot_lang, aes(x = time, y = estimate, color = setting_label
         "#0072B2",  # Python - Blue
         "#009E73",  # Go - Green
         "#CC79A7"   # Rust - Pink
-    ), lang_settings_with_counts)) +
+    ), lang_settings_with_counts), drop = FALSE) +
     labs(
         x = "Months Relative to Cursor Adoption",
         y = "Treatment Effect",
@@ -492,7 +571,7 @@ lang_plot <- ggplot(plot_lang, aes(x = time, y = estimate, color = setting_label
         legend.margin = margin(b = 3),
         legend.box.margin = margin(t = -5)
     ) +
-    facet_wrap(~ outcome_label, scales = "free_y", nrow = 5, ncol = 1)
+    facet_wrap(~ outcome_label, scales = "free_y", ncol = 1)
 
 print(lang_plot)
 
