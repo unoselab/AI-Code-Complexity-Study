@@ -1,0 +1,308 @@
+---
+title: "Descriptive Pre-Post Analysis: Raw Event Plots"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(dev = 'CairoPNG', dpi = 150)
+options(bitmapType = 'cairo')
+```
+
+## Loading Required Packages
+
+```{r load_packages}
+library(tidyverse)
+library(ggplot2)
+library(data.table)
+library(cowplot)
+library(scales)
+library(Cairo)
+```
+
+## Loading and Preparing the Data
+
+```{r load_data}
+panel_data <- fread("../data/panel_event_monthly.csv")
+
+# Convert variables to proper format
+panel_data$repo_name <- as.numeric(factor(panel_data$repo_name))
+panel_data$time <- as.numeric(gsub("-", "", panel_data$time))
+panel_data$event[!is.na(panel_data$event)] <- as.numeric(
+    gsub("-", "", panel_data$event[!is.na(panel_data$event)]))
+panel_data$event[is.na(panel_data$event)] <- 0
+panel_data <- panel_data[panel_data$event < 202401 # never treated
+        | (panel_data$event > 202407 & panel_data$event <= 202503)]
+panel_data$event <- as.integer(panel_data$event)
+
+panel_data$quality_warnings <- panel_data$code_smells + panel_data$vulnerabilities + panel_data$bugs
+
+# Log transform skewed variables (same as DiffInDiffAll.Rmd)
+panel_data$commits <- log(panel_data$commits + 1)
+panel_data$lines_added <- log(panel_data$lines_added + 1)
+panel_data$code_smells <- log(panel_data$code_smells + 1)
+panel_data$vulnerabilities <- log(panel_data$vulnerabilities + 1)
+panel_data$bugs <- log(panel_data$bugs + 1)
+panel_data$quality_warnings <- log(panel_data$quality_warnings + 1)
+panel_data$cognitive_complexity <- log(panel_data$cognitive_complexity + 1)
+panel_data$duplicated_lines_density <- log(panel_data$duplicated_lines_density + 1)
+panel_data$comment_lines_density <- log(panel_data$comment_lines_density + 1)
+panel_data$age <- log(panel_data$age + 1)
+panel_data$contributors <- log(panel_data$contributors + 1)
+panel_data$stars <- log(panel_data$stars + 1)
+panel_data$issues <- log(panel_data$issues + 1)
+panel_data$issue_comments <- log(panel_data$issue_comments + 1)
+```
+
+## Create Relative Time Variables
+
+```{r create_relative_time}
+# Filter to only include treatment repositories (those that adopted Cursor)
+panel_data <- panel_data %>%
+    filter(event > 0) %>%  # Only repositories that actually adopted Cursor
+    arrange(repo_name, time) %>%
+    group_by(repo_name) %>%
+    mutate(
+        relative_time = time - event
+    ) %>%
+    ungroup() %>%
+    # Filter to only include observations within -6 to +6 months of event
+    filter(relative_time >= -6 & relative_time <= 6)
+```
+
+## Define Outcome Variables
+
+```{r define_outcomes}
+outcome_vars <- c(
+    "commits",
+    "lines_added",
+    "quality_warnings",
+    "duplicated_lines_density",
+    "cognitive_complexity"
+)
+
+outcome_names <- c(
+    "Commits (log)",
+    "Lines Added (log)",
+    "Quality Warnings (log)",
+    "%Duplicated Lines (log)",
+    "Cognitive Complexity (log)"
+)
+```
+
+## Raw Event Plots with Boxplots
+
+```{r raw_event_plots, fig.width=10.5, fig.height=2.5}
+# Create boxplots for each outcome variable
+plot_list <- list()
+
+# Create boxplots for each outcome variable with x-axis labels on all plots
+for (i in seq_along(outcome_vars)) {
+    var <- outcome_vars[i]
+    name <- outcome_names[i]
+
+    # Create boxplot for current outcome
+    p <- ggplot(panel_data, aes(x = factor(relative_time), y = !!sym(var))) +
+        geom_boxplot(alpha = 0.7, outlier.alpha = 0.5, fill = "#0072B2") +
+        geom_vline(xintercept = which(levels(factor(panel_data$relative_time)) == "0"),
+                   linetype = "dashed", color = "blue", size = 1) +
+        labs(x = "Months Relative to Adoption",
+            y = name
+        ) +
+        theme_minimal() +
+        theme(
+            plot.title = element_text(hjust = 0.5, face = "bold"),
+            plot.subtitle = element_text(hjust = 0.5),
+            axis.text.x = element_text(angle = 0, hjust = 0.5, size = 8),
+            axis.title.x = element_text(size = 9),
+            axis.title.y = element_text(size = 9),
+            axis.text.y = element_text(size = 8),
+            plot.margin = margin(2, 2, 2, 2, "pt")
+        ) +
+        scale_y_continuous(expand = c(0.02, 0), labels = scales::number_format(accuracy = 0.1))
+
+    plot_list[[i]] <- p
+}
+
+# Arrange plots in a grid with proper alignment using cowplot
+combined_plot <- plot_grid(plotlist = plot_list, ncol = 5, align = "hv", axis = "tblr")
+
+# Display the plot
+print(combined_plot)
+
+# Save the plot
+ggsave("../plots/descriptive_pre_post.pdf",
+  plot = combined_plot, width = 10.5, height = 2.5, device = CairoPDF, family = "DejaVu Sans")
+```
+
+## Pre-Post Comparison: Mean Outcomes by Relative Time
+
+```{r pre_post_comparison}
+library(kableExtra)
+
+# Calculate mean outcomes for each relative time point
+means_by_time <- panel_data %>%
+    group_by(relative_time) %>%
+    summarise(
+        n = n(),
+        across(all_of(outcome_vars), ~ mean(.x, na.rm = TRUE)),
+        .groups = "drop"
+    )
+
+# Calculate overall pre vs post means
+pre_post_summary <- panel_data %>%
+    mutate(period = ifelse(relative_time < 0, "Pre", "Post")) %>%
+    group_by(period) %>%
+    summarise(
+        n = n(),
+        across(all_of(outcome_vars), ~ mean(.x, na.rm = TRUE)),
+        .groups = "drop"
+    ) %>%
+    arrange(desc(period))  # Pre first, then Post
+
+# Calculate difference (Post - Pre)
+pre_vals <- pre_post_summary %>% filter(period == "Pre")
+post_vals <- pre_post_summary %>% filter(period == "Post")
+
+# Build difference row
+diff_row <- tibble(period = "Difference (Post - Pre)", n = NA_integer_)
+for (var in outcome_vars) {
+    diff_row[[var]] <- post_vals[[var]] - pre_vals[[var]]
+}
+
+# Build percent change row
+pct_row <- tibble(period = "% Change", n = NA_integer_)
+for (var in outcome_vars) {
+    pct_row[[var]] <- 100 * (post_vals[[var]] - pre_vals[[var]]) / pre_vals[[var]]
+}
+
+# Perform Wilcoxon rank-sum tests for each outcome
+pval_row <- tibble(period = "p-value (Wilcoxon)", n = NA_integer_)
+for (var in outcome_vars) {
+    pre_data <- panel_data %>% filter(relative_time < 0) %>% pull(!!sym(var))
+    post_data <- panel_data %>% filter(relative_time >= 0) %>% pull(!!sym(var))
+    test <- wilcox.test(post_data, pre_data)
+    pval_row[[var]] <- test$p.value
+}
+
+# Combine all summary rows
+summary_table <- bind_rows(pre_post_summary, diff_row, pct_row, pval_row)
+
+# Rename columns for display
+colnames(summary_table) <- c("Period", "N", outcome_names)
+
+# Format the table
+summary_table %>%
+    mutate(across(where(is.numeric) & !matches("N"), ~ round(.x, 4))) %>%
+    mutate(N = ifelse(is.na(N), "-", format(N, big.mark = ","))) %>%
+    kable(format = "html", caption = "Pre-Post Comparison of Mean Outcomes (Treatment Repos Only)",
+          align = c("l", "r", rep("r", length(outcome_vars)))) %>%
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                  full_width = FALSE, position = "left") %>%
+    row_spec(0, bold = TRUE) %>%
+    row_spec(3, bold = TRUE, background = "#f0f0f0") %>%
+    row_spec(4, italic = TRUE) %>%
+    row_spec(5, italic = TRUE, color = "darkblue")
+```
+
+## Interrupted Time Series Analysis
+
+```{r its_analysis}
+library(fixest)
+
+# Prepare ITS variables
+# time: sequential time (0 to 12 for months -6 to +6)
+# post: indicator for post-intervention (relative_time >= 0)
+# time_after: time since intervention (0 before, 1,2,3... after)
+
+its_data <- panel_data %>%
+    mutate(
+        time_seq = relative_time + 7,  # Convert -6 to +6 → 1 to 13
+        post = ifelse(relative_time >= 0, 1, 0),
+        time_after = ifelse(relative_time >= 0, relative_time + 1, 0)
+    )
+
+# Helper function to add significance stars
+add_stars <- function(estimate, pval) {
+    stars <- case_when(
+        pval < 0.001 ~ "***",
+        pval < 0.01 ~ "**",
+        pval < 0.05 ~ "*",
+        TRUE ~ ""
+    )
+    paste0(round(estimate, 4), stars)
+}
+
+# Helper to format estimate with SE in parentheses (with line break)
+format_coef <- function(est, se, pval) {
+    paste0(add_stars(est, pval), "<br>(", round(se, 4), ")")
+}
+
+# Build summary table combining all four ITS models
+summary_results <- list()
+
+for (i in seq_along(outcome_vars)) {
+    var <- outcome_vars[i]
+
+    # Model 1: No covariates, no FE
+    formula1 <- as.formula(paste(var, "~ time_seq + post + time_after"))
+    model1 <- lm(formula1, data = its_data)
+    coefs1 <- coef(summary(model1))
+
+    # Model 2: With covariates, no FE
+    formula2 <- as.formula(paste(var, "~ time_seq + post + time_after + age + ncloc + contributors + stars + issues"))
+    model2 <- lm(formula2, data = its_data)
+    coefs2 <- coef(summary(model2))
+
+    # Model 3: Repo FE only (no covariates)
+    formula3 <- as.formula(paste(var, "~ time_seq + post + time_after | repo_name"))
+    model3 <- feols(formula3, data = its_data)
+    coefs3 <- coeftable(model3)
+
+    # Model 4: Repo FE + covariates
+    formula4 <- as.formula(paste(var, "~ time_seq + post + time_after + age + ncloc + contributors + stars + issues | repo_name"))
+    model4 <- feols(formula4, data = its_data)
+    coefs4 <- coeftable(model4)
+
+    summary_results[[i]] <- tibble(
+        Outcome = outcome_names[i],
+        N = format(nobs(model1), big.mark = ","),
+        # No covariates, no FE
+        `Pre` = format_coef(coefs1["time_seq", "Estimate"], coefs1["time_seq", "Std. Error"], coefs1["time_seq", "Pr(>|t|)"]),
+        `Level` = format_coef(coefs1["post", "Estimate"], coefs1["post", "Std. Error"], coefs1["post", "Pr(>|t|)"]),
+        `Post` = format_coef(coefs1["time_after", "Estimate"], coefs1["time_after", "Std. Error"], coefs1["time_after", "Pr(>|t|)"]),
+        `R²` = round(summary(model1)$r.squared, 3),
+        # With covariates, no FE
+        `Pre ` = format_coef(coefs2["time_seq", "Estimate"], coefs2["time_seq", "Std. Error"], coefs2["time_seq", "Pr(>|t|)"]),
+        `Level ` = format_coef(coefs2["post", "Estimate"], coefs2["post", "Std. Error"], coefs2["post", "Pr(>|t|)"]),
+        `Post ` = format_coef(coefs2["time_after", "Estimate"], coefs2["time_after", "Std. Error"], coefs2["time_after", "Pr(>|t|)"]),
+        `R² ` = round(summary(model2)$r.squared, 3),
+        # Repo FE only
+        `Pre  ` = format_coef(coefs3["time_seq", "Estimate"], coefs3["time_seq", "Std. Error"], coefs3["time_seq", "Pr(>|t|)"]),
+        `Level  ` = format_coef(coefs3["post", "Estimate"], coefs3["post", "Std. Error"], coefs3["post", "Pr(>|t|)"]),
+        `Post  ` = format_coef(coefs3["time_after", "Estimate"], coefs3["time_after", "Std. Error"], coefs3["time_after", "Pr(>|t|)"]),
+        `R²  ` = round(r2(model3, type = "ar2"), 3),
+        # Repo FE + covariates
+        `Pre   ` = format_coef(coefs4["time_seq", "Estimate"], coefs4["time_seq", "Std. Error"], coefs4["time_seq", "Pr(>|t|)"]),
+        `Level   ` = format_coef(coefs4["post", "Estimate"], coefs4["post", "Std. Error"], coefs4["post", "Pr(>|t|)"]),
+        `Post   ` = format_coef(coefs4["time_after", "Estimate"], coefs4["time_after", "Std. Error"], coefs4["time_after", "Pr(>|t|)"]),
+        `R²   ` = round(r2(model4, type = "ar2"), 3)
+    )
+}
+
+summary_table_all <- bind_rows(summary_results)
+
+summary_table_all %>%
+    kable(format = "html",
+          caption = "Summary: ITS Results Across Four Model Specifications<br><small>* p < 0.05, ** p < 0.01, *** p < 0.001. Standard errors in parentheses.</small>",
+          escape = FALSE,
+          align = c("l", "r", rep("r", 16))) %>%
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                  full_width = FALSE, position = "left", font_size = 12) %>%
+    row_spec(0, bold = TRUE) %>%
+    add_header_above(c(" " = 2,
+                       "No Covariates" = 4,
+                       "With Covariates" = 4,
+                       "Repo FE Only" = 4,
+                       "Repo FE + Covariates" = 4))
+```
