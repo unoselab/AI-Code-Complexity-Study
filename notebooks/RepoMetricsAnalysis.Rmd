@@ -27,19 +27,25 @@ theme_set(theme_minimal() +
 
 ```{r}
 # Load the dataset
-data_path <- "../data/repos.csv"
-repos_df <- read_csv(data_path)
+repos_df <- read_csv("../data/repos.csv")
+metrics_df <- read_csv("../data/repo_metrics.csv")
 
-# Convert datetime columns to R datetime format
+# Get repos that have cursor adoption data in metrics_df
+repos_with_adoption <- metrics_df %>%
+    filter(!is.na(cursor_adoption_time)) %>%
+    filter(cursor_adoption_time < ymd("2025-04-01")) %>%
+    filter(cursor_adoption_time >= ymd("2024-01-01")) %>%
+    pull(repo_name) %>%
+    unique()
+
+# Convert datetime columns to R datetime format and filter to repos with cursor adoption
 repos_df <- repos_df %>%
+    filter(repo_name %in% repos_with_adoption) %>%
     mutate(
         repo_created = ymd_hms(repo_created),
         repo_updated = ymd_hms(repo_updated),
-        repo_cursor_adoption = ymd_hms(repo_cursor_adoption),
-        adoption_yearmonth = format(repo_cursor_adoption, "%Y-%m"),
         repo_age_days = as.integer(difftime(Sys.Date(), repo_created, units = "days"))
-    ) %>%
-    filter(!is.na(repo_cursor_adoption))
+    )
 
 # View data structure
 glimpse(repos_df)
