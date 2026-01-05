@@ -1,10 +1,12 @@
 ---
-title: "Repository Metrics Analysis"
+title: "Data Collection and Repository Metrics Analysis"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.width = 6, fig.height = 4)
+knitr::opts_chunk$set(dev = 'CairoPNG', dpi = 150)
+options(bitmapType = 'cairo')
 ```
 
 ```{r}
@@ -13,6 +15,7 @@ library(tidyverse)
 library(lubridate)
 library(scales)
 library(kableExtra)
+library(Cairo)
 
 # Set global ggplot theme - black axis lines, no grid
 theme_set(theme_minimal() +
@@ -26,15 +29,22 @@ theme_set(theme_minimal() +
 ## Data Loading and Preprocessing
 
 ```{r}
-# Load the dataset
+# Load the datasets
 repos_df <- read_csv("../data/repos.csv")
 metrics_df <- read_csv("../data/repo_metrics.csv")
 
-# Get repos that have cursor adoption data in metrics_df
-repos_with_adoption <- metrics_df %>%
+# Process metrics_df - convert datetime and filter adoption time
+metrics_df <- metrics_df %>%
+    mutate(
+        cursor_adoption_time = ymd_hms(cursor_adoption_time),
+        adoption_yearmonth = format(cursor_adoption_time, "%Y-%m")
+    ) %>%
     filter(!is.na(cursor_adoption_time)) %>%
     filter(cursor_adoption_time < ymd("2025-04-01")) %>%
-    filter(cursor_adoption_time >= ymd("2024-01-01")) %>%
+    filter(cursor_adoption_time >= ymd("2024-01-01"))
+
+# Get repos that have cursor adoption data in metrics_df
+repos_with_adoption <- metrics_df %>%
     pull(repo_name) %>%
     unique()
 
@@ -49,6 +59,64 @@ repos_df <- repos_df %>%
 
 # View data structure
 glimpse(repos_df)
+glimpse(metrics_df)
+```
+
+## Distribution of Cursor Adoption Time
+
+```{r}
+# Plot cursor adoption over time (by year-month) with bar chart and numbers on top
+adoption_counts <- metrics_df %>%
+    count(adoption_yearmonth) %>%
+    arrange(adoption_yearmonth)
+
+p <- ggplot(adoption_counts, aes(x = adoption_yearmonth, y = n)) +
+    geom_bar(stat = "identity", fill = "#0072B2", alpha = 0.7) +
+    geom_text(aes(label = n), vjust = -0.5, size = 3) +
+    labs(
+        x = "Year-Month",
+        y = "Number of Repositories"
+    ) +
+    scale_y_continuous(expand = c(0, 0)) +
+    coord_cartesian(ylim = c(0, 330), clip = "off") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(p)
+
+ggsave("../plots/cursor_adoption_time.pdf", plot = p, width = 5, height = 2.5, device = CairoPDF, family = "DejaVu Sans")
+```
+
+## Distribution of Repository Creation Time
+
+```{r, fig.width = 9}
+# Create year-quarter field for repository creation dates
+repos_df <- repos_df %>%
+    mutate(
+        # Extract quarter (Q1, Q2, Q3, Q4) from date
+        quarter = paste0("Q", ceiling(month(repo_created)/3)),
+        # Format as YYYY-QN
+        creation_yearquarter = paste0(year(repo_created), "-", quarter)
+    )
+
+# Plot repo creation over time (by year-quarter) with bar chart and numbers on top
+creation_counts <- repos_df %>%
+    count(creation_yearquarter) %>%
+    arrange(creation_yearquarter)
+
+p2 <- ggplot(creation_counts, aes(x = creation_yearquarter, y = n)) +
+    geom_bar(stat = "identity", fill = "#009E73", alpha = 0.8) +
+    geom_text(aes(label = n), vjust = -0.5, size = 3) +
+    labs(
+        x = "Year-Quarter",
+        y = "Number of Repositories"
+    ) +
+    scale_y_continuous(expand = c(0, 0)) +
+    coord_cartesian(ylim = c(0, max(creation_counts$n) * 1.1), clip = "off") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(p2)
+
+ggsave("../plots/repo_creation_time.pdf", plot = p2, width = 9, height = 3, device = CairoPDF, family = "DejaVu Sans")
 ```
 
 ## Descriptive Statistics Table in LaTeX
@@ -76,9 +144,6 @@ metrics <- c(
 stats_list <- repos_df %>%
     select(all_of(metrics)) %>%
     map(calc_stats)
-
-# For reference
-print(stats_list)
 
 # Create a data frame for the table
 stats_df <- data.frame(
