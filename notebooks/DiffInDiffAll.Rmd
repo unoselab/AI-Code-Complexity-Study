@@ -144,7 +144,8 @@ run_callaway <- function(outcome_var, data) {
         data = data,
         panel = TRUE,
         allow_unbalanced_panel = TRUE,
-        anticipation = 1
+        anticipation = 1,
+        control_group = "notyettreated"
     )
     return(result)
 }
@@ -302,7 +303,7 @@ kable(static_table_wide,
 
 ## Dynamic Treatment Effects (Event Study) Comparison
 
-```{r dynamic_effects, fig.width=15, fig.height=2.5}
+```{r dynamic_effects, fig.width=16, fig.height=2.5}
 # Extract dynamic effects from each method
 extract_dynamic_effects <- function(results, method_name, variables = NULL) {
     effects_list <- list()
@@ -422,36 +423,34 @@ dynamic_effects <- dynamic_effects %>%
         p_value = 2 * (1 - pnorm(abs(z_stat))),
         # Create significance indicator
         significant = !is.na(p_value) & p_value < 0.05,
-        # Create aesthetic variables
-        point_shape = ifelse(significant, 19, 21),  # filled vs hollow circles
-        line_type = ifelse(significant, "solid", "dotted")
+        # Create linetype variable for scale_linetype_identity
+        linetype_sig = ifelse(significant, "solid", "dotted")
     )
 
+# Define dodge position once
+pos <- position_dodge(width = 0.5)
+
 # Create comparison plot (top panels)
-dynamic_plot <- ggplot(dynamic_effects, aes(x = time, y = estimate, color = method)) +
-    # Add significant points (filled)
-    geom_point(data = filter(dynamic_effects, significant),
-               position = position_dodge(width = 0.5), size = 1.5, shape = 19) +
-    # Add non-significant points (hollow)
-    geom_point(data = filter(dynamic_effects, !significant),
-               position = position_dodge(width = 0.5), size = 1.5, shape = 21, fill = "transparent") +
-    # Add error bars for significant effects (solid)
-    geom_errorbar(data = filter(dynamic_effects, significant),
-                  aes(ymin = conf.low, ymax = conf.high),
-                  position = position_dodge(width = 0.5), width = 0, linetype = "solid") +
-    # Add error bars for non-significant effects (dotted)
-    geom_errorbar(data = filter(dynamic_effects, !significant),
-                  aes(ymin = conf.low, ymax = conf.high),
-                  position = position_dodge(width = 0.5), width = 0, linetype = "dotted") +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-    geom_vline(xintercept = -0.5, linetype = "dashed", color = "blue") +
+dynamic_plot <- ggplot(dynamic_effects, aes(x = time, y = estimate, color = method, group = method)) +
+    # Error bars with linetype mapped to significance
+    geom_errorbar(aes(ymin = conf.low, ymax = conf.high, linetype = linetype_sig),
+                  position = pos, width = 0.4) +
+    # Points with shape mapped to significance
+    geom_point(aes(shape = significant, fill = after_scale(ifelse(significant, color, NA))),
+               position = pos, size = 1.5) +
+    scale_shape_manual(values = c("TRUE" = 19, "FALSE" = 21), guide = "none") +
+    scale_linetype_identity() +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
     scale_color_manual(values = c(
-        "Two Way Fixed Effects" = "#CC79A7",                    # Colorblind-friendly pink
-        "Borusyak et al." = "#009E73",         # Colorblind-friendly green
-        "Callaway and Sant'Anna" = "#0072B2"   # Colorblind-friendly blue
+        "Two Way Fixed Effects" = "#CC79A7",   # Pink
+        "Borusyak et al." = "#000000",         # Black
+        "Callaway and Sant'Anna" = "#0072B2"   # Blue
     )) +
     facet_wrap(~outcome, scales = "free_y", nrow = 1, ncol = 5) +
-    scale_x_continuous(limits = c(-6.5, 6.5), breaks = -6:6) +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) +
     labs(
         x = "Months Relative to Cursor Adoption",
         y = "Treatment Effect",
@@ -463,13 +462,15 @@ dynamic_plot <- ggplot(dynamic_effects, aes(x = time, y = estimate, color = meth
         legend.position = "bottom",
         plot.caption = element_text(hjust = 0.5, size = 10, margin = margin(t = 3)),
         legend.margin = margin(b = 3),
-        legend.box.margin = margin(t = -5)
+        legend.box.margin = margin(t = -5),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()
     )
 
 print(dynamic_plot)
 
 ggsave("../plots/dynamic_effects.pdf",
-  plot = dynamic_plot, width = 15, height = 2.5,
+  plot = dynamic_plot, width = 16, height = 2.5,
   device = CairoPDF, family = "DejaVu Sans")
 ```
 
