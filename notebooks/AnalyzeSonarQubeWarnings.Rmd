@@ -13,14 +13,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Overview
-
-This analysis compares the distribution of SonarQube warnings before and after Cursor adoption, focusing on:
-
-1. **Severity distribution** (BLOCKER, CRITICAL, MAJOR, MINOR, INFO)
-2. **Warning type distribution** (BUG, CODE_SMELL, VULNERABILITY)
-3. **Category distribution** (Logic Error, Code Hygiene, Accessibility, etc.)
-
 ## Load Required Libraries
 
 ```{r libraries}
@@ -285,6 +277,60 @@ kable(category_wide,
   scroll_box(height = "500px")
 ```
 
+## Average Warnings per Repo per Month by Category
+
+```{r category-avg-warnings-per-repo-month}
+# Calculate average warnings per repo per month for each category
+category_repo_month <- warnings_enriched %>%
+  filter(!is.na(category)) %>%
+  group_by(period, category, repo_name, month) %>%
+  summarise(warnings_count = n(), .groups = "drop") %>%
+  # Calculate average across months for each repo-category-period
+  group_by(period, category, repo_name) %>%
+  summarise(avg_warnings_per_month = mean(warnings_count), .groups = "drop") %>%
+  # Calculate average across repos for each category-period
+  group_by(period, category) %>%
+  summarise(
+    mean_warnings = mean(avg_warnings_per_month),
+    median_warnings = median(avg_warnings_per_month),
+    sd_warnings = sd(avg_warnings_per_month),
+    n_repos = n(),
+    .groups = "drop"
+  )
+
+# Filter to top categories and create wide format
+category_avg_wide <- category_repo_month %>%
+  filter(category %in% top_categories) %>%
+  select(category, period, mean_warnings, median_warnings) %>%
+  pivot_wider(
+    names_from = period,
+    values_from = c(mean_warnings, median_warnings),
+    names_glue = "{period}_{.value}"
+  ) %>%
+  mutate(
+    mean_change = `Post-Cursor_mean_warnings` - `Pre-Cursor_mean_warnings`,
+    mean_pct_change = ifelse(`Pre-Cursor_mean_warnings` > 0,
+                             (`Post-Cursor_mean_warnings` - `Pre-Cursor_mean_warnings`) /
+                               `Pre-Cursor_mean_warnings` * 100,
+                             NA)
+  ) %>%
+  arrange(desc(`Pre-Cursor_mean_warnings` + `Post-Cursor_mean_warnings`)) %>%
+  select(category,
+         `Pre-Cursor_mean_warnings`, `Post-Cursor_mean_warnings`,
+         `Pre-Cursor_median_warnings`, `Post-Cursor_median_warnings`,
+         mean_change, mean_pct_change)
+
+kable(category_avg_wide,
+      caption = "Average Warnings per Repository per Month by Category",
+      digits = 2,
+      col.names = c("Category",
+                    "Pre Mean", "Post Mean",
+                    "Pre Median", "Post Median",
+                    "Mean Change", "Mean % Change")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                font_size = 11)
+```
+
 ## Category Visualization
 
 ```{r category-plot, fig.height=10}
@@ -344,129 +390,6 @@ ggplot(category_change, aes(x = change, y = fct_reorder(category, change))) +
   ) +
   theme_minimal(base_size = 11) +
   theme(legend.position = "top")
-```
-
-# Statistical Tests
-
-## Chi-Square Test: Severity Distribution
-
-```{r chi-square-severity}
-# Create contingency table
-severity_table <- warnings_enriched %>%
-  filter(!is.na(severity)) %>%
-  count(period, severity) %>%
-  pivot_wider(names_from = period, values_from = n, values_fill = 0) %>%
-  column_to_rownames("severity")
-
-# Chi-square test
-chi_result_severity <- chisq.test(severity_table)
-
-cat("Chi-Square Test for Severity Distribution\n")
-cat("=========================================\n")
-cat("X-squared =", chi_result_severity$statistic, "\n")
-cat("df =", chi_result_severity$parameter, "\n")
-cat("p-value =", chi_result_severity$p.value, "\n")
-cat("\nInterpretation:",
-    ifelse(chi_result_severity$p.value < 0.05,
-           "SIGNIFICANT difference in severity distribution (p < 0.05)",
-           "NO significant difference in severity distribution (p >= 0.05)"), "\n")
-```
-
-## Chi-Square Test: Type Distribution
-
-```{r chi-square-type}
-# Create contingency table
-type_table <- warnings_enriched %>%
-  filter(!is.na(type)) %>%
-  count(period, type) %>%
-  pivot_wider(names_from = period, values_from = n, values_fill = 0) %>%
-  column_to_rownames("type")
-
-# Chi-square test
-chi_result_type <- chisq.test(type_table)
-
-cat("Chi-Square Test for Type Distribution\n")
-cat("======================================\n")
-cat("X-squared =", chi_result_type$statistic, "\n")
-cat("df =", chi_result_type$parameter, "\n")
-cat("p-value =", chi_result_type$p.value, "\n")
-cat("\nInterpretation:",
-    ifelse(chi_result_type$p.value < 0.05,
-           "SIGNIFICANT difference in type distribution (p < 0.05)",
-           "NO significant difference in type distribution (p >= 0.05)"), "\n")
-```
-
-## Chi-Square Test: Top Category Distribution
-
-```{r chi-square-category}
-# Create contingency table for top 10 categories
-category_table <- warnings_enriched %>%
-  filter(category %in% top_categories[1:10]) %>%
-  count(period, category) %>%
-  pivot_wider(names_from = period, values_from = n, values_fill = 0) %>%
-  column_to_rownames("category")
-
-# Chi-square test
-chi_result_category <- chisq.test(category_table)
-
-cat("Chi-Square Test for Top 10 Category Distribution\n")
-cat("=================================================\n")
-cat("X-squared =", chi_result_category$statistic, "\n")
-cat("df =", chi_result_category$parameter, "\n")
-cat("p-value =", chi_result_category$p.value, "\n")
-cat("\nInterpretation:",
-    ifelse(chi_result_category$p.value < 0.05,
-           "SIGNIFICANT difference in category distribution (p < 0.05)",
-           "NO significant difference in category distribution (p >= 0.05)"), "\n")
-```
-
-# Per-Repository Analysis
-
-```{r per-repo-analysis}
-# Calculate warnings per repo by period
-repo_summary <- warnings_enriched %>%
-  group_by(repo_name, period) %>%
-  summarise(
-    total_warnings = n(),
-    .groups = "drop"
-  ) %>%
-  pivot_wider(
-    names_from = period,
-    values_from = total_warnings,
-    values_fill = 0
-  ) %>%
-  mutate(
-    change = `Post-Cursor` - `Pre-Cursor`,
-    pct_change = ifelse(`Pre-Cursor` > 0,
-                        (change / `Pre-Cursor`) * 100,
-                        NA)
-  )
-
-# Summary statistics
-cat("Per-Repository Warning Changes\n")
-cat("===============================\n")
-cat("Repos with decreased warnings:", sum(repo_summary$change < 0, na.rm = TRUE), "\n")
-cat("Repos with increased warnings:", sum(repo_summary$change > 0, na.rm = TRUE), "\n")
-cat("Repos with no change:", sum(repo_summary$change == 0, na.rm = TRUE), "\n")
-cat("\nMean change:", mean(repo_summary$change, na.rm = TRUE), "\n")
-cat("Median change:", median(repo_summary$change, na.rm = TRUE), "\n")
-cat("Mean % change:", mean(repo_summary$pct_change, na.rm = TRUE), "%\n")
-cat("Median % change:", median(repo_summary$pct_change, na.rm = TRUE), "%\n")
-```
-
-```{r repo-change-histogram, fig.height=6}
-ggplot(repo_summary, aes(x = change)) +
-  geom_histogram(binwidth = 10, fill = "#56B4E9", alpha = 0.7, color = "black") +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "red", linewidth = 1) +
-  geom_vline(xintercept = median(repo_summary$change, na.rm = TRUE),
-             linetype = "dashed", color = "blue", linewidth = 1) +
-  labs(
-    title = "Distribution of Warning Count Changes per Repository",
-    subtitle = "Red line = no change, Blue line = median change",
-    x = "Change in Warning Count (Post - Pre)",
-    y = "Number of Repositories"
-  ) +
-  theme_minimal(base_size = 12)
 ```
 
 # Session Info
