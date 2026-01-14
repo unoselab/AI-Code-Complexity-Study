@@ -6,6 +6,10 @@ This script:
 1. Reads panel data to identify treatment repositories and their adoption times
 2. Queries SonarQube API for issues/warnings at time points before and after treatment
 3. Saves a sample of warnings for qualitative analysis
+
+NOTE: this script may not be working properly to precisely collect warnings introduced in a SonarQube version
+  because of limitation of SonarQube API. That is why we only do a coarse analysis of breakdown
+  of warnings before/after Cursor adoption instead of a more fine-grained analysis.
 """
 
 import logging
@@ -28,96 +32,87 @@ SCRIPT_DIR = Path(__file__).parent
 DATA_DIR = SCRIPT_DIR.parent / "data"
 
 ISSUE_TYPES = ["BUG", "VULNERABILITY", "CODE_SMELL"]
-SAMPLE_SIZE_PER_REPO_PERIOD = 500
+SAMPLE_SIZE_PER_REPO_PERIOD = 1000
 MAX_PERIODS = 6
 RANDOM_SEED = 114514
 
 
-def get_all_issues_for_version(project_key: str, version: str) -> list[dict]:
+def _fetch_issues(
+    project_key: str, issue_type: str, params: dict, headers: dict
+) -> list[dict]:
+    """Fetch paginated issues with given params."""
+    issues_list = []
+    page = 1
+    page_size = 500
+    url = f"{SONAR_HOST}/api/issues/search"
+
+    while True:
+        req_params = {
+            "componentKeys": project_key,
+            "types": issue_type,
+            "ps": page_size,
+            "p": page,
+            **params,
+        }
+
+        try:
+            response = requests.get(url, headers=headers, params=req_params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+
+            issues = data.get("issues", [])
+            for issue in issues:
+                issues_list.append(
+                    {
+                        "issue_key": issue.get("key"),
+                        "type": issue.get("type"),
+                        "severity": issue.get("severity"),
+                        "message": issue.get("message"),
+                        "component": issue.get("component"),
+                        "line": issue.get("line"),
+                        "rule": issue.get("rule"),
+                        "effort": issue.get("effort"),
+                        "creation_date": issue.get("creationDate"),
+                    }
+                )
+
+            if len(issues) < page_size:
+                break
+            page += 1
+
+        except requests.exceptions.RequestException as e:
+            logging.warning("Failed to fetch issues for %s: %s", project_key, str(e))
+            break
+
+    return issues_list
+
+
+def get_issues_introduced_in_range(
+    project_key: str, created_after: Optional[str], created_before: str
+) -> list[dict]:
     """
-    Fetch all issues from SonarQube for a specific project version.
+    Fetch all issues created within a date range (issues introduced in a version).
 
     Args:
         project_key: SonarQube project key
-        version: Version identifier (e.g., "2024-08")
+        created_after: ISO date string for start of range (exclusive), None for no lower bound
+        created_before: ISO date string for end of range (inclusive)
 
     Returns:
-        List of all issue dictionaries
+        List of all issue dictionaries created in that range
     """
     headers = {"Authorization": f"Bearer {SONAR_TOKEN}"}
     all_issues = []
 
+    params = {"createdBefore": created_before}
+    if created_after:
+        params["createdAfter"] = created_after
+
     for issue_type in ISSUE_TYPES:
-        url = f"{SONAR_HOST}/api/issues/search"
-        page = 1
-        page_size = 500
-
-        while True:
-            params = {
-                "componentKeys": project_key,
-                "types": issue_type,
-                "ps": page_size,
-                "p": page,
-                "resolved": "false",
-            }
-
-            try:
-                response = requests.get(url, headers=headers, params=params, timeout=30)
-                response.raise_for_status()
-                data = response.json()
-
-                issues = data.get("issues", [])
-                for issue in issues:
-                    all_issues.append(
-                        {
-                            "issue_key": issue.get("key"),
-                            "type": issue.get("type"),
-                            "severity": issue.get("severity"),
-                            "message": issue.get("message"),
-                            "component": issue.get("component"),
-                            "line": issue.get("line"),
-                            "rule": issue.get("rule"),
-                            "effort": issue.get("effort"),
-                            "creation_date": issue.get("creationDate"),
-                        }
-                    )
-
-                if len(issues) < page_size:
-                    break
-                page += 1
-
-            except requests.exceptions.RequestException as e:
-                logging.warning(
-                    "Failed to fetch issues for %s: %s", project_key, str(e)
-                )
-                break
+        issues = _fetch_issues(project_key, issue_type, params, headers)
+        all_issues.extend(issues)
 
     return all_issues
-
-
-def get_issues_for_version(
-    project_key: str, version: str, max_issues: int = 100
-) -> list[dict]:
-    """
-    Fetch and randomly sample issues from a specific project version.
-
-    Args:
-        project_key: SonarQube project key
-        version: Version identifier (e.g., "2024-08")
-        max_issues: Maximum number of issues to sample
-
-    Returns:
-        Randomly sampled list of issue dictionaries
-    """
-    all_issues = get_all_issues_for_version(project_key, version)
-    logging.info(
-        "Found %d issues for %s at version %s", len(all_issues), project_key, version
-    )
-
-    if len(all_issues) <= max_issues:
-        return all_issues
-
-    return random.sample(all_issues, max_issues)
 
 
 def get_analysis_versions(project_key: str) -> list[dict]:
@@ -176,16 +171,18 @@ def add_months(yyyymm: int, months: int) -> int:
     return new_year * 100 + new_month
 
 
-def find_version_for_month(analyses: list[dict], target_month: int) -> Optional[str]:
+def find_analysis_for_month(
+    analyses: list[dict], target_month: int
+) -> Optional[tuple[str, str]]:
     """
-    Find an analysis version matching the target month exactly.
+    Find an analysis matching the target month exactly.
 
     Args:
         analyses: List of analysis dicts with version and date
         target_month: Target month in YYYYMM format (e.g., 202408)
 
     Returns:
-        Version string or None if not found
+        Tuple of (version, date) or None if not found
     """
     target_str = str(target_month)
     target_with_dash = "%s-%s" % (target_str[:4], target_str[4:])
@@ -194,9 +191,31 @@ def find_version_for_month(analyses: list[dict], target_month: int) -> Optional[
         version = a["version"]
         version_normalized = version.replace("-", "")
         if version_normalized == target_str or version == target_with_dash:
-            return version
+            return (version, a["date"])
 
     return None
+
+
+def find_previous_analysis_date(
+    analyses: list[dict], current_date: str
+) -> Optional[str]:
+    """
+    Find the analysis date immediately before the given date.
+
+    Args:
+        analyses: List of analysis dicts with version and date (sorted by date desc)
+        current_date: ISO date string of the current analysis
+
+    Returns:
+        Date string of the previous analysis, or None if none found
+    """
+    sorted_analyses = sorted(analyses, key=lambda x: x["date"])
+    prev_date = None
+    for a in sorted_analyses:
+        if a["date"] >= current_date:
+            break
+        prev_date = a["date"]
+    return prev_date
 
 
 def collect_warnings_for_repo(
@@ -220,14 +239,18 @@ def collect_warnings_for_repo(
         logging.warning("No analyses found for %s", repo_name)
         return []
 
+    sorted_analyses = sorted(analyses, key=lambda x: x["date"])
+    for a in sorted_analyses:
+        logging.info("  %s: version %s", a["date"], a["version"])
+
     all_issues = []
     periods_found = 0
 
     for offset in range(-MAX_PERIODS, MAX_PERIODS + 1):
         target_month = add_months(event_time, offset)
-        version = find_version_for_month(analyses, target_month)
+        analysis_info = find_analysis_for_month(analyses, target_month)
 
-        if version is None:
+        if analysis_info is None:
             logging.debug(
                 "No version for %s at period %+d (month %d)",
                 repo_name,
@@ -236,7 +259,11 @@ def collect_warnings_for_repo(
             )
             continue
 
-        all_version_issues = get_all_issues_for_version(project_key, version)
+        version, analysis_date = analysis_info
+        prev_date = find_previous_analysis_date(analyses, analysis_date)
+        all_version_issues = get_issues_introduced_in_range(
+            project_key, prev_date, analysis_date
+        )
         total_issues = len(all_version_issues)
 
         if total_issues <= sample_size:
@@ -317,8 +344,9 @@ def main() -> None:
         other_cols = [c for c in output_df.columns if c not in key_cols]
         output_df = output_df[key_cols + other_cols]
 
-        definition_cols = ["rule", "type", "severity", "message", "effort"]
-        definitions_df = output_df[definition_cols].drop_duplicates()
+        definition_cols = ["rule", "type", "severity", "effort", "message"]
+        definitions_df = output_df[definition_cols].drop_duplicates(subset="rule")
+        definitions_df = definitions_df.rename(columns={"message": "example_message"})
         definitions_df = definitions_df.sort_values("rule").reset_index(drop=True)
 
         definitions_file = DATA_DIR / "sonarqube_warning_definitions.csv"
