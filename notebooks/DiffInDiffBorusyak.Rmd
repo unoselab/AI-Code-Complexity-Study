@@ -310,6 +310,12 @@ build_setting_variant <- function(data, setting_label) {
         dt <- filter_with_matched_controls(dt, dt$lang_group == "Go")
     } else if (setting_label == "Rust") {
         dt <- filter_with_matched_controls(dt, dt$lang_group == "Rust")
+    } else if (setting_label == "Pre Agent Release") {
+        # Adoption cohort <= 2024-11
+        dt <- filter_with_matched_controls(dt, dt$event <= 202411)
+    } else if (setting_label == "Post Agent Release") {
+        # Adoption cohort >= 2024-12
+        dt <- filter_with_matched_controls(dt, dt$event >= 202412)
     }
     dt
 }
@@ -348,6 +354,8 @@ all_settings <- c(
     "Low Confidence",
     "Cursor and Others",
     "Only Cursor",
+    "Pre Agent Release",
+    "Post Agent Release",
     "JavaScript/TypeScript",
     "Python",
     "Go",
@@ -374,7 +382,8 @@ knitr::kable(stats_df,
     ) %>%
     kableExtra::row_spec(0, bold = TRUE) %>%
     kableExtra::pack_rows("Main Settings", 1, 8) %>%
-    kableExtra::pack_rows("Language-Specific Settings", 9, 12)
+    kableExtra::pack_rows("Adoption Cohort Settings", 9, 10) %>%
+    kableExtra::pack_rows("Language-Specific Settings", 11, 14)
 ```
 
 ## Compare Event Studies Across Settings
@@ -562,6 +571,35 @@ print(plot_other_tools_all)
 
 ggsave("../plots/dynamic_effects_other_tools_all.pdf",
   plot = plot_other_tools_all, width = 16, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+### Adoption Cohort Settings (Pre-Agent vs Post-Agent)
+
+```{r compare_agent_cohort_main, fig.width=11, fig.height=2.5}
+settings_agent_cohort <- c("Orginal", "Pre Agent Release", "Post Agent Release")
+colors_agent_cohort <- c("#000000", "#D55E00", "#0072B2")  # Black, Vermillion, Blue
+
+plot_agent_cohort_main <- create_event_study_plot(
+    settings_agent_cohort, colors_agent_cohort, "Adoption Cohort ",
+    outcomes_main, outcome_labels_main
+)
+print(plot_agent_cohort_main)
+
+ggsave("../plots/dynamic_effects_agent_cohort_main.pdf",
+  plot = plot_agent_cohort_main, width = 11, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+```{r compare_agent_cohort_all, fig.width=16, fig.height=2.5}
+plot_agent_cohort_all <- create_event_study_plot(
+    settings_agent_cohort, colors_agent_cohort, "Adoption Cohort ",
+    outcomes_all, outcome_labels_all
+)
+print(plot_agent_cohort_all)
+
+ggsave("../plots/dynamic_effects_agent_cohort_all.pdf",
+  plot = plot_agent_cohort_all, width = 16, height = 2.5,
   device = CairoPDF, family = "DejaVu Sans")
 ```
 
