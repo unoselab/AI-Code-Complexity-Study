@@ -316,6 +316,9 @@ build_setting_variant <- function(data, setting_label) {
     } else if (setting_label == "Post Agent Release") {
         # Adoption cohort >= 2024-12
         dt <- filter_with_matched_controls(dt, dt$event >= 202412)
+    } else if (setting_label == "Agent Made Default") {
+        # Adoption cohort >= 2025-02
+        dt <- filter_with_matched_controls(dt, dt$event >= 202502)
     }
     dt
 }
@@ -356,6 +359,7 @@ all_settings <- c(
     "Only Cursor",
     "Pre Agent Release",
     "Post Agent Release",
+    "Agent Made Default",
     "JavaScript/TypeScript",
     "Python",
     "Go",
@@ -382,8 +386,8 @@ knitr::kable(stats_df,
     ) %>%
     kableExtra::row_spec(0, bold = TRUE) %>%
     kableExtra::pack_rows("Main Settings", 1, 8) %>%
-    kableExtra::pack_rows("Adoption Cohort Settings", 9, 10) %>%
-    kableExtra::pack_rows("Language-Specific Settings", 11, 14)
+    kableExtra::pack_rows("Adoption Cohort Settings", 9, 11) %>%
+    kableExtra::pack_rows("Language-Specific Settings", 12, 15)
 ```
 
 ## Compare Event Studies Across Settings
@@ -395,16 +399,30 @@ collect_dynamic_results <- function(outcomes, settings) {
     for (s in settings) {
         data_s <- build_setting_variant(panel_data, s)
         for (y in outcomes) {
-            dyn <- didimputation::did_imputation(
-                data = data_s,
-                yname = y,
-                gname = "event",
-                tname = "time",
-                idname = "repo_name",
-                first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
-                horizon = -6:6,
-                pretrends = -6:-2
-            )
+            # Use shorter horizon for "Agent Made Default" due to limited pre-treatment data
+            if (s == "Agent Made Default") {
+                dyn <- didimputation::did_imputation(
+                    data = data_s,
+                    yname = y,
+                    gname = "event",
+                    tname = "time",
+                    idname = "repo_name",
+                    first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+                    horizon = -2:6,
+                    pretrends = NULL  # Skip pretrends due to insufficient pre-treatment data
+                )
+            } else {
+                dyn <- didimputation::did_imputation(
+                    data = data_s,
+                    yname = y,
+                    gname = "event",
+                    tname = "time",
+                    idname = "repo_name",
+                    first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+                    horizon = -6:6,
+                    pretrends = -6:-2
+                )
+            }
             dyn$setting <- s
             dyn$outcome <- y
             results[[length(results) + 1]] <- dyn
@@ -577,8 +595,9 @@ ggsave("../plots/dynamic_effects_other_tools_all.pdf",
 ### Adoption Cohort Settings (Pre-Agent vs Post-Agent)
 
 ```{r compare_agent_cohort_main, fig.width=11, fig.height=2.5}
-settings_agent_cohort <- c("Orginal", "Pre Agent Release", "Post Agent Release")
-colors_agent_cohort <- c("#000000", "#D55E00", "#0072B2")  # Black, Vermillion, Blue
+# Note: "Agent Made Default" uses shorter horizon (-2:6) due to limited pre-treatment data
+settings_agent_cohort <- c("Orginal", "Pre Agent Release", "Post Agent Release", "Agent Made Default")
+colors_agent_cohort <- c("#000000", "#D55E00", "#0072B2", "#009E73")  # Black, Vermillion, Blue, Green
 
 plot_agent_cohort_main <- create_event_study_plot(
     settings_agent_cohort, colors_agent_cohort, "Adoption Cohort ",
@@ -592,6 +611,7 @@ ggsave("../plots/dynamic_effects_agent_cohort_main.pdf",
 ```
 
 ```{r compare_agent_cohort_all, fig.width=16, fig.height=2.5}
+# Uses same settings as above ("Agent Made Default" uses shorter horizon -2:6)
 plot_agent_cohort_all <- create_event_study_plot(
     settings_agent_cohort, colors_agent_cohort, "Adoption Cohort ",
     outcomes_all, outcome_labels_all
