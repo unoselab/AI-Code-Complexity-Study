@@ -310,10 +310,10 @@ build_setting_variant <- function(data, setting_label) {
         dt <- filter_with_matched_controls(dt, dt$lang_group == "Go")
     } else if (setting_label == "Rust") {
         dt <- filter_with_matched_controls(dt, dt$lang_group == "Rust")
-    } else if (setting_label == "Pre Agent Release") {
+    } else if (setting_label == "Before Agent Release") {
         # Adoption cohort <= 2024-11
         dt <- filter_with_matched_controls(dt, dt$event <= 202411)
-    } else if (setting_label == "Post Agent Release") {
+    } else if (setting_label == "After Agent Release") {
         # Adoption cohort >= 2024-12
         dt <- filter_with_matched_controls(dt, dt$event >= 202412)
     } else if (setting_label == "Agent Made Default") {
@@ -357,8 +357,8 @@ all_settings <- c(
     "Low Confidence",
     "Cursor and Others",
     "Only Cursor",
-    "Pre Agent Release",
-    "Post Agent Release",
+    "Before Agent Release",
+    "After Agent Release",
     "Agent Made Default",
     "JavaScript/TypeScript",
     "Python",
@@ -596,7 +596,7 @@ ggsave("../plots/dynamic_effects_other_tools_all.pdf",
 
 ```{r compare_agent_cohort_main, fig.width=11, fig.height=2.5}
 # Note: "Agent Made Default" uses shorter horizon (-2:6) due to limited pre-treatment data
-settings_agent_cohort <- c("Orginal", "Pre Agent Release", "Post Agent Release", "Agent Made Default")
+settings_agent_cohort <- c("Orginal", "Before Agent Release", "After Agent Release", "Agent Made Default")
 colors_agent_cohort <- c("#000000", "#D55E00", "#0072B2", "#009E73")  # Black, Vermillion, Blue, Green
 
 plot_agent_cohort_main <- create_event_study_plot(
