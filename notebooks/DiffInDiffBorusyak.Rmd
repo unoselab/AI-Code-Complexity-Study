@@ -483,23 +483,24 @@ create_event_study_plot <- function(settings, colors, legend_title = "Setting",
             caption = caption_text
         ) +
         guides(color = guide_legend(nrow = 1)) +
-        theme_minimal() +
+        theme_minimal(base_size = 15) +
         theme(
             legend.position = "bottom",
-            plot.caption = element_text(hjust = 0.5, size = 10, margin = margin(t = 3)),
+            plot.caption = element_text(hjust = 0.5, size = 13, margin = margin(t = 3)),
             legend.margin = margin(b = 3),
             legend.box.margin = margin(t = -5),
             panel.grid.major.x = element_blank(),
-            panel.grid.minor.x = element_blank()
+            panel.grid.minor.x = element_blank(),
+            axis.title = element_text(size = 15),
+            axis.text = element_text(size = 13),
+            strip.text = element_text(size = 14),
+            legend.text = element_text(size = 13),
+            legend.title = element_text(size = 14)
         ) +
         facet_wrap(~ outcome_label, scales = "free_y", nrow = nrow)
 
     return(p)
 }
-
-# Define outcome subsets for two-figure layout
-outcomes_main <- c("lines_added",  "quality_warnings", "cognitive_complexity")
-outcome_labels_main <- c("Lines Added", "Static Analysis Warnings", "Code Complexity")
 
 outcomes_all <- outcome_vars
 outcome_labels_all <- outcome_names
@@ -507,22 +508,10 @@ outcome_labels_all <- outcome_names
 
 ### Activity Settings
 
-```{r compare_activity_main, fig.width=11, fig.height=2.5}
+```{r compare_activity_all, fig.width=16, fig.height=2.5}
 settings_activity <- c("Orginal", "Active Months (>0 commits)", "Very Active (>=10 commits)")
 colors_activity <- c("#000000", "#56B4E9", "#009E73")  # Black, Sky blue, Green
 
-plot_activity_main <- create_event_study_plot(
-    settings_activity, colors_activity, "Activity Level ",
-    outcomes_main, outcome_labels_main
-)
-print(plot_activity_main)
-
-ggsave("../plots/dynamic_effects_activity_main.pdf",
-  plot = plot_activity_main, width = 11, height = 2.5,
-  device = CairoPDF, family = "DejaVu Sans")
-```
-
-```{r compare_activity_all, fig.width=16, fig.height=2.5}
 plot_activity_all <- create_event_study_plot(
     settings_activity, colors_activity, "Activity Level ",
     outcomes_all, outcome_labels_all
@@ -536,22 +525,10 @@ ggsave("../plots/dynamic_effects_activity_all.pdf",
 
 ### Confidence Settings
 
-```{r compare_confidence_main, fig.width=11, fig.height=2.5}
+```{r compare_confidence_all, fig.width=16, fig.height=2.5}
 settings_confidence <- c("Orginal", "High Contributor Adoption", "Cursor Configuration Changes")
 colors_confidence <- c("#000000", "#0072B2", "#E69F00")
 
-plot_confidence_main <- create_event_study_plot(
-    settings_confidence, colors_confidence, "Adoption Confidence ",
-    outcomes_main, outcome_labels_main
-)
-print(plot_confidence_main)
-
-ggsave("../plots/dynamic_effects_confidence_main.pdf",
-  plot = plot_confidence_main, width = 11, height = 2.5,
-  device = CairoPDF, family = "DejaVu Sans")
-```
-
-```{r compare_confidence_all, fig.width=16, fig.height=2.5}
 plot_confidence_all <- create_event_study_plot(
     settings_confidence, colors_confidence, "Adoption Confidence ",
     outcomes_all, outcome_labels_all
@@ -565,22 +542,10 @@ ggsave("../plots/dynamic_effects_confidence_all.pdf",
 
 ### Other Tools Settings
 
-```{r compare_other_tools_main, fig.width=11, fig.height=2.5}
+```{r compare_other_tools_all, fig.width=16, fig.height=2.5}
 settings_other_tools <- c("Orginal", "Cursor and Others", "Only Cursor")
 colors_other_tools <- c("#000000", "#CC79A7", "#999999")  # Black, Pink, Grey
 
-plot_other_tools_main <- create_event_study_plot(
-    settings_other_tools, colors_other_tools, "Other AI Tools ",
-    outcomes_main, outcome_labels_main
-)
-print(plot_other_tools_main)
-
-ggsave("../plots/dynamic_effects_other_tools_main.pdf",
-  plot = plot_other_tools_main, width = 11, height = 2.5,
-  device = CairoPDF, family = "DejaVu Sans")
-```
-
-```{r compare_other_tools_all, fig.width=16, fig.height=2.5}
 plot_other_tools_all <- create_event_study_plot(
     settings_other_tools, colors_other_tools, "Other AI Tools ",
     outcomes_all, outcome_labels_all
@@ -594,24 +559,11 @@ ggsave("../plots/dynamic_effects_other_tools_all.pdf",
 
 ### Adoption Cohort Settings (Pre-Agent vs Post-Agent)
 
-```{r compare_agent_cohort_main, fig.width=11, fig.height=2.5}
+```{r compare_agent_cohort_all, fig.width=16, fig.height=2.5}
 # Note: "Agent Made Default" uses shorter horizon (-2:6) due to limited pre-treatment data
 settings_agent_cohort <- c("Orginal", "Before Agent Release", "After Agent Release", "Agent Made Default")
 colors_agent_cohort <- c("#000000", "#D55E00", "#0072B2", "#009E73")  # Black, Vermillion, Blue, Green
 
-plot_agent_cohort_main <- create_event_study_plot(
-    settings_agent_cohort, colors_agent_cohort, "Adoption Cohort ",
-    outcomes_main, outcome_labels_main
-)
-print(plot_agent_cohort_main)
-
-ggsave("../plots/dynamic_effects_agent_cohort_main.pdf",
-  plot = plot_agent_cohort_main, width = 11, height = 2.5,
-  device = CairoPDF, family = "DejaVu Sans")
-```
-
-```{r compare_agent_cohort_all, fig.width=16, fig.height=2.5}
-# Uses same settings as above ("Agent Made Default" uses shorter horizon -2:6)
 plot_agent_cohort_all <- create_event_study_plot(
     settings_agent_cohort, colors_agent_cohort, "Adoption Cohort ",
     outcomes_all, outcome_labels_all
