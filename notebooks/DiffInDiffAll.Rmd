@@ -303,7 +303,7 @@ kable(static_table_wide,
 
 ## Dynamic Treatment Effects (Event Study) Comparison
 
-```{r dynamic_effects, fig.width=16, fig.height=2.5}
+```{r dynamic_effects, fig.width=16, fig.height=2.7}
 # Extract dynamic effects from each method
 extract_dynamic_effects <- function(results, method_name, variables = NULL) {
     effects_list <- list()
@@ -457,20 +457,25 @@ dynamic_plot <- ggplot(dynamic_effects, aes(x = time, y = estimate, color = meth
         color = "Estimator",
         caption = "Filled dots: p < 0.05 (significant), Hollow dots: p ≥ 0.05 (non-significant)"
     ) +
-    theme_minimal() +
+    theme_minimal(base_size = 15) +
     theme(
         legend.position = "bottom",
-        plot.caption = element_text(hjust = 0.5, size = 10, margin = margin(t = 3)),
+        plot.caption = element_text(hjust = 0.5, size = 13, margin = margin(t = 3)),
         legend.margin = margin(b = 3),
         legend.box.margin = margin(t = -5),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()
+        panel.grid.minor.x = element_blank(),
+        axis.title = element_text(size = 15),
+        axis.text = element_text(size = 13),
+        strip.text = element_text(size = 14),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 14)
     )
 
 print(dynamic_plot)
 
 ggsave("../plots/dynamic_effects.pdf",
-  plot = dynamic_plot, width = 16, height = 2.5,
+  plot = dynamic_plot, width = 16, height = 2.7,
   device = CairoPDF, family = "DejaVu Sans")
 ```
 
