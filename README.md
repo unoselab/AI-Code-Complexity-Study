@@ -4,7 +4,7 @@ This repository contains the replication package for the following paper:
 
 > Hao He, Courtney Miller, Shyam Agarwal, Christian Kästner, and Bogdan Vasilescu. 2026. Speed at the Cost of Quality: How Cursor AI Increases Short-Term Velocity and Long-Term Complexity in Open-Source Projects. In 23rd International Conference on Mining Software Repositories (MSR ’26), April 13–14, 2026, Rio de Janeiro, Brazil. ACM, New York, NY, USA, 19 pages. https://doi.org/10.1145/3793302.3793349
 
-The additional `.gitignore`d files are available on Zenodo: 10.5281/zenodo.18368662
+The additional `.gitignore`d files are available on Zenodo: [10.5281/zenodo.18368661](https://doi.org/10.5281/zenodo.18368661)
 
 ## Organization
 
