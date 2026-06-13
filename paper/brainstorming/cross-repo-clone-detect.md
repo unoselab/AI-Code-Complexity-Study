@@ -32,16 +32,16 @@ The matching process can be organized as a cost-aware, multi-stage pipeline.
 
 First, identify broadly similar candidate controls using pre-adoption repository metadata and activity history, such as:
 
-* repository age
-* active users
-* stars
-* forks
-* releases
-* pull requests
-* issues
-* comments
-* total GitHub events
-* primary programming language
+-   repository age
+-   active users
+-   stars
+-   forks
+-   releases
+-   pull requests
+-   issues
+-   comments
+-   total GitHub events
+-   primary programming language
 
 This stage captures whether repositories had similar popularity, maturity, and development trajectories before treatment.
 
@@ -49,15 +49,15 @@ This stage captures whether repositories had similar popularity, maturity, and d
 
 Second, refine the candidate controls using inexpensive pre-adoption code metrics, such as:
 
-* lines of code
-* number of source files
-* number of directories
-* average file size
-* code complexity
-* static-analysis warning density
-* test file ratio
-* dependency count
-* language composition
+-   lines of code
+-   number of source files
+-   number of directories
+-   average file size
+-   code complexity
+-   static-analysis warning density
+-   test file ratio
+-   dependency count
+-   language composition
 
 This stage helps ensure that candidate controls are not only socially and operationally similar, but also similar in codebase size and quality state.
 
@@ -78,14 +78,14 @@ For each treated repository (A) and candidate control repository (A'):
 
 To reduce computational cost, clone detection does not need to be run on the entire repository. Instead, we can select important files using deterministic pre-adoption criteria, such as:
 
-* most frequently changed files
-* files with highest pre-adoption churn
-* largest source files
-* most complex files
-* files central in the import or dependency graph
-* main entry-point files
-* core API, service, router, model, or controller files
-* important test files, if test similarity is relevant
+-   most frequently changed files
+-   files with highest pre-adoption churn
+-   largest source files
+-   most complex files
+-   files central in the import or dependency graph
+-   main entry-point files
+-   core API, service, router, model, or controller files
+-   important test files, if test similarity is relevant
 
 This makes the method more scalable than whole-repository clone detection.
 
@@ -93,19 +93,11 @@ This makes the method more scalable than whole-repository clone detection.
 
 A simple score is the proportion of clone classes that contain instances from both repositories:
 
-[
-\text{Mixed Clone Class Ratio} =
-\frac{# \text{clone classes containing instances from both repos}}
-{# \text{all clone classes}}
-]
+$$\text{Mixed Clone Class Ratio} = \frac{\# \text{ clone classes containing instances from both repos}}{\# \text{ all clone classes}}$$
 
 However, a more robust score should account for clone size and repository size:
 
-[
-\text{Shared Clone Coverage} =
-\frac{2 \times \text{shared cloned LOC}}
-{\text{selected LOC in treated repo} + \text{selected LOC in control repo}}
-]
+$$\text{Shared Clone Coverage} = \frac{2 \times \text{shared cloned LOC}}{\text{selected LOC in treated repo} + \text{selected LOC in control repo}}$$
 
 The intuition is:
 
@@ -127,13 +119,13 @@ For example, for each treated repository, we may first reduce thousands of possi
 
 Several risks should be addressed:
 
-* Shared boilerplate may inflate similarity.
-* Generated, vendored, minified, build, and dependency files should be excluded.
-* Template-derived repositories may appear highly similar but may not be good independent controls.
-* Very high similarity may indicate forks, mirrors, or copied projects.
-* Test code and production code should possibly be analyzed separately.
-* Language-specific clone detection issues should be considered.
-* All clone similarity metrics must be computed only using pre-adoption snapshots.
+-   Shared boilerplate may inflate similarity.
+-   Generated, vendored, minified, build, and dependency files should be excluded.
+-   Template-derived repositories may appear highly similar but may not be good independent controls.
+-   Very high similarity may indicate forks, mirrors, or copied projects.
+-   Test code and production code should possibly be analyzed separately.
+-   Language-specific clone detection issues should be considered.
+-   All clone similarity metrics must be computed only using pre-adoption snapshots.
 
 ### Suggested Use in Research Design
 
