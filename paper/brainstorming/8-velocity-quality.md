@@ -535,3 +535,376 @@ $$
 
 5. Table 3에는 $\rho$가 생략되어 있어서, 독자가 직접 계산하기는 어렵습니다.
 6. 따라서 이 문단은 방향성은 이해 가능하지만, percentage conversion은 더 명시적으로 설명했어야 합니다.
+
+
+
+---
+---
+---
+---
+---
+---
+---
+
+좋습니다. 이 설명은 핵심적으로 이렇게 말합니다:
+
+> **처음에는 64.5%와 50.3%가 long-run elasticity에서 나온다고 생각했지만, 실제 코드를 돌려보니 그 설명은 틀렸다.**
+> **Table 3의 계수와 논문 본문의 percentage 숫자가 서로 잘 맞지 않는다.**
+
+쉽게 단계별로 보겠습니다.
+
+---
+
+## 1. 먼저 Table 3의 실제 계수는 맞게 재현됨
+
+Table 3의 마지막 두 모델은 이것입니다.
+
+| Path                           | Table 3 coefficient |
+| ------------------------------ | ------------------: |
+| $C_{it} \rightarrow L_{i,t+1}$ |            $-0.718$ |
+| $W_{it} \rightarrow L_{i,t+1}$ |            $-0.588$ |
+
+여기서:
+
+* $C$ = Code Complexity
+* $W$ = Static Analysis Warnings
+* $L$ = Lines Added
+
+즉 Table 3은:
+
+> complexity와 warnings가 높으면 다음 달 lines added가 감소한다
+
+는 결과를 보여줍니다. 
+
+제공하신 설명에서는 실제 R 모델을 다시 돌려도 이 값들이 거의 그대로 나왔다고 합니다.
+
+* complexity model: $\gamma = -0.7185$
+* warnings model: $\gamma = -0.5880$
+
+즉 **Table 3 자체는 데이터와 코드로 재현됨**입니다.
+
+---
+
+## 2. 문제는 논문 본문의 64.5%, 50.3%
+
+논문 본문은 이렇게 말합니다.
+
+> complexity가 100% 증가하면 lines added가 64.5% 감소
+> warnings가 100% 증가하면 lines added가 50.3% 감소
+
+하지만 Table 3 계수를 보통 방식으로 바꾸면 이 숫자가 안 나옵니다.
+
+### Complexity
+
+$$
+1 - e^{-0.718}
+$$
+
+$$
+= 1 - 0.488
+$$
+
+$$
+= 0.512
+$$
+
+즉:
+
+$$
+51.2%
+$$
+
+입니다.
+
+64.5%가 아닙니다.
+
+### Warnings
+
+$$
+1 - e^{-0.588}
+$$
+
+$$
+= 1 - 0.555
+$$
+
+$$
+= 0.445
+$$
+
+즉:
+
+$$
+44.5%
+$$
+
+입니다.
+
+50.3%가 아닙니다.
+
+그래서 결론:
+
+> Table 3의 visible coefficient를 단순 변환하면 논문 본문의 64.5%, 50.3%가 나오지 않는다.
+
+---
+
+## 3. 이전 가설: long-run effect일 수도 있다
+
+처음에는 이렇게 생각할 수 있었습니다.
+
+Equation 6에는 lagged outcome이 있습니다.
+
+$$
+\rho Y_{i,t-1}
+$$
+
+그래서 short-run effect가 아니라 long-run effect를 썼을 수도 있습니다.
+
+long-run effect 공식은 보통:
+
+$$
+\frac{\gamma}{1-\rho}
+$$
+
+입니다.
+
+즉:
+
+> Table 3의 $\gamma$를 그대로 쓰지 않고, 지난달 outcome persistence $\rho$까지 고려했을 수 있다.
+
+이 설명이 맞으려면 $\rho$가 꽤 커야 했습니다.
+
+64.5%가 나오려면 complexity 쪽 long-run coefficient가 약:
+
+$$
+-1.036
+$$
+
+이어야 합니다.
+
+그래서:
+
+$$
+\frac{-0.718}{1-\rho} = -1.036
+$$
+
+가 되어야 하고, 이 경우 $\rho \approx 0.31$ 정도가 필요합니다.
+
+---
+
+## 4. 그런데 실제 $\rho$는 약 0.10이었다
+
+제공하신 설명에 따르면 실제 R 모델을 돌려보니:
+
+| Model            |       $\rho$ |
+| ---------------- | -----------: |
+| complexity model | about 0.0999 |
+| warnings model   | about 0.1011 |
+
+즉 $\rho$가 약 0.10입니다.
+
+생각보다 작습니다.
+
+그래서 long-run effect를 계산해도:
+
+### Complexity
+
+$$
+\frac{-0.718}{1-0.10}
+$$
+
+$$
+\approx -0.798
+$$
+
+이를 percentage로 바꾸면:
+
+$$
+1 - e^{-0.798}
+$$
+
+$$
+\approx 55.0%
+$$
+
+### Warnings
+
+$$
+\frac{-0.588}{1-0.10}
+$$
+
+$$
+\approx -0.654
+$$
+
+이를 percentage로 바꾸면:
+
+$$
+1 - e^{-0.654}
+$$
+
+$$
+\approx 48.0%
+$$
+
+여전히 논문의 64.5%, 50.3%와 맞지 않습니다.
+
+---
+
+## 5. 그래서 이전 long-run explanation은 틀림
+
+정리하면:
+
+| Method                                 | Complexity decrease | Warnings decrease |
+| -------------------------------------- | ------------------: | ----------------: |
+| Short-run coefficient                  |               51.2% |             44.5% |
+| Long-run with real $\rho \approx 0.10$ |               55.0% |             48.0% |
+| Paper prose                            |               64.5% |             50.3% |
+
+즉:
+
+> 실제 모델의 short-run effect도 아니고, 실제 $\rho$를 반영한 long-run effect도 아니다.
+
+그래서 제공하신 설명은 이렇게 말하는 것입니다.
+
+> 내가 처음에 추측했던 “long-run elasticity 때문에 64.5%가 나온다”는 설명은 실제 모델을 돌려보니 틀렸다.
+
+이건 매우 중요한 correction입니다.
+
+---
+
+## 6. 그럼 64.5%, 50.3%는 어디서 온 것 같나?
+
+제공하신 설명의 결론은:
+
+> 아마 논문 본문 숫자가 이전 모델이나 이전 데이터 버전에서 온 것일 수 있다.
+> 또는 단순 계산 실수일 수 있다.
+
+왜냐하면 64.5%가 나오려면 coefficient가 대략:
+
+$$
+-1.04
+$$
+
+이어야 합니다.
+
+50.3%가 나오려면 coefficient가 대략:
+
+$$
+-0.70
+$$
+
+이어야 합니다.
+
+그런데 실제 Table 3과 재현 모델에서는:
+
+$$
+-0.718,\quad -0.588
+$$
+
+입니다.
+
+즉 본문 숫자와 표 숫자가 서로 다른 모델을 보고 있는 것처럼 보입니다.
+
+---
+
+## 7. 그래도 qualitative conclusion은 유지됨
+
+중요한 점은 이것입니다.
+
+숫자 64.5%, 50.3%는 의심스럽지만, 방향 자체는 여전히 같습니다.
+
+Table 3의 계수는 둘 다 음수입니다.
+
+| Path                           | Coefficient | Meaning                               |
+| ------------------------------ | ----------: | ------------------------------------- |
+| $C_{it} \rightarrow L_{i,t+1}$ |    negative | complexity가 높으면 future lines added 감소 |
+| $W_{it} \rightarrow L_{i,t+1}$ |    negative | warnings가 많으면 future lines added 감소   |
+
+즉 강한 결론은 여전히:
+
+> technical debt가 미래 개발 속도를 낮춘다
+
+입니다.
+
+하지만 정확한 percentage로는:
+
+> 64.5%, 50.3%라고 단정하기 어렵다
+
+입니다.
+
+---
+
+## 8. cancellation multiplier도 다시 봐야 함
+
+논문은 또 이렇게 말합니다.
+
+> Cursor velocity gain은 complexity 약 3x 증가 또는 warnings 약 5x 증가로 상쇄될 수 있다.
+
+제공하신 설명에 따르면, 3x와 5x는 논문 본문의 64.5%, 50.3% 숫자와는 내부적으로 맞습니다.
+
+하지만 실제 coefficient로 다시 계산하면 조금 달라집니다.
+
+실제 long-run values를 쓰면:
+
+* complexity: 약 $-0.798$
+* warnings: 약 $-0.654$
+
+Cursor gain은 약:
+
+$$
+1.044
+$$
+
+그러면 cancellation point는 대략:
+
+### Complexity
+
+$$
+e^{1.044/0.798}
+$$
+
+$$
+\approx 3.7x
+$$
+
+### Warnings
+
+$$
+e^{1.044/0.654}
+$$
+
+$$
+\approx 5.0x
+$$
+
+즉 실제 모델 기준으로는:
+
+| Variable                | Paper prose | Based on reproduced model |
+| ----------------------- | ----------: | ------------------------: |
+| Complexity cancellation |   $\sim 3x$ |     closer to $\sim 3.7x$ |
+| Warnings cancellation   |   $\sim 5x$ |     closer to $\sim 5.0x$ |
+
+Warnings 쪽은 거의 맞지만, complexity 쪽은 차이가 있습니다.
+
+---
+
+## 9. 아주 쉽게 한 문장으로
+
+이 설명의 핵심은:
+
+> Table 3의 회귀계수는 재현되지만, 논문 본문에 적힌 64.5%와 50.3%는 그 계수에서 표준적인 방식으로 계산되지 않는다. 따라서 방향성은 맞지만, 본문의 구체적인 percentage 숫자는 이전 버전의 결과가 남았거나 계산 실수일 가능성이 있다.
+
+---
+
+## 10. 우리가 지금 이해해야 할 최종 버전
+
+가장 안전한 해석은 이렇게 하면 됩니다.
+
+> Table 3은 complexity와 warnings가 future lines added를 감소시킨다는 evidence를 제공한다. 하지만 본문에 제시된 “64.5%”와 “50.3%” 감소율은 Table 3의 최종 계수와 replication result로부터 직접 재현되지 않는다. 따라서 이 percentage 값들은 조심해서 해석해야 하며, 저자에게 계산 방식 또는 버전 불일치 여부를 확인할 필요가 있다.
+
+쉽게 말하면:
+
+> **방향은 믿을 수 있다: technical debt가 future velocity를 낮춘다.**
+> **하지만 정확한 숫자 64.5%, 50.3%는 paper 안에서 투명하게 설명되지 않고, 최종 Table 3과 잘 안 맞는다.**
+
