@@ -186,6 +186,55 @@ for (var in outcome_vars) {
 }
 ```
 
+
+```{r reproduce_check}
+# log(x+1) 계수 -> % 변화로 환산
+pct <- function(b) (exp(b) - 1) * 100
+
+# 안전하게 한 term의 estimate/CI 꺼내는 헬퍼
+grab <- function(df, trm) {
+  i <- which(df$term == as.character(trm))
+  if (length(i) == 0) return(c(est = NA, lo = NA, hi = NA))
+  c(est = df$estimate[i], lo = df$conf.low[i], hi = df$conf.high[i])
+}
+
+# 논문에 적힌 값 (md 9-task1 기준). 비교용 참고열.
+paper <- data.frame(
+  outcome    = outcome_vars,
+  paper_avg  = c(NA,    NA,    30.3,  NA,   41.6),   # 전체 평균 %
+  paper_m1   = c(55.4,  281.3, NA,    NA,   NA),     # 도입 첫 달 %
+  paper_m2   = c(14.5,  48.4,  NA,    NA,   NA)      # 둘째 달 %
+)
+
+# (A) 전체 평균 효과 = static "treat" 계수
+compare <- data.frame(
+  Outcome   = outcome_names,
+  my_avg_pct = round(sapply(outcome_vars, function(v)
+                  pct(grab(static_results[[v]], "treat")["est"])), 1),
+  my_m0_pct  = round(sapply(outcome_vars, function(v)
+                  pct(grab(dynamic_results[[v]], 0)["est"])), 1),   # 도입한 달 (h=0)
+  my_m1_pct  = round(sapply(outcome_vars, function(v)
+                  pct(grab(dynamic_results[[v]], 1)["est"])), 1),   # 그 다음 달 (h=1)
+  paper_avg = paper$paper_avg,
+  paper_m1  = paper$paper_m1,
+  paper_m2  = paper$paper_m2
+)
+knitr::kable(compare, caption = "내 재현값(%) vs 논문값(%) — exp(b)-1로 환산")
+
+# (B) Pre-trend 점검: 도입 전(-6~-2)은 0 근처여야 함 (CI가 0 포함하면 OK)
+cat("\n=== Pre-trend (도입 전, 0이어야 정상) ===\n")
+for (v in outcome_vars) {
+  cat("\n", v, ":\n", sep = "")
+  for (h in -6:-2) {
+    g <- grab(dynamic_results[[v]], h)
+    ok <- if (is.na(g["lo"])) "?" else if (g["lo"] <= 0 & g["hi"] >= 0) "OK(0포함)" else "!! 0배제"
+    cat(sprintf("  h=%d  est=% .3f  CI[% .3f, % .3f]  %s\n",
+                h, g["est"], g["lo"], g["hi"], ok))
+  }
+}
+```
+
+
 ```{r event_study, fig.width=11, fig.height=2.5}
 # Prepare data for all outcomes in a single faceted plot
 event_study_data <- list()

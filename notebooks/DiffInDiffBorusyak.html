@@ -859,6 +859,163 @@ for (var in outcome_vars) {
 ## Running dynamic analysis for: quality_warnings 
 ## Running dynamic analysis for: duplicated_lines_density 
 ## Running dynamic analysis for: cognitive_complexity</code></pre>
+<pre class="r"><code># log(x+1) 계수 -&gt; % 변화로 환산
+pct &lt;- function(b) (exp(b) - 1) * 100
+
+# 안전하게 한 term의 estimate/CI 꺼내는 헬퍼
+grab &lt;- function(df, trm) {
+  i &lt;- which(df$term == as.character(trm))
+  if (length(i) == 0) return(c(est = NA, lo = NA, hi = NA))
+  c(est = df$estimate[i], lo = df$conf.low[i], hi = df$conf.high[i])
+}
+
+# 논문에 적힌 값 (md 9-task1 기준). 비교용 참고열.
+paper &lt;- data.frame(
+  outcome    = outcome_vars,
+  paper_avg  = c(NA,    NA,    30.3,  NA,   41.6),   # 전체 평균 %
+  paper_m1   = c(55.4,  281.3, NA,    NA,   NA),     # 도입 첫 달 %
+  paper_m2   = c(14.5,  48.4,  NA,    NA,   NA)      # 둘째 달 %
+)
+
+# (A) 전체 평균 효과 = static &quot;treat&quot; 계수
+compare &lt;- data.frame(
+  Outcome   = outcome_names,
+  my_avg_pct = round(sapply(outcome_vars, function(v)
+                  pct(grab(static_results[[v]], &quot;treat&quot;)[&quot;est&quot;])), 1),
+  my_m0_pct  = round(sapply(outcome_vars, function(v)
+                  pct(grab(dynamic_results[[v]], 0)[&quot;est&quot;])), 1),   # 도입한 달 (h=0)
+  my_m1_pct  = round(sapply(outcome_vars, function(v)
+                  pct(grab(dynamic_results[[v]], 1)[&quot;est&quot;])), 1),   # 그 다음 달 (h=1)
+  paper_avg = paper$paper_avg,
+  paper_m1  = paper$paper_m1,
+  paper_m2  = paper$paper_m2
+)
+knitr::kable(compare, caption = &quot;내 재현값(%) vs 논문값(%) — exp(b)-1로 환산&quot;)</code></pre>
+<table>
+<caption>내 재현값(%) vs 논문값(%) — exp(b)-1로 환산</caption>
+<colgroup>
+<col width="25%" />
+<col width="22%" />
+<col width="9%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="7%" />
+<col width="7%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Outcome</th>
+<th align="right">my_avg_pct</th>
+<th align="right">my_m0_pct</th>
+<th align="right">my_m1_pct</th>
+<th align="right">paper_avg</th>
+<th align="right">paper_m1</th>
+<th align="right">paper_m2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">commits.est</td>
+<td align="left">Commits</td>
+<td align="right">2.6</td>
+<td align="right">55.4</td>
+<td align="right">13.8</td>
+<td align="right">NA</td>
+<td align="right">55.4</td>
+<td align="right">14.5</td>
+</tr>
+<tr class="even">
+<td align="left">lines_added.est</td>
+<td align="left">Lines Added</td>
+<td align="right">28.6</td>
+<td align="right">284.7</td>
+<td align="right">49.1</td>
+<td align="right">NA</td>
+<td align="right">281.3</td>
+<td align="right">48.4</td>
+</tr>
+<tr class="odd">
+<td align="left">quality_warnings.est</td>
+<td align="left">Static Analysis Warnings</td>
+<td align="right">30.3</td>
+<td align="right">28.0</td>
+<td align="right">33.3</td>
+<td align="right">30.3</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">duplicated_lines_density.est</td>
+<td align="left">Duplicated Lines Density</td>
+<td align="right">7.0</td>
+<td align="right">5.9</td>
+<td align="right">4.0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">cognitive_complexity.est</td>
+<td align="left">Code Complexity</td>
+<td align="right">41.6</td>
+<td align="right">39.1</td>
+<td align="right">39.1</td>
+<td align="right">41.6</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># (B) Pre-trend 점검: 도입 전(-6~-2)은 0 근처여야 함 (CI가 0 포함하면 OK)
+cat(&quot;\n=== Pre-trend (도입 전, 0이어야 정상) ===\n&quot;)</code></pre>
+<pre><code>## 
+## === Pre-trend (도입 전, 0이어야 정상) ===</code></pre>
+<pre class="r"><code>for (v in outcome_vars) {
+  cat(&quot;\n&quot;, v, &quot;:\n&quot;, sep = &quot;&quot;)
+  for (h in -6:-2) {
+    g &lt;- grab(dynamic_results[[v]], h)
+    ok &lt;- if (is.na(g[&quot;lo&quot;])) &quot;?&quot; else if (g[&quot;lo&quot;] &lt;= 0 &amp; g[&quot;hi&quot;] &gt;= 0) &quot;OK(0포함)&quot; else &quot;!! 0배제&quot;
+    cat(sprintf(&quot;  h=%d  est=% .3f  CI[% .3f, % .3f]  %s\n&quot;,
+                h, g[&quot;est&quot;], g[&quot;lo&quot;], g[&quot;hi&quot;], ok))
+  }
+}</code></pre>
+<pre><code>## 
+## commits:
+##   h=-6  est=-0.104  CI[-0.304,  0.097]  OK(0포함)
+##   h=-5  est=-0.059  CI[-0.262,  0.144]  OK(0포함)
+##   h=-4  est= 0.049  CI[-0.141,  0.238]  OK(0포함)
+##   h=-3  est= 0.032  CI[-0.170,  0.234]  OK(0포함)
+##   h=-2  est=-0.072  CI[-0.187,  0.043]  OK(0포함)
+## 
+## lines_added:
+##   h=-6  est=-0.373  CI[-0.902,  0.156]  OK(0포함)
+##   h=-5  est=-0.234  CI[-0.774,  0.307]  OK(0포함)
+##   h=-4  est= 0.498  CI[-0.067,  1.062]  OK(0포함)
+##   h=-3  est= 0.221  CI[-0.256,  0.699]  OK(0포함)
+##   h=-2  est=-0.132  CI[-0.420,  0.156]  OK(0포함)
+## 
+## quality_warnings:
+##   h=-6  est=-0.057  CI[-0.151,  0.036]  OK(0포함)
+##   h=-5  est= 0.001  CI[-0.089,  0.090]  OK(0포함)
+##   h=-4  est=-0.054  CI[-0.205,  0.098]  OK(0포함)
+##   h=-3  est=-0.059  CI[-0.220,  0.101]  OK(0포함)
+##   h=-2  est= 0.042  CI[-0.031,  0.115]  OK(0포함)
+## 
+## duplicated_lines_density:
+##   h=-6  est=-0.051  CI[-0.166,  0.063]  OK(0포함)
+##   h=-5  est=-0.059  CI[-0.168,  0.051]  OK(0포함)
+##   h=-4  est=-0.075  CI[-0.217,  0.066]  OK(0포함)
+##   h=-3  est= 0.100  CI[-0.029,  0.229]  OK(0포함)
+##   h=-2  est= 0.027  CI[-0.039,  0.092]  OK(0포함)
+## 
+## cognitive_complexity:
+##   h=-6  est=-0.066  CI[-0.169,  0.036]  OK(0포함)
+##   h=-5  est=-0.006  CI[-0.106,  0.095]  OK(0포함)
+##   h=-4  est=-0.101  CI[-0.260,  0.058]  OK(0포함)
+##   h=-3  est=-0.036  CI[-0.221,  0.148]  OK(0포함)
+##   h=-2  est= 0.015  CI[-0.070,  0.099]  OK(0포함)</code></pre>
 <pre class="r"><code># Prepare data for all outcomes in a single faceted plot
 event_study_data &lt;- list()
 for (i in seq_along(outcome_vars)) {
