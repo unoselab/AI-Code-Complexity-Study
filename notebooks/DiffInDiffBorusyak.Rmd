@@ -219,16 +219,16 @@ compare <- data.frame(
   paper_m1  = paper$paper_m1,
   paper_m2  = paper$paper_m2
 )
-knitr::kable(compare, caption = "내 재현값(%) vs 논문값(%) — exp(b)-1로 환산")
+knitr::kable(compare, caption = "My reproduced values (%) vs. paper values (%) — converted using exp(b)-1")
 
 # (B) Pre-trend check: pre-adoption periods (-6 to -2) should be close to 0
 # It is OK if the CI includes 0.
-cat("\n=== Pre-trend (도입 전, 0이어야 정상) ===\n")
+cat("\n=== Pre-trend check: pre-adoption estimates should be 0 ===\n")
 for (v in outcome_vars) {
   cat("\n", v, ":\n", sep = "")
   for (h in -6:-2) {
     g <- grab(dynamic_results[[v]], h)
-    ok <- if (is.na(g["lo"])) "?" else if (g["lo"] <= 0 & g["hi"] >= 0) "OK(0포함)" else "!! 0배제"
+    ok <- if (is.na(g["lo"])) "?" else if (g["lo"] <= 0 & g["hi"] >= 0) "OK: includes 0" else "!! excludes 0"
     cat(sprintf("  h=%d  est=% .3f  CI[% .3f, % .3f]  %s\n",
                 h, g["est"], g["lo"], g["hi"], ok))
   }
