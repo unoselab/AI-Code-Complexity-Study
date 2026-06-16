@@ -155,7 +155,7 @@ plot_poster_single <- function(outcome_var, outcome_name, y_label, y_limits = NU
     p <- ggplot(df, aes(x = time, y = pct_change)) +
         geom_hline(yintercept = 0, linetype = "solid", color = line_color, linewidth = 0.6) +
         geom_vline(xintercept = -0.5, linetype = "dashed", color = line_color, linewidth = 0.9) +
-        with_shadow(geom_ribbon(aes(ymin = pct_low, ymax = pct_high), fill = line_color),
+        with_shadow(geom_ribbon(aes(ymin = pct_low, ymax = pct_high), fill = line_color, alpha = 0.3),
                     sigma = 2, x_offset = 1, y_offset = 1, color = "black") +
         with_shadow(geom_line(linewidth = 1.8, color = line_color),
                     sigma = 2, x_offset = 1, y_offset = 1, color = "black") +
@@ -171,7 +171,7 @@ plot_poster_single <- function(outcome_var, outcome_name, y_label, y_limits = NU
             axis.line = element_line(color = text_color, linewidth = 0.6),
             axis.ticks = element_line(color = text_color, linewidth = 0.5),
             panel.grid.minor = element_blank(),
-            panel.grid.major = element_line(color = grid_color, linewidth = 0.25),
+            panel.grid.major = element_line(color = grid_color, linewidth = 0.25, alpha = 0.25),
             plot.margin = margin(15, 15, 15, 15),
             panel.background = element_rect(fill = "transparent", colour = NA),
             plot.background = element_rect(fill = "transparent", colour = NA)
