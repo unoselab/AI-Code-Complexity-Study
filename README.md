@@ -1,484 +1,92 @@
-# How Cursor AI Increases Short-Term Velocity and Long-Term Complexity in Open-Source Projects
+# A STUDY OF VELOCITY, COMPLEXITY, QUALITY, AND PRODUCTIVITY IN AI GENERATED CODE 
 
-Replication package
-
-> MSR '26 https://doi.org/10.1145/3793302.3793349, https://doi.org/10.5281/zenodo.18368661
+This repository contains a new empirical software engineering study on **AI-assisted software development, code velocity, code complexity, and long-term maintainability**.
 
 ---
 
-## Current reproduction status
+## Project goal
 
-This has been updated to reflect the Phase 1 reproduction completed on the Ubuntu server using the existing `data/` directory.
-
-Phase 1 means:
+Research direction:
 
 ```text
-Use the already prepared data files in data/
-Render the R Markdown notebooks in notebooks/
-Reproduce the main paper tables, figures, and robustness outputs
-Do not rerun live data collection yet
+How do AI coding assistants affect short-term development velocity,
+code complexity, static analysis warnings, and longer-term maintainability
+in open-source software projects?
 ```
 
-Current status:
+---
+
+## Current status
+
+Current checkpoint:
 
 ```text
-Environment setup:                         done
-R 4.3.3 installed:                          done
-Python 3.11.4 available:                    done
-Core R packages installed:                  done
-Plot/table R packages installed:            done
-
-DataCollection.Rmd rendered:                done
-PropensityScoreMatching.Rmd rendered:       done
-DiffInDiffBorusyak.Rmd rendered:            done
-Figure 3 PDF created:                       done
-DynamicPanel.Rmd rendered:                  done
-Table 3 reproduced:                         done
-
-DiffInDiffAll.Rmd rendered:                 done
-DiffInDiffTWFE.Rmd rendered:                done
-DiffInDiffCallaway.Rmd rendered:            done
-AnalyzeSonarQubeWarnings.Rmd rendered:      done
-NonCausalMethods.Rmd rendered:              done
-DiffInDiffPosterFigures.Rmd rendered:       done
-
-Full data collection rerun:                 not yet
+Phase 1 reproduction: complete
+New repository: AI-Code-Complexity-Study
+New conda environment: aicomplexity
+Phase 2 live data collection: not started
 ```
 
-The main Phase 1 reproduction script is:
+Phase 1 used the existing `data/` files and rendered the R Markdown notebooks. We did **not** rerun live GitHub, GHArchive, repository cloning, or SonarQube collection during Phase 1.
+
+Successful Phase 1 reproduction was completed in:
+
+```text
+/home/user1-system12/project-workspace/ai_code_complexity_study
+```
+
+using:
+
+```text
+conda environment: aicomplexity
+Python: 3.11.4
+R: 4.3.3
+Ubuntu: 22.04.5 LTS
+```
+
+---
+
+## Phase 1 reproduction baseline
+
+The following notebooks were successfully rendered:
+
+```text
+DataCollection.Rmd
+PropensityScoreMatching.Rmd
+DiffInDiffBorusyak.Rmd
+DynamicPanel.Rmd
+DiffInDiffAll.Rmd
+DiffInDiffTWFE.Rmd
+DiffInDiffCallaway.Rmd
+AnalyzeSonarQubeWarnings.Rmd
+NonCausalMethods.Rmd
+DiffInDiffPosterFigures.Rmd
+```
+
+The main Phase 1 script is:
 
 ```text
 run-phase1.sh
 ```
 
-Run it from the repository root after activating the `cursorstudy` conda environment.
-
----
-
-## Recommended reproduction workflow
-
-There are two different workflows.
-
-### Phase 1: Reproduce the paper results from existing data
-
-This is the recommended workflow for exact reproduction.
+Run it from the repository root:
 
 ```bash
-conda activate cursorstudy
+conda activate aicomplexity
 ./run-phase1.sh
 ```
 
-This phase reads the existing CSV files from:
+Expected completion message:
 
 ```text
-data/
-```
-
-and renders the R Markdown notebooks from:
-
-```text
-notebooks/
-```
-
-This is the workflow used for the successful checkpoint documented in this README.
-
-### Phase 2: Rerun data collection from live sources
-
-This is optional and not recommended for exact reproduction.
-
-Phase 2 would rerun GitHub search, repository cloning, GHArchive/BigQuery collection, and SonarQube analysis. Because these steps depend on live systems, rerunning them later may not produce the exact same dataset used in the paper. GitHub repositories may be deleted or updated, API behavior may change, and SonarQube rules may evolve.
-
-Do not run Phase 2 unless the goal is to rebuild or extend the dataset rather than exactly reproduce the paper outputs.
-
----
-
-## Repository organization
-
-### `data/`
-
-The `data/` folder contains the dataset used for the paper. Some files may be `.gitignore`d in the GitHub repository but are available from Zenodo.
-
-Important files include:
-
-```text
-repos.csv
-cursor_commits.csv
-cursor_files.csv
-repo_events.csv
-repo_events_control.csv
-matching.csv
-panel_event_monthly.csv
-ts_repos_monthly.csv
-ts_repos_control_monthly.csv
-repo_metrics.csv
-sonarqube_warnings.csv
-sonarqube_warning_definitions.csv
-control_repo_candidates_*.csv
-```
-
-Key roles:
-
-| File | Purpose |
-|---|---|
-| `repos.csv` | Metadata for Cursor-adopting treatment repositories |
-| `cursor_commits.csv` | Commits that modify Cursor configuration files |
-| `cursor_files.csv` | Cursor configuration files found in repositories |
-| `repo_events.csv` / `repo_events_control.csv` | GitHub event data for treatment/control repositories |
-| `matching.csv` | Propensity score matching results |
-| `panel_event_monthly.csv` | Main monthly panel dataset for DiD and dynamic panel analysis |
-| `ts_repos_monthly.csv` / `ts_repos_control_monthly.csv` | Monthly time series data for treatment/control repositories |
-| `repo_metrics.csv` | Additional repository-level metrics |
-| `sonarqube_warnings.csv` | SonarQube static analysis warnings |
-| `sonarqube_warning_definitions.csv` | SonarQube warning metadata and categories |
-| `control_repo_candidates_*.csv` | Monthly candidate control repository snapshots |
-
-### `notebooks/`
-
-The `notebooks/` folder contains the R Markdown notebooks used to reproduce the paper results.
-
-| Notebook | Role in reproduction |
-|---|---|
-| `DataCollection.Rmd` | Dataset overview, descriptive statistics, and collection summary |
-| `PropensityScoreMatching.Rmd` | Propensity score matching and balance diagnostics |
-| `DiffInDiffBorusyak.Rmd` | Main Borusyak et al. DiD results, including Figure 3 |
-| `DynamicPanel.Rmd` | Dynamic panel GMM results, corresponding to Table 3 |
-| `DiffInDiffAll.Rmd` | Comparison across DiD estimators |
-| `DiffInDiffTWFE.Rmd` | Two-way fixed effects DiD robustness analysis |
-| `DiffInDiffCallaway.Rmd` | Callaway and Sant'Anna DiD robustness analysis |
-| `AnalyzeSonarQubeWarnings.Rmd` | SonarQube warning severity/type analysis |
-| `NonCausalMethods.Rmd` | Descriptive and correlational auxiliary analysis |
-| `DiffInDiffPosterFigures.Rmd` | Poster-oriented versions of selected figures |
-
-### `plots/`
-
-The `plots/` folder stores generated figures. Some plot files may be `.gitignore`d in the GitHub repository but available from Zenodo.
-
-Important reproduced files include:
-
-```text
-plots/dynamic_effects_borusyak.pdf
-plots/dynamic_effects_activity_all.pdf
-plots/dynamic_effects_agent_cohort_all.pdf
-```
-
-The file:
-
-```text
-plots/dynamic_effects_borusyak.pdf
-```
-
-corresponds to the paper's Figure 3.
-
-### `scripts/`
-
-The `scripts/` folder contains Python scripts for data collection and preparation. These scripts are mainly for Phase 2.
-
-They include scripts for:
-
-```text
-GitHub repository search
-repository cloning
-Git history analysis
-GHArchive/BigQuery collection
-propensity score matching
-SonarQube scanning
-panel dataset preparation
-```
-
-These scripts are useful for understanding or extending the pipeline, but they should not be rerun when the goal is exact Phase 1 reproduction.
-
-### `env_dev/`
-
-The `env_dev/` folder stores the local environment snapshot used for reproduction.
-
-Expected files include:
-
-```text
-env_dev/conda-list.txt
-env_dev/cursorstudy-explicit-linux-64.txt
-env_dev/cursorstudy-full-no-prefix.yml
-env_dev/cursorstudy-full.yml
-env_dev/export-date.txt
-env_dev/pip-freeze.txt
-env_dev/r-installed-packages.csv
-env_dev/r-session-info.txt
-env_dev/system-uname.txt
-```
-
-Use `cursorstudy-full-no-prefix.yml` for normal environment recreation.
-
----
-
-## Development environment
-
-The successful Phase 1 reproduction used:
-
-```text
-Conda environment: cursorstudy
-Python: 3.11.4
-R: 4.3.3
-Operating system: Ubuntu 22.04.5 LTS
-Platform: Linux x86_64
-```
-
-The working R executable path was:
-
-```text
-{HOME-PATH}/miniconda3/envs/cursorstudy/bin/R
-```
-
-The working Rscript path was:
-
-```text
-{HOME-PATH}/miniconda3/envs/cursorstudy/bin/Rscript
-```
-
-Check your environment with:
-
-```bash
-which python
-python --version
-
-which R
-R --version
-
-which Rscript
-Rscript --version
-```
-
-Expected versions:
-
-```text
-Python 3.11.4
-R version 4.3.3
+Phase 1 reproduction completed.
 ```
 
 ---
 
-## Recreate the environment
+## Main reproduced outputs
 
-### Option A: Recreate from the portable conda YAML
-
-This is the recommended method.
-
-```bash
-conda env create -f env_dev/cursorstudy-full-no-prefix.yml
-conda activate cursorstudy
-```
-
-If the environment name already exists, create a separate environment:
-
-```bash
-conda env create -n cursorstudy-rebuild -f env_dev/cursorstudy-full-no-prefix.yml
-conda activate cursorstudy-rebuild
-```
-
-### Option B: Recreate exactly on Linux x86_64
-
-This is more exact but less portable.
-
-```bash
-conda create -n cursorstudy-rebuild --file env_dev/cursorstudy-explicit-linux-64.txt
-conda activate cursorstudy-rebuild
-```
-
-### If `conda activate` fails
-
-Run:
-
-```bash
-conda init bash
-exec bash
-conda activate cursorstudy
-```
-
-For shell scripts or VS Code Remote SSH terminals, this form is often safer:
-
-```bash
-source {HOME-PATH}/miniconda3/etc/profile.d/conda.sh
-conda activate cursorstudy
-```
-
-Adjust the miniconda path if your system uses a different location.
-
----
-
-## Verify required packages
-
-### Verify Python packages
-
-```bash
-python --version
-pip --version
-pip freeze | grep -E "pandas|numpy|requests|GitPython|PyGithub|google-cloud-bigquery|scikit-learn|semver|node-semver|gql|aiohttp"
-```
-
-Important Python packages include:
-
-```text
-pandas
-numpy
-requests
-python-dotenv
-GitPython
-PyGithub
-google-cloud-bigquery
-scikit-learn
-semver
-node-semver
-gql
-aiohttp
-```
-
-These are mainly needed for Phase 2 data collection scripts.
-
-### Verify core R packages
-
-```bash
-Rscript -e "pkgs <- c('tidyverse','did','DRDID','didimputation','fixest','plm','modelsummary','rmarkdown','languageserver'); print(setNames(sapply(pkgs, requireNamespace, quietly=TRUE), pkgs))"
-```
-
-Expected result:
-
-```text
-tidyverse       TRUE
-did             TRUE
-DRDID           TRUE
-didimputation   TRUE
-fixest          TRUE
-plm             TRUE
-modelsummary    TRUE
-rmarkdown       TRUE
-languageserver  TRUE
-```
-
-### Verify plotting and table packages
-
-```bash
-Rscript -e "pkgs <- c('systemfonts','magick','Cairo','svglite','ggfx','kableExtra'); print(setNames(sapply(pkgs, requireNamespace, quietly=TRUE), pkgs))"
-```
-
-Expected result:
-
-```text
-systemfonts TRUE
-magick      TRUE
-Cairo       TRUE
-svglite     TRUE
-ggfx        TRUE
-kableExtra  TRUE
-```
-
----
-
-## Install missing R packages
-
-For conda-based reproduction, prefer conda-forge for large R packages and system-dependent graphics packages.
-
-```bash
-conda install -c conda-forge   r-base=4.3.3   r-tidyverse   r-rmarkdown   r-knitr   r-data.table   r-fixest   r-did   r-drdid   r-fastglm   r-plm   r-modelsummary   r-kableextra   r-gridextra   r-cowplot   r-corrplot   r-rcolorbrewer   r-cairo   r-showtext   r-ggfx   r-languageserver   -y
-```
-
-If plotting packages are missing:
-
-```bash
-conda install -c conda-forge   r-systemfonts   r-magick   r-cairo   r-svglite   r-ggfx   r-kableextra   -y
-```
-
-If smaller R packages are still missing, install them from R:
-
-```r
-options(repos = c(CRAN = "https://cloud.r-project.org"))
-
-install.packages(c(
-  "didimputation",
-  "bacondecomp"
-))
-```
-
-If an R package installation fails and leaves a lock directory, remove stale locks:
-
-```bash
-find "$CONDA_PREFIX/lib/R/library" -maxdepth 1 -name "00LOCK*" -type d -print -exec rm -rf {} +
-```
-
----
-
-## Run Phase 1 reproduction
-
-Use the provided script:
-
-```bash
-conda activate cursorstudy
-./run-phase1.sh
-```
-
-Recommended `run-phase1.sh` content:
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "Starting Phase 1 reproduction..."
-date
-
-# Main data and matching
-echo "Rendering DataCollection.Rmd"
-Rscript -e "rmarkdown::render('notebooks/DataCollection.Rmd')"
-
-echo "Rendering PropensityScoreMatching.Rmd"
-Rscript -e "rmarkdown::render('notebooks/PropensityScoreMatching.Rmd')"
-
-# Main causal results
-echo "Rendering DiffInDiffBorusyak.Rmd"
-Rscript -e "rmarkdown::render('notebooks/DiffInDiffBorusyak.Rmd')"
-
-echo "Rendering DynamicPanel.Rmd"
-Rscript -e "rmarkdown::render('notebooks/DynamicPanel.Rmd')"
-
-# Robustness checks
-echo "Rendering DiffInDiffAll.Rmd"
-Rscript -e "rmarkdown::render('notebooks/DiffInDiffAll.Rmd')"
-
-echo "Rendering DiffInDiffTWFE.Rmd"
-Rscript -e "rmarkdown::render('notebooks/DiffInDiffTWFE.Rmd')"
-
-echo "Rendering DiffInDiffCallaway.Rmd"
-Rscript -e "rmarkdown::render('notebooks/DiffInDiffCallaway.Rmd')"
-
-# Quality details and auxiliary analyses
-echo "Rendering AnalyzeSonarQubeWarnings.Rmd"
-Rscript -e "rmarkdown::render('notebooks/AnalyzeSonarQubeWarnings.Rmd')"
-
-echo "Rendering NonCausalMethods.Rmd"
-Rscript -e "rmarkdown::render('notebooks/NonCausalMethods.Rmd')"
-
-echo "Rendering DiffInDiffPosterFigures.Rmd"
-Rscript -e "rmarkdown::render('notebooks/DiffInDiffPosterFigures.Rmd')"
-
-echo "Phase 1 reproduction completed."
-date
-```
-
-If your current `run-phase1.sh` does not contain the shebang and safety options, update it:
-
-```bash
-chmod +x run-phase1.sh
-```
-
-The line:
-
-```bash
-set -euo pipefail
-```
-
-makes the script stop immediately if a notebook fails.
-
----
-
-## Expected Phase 1 HTML outputs
-
-After a successful Phase 1 run, the following files should exist:
+Expected HTML outputs:
 
 ```text
 notebooks/DataCollection.html
@@ -499,19 +107,23 @@ Check with:
 ls -lh notebooks/*html
 ```
 
----
+Important reproduced plot files include:
 
-## Main reproduced results
+```text
+plots/dynamic_effects_borusyak.pdf
+plots/dynamic_effects_activity_all.pdf
+plots/dynamic_effects_agent_cohort_all.pdf
+```
 
-### Figure 3
-
-The main reproduced Figure 3 file is:
+The key reproduced Figure 3 file is:
 
 ```text
 plots/dynamic_effects_borusyak.pdf
 ```
 
-It contains five panels:
+### Figure 3 interpretation
+
+The reproduced Figure 3 contains five panels:
 
 ```text
 1. Commits
@@ -521,37 +133,7 @@ It contains five panels:
 5. Code Complexity
 ```
 
-Interpretation:
-
-```text
-Cursor adoption produces a large but short-lived increase in development velocity,
-especially lines added, while static analysis warnings and code complexity increase
-more persistently.
-```
-
-In short:
-
-```text
-Cursor makes projects faster at first,
-but the code also becomes more warning-heavy and complex over time.
-```
-
-The x-axis is months relative to Cursor adoption:
-
-```text
--6 to -2   months before Cursor adoption
-0          adoption month
-1 to 6     months after adoption
-```
-
-Filled and hollow points indicate statistical significance:
-
-```text
-Filled point: statistically significant, p < 0.05
-Hollow point: not statistically significant, p >= 0.05
-```
-
-### Dynamic panel / Table 3
+### Dynamic panel / Table 3 interpretation
 
 The dynamic panel results are reproduced by:
 
@@ -559,52 +141,250 @@ The dynamic panel results are reproduced by:
 notebooks/DynamicPanel.html
 ```
 
-This notebook examines whether accumulated code quality burden is associated with later development velocity.
+---
 
-Core interpretation:
+## Repository organization
+
+### `data/`
+
+The `data/` folder currently contains the original dataset used for the MSR 2026 reproduction baseline.
+
+Important files include:
 
 ```text
-Cursor adoption is associated with short-term velocity gains.
-Warnings and complexity accumulate after adoption.
-Accumulated warnings and complexity are associated with lower future velocity.
+repos.csv
+cursor_commits.csv
+cursor_files.csv
+repo_events.csv
+repo_events_control.csv
+matching.csv
+panel_event_monthly.csv
+ts_repos_monthly.csv
+ts_repos_control_monthly.csv
+repo_metrics.csv
+sonarqube_warnings.csv
+sonarqube_warning_definitions.csv
+control_repo_candidates_*.csv
 ```
 
-This supports the paper's main story:
+Future versions may add new data files for non-Cursor AI tools and additional project cohorts.
+
+### `notebooks/`
+
+The `notebooks/` folder contains R Markdown notebooks for the reproduction baseline and future study extensions.
+
+| Notebook | Role |
+|---|---|
+| `DataCollection.Rmd` | Dataset overview and descriptive statistics |
+| `PropensityScoreMatching.Rmd` | Propensity score matching and balance diagnostics |
+| `DiffInDiffBorusyak.Rmd` | Main Borusyak et al. DiD results, including Figure 3 |
+| `DynamicPanel.Rmd` | Dynamic panel GMM results, corresponding to Table 3 |
+| `DiffInDiffAll.Rmd` | Comparison across DiD estimators |
+| `DiffInDiffTWFE.Rmd` | Two-way fixed effects DiD robustness analysis |
+| `DiffInDiffCallaway.Rmd` | Callaway and Sant'Anna DiD robustness analysis |
+| `AnalyzeSonarQubeWarnings.Rmd` | SonarQube warning severity/type analysis |
+| `NonCausalMethods.Rmd` | Descriptive and correlational auxiliary analysis |
+| `DiffInDiffPosterFigures.Rmd` | Poster-oriented versions of selected figures |
+
+Future notebooks should be added for the new AI-code-complexity study rather than overwriting the reproduced baseline.
+
+### `scripts/`
+
+The `scripts/` folder contains Python scripts inherited from the Cursor baseline for:
 
 ```text
-short-term speed gain
-longer-term quality and complexity cost
+GitHub repository search
+repository cloning
+Git history analysis
+GHArchive/BigQuery collection
+propensity score matching
+SonarQube scanning
+panel dataset preparation
 ```
 
-### Robustness notebooks
+These scripts are useful for understanding the original pipeline and for designing the Phase 2 extension.
 
-The following notebooks were also rendered successfully:
+### `plots/`
+
+The `plots/` folder stores generated figures.
+
+Important reproduced files include:
 
 ```text
-notebooks/DiffInDiffAll.html
-notebooks/DiffInDiffTWFE.html
-notebooks/DiffInDiffCallaway.html
+plots/dynamic_effects_borusyak.pdf
+plots/dynamic_effects_activity_all.pdf
+plots/dynamic_effects_agent_cohort_all.pdf
 ```
 
-These check whether the DiD findings are consistent across alternative DiD estimators.
+### `env_dev/`
 
-### SonarQube warning detail analysis
+The `env_dev/` folder stores environment snapshots.
 
-The warning detail analysis is reproduced by:
+For this new repository, the preferred environment name is:
 
 ```text
-notebooks/AnalyzeSonarQubeWarnings.html
+aicomplexity
 ```
 
-This notebook examines the composition of SonarQube warnings before and after Cursor adoption, including severity and warning categories.
-
-### Auxiliary notebooks
-
-The following auxiliary outputs were also rendered successfully:
+Recommended snapshot files:
 
 ```text
-notebooks/NonCausalMethods.html
-notebooks/DiffInDiffPosterFigures.html
+env_dev/aicomplexity-full.yml
+env_dev/aicomplexity-full-no-prefix.yml
+env_dev/aicomplexity-explicit-linux-64.txt
+env_dev/aicomplexity-conda-list.txt
+env_dev/aicomplexity-pip-freeze.txt
+env_dev/aicomplexity-r-installed-packages.csv
+env_dev/aicomplexity-r-session-info.txt
+env_dev/aicomplexity-export-date.txt
+env_dev/aicomplexity-system-uname.txt
+```
+
+---
+
+## Development environment
+
+Successful Phase 1 reproduction used:
+
+```text
+Conda environment: aicomplexity
+Python: 3.11.4
+R: 4.3.3
+Operating system: Ubuntu 22.04.5 LTS
+Platform: Linux x86_64
+```
+
+The working R path should be similar to:
+
+```text
+{HOME-PATH}/miniconda3/envs/aicomplexity/bin/R
+```
+
+Check with:
+
+```bash
+which python
+python --version
+
+which R
+R --version
+
+which Rscript
+Rscript --version
+```
+
+---
+
+## Recreate the environment
+
+### Option A: portable conda YAML
+
+```bash
+conda env create -f env_dev/aicomplexity-full-no-prefix.yml
+conda activate aicomplexity
+```
+
+If the environment name already exists:
+
+```bash
+conda env create -n aicomplexity-rebuild -f env_dev/aicomplexity-full-no-prefix.yml
+conda activate aicomplexity-rebuild
+```
+
+### Option B: exact Linux x86_64 reproduction
+
+```bash
+conda create -n aicomplexity-rebuild --file env_dev/aicomplexity-explicit-linux-64.txt
+conda activate aicomplexity-rebuild
+```
+
+### If `conda activate` fails
+
+```bash
+conda init bash
+exec bash
+conda activate aicomplexity
+```
+
+For shell scripts or VS Code Remote SSH terminals:
+
+```bash
+source {HOME-PATH}/miniconda3/etc/profile.d/conda.sh
+conda activate aicomplexity
+```
+
+---
+
+## Verify required packages
+
+### Verify Python packages
+
+```bash
+python --version
+pip --version
+pip freeze | grep -E "pandas|numpy|requests|GitPython|PyGithub|google-cloud-bigquery|scikit-learn|semver|node-semver|gql|aiohttp"
+```
+
+### Verify core R packages
+
+```bash
+Rscript -e "pkgs <- c('tidyverse','did','DRDID','didimputation','fixest','plm','modelsummary','rmarkdown','languageserver'); print(setNames(sapply(pkgs, requireNamespace, quietly=TRUE), pkgs))"
+```
+
+### Verify plotting and table packages
+
+```bash
+Rscript -e "pkgs <- c('systemfonts','magick','Cairo','svglite','ggfx','kableExtra'); print(setNames(sapply(pkgs, requireNamespace, quietly=TRUE), pkgs))"
+```
+
+---
+
+## Install missing R packages
+
+For conda-based reproduction, prefer conda-forge for large R packages and system-dependent graphics packages.
+
+```bash
+conda install -c conda-forge \
+  r-base=4.3.3 \
+  r-tidyverse \
+  r-rmarkdown \
+  r-knitr \
+  r-data.table \
+  r-fixest \
+  r-did \
+  r-drdid \
+  r-fastglm \
+  r-plm \
+  r-modelsummary \
+  r-kableextra \
+  r-gridextra \
+  r-cowplot \
+  r-corrplot \
+  r-rcolorbrewer \
+  r-cairo \
+  r-showtext \
+  r-ggfx \
+  r-languageserver \
+  -y
+```
+
+If plotting packages are missing:
+
+```bash
+conda install -c conda-forge \
+  r-systemfonts \
+  r-magick \
+  r-cairo \
+  r-svglite \
+  r-ggfx \
+  r-kableextra \
+  -y
+```
+
+If an R package installation leaves a lock directory:
+
+```bash
+find "$CONDA_PREFIX/lib/R/library" -maxdepth 1 -name "00LOCK*" -type d -print -exec rm -rf {} +
 ```
 
 ---
@@ -613,233 +393,80 @@ notebooks/DiffInDiffPosterFigures.html
 
 During Phase 1 reproduction, several notebooks required small compatibility patches for the local R/ggplot2/grid environment.
 
-These patches affected plot rendering only. They did not change the data, model estimates, confidence intervals, or statistical interpretation.
+These patches affected plot rendering only. They did not change:
 
-### `DiffInDiffBorusyak.Rmd`
+```text
+data
+models
+estimates
+confidence intervals
+statistical interpretation
+```
 
-Possible errors:
+Examples of local rendering errors:
 
 ```text
 object 'significant' not found
 invalid hex digit in 'color' or 'lty'
-```
-
-Cause:
-
-```text
-Fragile ggplot aesthetics involving after_scale(), significance mapping, or linetype mapping.
-```
-
-Safe fix:
-
-```text
-Draw significant and non-significant error bars as separate layers.
-Use simpler point shapes for significant/non-significant results.
-```
-
-### `DiffInDiffAll.Rmd`
-
-Possible error:
-
-```text
-object 'significant' not found
-```
-
-Cause:
-
-```text
-Same ggplot after_scale/significance aesthetic compatibility issue.
-```
-
-Safe fix:
-
-```text
-Use separate plotting layers for significant and non-significant intervals.
-```
-
-### `DiffInDiffPosterFigures.Rmd`
-
-Possible error:
-
-```text
 Error in element_line(): unused argument (alpha = 0.25)
 ```
 
-Cause:
+Safe fixes included:
 
 ```text
-The installed ggplot2 version does not support alpha inside element_line().
+Draw significant and non-significant intervals as separate ggplot layers.
+Use simpler point shapes for significance.
+Remove unsupported alpha arguments from element_line()/theme() calls.
 ```
-
-Safe fix:
-
-```text
-Remove the unsupported alpha argument from element_line()/theme() calls.
-```
-
-Again, these are plot-style compatibility fixes only.
 
 ---
 
 ## VS Code Remote SSH setup
 
-This project can be reproduced using VS Code with Remote SSH.
-
-Recommended workflow:
-
-```text
-Local machine:
-- VS Code UI
-- Remote SSH connection
-
-Remote Ubuntu server:
-- conda environment
-- R execution
-- R Markdown rendering
-- data files
-- generated plots
-```
-
-Install the VS Code R extension on the remote SSH target.
-
 Recommended `.vscode/settings.json`:
 
 ```json
 {
-  "r.rpath.linux": "{HOME-PATH}/miniconda3/envs/cursorstudy/bin/R",
-  "r.rterm.linux": "{HOME-PATH}/miniconda3/envs/cursorstudy/bin/R",
+  "r.rpath.linux": "{HOME-PATH}/miniconda3/envs/aicomplexity/bin/R",
+  "r.rterm.linux": "{HOME-PATH}/miniconda3/envs/aicomplexity/bin/R",
   "r.bracketedPaste": true
 }
 ```
 
-Adjust paths if your conda environment is elsewhere.
+For interactive R chunks, set the working directory to the notebooks folder because many notebooks use paths such as `../data/...`:
+
+```r
+setwd("{HOME-PATH}/project-workspace/ai_code_complexity_study/notebooks")
+```
 
 ---
 
 ## Refresh the environment snapshot
 
-After a successful reproduction run, refresh `env_dev/`:
+After a successful reproduction run:
 
 ```bash
-conda activate cursorstudy
+conda activate aicomplexity
 
 mkdir -p env_dev
 
-conda env export > env_dev/cursorstudy-full.yml
-grep -v "^prefix:" env_dev/cursorstudy-full.yml > env_dev/cursorstudy-full-no-prefix.yml
+conda env export > env_dev/aicomplexity-full.yml
+grep -v "^prefix:" env_dev/aicomplexity-full.yml > env_dev/aicomplexity-full-no-prefix.yml
 
-conda list --explicit > env_dev/cursorstudy-explicit-linux-64.txt
-conda list > env_dev/conda-list.txt
+conda list --explicit > env_dev/aicomplexity-explicit-linux-64.txt
+conda list > env_dev/aicomplexity-conda-list.txt
 
-pip freeze > env_dev/pip-freeze.txt
+pip freeze > env_dev/aicomplexity-pip-freeze.txt
 
-Rscript -e "ip <- as.data.frame(installed.packages()[, c('Package','Version','LibPath')]); write.csv(ip, 'env_dev/r-installed-packages.csv', row.names=FALSE)"
-Rscript -e "sink('env_dev/r-session-info.txt'); sessionInfo(); sink()"
+Rscript -e "ip <- as.data.frame(installed.packages()[, c('Package','Version','LibPath')]); write.csv(ip, 'env_dev/aicomplexity-r-installed-packages.csv', row.names=FALSE)"
+Rscript -e "sink('env_dev/aicomplexity-r-session-info.txt'); sessionInfo(); sink()"
 
-date > env_dev/export-date.txt
-uname -a > env_dev/system-uname.txt
-```
-
-Check:
-
-```bash
-ls -lh env_dev/
+date > env_dev/aicomplexity-export-date.txt
+uname -a > env_dev/aicomplexity-system-uname.txt
 ```
 
 ---
 
-## What not to run during Phase 1
+The project extends the MSR 2026 study:
 
-Do not run live data collection during Phase 1:
-
-```bash
-bash data-collection.sh
-python -m scripts.clone_repos
-python -m scripts.analyze_repos
-python -m scripts.fetch_gharchive
-python -m scripts.run_sonarqube
-```
-
-These commands belong to Phase 2 and may change the dataset.
-
----
-
-## Optional Phase 2: rerun full data collection
-
-Phase 2 is for rebuilding the dataset from live sources.
-
-Before Phase 2, configure credentials and tool paths such as:
-
-```text
-GITHUB_TOKEN
-SONAR_HOST
-SONAR_SCANNER_PATH
-SONAR_TOKEN
-```
-
-The approximate Phase 2 pipeline is:
-
-```text
-1. Search for Cursor-adopting repositories
-2. Clone treatment repositories
-3. Analyze treatment repository commits and lines added
-4. Fetch GHArchive activity for treatment repositories
-5. Run SonarQube for treatment repositories
-
-6. Build candidate controls
-7. Match treatment and control repositories
-8. Clone matched control repositories
-9. Analyze control repository commits and lines added
-10. Fetch GHArchive activity for controls
-11. Run SonarQube for controls
-12. Prepare panel datasets
-13. Rerun the R notebooks
-```
-
-Because this pipeline depends on live systems, results may differ from the published paper dataset.
-
----
-
-## SonarQube note
-
-The file:
-
-```text
-sonarqube-start.sh
-```
-
-is for starting/stopping a local SonarQube server.
-
-It is not needed for Phase 1 reproduction from existing data.
-
-It matters only if rerunning SonarQube static analysis in Phase 2.
-
----
-
-## Quick verification checklist
-
-Run:
-
-```bash
-git status
-ls -lh notebooks/*html
-ls -lh plots/*pdf
-```
-
-Expected core files:
-
-```text
-notebooks/DataCollection.html
-notebooks/PropensityScoreMatching.html
-notebooks/DiffInDiffBorusyak.html
-notebooks/DynamicPanel.html
-notebooks/DiffInDiffAll.html
-notebooks/DiffInDiffTWFE.html
-notebooks/DiffInDiffCallaway.html
-notebooks/AnalyzeSonarQubeWarnings.html
-notebooks/NonCausalMethods.html
-notebooks/DiffInDiffPosterFigures.html
-plots/dynamic_effects_borusyak.pdf
-```
-
-At this checkpoint, Phase 1 reproduction is complete.
+> Hao He, Courtney Miller, Shyam Agarwal, Christian Kästner, and Bogdan Vasilescu. 2026. *Speed at the Cost of Quality: How Cursor AI Increases Short-Term Velocity and Long-Term Complexity in Open-Source Projects*. MSR 2026. https://doi.org/10.1145/3793302.3793349
