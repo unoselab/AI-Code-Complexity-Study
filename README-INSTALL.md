@@ -822,26 +822,3 @@ ls -lh env_dev/
 ```
 
 ---
-
-# 20. Current reproduction status
-
-Current status:
-
-```text
-Environment setup:                      done
-R 4.3.3 installed:                       done
-Core R packages installed:               done
-Plot/table R packages installed:         done
-DataCollection.Rmd rendered:             done
-PropensityScoreMatching.Rmd rendered:    done
-DiffInDiffBorusyak.Rmd rendered:         done
-Figure 3 PDF created:                    done
-DynamicPanel.Rmd rendered:               not yet
-Full data collection rerun:              not yet
-```
-
-Next recommended command:
-
-```bash
-Rscript -e "rmarkdown::render('notebooks/DynamicPanel.Rmd')"
-```
