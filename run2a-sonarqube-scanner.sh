@@ -1,0 +1,1 @@
+python proc_scripts/test_sonarqube_connection.py

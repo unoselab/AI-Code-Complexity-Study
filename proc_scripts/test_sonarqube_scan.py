@@ -1,8 +1,3 @@
-cat > run2c-sonarqube-tiny-scan.sh <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-python - <<'PY'
 import os
 import subprocess
 from pathlib import Path
@@ -59,7 +54,3 @@ if result.returncode != 0:
     raise SystemExit("Tiny SonarQube scan failed")
 
 print("\nTiny SonarQube scan completed.")
-PY
-EOF
-
-chmod +x run2c-sonarqube-tiny-scan.sh
