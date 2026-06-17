@@ -126,11 +126,78 @@ grep -n '^.env$' .gitignore || echo ".env" >> .gitignore
 
 ## 5. SonarQube server
 
-The local SonarQube server was started and accessed through:
+The local SonarQube server was started as a Docker container.
+
+We confirmed the running container with:
+
+```bash
+docker ps -a | grep -i sonar
+```
+
+Observed result:
+
+```text
+39765bedac3c   sonarqube:latest   "/opt/sonarqube/dock…"   About an hour ago   Up About an hour   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp   sonarqube
+```
+
+This means:
+
+```text
+Container name: sonarqube
+Docker image: sonarqube:latest
+Container status: Up
+Host port: 9000
+Container port: 9000
+```
+
+The SonarQube server is available on the remote Ubuntu server at:
 
 ```text
 http://localhost:9000
 ```
+
+Because SonarQube is running on the remote Ubuntu machine, browser access from a local laptop requires SSH port forwarding or VS Code port forwarding.
+
+For SSH local port forwarding, run this from the local laptop:
+
+```bash
+ssh -L 9000:localhost:9000 user1-system12@<server-address>
+```
+
+Keep this SSH session open, then open the local browser at:
+
+```text
+http://localhost:9000
+```
+
+The traffic flow is:
+
+```text
+Local browser localhost:9000
+→ SSH tunnel
+→ remote Ubuntu server localhost:9000
+→ SonarQube Docker container port 9000
+```
+
+If local port `9000` is already used on the laptop, use another local port such as `9001`:
+
+```bash
+ssh -L 9001:localhost:9000 user1-system12@<server-address>
+```
+
+Then open:
+
+```text
+http://localhost:9001
+```
+
+For Python scripts executed directly on the remote Ubuntu server, SSH tunneling is not needed. Those scripts can use:
+
+```text
+SONAR_HOST=http://localhost:9000
+```
+
+because they run on the same machine where the SonarQube container is exposed.
 
 The browser showed the SonarQube login page.
 
@@ -161,37 +228,270 @@ upload the analysis to the local SonarQube server,
 and then query SonarQube APIs for metrics.
 ```
 
----
+Useful Docker commands for this local SonarQube server:
 
-## 6. SonarQube token
-
-A SonarQube analysis token was generated in the local SonarQube UI.
-
-The token was added to `.env` as:
-
-```text
-SONAR_TOKEN=your_generated_sonarqube_token_here
+```bash
+docker ps -a | grep -i sonar
+docker logs -f sonarqube
+docker stop sonarqube
+docker start sonarqube
+docker restart sonarqube
 ```
 
-The token was validated successfully using the local SonarQube authentication API.
+Do not remove the container unless intentionally resetting the local SonarQube instance:
 
-The connection test confirmed:
+```bash
+docker rm sonarqube
+```
+
+If the container is removed, local SonarQube state may be lost unless persistent Docker volumes were configured.
+
+Important note:
+
+```text
+The current Docker setup is suitable for smoke testing and small local experiments.
+For a large Phase 2 rerun, a more stable Docker Compose setup with PostgreSQL and named volumes should be considered.
+```
+
+
+---
+
+### 5a. SSH tunnel / port forwarding for browser access
+
+The SonarQube server runs on the remote Ubuntu machine.
+
+On the Ubuntu server, SonarQube listens at:
+
+```text
+http://localhost:9000
+```
+
+However, when using a browser on a local laptop such as a MacBook, `localhost:9000` normally refers to the laptop itself, not the remote Ubuntu server.
+
+Therefore, to access the remote SonarQube UI from the local browser, we need SSH local port forwarding.
+
+From the local machine, run:
+
+```bash
+ssh -L 9000:localhost:9000 user1-system12@<server-address>
+```
+
+Keep this SSH session open.
+
+Then open the local browser and visit:
+
+```text
+http://localhost:9000
+```
+
+This forwards local browser traffic as follows:
+
+```text
+MacBook browser localhost:9000
+→ SSH tunnel
+→ remote Ubuntu server localhost:9000
+→ SonarQube UI
+```
+
+If local port `9000` is already used on the laptop, use another local port such as `9001`:
+
+```bash
+ssh -L 9001:localhost:9000 user1-system12@<server-address>
+```
+
+Then open:
+
+```text
+http://localhost:9001
+```
+
+The right side of the mapping is still `localhost:9000` because SonarQube is running on port `9000` on the remote server.
+
+Alternative through VS Code Remote SSH:
+
+```text
+VS Code
+→ Ports tab
+→ Forward Port
+→ 9000
+```
+
+Then open the forwarded URL from VS Code or visit:
+
+```text
+http://localhost:9000
+```
+
+depending on how VS Code maps the forwarded port.
+
+A quick check from the local machine, after opening the tunnel, is:
+
+```bash
+curl http://localhost:9000/api/system/status
+```
+
+Expected response:
+
+```json
+{"id":"...","version":"...","status":"UP"}
+```
+
+If this works, the local browser can reach the remote SonarQube server.
+
+Important notes:
+
+```text
+The SSH tunnel must remain open while using the browser.
+The SonarQube server must also remain running on the remote Ubuntu machine.
+The .env value should still use the remote server perspective:
+SONAR_HOST=http://localhost:9000
+```
+
+For Python scripts executed on the remote Ubuntu server, no SSH tunnel is needed because those scripts access SonarQube from the same machine where SonarQube is running.
+
+The SSH tunnel is only needed for browser access from the local laptop.
+
+
+---
+
+
+## 6. Generating the SonarQube token
+
+After the local SonarQube server was running and accessible through the browser, we generated a SonarQube analysis token.
+
+The browser was opened at:
+
+```text
+http://localhost:9000
+```
+
+If accessing the remote Ubuntu server from a local laptop, this required SSH port forwarding or VS Code port forwarding.
+
+After logging in to the SonarQube UI, the token can be generated in one of two ways.
+
+### Option A: Generate token from user account settings
+
+Go to:
+
+```text
+User icon
+→ My Account
+→ Security
+→ Generate Tokens
+```
+
+Use a descriptive token name, for example:
+
+```text
+cursorstudy-local
+```
+
+For local smoke testing, a general analysis token is acceptable.
+
+Important:
+
+```text
+The token value is shown only once.
+Copy it immediately and store it in the local .env file.
+```
+
+### Option B: Generate token during local project setup
+
+When creating a local project, SonarQube may also offer a token generation step.
+
+The project setup flow is:
+
+```text
+Create a local project
+→ Enter project key and display name
+→ Choose local analysis
+→ Generate token
+```
+
+For the tiny smoke test, we used:
+
+```text
+Project key: cursorstudy-tiny-test
+Project name: CursorStudy Tiny Test
+```
+
+A token generated in this flow can also be used as `SONAR_TOKEN`.
+
+---
+
+## 7. Saving the token in `.env`
+
+The generated token was saved in the project `.env` file.
+
+From the repository root:
+
+```bash
+cd ~/project-workspace/ai_code_complexity_study
+nano .env
+```
+
+The relevant SonarQube variables are:
+
+```text
+SONAR_HOST=http://localhost:9000
+SONAR_TOKEN=your_generated_sonarqube_token_here
+SONAR_SCANNER_PATH=/home/user1-system12/tools/sonar-scanner/bin/sonar-scanner
+```
+
+The `.env` file must not be committed to Git because it contains secrets.
+
+Check that `.env` is ignored:
+
+```bash
+grep -n '^.env$' .gitignore || echo ".env" >> .gitignore
+```
+
+---
+
+## 8. Validating the token
+
+We validated the token using the SonarQube authentication API.
+
+The validation script checks:
+
+```text
+SONAR_HOST is set
+SONAR_TOKEN is set
+SONAR_SCANNER_PATH is set
+SonarQube server status API is reachable
+SonarQube token is valid
+```
+
+The connection test script is:
+
+```text
+proc_scripts/test_sonarqube_connection.py
+```
+
+It can be run through:
+
+```bash
+python proc_scripts/test_sonarqube_connection.py
+```
+
+The successful result was:
 
 ```text
 SONAR_HOST is set: True
 SONAR_TOKEN is set: True
 SONAR_SCANNER_PATH is set: True
 System status HTTP: 200
+System status response: {"id":"147B411E-AZ7XUeuF209cAQJhd365","version":"26.6.0.123539","status":"UP"}
 Authentication validate HTTP: 200
 Authentication validate response: {"valid":true}
 ```
 
-This means:
+This confirmed:
 
 ```text
 The local SonarQube server is reachable.
-The token is valid.
-The project can authenticate against the local server.
+The SonarQube token is valid.
+The local scripts can authenticate to SonarQube.
 ```
 
 ---
