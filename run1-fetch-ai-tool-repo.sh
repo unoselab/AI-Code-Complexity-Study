@@ -1,4 +1,3 @@
-cat > run-fetch-ai-tool-repo.sh <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -82,6 +81,3 @@ echo "Log saved to: ${LOG_FILE}"
 echo "============================================================"
 
 exit "${STATUS}"
-EOF
-
-chmod +x run-fetch-ai-tool-repo.sh
