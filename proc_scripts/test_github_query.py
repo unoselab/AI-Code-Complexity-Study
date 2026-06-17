@@ -1,4 +1,3 @@
-cat > scripts_proc/test_github_query.py <<'PY'
 import os
 from dotenv import load_dotenv
 from github import Github
@@ -26,4 +25,3 @@ print("\nFirst 5 results:")
 for i, item in enumerate(results[:5], start=1):
     print(f"{i}. {item.repository.full_name} :: {item.path}")
     print(f"   {item.html_url}")
-PY
