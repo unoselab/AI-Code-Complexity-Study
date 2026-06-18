@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo ""
-echo "version 1"
-echo ""
+# echo ""
+# echo "version 1"
+# echo ""
+
+# python proc_scripts/find_repo_pre_post_ai_adoption.py \
+#   --data-dir data_baseline_backup \
+#   --top-n 100 \
+#   --min-pre-months 1 \
+#   --min-post-months 1 \
+#   --output tmp_adoption_test/data/top_100_clone_candidates.csv
+
+# echo ""
+# echo "version 2"
+# echo ""
 
 python proc_scripts/find_repo_pre_post_ai_adoption.py \
   --data-dir data_baseline_backup \
@@ -11,17 +22,6 @@ python proc_scripts/find_repo_pre_post_ai_adoption.py \
   --min-pre-months 1 \
   --min-post-months 1 \
   --output tmp_adoption_test/data/top_100_clone_candidates.csv
-
-echo ""
-echo "version 2"
-echo ""
-
-python proc_scripts/find_repo_pre_post_ai_adoption_v2.py \
-  --data-dir data_baseline_backup \
-  --top-n 100 \
-  --min-pre-months 1 \
-  --min-post-months 1 \
-  --output tmp_adoption_test/data/top_100_clone_candidates_v2.csv
 
 # mkdir -p tmp_adoption_test/data
 
