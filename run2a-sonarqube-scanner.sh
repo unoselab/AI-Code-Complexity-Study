@@ -10,3 +10,6 @@ echo "python proc_scripts/test_sonarqube_metrics.py"
 echo ""
 python proc_scripts/test_sonarqube_metrics.py
 
+echo "python proc_scripts/test_sonarqube_tiny_issues.py"
+echo ""
+python proc_scripts/test_sonarqube_tiny_issues.py

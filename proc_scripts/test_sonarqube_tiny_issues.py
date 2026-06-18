@@ -1,4 +1,3 @@
-cat > proc_scripts/test_sonarqube_tiny_issues.py <<'EOF'
 import os
 import requests
 from dotenv import load_dotenv
@@ -62,4 +61,3 @@ for issue_type in issue_types:
             issue.get("rule"),
             issue.get("message"),
         )
-EOF
