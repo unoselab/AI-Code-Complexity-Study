@@ -12,6 +12,7 @@ so you may have to run this script twice in order to fetch all available metrics
 """
 
 import argparse
+import re
 import logging
 import multiprocessing as mp
 import os
