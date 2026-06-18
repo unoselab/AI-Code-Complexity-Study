@@ -308,58 +308,106 @@ def process_repository(
     ts_df: pd.DataFrame, repo_name: str, aggregation: str, is_control: bool = False
 ) -> pd.DataFrame:
     """
-    Process a single repository's analysis.
+    Process a single repository's SonarQube analysis.
 
     Args:
-        ts_df: Time series dataframe
-        repo_name: Name of the repository to process
-        aggregation: Either 'week' or 'month'
-        is_control: Whether this is a control repository
+        ts_df: Time series dataframe.
+        repo_name: Name of the repository to process.
+        aggregation: Either "week" or "month".
+        is_control: Whether this is a control repository.
 
     Returns:
-        pd.DataFrame: Updated time series dataframe for this repository
+        pd.DataFrame: Updated time series dataframe for this repository.
     """
-    # Setup repository info and data
+    # Setup repository info and data.
     project_key = repo_name.replace("/", "_")
     repo_path = (CONTROL_CLONE_DIR if is_control else CLONE_DIR) / project_key
+
     if not repo_path.exists():
         logging.warning("Repository %s not found at %s", repo_name, repo_path)
         return ts_df[ts_df["repo_name"] == repo_name]
 
-    # Get repository data
+    # Get repository-specific rows.
     repo_df = ts_df[ts_df["repo_name"] == repo_name].copy()
 
-    # Use single date format string based on aggregation
+    # Use a single date format string based on aggregation.
     date_format = "%Y-W%W" if aggregation == "week" else "%Y-%m"
 
-    # Get start and end times using the same format
+    # Get start and end times using the same format.
     start_time = pd.Timestamp(START_DATE).strftime(date_format)
     end_time = pd.Timestamp(END_DATE).strftime(date_format)
 
     logging.info("Processing %s from %s to %s", repo_name, start_time, end_time)
 
-    # Process each time period's latest commit in chronological order
-    for time_period in sorted(
-        repo_df[(repo_df[TIME_KEY] >= start_time) & (repo_df[TIME_KEY] <= end_time)][
-            TIME_KEY
-        ].unique()
-    ):
+    # Process each time period's latest commit in chronological order.
+    time_periods = sorted(
+        repo_df[
+            (repo_df[TIME_KEY].astype(str) >= start_time)
+            & (repo_df[TIME_KEY].astype(str) <= end_time)
+        ][TIME_KEY].unique()
+    )
+
+    for time_period in time_periods:
         row_idx = repo_df[repo_df[TIME_KEY] == time_period].index[0]
         commit_hash = repo_df.loc[row_idx, "latest_commit"]
 
-        if not commit_hash:
+        # Handle missing or invalid commit hashes robustly.
+        if pd.isna(commit_hash) or not str(commit_hash).strip():
             logging.warning("No commit hash for %s at %s", repo_name, time_period)
             continue
 
-        if not check_analysis_exists(project_key, time_period):
-            logging.info("%s at %s (%s)", repo_name, time_period, commit_hash[:8])
-            run_sonar_scan(repo_path, commit_hash, time_period, project_key)
+        commit_hash = str(commit_hash).strip()
+        time_period = str(time_period).strip()
 
-        # Get and store metrics
-        if metrics := get_sonar_metrics(project_key, time_period):
+        analysis_exists = check_analysis_exists(project_key, time_period)
+
+        if not analysis_exists:
+            logging.info("%s at %s (%s)", repo_name, time_period, commit_hash[:8])
+
+            scan_result = run_sonar_scan(
+                repo_path,
+                commit_hash,
+                time_period,
+                project_key,
+            )
+
+            # Some versions of run_sonar_scan may return None on success.
+            # Treat only explicit False as failure.
+            if scan_result is False:
+                logging.warning(
+                    "Skipping metrics because SonarQube scan failed for %s at %s",
+                    repo_name,
+                    time_period,
+                )
+                continue
+
+            # SonarScanner returns after uploading the report, but SonarQube's
+            # Compute Engine may need time before the VERSION analysis appears.
+            ready = wait_for_analysis_ready(
+                project_key=project_key,
+                version=time_period,
+                timeout_seconds=120,
+                poll_interval_seconds=5,
+            )
+
+            if not ready:
+                logging.warning(
+                    "Skipping metrics because analysis was not ready for %s at %s",
+                    repo_name,
+                    time_period,
+                )
+                continue
+
+        # Get and store metrics.
+        metrics = get_sonar_metrics(project_key, time_period)
+
+        if metrics:
             for metric, value in metrics.items():
                 repo_df.loc[row_idx, metric] = value
+
             logging.info("Metrics for %s at %s: %s", repo_name, time_period, metrics)
+        else:
+            logging.warning("No metrics returned for %s at %s", repo_name, time_period)
 
     return repo_df
 
