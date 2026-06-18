@@ -1,4 +1,3 @@
-cat > proc_scripts/create_tmp_repo_timeseries_input.py <<'EOF'
 #!/usr/bin/env python3
 """
 Create a temporary repository time-series input CSV for SonarQube smoke tests.
@@ -116,6 +115,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-EOF
-
-chmod +x proc_scripts/create_tmp_repo_timeseries_input.py

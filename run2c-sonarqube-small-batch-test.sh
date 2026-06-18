@@ -66,14 +66,7 @@ done
 echo "============================================================"
 echo
 
-echo "Step 1: Create temporary batch time-series input"
-mkdir -p "${TMP_DATA_DIR}"
-
-# proc_scripts/test_create_tmp_repo_timeseries_input_batch.py
-python proc_scripts/test_create_tmp_repo_timeseries_input_batch.py "${TMP_TS_FILE}" "${REPOS[@]}"
-echo
-
-echo "Step 2: Clone missing repositories"
+echo "Step 1: Clone missing repositories"
 mkdir -p "${CLONE_ROOT}"
 
 for repo in "${REPOS[@]}"; do
@@ -99,19 +92,33 @@ for repo in "${REPOS[@]}"; do
   git -C "${repo_path}" log --oneline -3 || true
 done
 
+echo "============================================================"
 echo
 
-echo "Step 4: Run small-batch SonarQube pipeline"
+echo "Step 2: Create temporary batch time-series input from cloned repo HEAD commits"
+mkdir -p "${TMP_DATA_DIR}"
+
+python proc_scripts/create_tmp_repo_timeseries_input.py \
+  --output "${TMP_TS_FILE}" \
+  --clone-root "${CLONE_ROOT}" \
+  --month "2026-06" \
+  "${REPOS[@]}"
+
+echo "============================================================"
+echo
+
+echo "Step 3: Run small-batch SonarQube pipeline"
 python "${BATCH_SCRIPT}" --aggregation "${AGGREGATION}"
+echo "============================================================"
 echo
 
-# proc_scripts/test_display_metrics.py
-echo "Step 5: Show resulting metrics"
+echo "Step 4: Show resulting metrics"
 python proc_scripts/test_display_metrics.py "${TMP_TS_FILE}"
-
+echo "============================================================"
 echo
-echo "Step 6: SonarQube Docker memory snapshot"
-docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.PIDs}}" sonarqube || true
 
+echo "Step 5: SonarQube Docker memory snapshot"
+docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.PIDs}}" sonarqube || true
+echo "============================================================"
 echo
 echo "SonarQube small-batch smoke test completed successfully."
