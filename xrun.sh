@@ -1,34 +1,45 @@
+echo "Step 3: Create patched small-batch copy of run_sonarqube.py"
+
+cp scripts/run_sonarqube.py proc_scripts/run_sonarqube_small_batch_test.py
+
 python - <<'PY'
-import pandas as pd
+from pathlib import Path
+import re
 
-# Load repository metadata and monthly time-series data
-repos = pd.read_csv("data/repos.csv")
-ts = pd.read_csv("data/ts_repos_monthly.csv")
+p = Path("proc_scripts/run_sonarqube_small_batch_test.py")
+s = p.read_text()
 
-# Keep only repos that actually appear in the monthly panel
-valid_ts = ts[
-    ts["latest_commit"].notna()
-    & (ts["latest_commit"].astype(str).str.len() > 0)
-].copy()
+# Patch 1: use temporary small-batch data directory.
+s = re.sub(
+    r'DATA_DIR\s*=\s*SCRIPT_DIR\.parent\s*/\s*"data"',
+    'DATA_DIR = SCRIPT_DIR.parent / "tmp_sonar_batch" / "data"',
+    s,
+)
 
-valid_repo_names = set(valid_ts["repo_name"].unique())
+# Patch 2: use one process for a controlled smoke test.
+s = re.sub(
+    r'NUM_PROCESSES\s*=\s*\d+.*',
+    'NUM_PROCESSES = 1  # small-batch smoke test',
+    s,
+)
 
-candidates = repos[repos["repo_name"].isin(valid_repo_names)].copy()
+# Patch 3: use SonarQube token basic authentication instead of Bearer auth.
+s = s.replace(
+    'headers = {"Authorization": f"Bearer {SONAR_TOKEN}"}',
+    'auth = (SONAR_TOKEN, "")',
+)
 
-cols = [
-    "repo_name",
-    "repo_stars",
-    "repo_size",
-    "repo_primary_language",
-]
+s = s.replace(
+    'requests.get(url, headers=headers, params=params)',
+    'requests.get(url, auth=auth, params=params)',
+)
 
-cols = [c for c in cols if c in candidates.columns]
+p.write_text(s)
 
-# Medium-size candidates: larger than tiny test, but still safe
-medium = candidates[
-    (candidates["repo_size"] >= 500)
-    & (candidates["repo_size"] <= 50000000)
-].sort_values("repo_size")
-
-print(medium[cols].head(80).to_string(index=False))
+print("Patched:", p)
 PY
+
+echo
+echo "Patch check:"
+grep -n "DATA_DIR\|NUM_PROCESSES\|Authorization\|auth =\|requests.get" proc_scripts/run_sonarqube_small_batch_test.py
+echo

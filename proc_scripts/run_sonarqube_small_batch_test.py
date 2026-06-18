@@ -54,12 +54,12 @@ METRICS_OF_INTEREST = [
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
-DATA_DIR = SCRIPT_DIR.parent / "data"
+DATA_DIR = SCRIPT_DIR.parent / "tmp_sonar_batch" / "data"
 CLONE_DIR = SCRIPT_DIR.parent.parent / "CursorRepos"
 CONTROL_CLONE_DIR = SCRIPT_DIR.parent.parent / "ControlRepos"
 
 # Number of processes to use for parallel processing
-NUM_PROCESSES = 8  # if too much may crash Elastic Search
+NUM_PROCESSES = 1  # small-batch smoke test
 
 # Taking too long to analyze
 REPO_IGNORE = [
