@@ -1,8 +1,3 @@
-cat > run2d-sonarqube-tiny-metrics.sh <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-python - <<'PY'
 import os
 import requests
 from dotenv import load_dotenv
@@ -66,7 +61,3 @@ if missing:
     print()
     print("Missing metrics:", ", ".join(missing))
     print("This may be okay for a tiny test if the metric is not produced.")
-PY
-EOF
-
-chmod +x run2d-sonarqube-tiny-metrics.sh
