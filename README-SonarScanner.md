@@ -29,7 +29,6 @@ We then updated the small-batch smoke test so that the workflow became:
 2. Create temporary time-series input from cloned repository HEAD commits
 3. Run the SonarQube pipeline
 4. Display resulting metrics
-5. Check SonarQube Docker memory usage
 ```
 
 During testing, we found that the temporary input used `2026-06` as the test month, while the SonarQube runner was originally hardcoded to process only the original study window, from `2024-01` to `2025-08`. Because of this mismatch, the runner initially skipped the `2026-06` rows and produced missing metric values.
@@ -42,15 +41,7 @@ END_DATE   = max(input month)
 ```
 
 This allowed the runner to process arbitrary temporary test months such as `2026-06`.
-
-While applying this patch, we fixed two implementation issues:
-
-```text
-1. A misplaced duplicate dynamic-date block caused a Python SyntaxError.
-2. The helper function used `re.fullmatch()` but `import re` was missing.
-```
-
-After fixing these issues, the dynamic date range patch worked correctly. The runner logged:
+the dynamic date range patch worked correctly. The runner logged:
 
 ```text
 Using input-derived date range: 2026-06 to 2026-06
@@ -93,7 +84,7 @@ The final result confirmed that:
 
 We also confirmed an important methodological distinction. The current smoke test analyzes one month per repository using the current repository `HEAD` commit. This is useful for infrastructure validation, but it is not equivalent to the original paper pipeline.
 
-The original paper analyzed multiple months per repository. For each repository-month, the pipeline should use the commit corresponding to that historical month, not simply repeat the current `HEAD` commit.
+The original paper analyzed multiple months per repository. For each repository-month, the pipeline should use the commit corresponding to that historical month.
 
 Therefore, the next planned step is:
 
