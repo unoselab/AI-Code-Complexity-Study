@@ -1,3 +1,14 @@
+python proc_scripts/test_sonarqube_connection.py
+
+SONAR_HOST is set: True
+SONAR_TOKEN is set: True
+SONAR_SCANNER_PATH is set: True
+System status HTTP: 200
+System status response: {"id":"147B411E-AZ7XUeuF209cAQJhd365","version":"26.6.0.123539","status":"UP"}
+Authentication validate HTTP: 200
+Authentication validate response: {"valid":true}
+python proc_scripts/test_sonarqube_scan.py
+
 SONAR_HOST: http://localhost:9000
 SONAR_TOKEN is set: True
 SONAR_SCANNER_PATH: /home/user1-system12/tools/sonar-scanner/bin/sonar-scanner
@@ -8,123 +19,156 @@ Running sonar-scanner...
 Return code: 0
 
 STDOUT:
-16:30:19.369 INFO  Scanner configuration file: /home/user1-system12/tools/sonar-scanner-8.0.1.6346-linux-x64/conf/sonar-scanner.properties
-16:30:19.371 INFO  Project root configuration file: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_smoke/tiny_project/sonar-project.properties
-16:30:19.380 INFO  SonarScanner CLI 8.0.1.6346
-16:30:19.383 INFO  Linux 6.8.0-94-generic amd64
-16:30:21.138 INFO  Communicating with SonarQube Community Build 26.6.0.123539
-16:30:21.138 INFO  JRE provisioning: os[linux], arch[x86_64]
-16:30:21.347 INFO  Starting SonarScanner Engine...
-16:30:21.347 INFO  Java 21.0.9 Eclipse Adoptium (64-bit)
-16:30:23.183 INFO  Load global settings
-16:30:23.228 INFO  Load global settings (done) | time=43ms
-16:30:23.229 INFO  Server id: 147B411E-AZ7XUeuF209cAQJhd365
-16:30:23.234 INFO  Loading required plugins
-16:30:23.235 INFO  Load plugins index
-16:30:23.243 INFO  Load plugins index (done) | time=9ms
-16:30:23.244 INFO  Load/download plugins
-16:30:23.257 INFO  Load/download plugins (done) | time=13ms
-16:30:23.394 INFO  Process project properties
-16:30:23.402 INFO  Process project properties (done) | time=7ms
-16:30:23.408 INFO  Project key: cursorstudy-tiny-test
-16:30:23.408 INFO  Base dir: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_smoke/tiny_project
-16:30:23.409 INFO  Working dir: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_smoke/tiny_project/.scannerwork
-16:30:23.413 INFO  Load project settings for component key: 'cursorstudy-tiny-test'
-16:30:23.421 INFO  Load project settings for component key: 'cursorstudy-tiny-test' (done) | time=9ms
-16:30:23.433 INFO  Load quality profiles
-16:30:23.459 INFO  Load quality profiles (done) | time=27ms
-16:30:23.484 INFO  Load active rules
-16:30:23.649 INFO  Load active rules (done) | time=165ms
-16:30:23.652 INFO  Load analysis cache
-16:30:23.661 INFO  Load analysis cache (1.8 kB) | time=9ms
-16:30:23.727 INFO  Preprocessing files...
-16:30:23.746 INFO  1 language detected in 1 preprocessed file (done) | time=18ms
-16:30:23.746 INFO  0 files ignored because of scm ignore settings
-16:30:23.747 INFO  Loading plugins for detected languages
-16:30:23.747 INFO  Load/download plugins
-16:30:23.751 INFO  Load/download plugins (done) | time=3ms
-16:30:23.801 INFO  Load project repositories
-16:30:23.862 INFO  Load project repositories (done) | time=61ms
-16:30:23.877 INFO  Indexing files...
-16:30:23.877 INFO  Project configuration:
-16:30:23.887 INFO  1 file indexed (done) | time=9ms
-16:30:23.888 INFO  Quality profile for py: Sonar way
-16:30:23.888 INFO  ------------- Run sensors on module CursorStudy Tiny Test
-16:30:23.911 INFO  Load metrics repository
-16:30:23.921 INFO  Load metrics repository (done) | time=11ms
-16:30:24.187 INFO  Sensor IaC hadolint report Sensor [iac]
-16:30:24.187 INFO  Sensor IaC hadolint report Sensor [iac] (done) | time=0ms
-16:30:24.187 INFO  Sensor Java Config Sensor [iac]
-16:30:24.190 INFO  There are no files to be analyzed for the Java language
-16:30:24.190 INFO  Sensor Java Config Sensor [iac] (done) | time=3ms
-16:30:24.190 INFO  Sensor IaC Docker Sensor [iac]
-16:30:24.190 INFO  There are no files to be analyzed for the Docker language
-16:30:24.191 INFO  Sensor IaC Docker Sensor [iac] (done) | time=0ms
-16:30:24.191 INFO  Sensor Python Sensor [python]
-16:30:24.192 WARN  Your code is analyzed as compatible with all Python 3 versions by default. You can get a more precise analysis by setting the exact Python version in your configuration via the parameter "sonar.python.version"
-16:30:24.464 WARN  Access to the multi-values/property set property 'sonar.test.inclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
-16:30:24.465 WARN  Access to the multi-values/property set property 'sonar.test.exclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
-16:30:24.468 WARN  Access to the multi-values/property set property 'sonar.test.inclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
-16:30:24.468 WARN  Access to the multi-values/property set property 'sonar.test.exclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
-16:30:24.476 INFO  Starting global symbols computation
-16:30:24.479 INFO  1 source file to be analyzed
-16:30:24.576 INFO  1/1 source file has been analyzed
-16:30:24.577 INFO  Finished step global symbols computation in 99ms
-16:30:24.590 INFO  Starting rules execution
-16:30:24.590 INFO  1 source file to be analyzed
-16:30:24.929 INFO  1/1 source file has been analyzed
-16:30:24.930 INFO  Finished step rules execution in 339ms
-16:30:24.930 INFO  The Python analyzer was able to leverage cached data from previous analyses for 0 out of 1 files. These files were not parsed.
-16:30:24.931 INFO  Sensor Python Sensor [python] (done) | time=740ms
-16:30:24.931 INFO  Sensor Cobertura Sensor for Python coverage [python]
-16:30:24.932 INFO  Sensor Cobertura Sensor for Python coverage [python] (done) | time=1ms
-16:30:24.932 INFO  Sensor PythonXUnitSensor [python]
-16:30:24.933 INFO  Sensor PythonXUnitSensor [python] (done) | time=0ms
-16:30:24.933 INFO  Sensor Python Dependency Sensor [python]
-16:30:24.935 INFO  Sensor Python Dependency Sensor [python] (done) | time=1ms
-16:30:24.935 INFO  Sensor TextAndSecretsSensor [text]
-16:30:24.940 INFO  Available processors: 128
-16:30:24.940 INFO  Using 128 threads for analysis.
-16:30:25.084 INFO  The property "sonar.tests" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:
+20:01:05.012 INFO  Scanner configuration file: /home/user1-system12/tools/sonar-scanner-8.0.1.6346-linux-x64/conf/sonar-scanner.properties
+20:01:05.014 INFO  Project root configuration file: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_smoke/tiny_project/sonar-project.properties
+20:01:05.023 INFO  SonarScanner CLI 8.0.1.6346
+20:01:05.026 INFO  Linux 6.8.0-94-generic amd64
+20:01:06.776 INFO  Communicating with SonarQube Community Build 26.6.0.123539
+20:01:06.776 INFO  JRE provisioning: os[linux], arch[x86_64]
+20:01:06.983 INFO  Starting SonarScanner Engine...
+20:01:06.983 INFO  Java 21.0.9 Eclipse Adoptium (64-bit)
+20:01:08.814 INFO  Load global settings
+20:01:08.860 INFO  Load global settings (done) | time=45ms
+20:01:08.861 INFO  Server id: 147B411E-AZ7XUeuF209cAQJhd365
+20:01:08.866 INFO  Loading required plugins
+20:01:08.866 INFO  Load plugins index
+20:01:08.875 INFO  Load plugins index (done) | time=9ms
+20:01:08.875 INFO  Load/download plugins
+20:01:08.888 INFO  Load/download plugins (done) | time=14ms
+20:01:09.021 INFO  Process project properties
+20:01:09.029 INFO  Process project properties (done) | time=7ms
+20:01:09.035 INFO  Project key: cursorstudy-tiny-test
+20:01:09.036 INFO  Base dir: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_smoke/tiny_project
+20:01:09.036 INFO  Working dir: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_smoke/tiny_project/.scannerwork
+20:01:09.040 INFO  Load project settings for component key: 'cursorstudy-tiny-test'
+20:01:09.047 INFO  Load project settings for component key: 'cursorstudy-tiny-test' (done) | time=6ms
+20:01:09.058 INFO  Load quality profiles
+20:01:09.091 INFO  Load quality profiles (done) | time=33ms
+20:01:09.117 INFO  Load active rules
+20:01:09.275 INFO  Load active rules (done) | time=157ms
+20:01:09.278 INFO  Load analysis cache
+20:01:09.284 INFO  Load analysis cache (1.8 kB) | time=7ms
+20:01:09.347 INFO  Preprocessing files...
+20:01:09.369 INFO  1 language detected in 1 preprocessed file (done) | time=21ms
+20:01:09.370 INFO  0 files ignored because of scm ignore settings
+20:01:09.370 INFO  Loading plugins for detected languages
+20:01:09.370 INFO  Load/download plugins
+20:01:09.374 INFO  Load/download plugins (done) | time=4ms
+20:01:09.424 INFO  Load project repositories
+20:01:09.485 INFO  Load project repositories (done) | time=61ms
+20:01:09.503 INFO  Indexing files...
+20:01:09.504 INFO  Project configuration:
+20:01:09.508 INFO  1 file indexed (done) | time=5ms
+20:01:09.509 INFO  Quality profile for py: Sonar way
+20:01:09.509 INFO  ------------- Run sensors on module CursorStudy Tiny Test
+20:01:09.532 INFO  Load metrics repository
+20:01:09.544 INFO  Load metrics repository (done) | time=12ms
+20:01:09.821 INFO  Sensor IaC hadolint report Sensor [iac]
+20:01:09.821 INFO  Sensor IaC hadolint report Sensor [iac] (done) | time=0ms
+20:01:09.821 INFO  Sensor Java Config Sensor [iac]
+20:01:09.824 INFO  There are no files to be analyzed for the Java language
+20:01:09.824 INFO  Sensor Java Config Sensor [iac] (done) | time=3ms
+20:01:09.825 INFO  Sensor IaC Docker Sensor [iac]
+20:01:09.825 INFO  There are no files to be analyzed for the Docker language
+20:01:09.825 INFO  Sensor IaC Docker Sensor [iac] (done) | time=0ms
+20:01:09.825 INFO  Sensor Python Sensor [python]
+20:01:09.827 WARN  Your code is analyzed as compatible with all Python 3 versions by default. You can get a more precise analysis by setting the exact Python version in your configuration via the parameter "sonar.python.version"
+20:01:10.114 WARN  Access to the multi-values/property set property 'sonar.test.inclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
+20:01:10.115 WARN  Access to the multi-values/property set property 'sonar.test.exclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
+20:01:10.120 WARN  Access to the multi-values/property set property 'sonar.test.inclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
+20:01:10.120 WARN  Access to the multi-values/property set property 'sonar.test.exclusions' should be made using 'getStringArray' method. The SonarQube plugin using this property should be updated.
+20:01:10.127 INFO  Starting global symbols computation
+20:01:10.132 INFO  1 source file to be analyzed
+20:01:10.230 INFO  1/1 source file has been analyzed
+20:01:10.231 INFO  Finished step global symbols computation in 101ms
+20:01:10.245 INFO  Starting rules execution
+20:01:10.245 INFO  1 source file to be analyzed
+20:01:10.598 INFO  1/1 source file has been analyzed
+20:01:10.598 INFO  Finished step rules execution in 353ms
+20:01:10.598 INFO  The Python analyzer was able to leverage cached data from previous analyses for 0 out of 1 files. These files were not parsed.
+20:01:10.600 INFO  Sensor Python Sensor [python] (done) | time=774ms
+20:01:10.600 INFO  Sensor Cobertura Sensor for Python coverage [python]
+20:01:10.601 INFO  Sensor Cobertura Sensor for Python coverage [python] (done) | time=1ms
+20:01:10.601 INFO  Sensor PythonXUnitSensor [python]
+20:01:10.601 INFO  Sensor PythonXUnitSensor [python] (done) | time=0ms
+20:01:10.602 INFO  Sensor Python Dependency Sensor [python]
+20:01:10.603 INFO  Sensor Python Dependency Sensor [python] (done) | time=1ms
+20:01:10.604 INFO  Sensor TextAndSecretsSensor [text]
+20:01:10.610 INFO  Available processors: 128
+20:01:10.610 INFO  Using 128 threads for analysis.
+20:01:10.746 INFO  The property "sonar.tests" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:
   * The filename starts with "test"
   * The filename contains "test." or "tests."
   * Any directory in the file path is named: "doc", "docs", "test", "tests", "mock" or "mocks"
   * Any directory in the file path has a name ending in "test" or "tests"
 
-16:30:25.097 INFO  Start fetching files for the text and secrets analysis
-16:30:25.103 INFO  Using Git CLI to retrieve dirty files
-16:30:25.109 INFO  Retrieving language associated files and files included via "sonar.text.inclusions" that are tracked by git
-16:30:25.109 INFO  Starting the text and secrets analysis
-16:30:25.109 INFO  1 source file to be analyzed for the text and secrets analysis
-16:30:25.117 INFO  1/1 source file has been analyzed for the text and secrets analysis
-16:30:25.118 INFO  Sensor TextAndSecretsSensor [text] (done) | time=183ms
-16:30:25.121 INFO  ------------- Run sensors on project
-16:30:25.212 INFO  Sensor Zero Coverage Sensor
-16:30:25.215 INFO  Sensor Zero Coverage Sensor (done) | time=3ms
-16:30:25.216 INFO  ------------- Gather SCA dependencies on project
-16:30:25.219 INFO  Dependency analysis skipped
-16:30:25.222 INFO  SCM Publisher SCM provider for this project is: git
-16:30:25.223 INFO  SCM Publisher 1 source file to be analyzed
-16:30:25.402 INFO  SCM Publisher 0/1 source files have been analyzed (done) | time=179ms
-16:30:25.402 WARN  Missing blame information for the following files:
-16:30:25.403 WARN    * src/app.py
-16:30:25.403 WARN  This may lead to missing/broken features in SonarQube
-16:30:25.405 INFO  CPD Executor Calculating CPD for 1 file
-16:30:25.408 INFO  CPD Executor CPD calculation finished (done) | time=3ms
-16:30:25.411 INFO  SCM revision ID '8ec2be6ba22f77bebdac997f384439e7fa838002'
-16:30:25.463 INFO  Analysis report generated in 51ms, dir size=277.1 kB
-16:30:25.474 INFO  Analysis report compressed in 11ms, zip size=33.2 kB
-16:30:25.488 INFO  Analysis report uploaded in 13ms
-16:30:25.489 INFO  ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=cursorstudy-tiny-test
-16:30:25.489 INFO  Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
-16:30:25.489 INFO  More about the report processing at http://localhost:9000/api/ce/task?id=11f558d6-052b-4697-8d7b-6fee69301f53
-16:30:25.494 INFO  Analysis total time: 2.216 s
-16:30:25.494 INFO  SonarScanner Engine completed successfully
-16:30:25.574 INFO  EXECUTION SUCCESS
-16:30:25.574 INFO  Total time: 6.208s
+20:01:10.758 INFO  Start fetching files for the text and secrets analysis
+20:01:10.767 INFO  Using Git CLI to retrieve dirty files
+20:01:10.774 INFO  Retrieving language associated files and files included via "sonar.text.inclusions" that are tracked by git
+20:01:10.774 INFO  Starting the text and secrets analysis
+20:01:10.775 INFO  1 source file to be analyzed for the text and secrets analysis
+20:01:10.790 INFO  1/1 source file has been analyzed for the text and secrets analysis
+20:01:10.791 INFO  Sensor TextAndSecretsSensor [text] (done) | time=187ms
+20:01:10.794 INFO  ------------- Run sensors on project
+20:01:10.874 INFO  Sensor Zero Coverage Sensor
+20:01:10.878 INFO  Sensor Zero Coverage Sensor (done) | time=3ms
+20:01:10.878 INFO  ------------- Gather SCA dependencies on project
+20:01:10.883 INFO  Dependency analysis skipped
+20:01:10.890 INFO  CPD Executor Calculating CPD for 1 file
+20:01:10.895 INFO  CPD Executor CPD calculation finished (done) | time=4ms
+20:01:10.900 INFO  SCM revision ID 'dd1229f99d79045e8401e0b92766fc9b2324d8fd'
+20:01:10.949 INFO  Analysis report generated in 50ms, dir size=276.8 kB
+20:01:10.963 INFO  Analysis report compressed in 15ms, zip size=33.1 kB
+20:01:10.982 INFO  Analysis report uploaded in 19ms
+20:01:10.983 INFO  ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=cursorstudy-tiny-test
+20:01:10.983 INFO  Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
+20:01:10.984 INFO  More about the report processing at http://localhost:9000/api/ce/task?id=39d98ce1-61b1-42c9-8299-f8aafeac9408
+20:01:11.005 INFO  Analysis total time: 2.097 s
+20:01:11.005 INFO  SonarScanner Engine completed successfully
+20:01:11.072 INFO  EXECUTION SUCCESS
+20:01:11.073 INFO  Total time: 6.063s
 
 
 STDERR:
 
 
 Tiny SonarQube scan completed.
+python proc_scripts/test_sonarqube_metrics.py
+
+SONAR_HOST: http://localhost:9000
+Project key: cursorstudy-tiny-test
+Metrics: ncloc, bugs, vulnerabilities, code_smells, duplicated_lines_density, cognitive_complexity, sqale_index
+API: http://localhost:9000/api/measures/component
+
+HTTP: 200
+{"component":{"key":"cursorstudy-tiny-test","name":"CursorStudy Tiny Test","qualifier":"TRK","measures":[{"metric":"bugs","value":"0","bestValue":true},{"metric":"code_smells","value":"0","bestValue":true},{"metric":"duplicated_lines_density","value":"0.0","bestValue":true},{"metric":"cognitive_complexity","value":"5","bestValue":false},{"metric":"ncloc","value":"21"},{"metric":"vulnerabilities","value":"0","bestValue":true},{"metric":"sqale_index","value":"0","bestValue":true}]}}
+
+Parsed metrics:
+bugs: 0
+code_smells: 0
+duplicated_lines_density: 0.0
+cognitive_complexity: 5
+ncloc: 21
+vulnerabilities: 0
+sqale_index: 0
+python proc_scripts/test_sonarqube_tiny_issues.py
+
+SONAR_HOST: http://localhost:9000
+Project key: cursorstudy-tiny-test
+API: http://localhost:9000/api/issues/search
+
+============================================================
+Issue type: BUG
+HTTP: 200
+Total issues: 0
+Returned issues: 0
+============================================================
+Issue type: VULNERABILITY
+HTTP: 200
+Total issues: 0
+Returned issues: 0
+============================================================
+Issue type: CODE_SMELL
+HTTP: 200
+Total issues: 0
+Returned issues: 0

@@ -1,4 +1,3 @@
-cat > run2a-sonarqube-smoke-test.sh <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -19,6 +18,3 @@ python proc_scripts/test_sonarqube_tiny_issues.py
 echo
 
 echo "SonarQube smoke test completed successfully."
-EOF
-
-chmod +x run2a-sonarqube-smoke-test.sh
