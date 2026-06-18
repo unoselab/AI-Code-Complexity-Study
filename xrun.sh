@@ -1,22 +1,19 @@
-# python - <<'PY'
-# from pathlib import Path
+python - <<'PY'
+import pandas as pd
 
-# p = Path("proc_scripts/run_sonarqube_one_repo_test.py")
-# s = p.read_text()
+df = pd.read_csv("data/repos.csv")
 
-# # Read/write only the temporary one-repo test data.
-# s = s.replace(
-#     'DATA_DIR = SCRIPT_DIR.parent / "data"',
-#     'DATA_DIR = SCRIPT_DIR.parent / "tmp_sonar_one_repo" / "data"'
-# )
+cols = [
+    "repo_name",
+    "repo_stars",
+    "repo_size",
+    "repo_primary_language",
+]
 
-# # Use one process for a controlled smoke test.
-# s = s.replace(
-#     "NUM_PROCESSES = 8",
-#     "NUM_PROCESSES = 1"
-# )
+cols = [c for c in cols if c in df.columns]
 
-# p.write_text(s)
+# Show smallest repos first
+small = df.sort_values("repo_size")[cols].head(-1)
 
-# print("Patched:", p)
-# PY
+print(small.to_string(index=False))
+PY
