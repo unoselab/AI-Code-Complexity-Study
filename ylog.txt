@@ -1,77 +1,171 @@
 ============================================================
-SonarQube one-repo smoke test
-Repo name:      nextml-code/pytorch-datastream
-Project key:    nextml-code_pytorch-datastream
-Repo path:      ../CursorRepos/nextml-code_pytorch-datastream
+SonarQube small-batch smoke test
 Aggregation:    month
-Month filter:   latest available month
+Clone root:     ../CursorRepos
+Temp data:      tmp_sonar_batch/data/ts_repos_monthly.csv
 SONAR_HOST:     http://localhost:9000
 Scanner path:   /home/user1-system12/tools/sonar-scanner/bin/sonar-scanner
+Repositories:
+  - TheSethRose/Agent-Chat
+  - utensils/mcp-nixos
+  - nextml-code/pytorch-datastream
 ============================================================
 
-Step 5: Check or clone repository
-Repository already exists: ../CursorRepos/nextml-code_pytorch-datastream
-
-Repository size:
-1.6M	../CursorRepos/nextml-code_pytorch-datastream
-
-Latest commits:
-7a3e941 doc: instant navigation
-64f74e9 doc: link to new docs
-ce4fbed doc: remove doc status
-3e936f1 build: fix python 3.10 version
-ae25542 build: python 3.9 and above
-
-Step 6: Create temporary one-repo time-series input
-/home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/test_create_tmp_repo_timeseries_input.py:3: DeprecationWarning: 
+Step 1: Create temporary batch time-series input
+/home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/test_create_tmp_repo_timeseries_input_batch.py:3: DeprecationWarning:
 Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
 (to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
 but was not found to be installed on your system.
 If this would cause problems for you,
 please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
-        
+
   import pandas as pd
-Wrote: tmp_sonar_one_repo/data/ts_repos_monthly.csv
+Wrote: tmp_sonar_batch/data/ts_repos_monthly.csv
                      repo_name   month                            latest_commit
+        TheSethRose/Agent-Chat 2024-10 464bdbd1b280f5a15358aca50b7c8e60a4d5ff04
+            utensils/mcp-nixos 2025-08 46b4d4d3d6421bfbadc415532ef74433871e1cda
 nextml-code/pytorch-datastream 2025-01 7a3e9411106bcf354a5dd6e660a9b7aac0c52599
 
-Step 7: Create patched one-repo copy of run_sonarqube.py
+Step 2: Clone missing repositories
+------------------------------------------------------------
+Repo:       TheSethRose/Agent-Chat
+Project:    TheSethRose_Agent-Chat
+Repo path:  ../CursorRepos/TheSethRose_Agent-Chat
+Cloning repository...
+Cloning into '../CursorRepos/TheSethRose_Agent-Chat'...
+remote: Enumerating objects: 36, done.
+remote: Counting objects: 100% (36/36), done.
+remote: Compressing objects: 100% (28/28), done.
+remote: Total 36 (delta 12), reused 25 (delta 7), pack-reused 0 (from 0)
+Receiving objects: 100% (36/36), 891.87 KiB | 755.00 KiB/s, done.
+Resolving deltas: 100% (12/12), done.
+Repository size:
+2.0M	../CursorRepos/TheSethRose_Agent-Chat
+Latest commits:
+464bdbd (HEAD -> master, origin/master, origin/HEAD) Upload Preview
+3df1c54 Seperating out code into seperate files / folders
+6e4fa54 Issue with Calculator overriding DuckDuckGo - Fixed
+------------------------------------------------------------
+Repo:       utensils/mcp-nixos
+Project:    utensils_mcp-nixos
+Repo path:  ../CursorRepos/utensils_mcp-nixos
+Cloning repository...
+Cloning into '../CursorRepos/utensils_mcp-nixos'...
+remote: Enumerating objects: 3544, done.
+remote: Counting objects: 100% (529/529), done.
+remote: Compressing objects: 100% (240/240), done.
+remote: Total 3544 (delta 408), reused 289 (delta 289), pack-reused 3015 (from 3)
+Receiving objects: 100% (3544/3544), 2.85 MiB | 15.68 MiB/s, done.
+Resolving deltas: 100% (2240/2240), done.
+Repository size:
+4.6M	../CursorRepos/utensils_mcp-nixos
+Latest commits:
+0ef99b6 (HEAD -> main, origin/main, origin/HEAD) chore: switch direnv to nix-direnv for cached devshell loads (#155)
+d7ebc7b test(store): fix flaky "Error" not-in-result assertions (#154)
+fd51bb2 (tag: v2.4.3) release: v2.4.3 - LLM Discoverability
+------------------------------------------------------------
+Repo:       nextml-code/pytorch-datastream
+Project:    nextml-code_pytorch-datastream
+Repo path:  ../CursorRepos/nextml-code_pytorch-datastream
+Repository already exists.
+Repository size:
+1.6M	../CursorRepos/nextml-code_pytorch-datastream
+Latest commits:
+7a3e941 (HEAD, origin/master, origin/HEAD, master) doc: instant navigation
+64f74e9 doc: link to new docs
+ce4fbed doc: remove doc status
 
-Patch check:
-57:DATA_DIR = SCRIPT_DIR.parent / "tmp_sonar_one_repo" / "data"
-62:NUM_PROCESSES = 1  # if too much may crash Elastic Search
-88:            auth = (SONAR_TOKEN, "")
-96:            response = requests.get(url, auth=auth, params=params)
-205:            auth = (SONAR_TOKEN, "")
-213:            response = requests.get(url, auth=auth, params=params)
-248:        response = requests.get(url, auth=auth, params=params)
-364:    ts_repos_file = DATA_DIR / f"{file_prefix}{args.aggregation}ly.csv"
-380:    with mp.Pool(NUM_PROCESSES) as pool:
-
-Step 8: Run one-repo SonarQube pipeline
-/home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/run_sonarqube_one_repo_test.py:24: DeprecationWarning: 
+Step 4: Run small-batch SonarQube pipeline
+/home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/run_sonarqube_small_batch_test.py:24: DeprecationWarning:
 Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
 (to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
 but was not found to be installed on your system.
 If this would cause problems for you,
 please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
-        
+
   import pandas as pd
-2026-06-17 23:06:50,552 [INFO] Processing nextml-code/pytorch-datastream from 2024-01 to 2025-08
-2026-06-17 23:06:50,561 [INFO] Analysis already exists for nextml-code_pytorch-datastream version 2025-01
-2026-06-17 23:06:50,566 [INFO] Found 1 analyses for nextml-code_pytorch-datastream
-2026-06-17 23:06:50,571 [INFO] Metrics for nextml-code/pytorch-datastream at 2025-01: {'bugs': 0.0, 'code_smells': 13.0, 'cognitive_complexity': 124.0, 'comment_lines_density': 19.4, 'duplicated_lines_density': 0.0, 'ncloc': 1671.0, 'software_quality_maintainability_remediation_effort': 125.0, 'vulnerabilities': 0.0}
-2026-06-17 23:06:50,579 [INFO] Updated metrics saved to /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_one_repo/data/ts_repos_monthly.csv
+2026-06-17 23:37:16,109 [INFO] Processing TheSethRose/Agent-Chat from 2024-01 to 2025-08
+2026-06-17 23:37:16,116 [ERROR] Failed to check existing analysis for TheSethRose_Agent-Chat: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=TheSethRose_Agent-Chat&category=VERSION&p=1&ps=100
+2026-06-17 23:37:16,116 [INFO] TheSethRose/Agent-Chat at 2024-10 (464bdbd1)
+2026-06-17 23:37:23,086 [INFO] SonarQube scan completed for TheSethRose_Agent-Chat at 2024-10
+2026-06-17 23:37:23,095 [INFO] Found 0 analyses for TheSethRose_Agent-Chat
+2026-06-17 23:37:23,095 [WARNING] No analysis found for TheSethRose_Agent-Chat version 2024-10
+2026-06-17 23:37:23,096 [INFO] Processing nextml-code/pytorch-datastream from 2024-01 to 2025-08
+2026-06-17 23:37:23,100 [INFO] Analysis already exists for nextml-code_pytorch-datastream version 2025-01
+2026-06-17 23:37:23,103 [INFO] Found 1 analyses for nextml-code_pytorch-datastream
+2026-06-17 23:37:23,108 [INFO] Metrics for nextml-code/pytorch-datastream at 2025-01: {'bugs': 0.0, 'code_smells': 13.0, 'cognitive_complexity': 124.0, 'comment_lines_density': 19.4, 'duplicated_lines_density': 0.0, 'ncloc': 1671.0, 'software_quality_maintainability_remediation_effort': 125.0, 'vulnerabilities': 0.0}
+2026-06-17 23:37:23,109 [INFO] Processing utensils/mcp-nixos from 2024-01 to 2025-08
+2026-06-17 23:37:23,111 [ERROR] Failed to check existing analysis for utensils_mcp-nixos: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=utensils_mcp-nixos&category=VERSION&p=1&ps=100
+2026-06-17 23:37:23,111 [INFO] utensils/mcp-nixos at 2025-08 (46b4d4d3)
+2026-06-17 23:37:37,502 [INFO] SonarQube scan completed for utensils_mcp-nixos at 2025-08
+2026-06-17 23:37:37,519 [INFO] Found 0 analyses for utensils_mcp-nixos
+2026-06-17 23:37:37,519 [WARNING] No analysis found for utensils_mcp-nixos version 2025-08
+2026-06-17 23:37:37,527 [INFO] Updated metrics saved to /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_batch/data/ts_repos_monthly.csv
 
-Step 9: Show resulting metrics
-<stdin>:3: DeprecationWarning: 
+Step 5: Show resulting metrics
+/home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/test_display_metrics.py:4: DeprecationWarning:
 Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
 (to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
 but was not found to be installed on your system.
 If this would cause problems for you,
 please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
-        
-                     repo_name   month                            latest_commit  ncloc  bugs  vulnerabilities  code_smells  static_analysis_warnings  duplicated_lines_density  comment_lines_density  cognitive_complexity  technical_debt
-nextml-code/pytorch-datastream 2025-01 7a3e9411106bcf354a5dd6e660a9b7aac0c52599 1671.0   0.0              0.0         13.0                      13.0                       0.0                   19.4                 124.0           125.0
 
-SonarQube one-repo smoke test completed successfully.
+  import pandas as pd
+==========================================================================================
+Repository #1: TheSethRose/Agent-Chat
+==========================================================================================
+repo_name                : TheSethRose/Agent-Chat
+month                    : 2024-10
+latest_commit            : 464bdbd1b280f5a15358aca50b7c8e60a4d5ff04
+ncloc                    : 356.0
+bugs                     : 0.0
+vulnerabilities          : 0.0
+code_smells              : 4.0
+static_analysis_warnings : 4.0
+duplicated_lines_density : 0.0
+comment_lines_density    : 25.5
+cognitive_complexity     : 77.0
+technical_debt           :
+
+==========================================================================================
+Repository #2: nextml-code/pytorch-datastream
+==========================================================================================
+repo_name                : nextml-code/pytorch-datastream
+month                    : 2025-01
+latest_commit            : 7a3e9411106bcf354a5dd6e660a9b7aac0c52599
+ncloc                    : 1671.0
+bugs                     : 0.0
+vulnerabilities          : 0.0
+code_smells              : 13.0
+static_analysis_warnings : 13.0
+duplicated_lines_density : 0.0
+comment_lines_density    : 19.4
+cognitive_complexity     : 124.0
+technical_debt           : 125.0
+
+==========================================================================================
+Repository #3: utensils/mcp-nixos
+==========================================================================================
+repo_name                : utensils/mcp-nixos
+month                    : 2025-08
+latest_commit            : 46b4d4d3d6421bfbadc415532ef74433871e1cda
+ncloc                    : 26618.0
+bugs                     : 8.0
+vulnerabilities          : 0.0
+code_smells              : 44.0
+static_analysis_warnings : 52.0
+duplicated_lines_density : 29.3
+comment_lines_density    : 5.7
+cognitive_complexity     : 973.0
+technical_debt           :
+
+==========================================================================================
+Total repositories displayed: 3
+==========================================================================================
+
+Step 6: SonarQube Docker memory snapshot
+NAME        CPU %     MEM USAGE / LIMIT     MEM %     PIDS
+sonarqube   349.52%   3.846GiB / 251.2GiB   1.53%     1224
+
+SonarQube small-batch smoke test completed successfully.
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$
