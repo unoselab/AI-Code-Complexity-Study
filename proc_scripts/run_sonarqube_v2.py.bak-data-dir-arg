@@ -461,16 +461,6 @@ def main() -> None:
         action="store_true",
         help="Run analysis on control repositories instead of experimental ones",
     )
-
-    parser.add_argument(
-        "--data-dir",
-        type=Path,
-        default=DATA_DIR,
-        help=(
-            "Directory containing ts_repos_monthly.csv or ts_repos_weekly.csv. "
-            "Default: %(default)s"
-        ),
-    )
     args = parser.parse_args()
     TIME_KEY = "week" if args.aggregation == "week" else "month"
 
@@ -485,11 +475,8 @@ def main() -> None:
         return
 
     # Set input file path based on aggregation level and control flag
-    data_dir = Path(args.data_dir).expanduser().resolve()
-    logging.info("Using data directory: %s", data_dir)
-
     file_prefix = "ts_repos_control_" if args.control else "ts_repos_"
-    ts_repos_file = data_dir / f"{file_prefix}{args.aggregation}ly.csv"
+    ts_repos_file = DATA_DIR / f"{file_prefix}{args.aggregation}ly.csv"
 
     # Read repository time series data and adoption data
     try:
