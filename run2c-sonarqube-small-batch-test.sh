@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Small-batch SonarQube smoke test using three original-paper repositories.
-#
 # This script does NOT modify the original data/ts_repos_monthly.csv.
 # It writes temporary batch input to:
 #   tmp_sonar_batch/data/ts_repos_monthly.csv
-#
-# It creates a safe patched copy:
-#   proc_scripts/run_sonarqube_small_batch_test.py
 #
 # Target repos:
 #   TheSethRose/Agent-Chat
@@ -20,7 +15,7 @@ CLONE_ROOT="../CursorRepos"
 TMP_ROOT="tmp_sonar_batch"
 TMP_DATA_DIR="${TMP_ROOT}/data"
 TMP_TS_FILE="${TMP_DATA_DIR}/ts_repos_monthly.csv"
-BATCH_SCRIPT="proc_scripts/run_sonarqube_small_batch_test.py"
+BATCH_SCRIPT="proc_scripts/run_sonarqube_v2.py"
 
 REPOS=(
   "TheSethRose/Agent-Chat"

@@ -37,7 +37,7 @@ remote: Enumerating objects: 36, done.
 remote: Counting objects: 100% (36/36), done.
 remote: Compressing objects: 100% (28/28), done.
 remote: Total 36 (delta 12), reused 25 (delta 7), pack-reused 0 (from 0)
-Receiving objects: 100% (36/36), 891.87 KiB | 755.00 KiB/s, done.
+Receiving objects: 100% (36/36), 891.87 KiB | 747.00 KiB/s, done.
 Resolving deltas: 100% (12/12), done.
 Repository size:
 2.0M	../CursorRepos/TheSethRose_Agent-Chat
@@ -55,7 +55,7 @@ remote: Enumerating objects: 3544, done.
 remote: Counting objects: 100% (529/529), done.
 remote: Compressing objects: 100% (240/240), done.
 remote: Total 3544 (delta 408), reused 289 (delta 289), pack-reused 3015 (from 3)
-Receiving objects: 100% (3544/3544), 2.85 MiB | 15.68 MiB/s, done.
+Receiving objects: 100% (3544/3544), 2.85 MiB | 13.70 MiB/s, done.
 Resolving deltas: 100% (2240/2240), done.
 Repository size:
 4.6M	../CursorRepos/utensils_mcp-nixos
@@ -67,11 +67,18 @@ fd51bb2 (tag: v2.4.3) release: v2.4.3 - LLM Discoverability
 Repo:       nextml-code/pytorch-datastream
 Project:    nextml-code_pytorch-datastream
 Repo path:  ../CursorRepos/nextml-code_pytorch-datastream
-Repository already exists.
+Cloning repository...
+Cloning into '../CursorRepos/nextml-code_pytorch-datastream'...
+remote: Enumerating objects: 842, done.
+remote: Counting objects: 100% (54/54), done.
+remote: Compressing objects: 100% (45/45), done.
+remote: Total 842 (delta 11), reused 11 (delta 6), pack-reused 788 (from 2)
+Receiving objects: 100% (842/842), 933.09 KiB | 5.98 MiB/s, done.
+Resolving deltas: 100% (483/483), done.
 Repository size:
 1.6M	../CursorRepos/nextml-code_pytorch-datastream
 Latest commits:
-7a3e941 (HEAD, origin/master, origin/HEAD, master) doc: instant navigation
+7a3e941 (HEAD -> master, origin/master, origin/HEAD) doc: instant navigation
 64f74e9 doc: link to new docs
 ce4fbed doc: remove doc status
 
@@ -84,23 +91,19 @@ If this would cause problems for you,
 please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
 
   import pandas as pd
-2026-06-17 23:37:16,109 [INFO] Processing TheSethRose/Agent-Chat from 2024-01 to 2025-08
-2026-06-17 23:37:16,116 [ERROR] Failed to check existing analysis for TheSethRose_Agent-Chat: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=TheSethRose_Agent-Chat&category=VERSION&p=1&ps=100
-2026-06-17 23:37:16,116 [INFO] TheSethRose/Agent-Chat at 2024-10 (464bdbd1)
-2026-06-17 23:37:23,086 [INFO] SonarQube scan completed for TheSethRose_Agent-Chat at 2024-10
-2026-06-17 23:37:23,095 [INFO] Found 0 analyses for TheSethRose_Agent-Chat
-2026-06-17 23:37:23,095 [WARNING] No analysis found for TheSethRose_Agent-Chat version 2024-10
-2026-06-17 23:37:23,096 [INFO] Processing nextml-code/pytorch-datastream from 2024-01 to 2025-08
-2026-06-17 23:37:23,100 [INFO] Analysis already exists for nextml-code_pytorch-datastream version 2025-01
-2026-06-17 23:37:23,103 [INFO] Found 1 analyses for nextml-code_pytorch-datastream
-2026-06-17 23:37:23,108 [INFO] Metrics for nextml-code/pytorch-datastream at 2025-01: {'bugs': 0.0, 'code_smells': 13.0, 'cognitive_complexity': 124.0, 'comment_lines_density': 19.4, 'duplicated_lines_density': 0.0, 'ncloc': 1671.0, 'software_quality_maintainability_remediation_effort': 125.0, 'vulnerabilities': 0.0}
-2026-06-17 23:37:23,109 [INFO] Processing utensils/mcp-nixos from 2024-01 to 2025-08
-2026-06-17 23:37:23,111 [ERROR] Failed to check existing analysis for utensils_mcp-nixos: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=utensils_mcp-nixos&category=VERSION&p=1&ps=100
-2026-06-17 23:37:23,111 [INFO] utensils/mcp-nixos at 2025-08 (46b4d4d3)
-2026-06-17 23:37:37,502 [INFO] SonarQube scan completed for utensils_mcp-nixos at 2025-08
-2026-06-17 23:37:37,519 [INFO] Found 0 analyses for utensils_mcp-nixos
-2026-06-17 23:37:37,519 [WARNING] No analysis found for utensils_mcp-nixos version 2025-08
-2026-06-17 23:37:37,527 [INFO] Updated metrics saved to /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_batch/data/ts_repos_monthly.csv
+2026-06-17 23:40:20,417 [INFO] Processing utensils/mcp-nixos from 2024-01 to 2025-08
+2026-06-17 23:40:20,426 [INFO] Analysis already exists for utensils_mcp-nixos version 2025-08
+2026-06-17 23:40:20,430 [INFO] Found 1 analyses for utensils_mcp-nixos
+2026-06-17 23:40:20,436 [INFO] Metrics for utensils/mcp-nixos at 2025-08: {'bugs': 11.0, 'code_smells': 59.0, 'cognitive_complexity': 973.0, 'comment_lines_density': 5.7, 'duplicated_lines_density': 29.3, 'ncloc': 26620.0, 'software_quality_maintainability_remediation_effort': 491.0, 'vulnerabilities': 4.0}
+2026-06-17 23:40:20,437 [INFO] Processing nextml-code/pytorch-datastream from 2024-01 to 2025-08
+2026-06-17 23:40:20,441 [INFO] Analysis already exists for nextml-code_pytorch-datastream version 2025-01
+2026-06-17 23:40:20,450 [INFO] Found 1 analyses for nextml-code_pytorch-datastream
+2026-06-17 23:40:20,455 [INFO] Metrics for nextml-code/pytorch-datastream at 2025-01: {'bugs': 0.0, 'code_smells': 13.0, 'cognitive_complexity': 124.0, 'comment_lines_density': 19.4, 'duplicated_lines_density': 0.0, 'ncloc': 1671.0, 'software_quality_maintainability_remediation_effort': 125.0, 'vulnerabilities': 0.0}
+2026-06-17 23:40:20,456 [INFO] Processing TheSethRose/Agent-Chat from 2024-01 to 2025-08
+2026-06-17 23:40:20,460 [INFO] Analysis already exists for TheSethRose_Agent-Chat version 2024-10
+2026-06-17 23:40:20,464 [INFO] Found 1 analyses for TheSethRose_Agent-Chat
+2026-06-17 23:40:20,468 [INFO] Metrics for TheSethRose/Agent-Chat at 2024-10: {'bugs': 0.0, 'code_smells': 12.0, 'cognitive_complexity': 77.0, 'comment_lines_density': 25.5, 'duplicated_lines_density': 0.0, 'ncloc': 356.0, 'software_quality_maintainability_remediation_effort': 71.0, 'vulnerabilities': 1.0}
+2026-06-17 23:40:20,477 [INFO] Updated metrics saved to /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_batch/data/ts_repos_monthly.csv
 
 Step 5: Show resulting metrics
 /home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/test_display_metrics.py:4: DeprecationWarning:
@@ -119,13 +122,13 @@ month                    : 2024-10
 latest_commit            : 464bdbd1b280f5a15358aca50b7c8e60a4d5ff04
 ncloc                    : 356.0
 bugs                     : 0.0
-vulnerabilities          : 0.0
-code_smells              : 4.0
-static_analysis_warnings : 4.0
+vulnerabilities          : 1.0
+code_smells              : 12.0
+static_analysis_warnings : 13.0
 duplicated_lines_density : 0.0
 comment_lines_density    : 25.5
 cognitive_complexity     : 77.0
-technical_debt           :
+technical_debt           : 71.0
 
 ==========================================================================================
 Repository #2: nextml-code/pytorch-datastream
@@ -149,15 +152,15 @@ Repository #3: utensils/mcp-nixos
 repo_name                : utensils/mcp-nixos
 month                    : 2025-08
 latest_commit            : 46b4d4d3d6421bfbadc415532ef74433871e1cda
-ncloc                    : 26618.0
-bugs                     : 8.0
-vulnerabilities          : 0.0
-code_smells              : 44.0
-static_analysis_warnings : 52.0
+ncloc                    : 26620.0
+bugs                     : 11.0
+vulnerabilities          : 4.0
+code_smells              : 59.0
+static_analysis_warnings : 74.0
 duplicated_lines_density : 29.3
 comment_lines_density    : 5.7
 cognitive_complexity     : 973.0
-technical_debt           :
+technical_debt           : 491.0
 
 ==========================================================================================
 Total repositories displayed: 3
@@ -165,7 +168,7 @@ Total repositories displayed: 3
 
 Step 6: SonarQube Docker memory snapshot
 NAME        CPU %     MEM USAGE / LIMIT     MEM %     PIDS
-sonarqube   349.52%   3.846GiB / 251.2GiB   1.53%     1224
+sonarqube   276.86%   3.848GiB / 251.2GiB   1.53%     1211
 
 SonarQube small-batch smoke test completed successfully.
 (aicomplexity) OISSE-IST173C01:ai_code_complexity_study$

@@ -1,4 +1,4 @@
 month,repo_name,latest_commit,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,technical_debt
-2024-10,TheSethRose/Agent-Chat,464bdbd1b280f5a15358aca50b7c8e60a4d5ff04,True,8.0,302.0,181.0,2.0,0,0,0,0,356.0,0.0,0.0,4.0,0.0,25.5,77.0,,,,
+2024-10,TheSethRose/Agent-Chat,464bdbd1b280f5a15358aca50b7c8e60a4d5ff04,True,8.0,302.0,181.0,2.0,0,0,0,0,356.0,0.0,1.0,12.0,0.0,25.5,77.0,,,,71.0
 2025-01,nextml-code/pytorch-datastream,7a3e9411106bcf354a5dd6e660a9b7aac0c52599,True,8.0,2744.0,1486.0,1.0,0,0,0,1016,1671.0,0.0,0.0,13.0,0.0,19.4,124.0,,,,125.0
-2025-08,utensils/mcp-nixos,46b4d4d3d6421bfbadc415532ef74433871e1cda,False,18.0,9648.0,12811.0,2.0,32,2,35,124,26618.0,8.0,0.0,44.0,29.3,5.7,973.0,,,,
+2025-08,utensils/mcp-nixos,46b4d4d3d6421bfbadc415532ef74433871e1cda,False,18.0,9648.0,12811.0,2.0,32,2,35,124,26620.0,11.0,4.0,59.0,29.3,5.7,973.0,,,,491.0
