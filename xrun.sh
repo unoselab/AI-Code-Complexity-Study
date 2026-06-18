@@ -1,121 +1,60 @@
-cat > proc_scripts/create_tmp_repo_timeseries_input.py <<'EOF'
-#!/usr/bin/env python3
-"""
-Create a temporary repository time-series input CSV for SonarQube smoke tests.
+cp proc_scripts/run_sonarqube_v2.py proc_scripts/run_sonarqube_v2.py.bak-dynamic-dates
 
-This script does not depend on the original paper's data/ts_repos_monthly.csv.
-It reads the current HEAD commit from already cloned repositories and writes
-a minimal CSV that can be consumed by proc_scripts/run_sonarqube_v2.py.
-
-Example:
-    python proc_scripts/create_tmp_repo_timeseries_input.py \
-      --output tmp_sonar_batch/data/ts_repos_monthly.csv \
-      --clone-root ../CursorRepos \
-      --month 2026-06 \
-      TheSethRose/Agent-Chat \
-      utensils/mcp-nixos \
-      nextml-code/pytorch-datastream
-"""
-
-from __future__ import annotations
-
-import argparse
-import subprocess
+python - <<'PY'
 from pathlib import Path
+import re
 
-import pandas as pd
+p = Path("proc_scripts/run_sonarqube_v2.py")
+s = p.read_text()
 
+# Insert a helper function before main().
+helper = r'''
+def infer_date_range_from_input(ts_df: pd.DataFrame, time_key: str) -> tuple[str, str]:
+    """Infer START_DATE and END_DATE from the input time-series file."""
+    if time_key not in ts_df.columns:
+        raise ValueError(f"Missing time column: {time_key}")
 
-def repo_to_project_key(repo_name: str) -> str:
-    """Convert GitHub repo name OWNER/REPO to SonarQube project key OWNER_REPO."""
-    return repo_name.replace("/", "_")
-
-
-def get_head_commit(repo_path: Path) -> str:
-    """Return the current HEAD commit hash for a cloned Git repository."""
-    if not (repo_path / ".git").exists():
-        raise FileNotFoundError(f"Missing cloned Git repository: {repo_path}")
-
-    result = subprocess.run(
-        ["git", "-C", str(repo_path), "rev-parse", "HEAD"],
-        text=True,
-        capture_output=True,
-        check=True,
+    values = (
+        ts_df[time_key]
+        .dropna()
+        .astype(str)
+        .str.strip()
     )
 
-    return result.stdout.strip()
+    if values.empty:
+        raise ValueError(f"No valid values found in time column: {time_key}")
 
+    # Accept both YYYY-MM and YYYYMM formats, but normalize to YYYY-MM.
+    normalized = []
+    for value in values:
+        if re.fullmatch(r"\d{6}", value):
+            normalized.append(f"{value[:4]}-{value[4:]}")
+        elif re.fullmatch(r"\d{4}-\d{2}", value):
+            normalized.append(value)
+        else:
+            raise ValueError(
+                f"Unsupported time value format in {time_key}: {value}. "
+                "Expected YYYY-MM or YYYYMM."
+            )
 
-def build_rows(repo_names: list[str], clone_root: Path, month: str) -> list[dict[str, str]]:
-    """Build minimal time-series rows from cloned repository HEAD commits."""
-    rows = []
+    return min(normalized), max(normalized)
 
-    for repo_name in repo_names:
-        project_key = repo_to_project_key(repo_name)
-        repo_path = clone_root / project_key
-        latest_commit = get_head_commit(repo_path)
+'''
 
-        rows.append(
-            {
-                "repo_name": repo_name,
-                "month": month,
-                "latest_commit": latest_commit,
-            }
-        )
+if "def infer_date_range_from_input" not in s:
+    s = s.replace("\ndef main() -> None:", "\n" + helper + "\ndef main() -> None:")
 
-    return rows
+# After ts_df = pd.read_csv(ts_repos_file), assign global START_DATE and END_DATE.
+pattern = r'(\s+ts_df\s*=\s*pd\.read_csv\(ts_repos_file\)\n)'
+replacement = r'''\1
+    global START_DATE, END_DATE
+    START_DATE, END_DATE = infer_date_range_from_input(ts_df, TIME_KEY)
+    logging.info("Using input-derived date range: %s to %s", START_DATE, END_DATE)
+'''
 
+if "Using input-derived date range" not in s:
+    s = re.sub(pattern, replacement, s, count=1)
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Create temporary SonarQube time-series input from cloned repo HEAD commits."
-    )
-
-    parser.add_argument(
-        "repo_names",
-        nargs="+",
-        help="GitHub repositories in OWNER/REPO format.",
-    )
-
-    parser.add_argument(
-        "--output",
-        required=True,
-        help="Output CSV path, e.g., tmp_sonar_batch/data/ts_repos_monthly.csv.",
-    )
-
-    parser.add_argument(
-        "--clone-root",
-        default="../CursorRepos",
-        help="Directory containing cloned repositories. Default: ../CursorRepos.",
-    )
-
-    parser.add_argument(
-        "--month",
-        default="2026-06",
-        help="Month/version label to write to the CSV. Default: 2026-06.",
-    )
-
-    args = parser.parse_args()
-
-    output_path = Path(args.output)
-    clone_root = Path(args.clone_root)
-
-    rows = build_rows(
-        repo_names=args.repo_names,
-        clone_root=clone_root,
-        month=args.month,
-    )
-
-    df = pd.DataFrame(rows)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(output_path, index=False)
-
-    print("Wrote:", output_path)
-    print(df.to_string(index=False))
-
-
-if __name__ == "__main__":
-    main()
-EOF
-
-chmod +x proc_scripts/create_tmp_repo_timeseries_input.py
+p.write_text(s)
+print("Patched dynamic START_DATE/END_DATE in", p)
+PY
