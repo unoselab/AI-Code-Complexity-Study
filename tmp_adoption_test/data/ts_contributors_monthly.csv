@@ -1,0 +1,58 @@
+repo_name,author,month,commits,lines_added,lines_removed
+TheSethRose/Agent-Chat,Seth Rose <10383809+TheSethRose@users.noreply.github.com>,2024-10,2,0,0
+TheSethRose/Agent-Chat,Seth Rose <admin@seth-rose.com>,2024-10,6,302,181
+nextml-code/pytorch-datastream,Felix Abrahamsson <felix@aiwizo.com>,2020-06,1,11,17
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2020-06,3,26,29
+nextml-code/pytorch-datastream,Jim Holmstrom <jim.holmstroem@gmail.com>,2020-06,4,58,17
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2020-06,41,3894,967
+nextml-code/pytorch-datastream,Richard Löwenström <samedii@gmail.com>,2020-06,1,1,1
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2020-07,4,159,79
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2020-08,2,148,11
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2020-08,6,76,18
+nextml-code/pytorch-datastream,Jim Holmstrom <jim.holmstroem@gmail.com>,2020-09,1,3,0
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2020-09,3,90,19
+nextml-code/pytorch-datastream,Author FelixAbrahamsson <felixab@kth.se>,2020-10,1,26,0
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2020-10,5,483,376
+nextml-code/pytorch-datastream,Jim Holmstrom <jim.holmstroem@gmail.com>,2020-10,13,218,171
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2020-10,5,14,13
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2020-11,1,2,3
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2020-11,2,5,3
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2020-12,6,390,296
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2020-12,5,163,39
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2021-02,2,27,2
+nextml-code/pytorch-datastream,Jim Holmstrom <jim.holmstroem@gmail.com>,2021-02,1,3,2
+nextml-code/pytorch-datastream,Joar Gruneau <joar@gruneau.se>,2021-03,1,13,25
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2021-04,1,4,4
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2021-05,2,48,5
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2021-05,2,2,2
+nextml-code/pytorch-datastream,FelixAbrahamsson <felixab@kth.se>,2021-09,1,10,0
+nextml-code/pytorch-datastream,Richard <samedii@gmail.com>,2021-12,2,831,139
+nextml-code/pytorch-datastream,Richard Löwenström <samedii@gmail.com>,2022-10,2,1031,902
+nextml-code/pytorch-datastream,Richard Löwenström <samedii@gmail.com>,2023-05,1,862,424
+nextml-code/pytorch-datastream,Richard Löwenström <samedii@gmail.com>,2023-11,1,520,562
+nextml-code/pytorch-datastream,Richard Löwenström <samedii@gmail.com>,2024-08,4,481,401
+nextml-code/pytorch-datastream,Richard Löwenström <samedii@gmail.com>,2024-09,1,161,128
+nextml-code/pytorch-datastream,Richard Löwenström <samedii@gmail.com>,2025-01,8,2744,1486
+utensils/mcp-nixos,James Brink (aider) <brink.james@gmail.com>,2025-03,15,1451,195
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2025-03,156,83222,60362
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2025-04,135,39614,6585
+utensils/mcp-nixos,Lawrence Sinclair <sinclair@stanyangroup.com>,2025-04,1,2,0
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2025-05,18,34462,30438
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2025-06,3,151,1
+utensils/mcp-nixos,Sagi Sarussi <39622904+tuxiqae@users.noreply.github.com>,2025-06,1,1,0
+utensils/mcp-nixos,Will Ruggiano <11872440+willruggiano@users.noreply.github.com>,2025-06,1,29,26
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2025-08,17,9297,12811
+utensils/mcp-nixos,Sean Callan <doomspork@users.noreply.github.com>,2025-08,1,351,0
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2025-10,14,1056,681
+utensils/mcp-nixos,Malix <alixbrunetcontact@gmail.com>,2025-10,1,29,0
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2026-01,24,12746,35373
+utensils/mcp-nixos,Malix - Alix Brunet <alixbrunetcontact@gmail.com>,2026-01,6,215,217
+utensils/mcp-nixos,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-01,10,235,894
+utensils/mcp-nixos,David Dudson <DavidDudson@users.noreply.github.com>,2026-03,1,3,3
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2026-03,3,100,15
+utensils/mcp-nixos,ReStranger <restranger@disroot.org>,2026-03,1,256,5
+utensils/mcp-nixos,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-03,7,57,57
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2026-04,18,6192,9349
+utensils/mcp-nixos,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-04,1,1,1
+utensils/mcp-nixos,James Brink <brink.james@gmail.com>,2026-05,1,9,0
+utensils/mcp-nixos,Lorenz Bischof <1837725+LorenzBischof@users.noreply.github.com>,2026-05,1,4,4

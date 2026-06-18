@@ -1,0 +1,4 @@
+repo_name,adoption_tool,adoption_commit,adoption_date,adoption_month,evidence_paths,evidence_type,confidence,message
+TheSethRose/Agent-Chat,cursor,c30a90b5d6bad4af242c9dd99ff40cd4497261c0,2024-10-20,2024-10,.cursorrules,cursor_related_path,high,Initial Commit
+nextml-code/pytorch-datastream,cursor,5bcbc9467c2b8a19336539482b88f70f871d2825,2025-01-03,2025-01,.cursorrules,cursor_related_path,high,doc: migrate to mkdocs
+utensils/mcp-nixos,cursor,679572cc171210deeb72bb9f7acf11eb2c0867c4,2025-03-20,2025-03,.cursorrules,cursor_related_path,high,Add development guidelines and tooling support
