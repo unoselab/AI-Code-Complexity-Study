@@ -12,6 +12,7 @@ so you may have to run this script twice in order to fetch all available metrics
 """
 
 import argparse
+import time
 import re
 import logging
 import multiprocessing as mp
@@ -268,6 +269,39 @@ def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
             "Failed to get metrics for %s version %s: %s", project_key, version, str(e)
         )
         return None
+
+
+def wait_for_analysis_ready(
+    project_key: str,
+    version: str,
+    timeout_seconds: int = 120,
+    poll_interval_seconds: int = 5,
+) -> bool:
+    """Wait until a SonarQube VERSION analysis appears for the given project/version."""
+    deadline = time.monotonic() + timeout_seconds
+
+    while time.monotonic() < deadline:
+        if check_analysis_exists(project_key, version):
+            logging.info(
+                "SonarQube analysis is ready for %s version %s",
+                project_key,
+                version,
+            )
+            return True
+
+        logging.info(
+            "Waiting for SonarQube analysis for %s version %s...",
+            project_key,
+            version,
+        )
+        time.sleep(poll_interval_seconds)
+
+    logging.warning(
+        "Timed out waiting for SonarQube analysis for %s version %s",
+        project_key,
+        version,
+    )
+    return False
 
 
 def process_repository(
