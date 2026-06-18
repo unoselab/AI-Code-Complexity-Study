@@ -1,403 +1,375 @@
 #!/usr/bin/env python3
 """
-Script to analyze repositories cloned by clone_repos.py.
+Extended repository analyzer for AI code generator adoption-date detection.
 
-This script:
-1. Reads repos.csv file and checks which repositories have been cloned
-2. Detects when cursor files were first introduced in each repository
-3. Collects a time series of weekly or monthly commit counts and lines added for each repository
+This wrapper imports scripts/analyze_repos.py and reuses its original logic:
+  - find_cursor_commits()
+  - count_cursor_commits_by_time()
+  - get_commit_stats()
+  - process_repository()
+
+New logic added here:
+  - CLI arguments for repos file, clone directory, output directory, aggregation
+  - sample testing with --max-repos or --repos
+  - ai_adoption_dates.csv generated from earliest Cursor-related commit per repo
+
+The original script is not modified.
 """
 
+from __future__ import annotations
+
 import argparse
+import importlib.util
 import logging
 import multiprocessing
 import random
-import subprocess
 import sys
-from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
-import git
 import pandas as pd
 
-# Constants
-REPOS_CSV = Path(__file__).parent.parent / "data" / "repos.csv"
-CURSOR_FILES_CSV = Path(__file__).parent.parent / "data" / "cursor_files.csv"
-CURSOR_COMMITS_CSV = Path(__file__).parent.parent / "data" / "cursor_commits.csv"
-CLONE_DIR = Path(__file__).parent.parent.parent / "CursorRepos"
-OUTPUT_DIR = Path(__file__).parent.parent / "data"
-NUM_PROCESSES = multiprocessing.cpu_count() // 2
-REPO_TIMEOUT_SECONDS = 7200  # 2 hours timeout per repository
-TIME_KEY = None
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = SCRIPT_DIR.parent
+ORIGINAL_SCRIPT = PROJECT_DIR / "scripts" / "analyze_repos.py"
+
+if not ORIGINAL_SCRIPT.exists():
+    raise FileNotFoundError(f"Original analyzer not found: {ORIGINAL_SCRIPT}")
+
+spec = importlib.util.spec_from_file_location("original_analyze_repos", ORIGINAL_SCRIPT)
+orig = importlib.util.module_from_spec(spec)
+assert spec.loader is not None
+spec.loader.exec_module(orig)
 
 
-def get_time_key(commit_time: datetime, aggregation: str) -> str:
+def load_repos(
+    repos_file: Path,
+    repos_filter: Optional[list[str]],
+    max_repos: Optional[int],
+    random_sample: bool,
+    seed: int,
+) -> pd.DataFrame:
+    """Load repo list and optionally filter/sample it."""
+    if not repos_file.exists():
+        raise FileNotFoundError(f"Repos file not found: {repos_file}")
+
+    repos_df = pd.read_csv(repos_file)
+
+    if "repo_name" not in repos_df.columns:
+        raise ValueError(f"{repos_file} must contain a repo_name column")
+
+    repos_df["repo_name"] = repos_df["repo_name"].astype(str).str.strip()
+    repos_df = repos_df[repos_df["repo_name"] != ""].drop_duplicates("repo_name")
+
+    if repos_filter:
+        wanted = set(repos_filter)
+        repos_df = repos_df[repos_df["repo_name"].isin(wanted)].copy()
+
+    if max_repos is not None and max_repos > 0 and len(repos_df) > max_repos:
+        if random_sample:
+            repos_df = repos_df.sample(n=max_repos, random_state=seed)
+        else:
+            repos_df = repos_df.head(max_repos)
+
+    return repos_df.reset_index(drop=True)
+
+
+def compute_ai_adoption_dates(cursor_commits_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Get time key based on aggregation level.
+    Compute earliest Cursor-related commit per repo.
 
-    Args:
-        commit_time (datetime): Commit timestamp
-        aggregation (str): Either 'week' or 'month'
+    Input rows come from original find_cursor_commits(), with columns:
+      repo_name, commit_hash, authored_at, committed_at, paths, message, ...
 
-    Returns:
-        str: Formatted time key
+    Output:
+      repo_name, adoption_tool, adoption_commit, adoption_date,
+      adoption_month, evidence_paths, evidence_type, confidence
     """
-    if aggregation == "week":
-        return commit_time.strftime("%Y-W%W")
-    else:  # month
-        return commit_time.strftime("%Y-%m")
-
-
-def get_commit_stats(
-    repo_path: Path,
-    aggregation: str,
-) -> Tuple[Optional[Dict[str, Dict[str, int]]], Optional[List[Dict]]]:
-    """
-    Get weekly or monthly commit counts and lines added for a repository.
-
-    Args:
-        repo_path (Path): Path to the repository
-        aggregation (str): Either 'week' or 'month'
-
-    Returns:
-        Tuple containing:
-            1. dict: Dictionary with time period as key and dict of stats as value
-                  or None if failed
-            2. list: List of contributor-specific stats dictionaries
-                  or None if failed
-    """
-    try:
-        repo = git.Repo(str(repo_path))
-
-        # Checkout HEAD before collecting any metrics
-        try:
-            logging.info("Checking out HEAD for repo %s", repo_path.name)
-            repo.git.checkout("HEAD")
-        except git.GitCommandError as e:
-            logging.error("Failed to checkout HEAD for %s: %s", repo_path.name, e)
-            # Continue anyway to try to collect what we can
-
-        repo_name = repo_path.name.replace("_", "/")
-
-        time_stats = defaultdict(
-            lambda: {
-                "commits": 0,
-                "lines_added": 0,
-                "lines_removed": 0,
-                "contributors": set(),
-                "latest_commit": None,
-                "latest_commit_time": None,
-                "cursor_commits": 0,
-            }
+    if cursor_commits_df.empty:
+        return pd.DataFrame(
+            columns=[
+                "repo_name",
+                "adoption_tool",
+                "adoption_commit",
+                "adoption_date",
+                "adoption_month",
+                "evidence_paths",
+                "evidence_type",
+                "confidence",
+                "message",
+            ]
         )
 
-        contributor_stats = []
-        contributor_time_stats = defaultdict(
-            lambda: defaultdict(
-                lambda: {"commits": 0, "lines_added": 0, "lines_removed": 0}
-            )
-        )
+    df = cursor_commits_df.copy()
 
-        for commit in repo.iter_commits():
-            commit_time = datetime.fromtimestamp(commit.committed_date)
-            time_key = get_time_key(commit_time, aggregation)
-            author_str = f"{commit.author.name} <{commit.author.email}>"
+    # Prefer authored_at because it is closer to when the change was authored.
+    # Fall back to committed_at if needed.
+    if "authored_at" in df.columns:
+        df["adoption_datetime"] = pd.to_datetime(df["authored_at"], errors="coerce")
+    else:
+        df["adoption_datetime"] = pd.NaT
 
-            time_stats[time_key]["commits"] += 1
-            time_stats[time_key]["contributors"].add(author_str)
+    if "committed_at" in df.columns:
+        committed_dt = pd.to_datetime(df["committed_at"], errors="coerce")
+        df["adoption_datetime"] = df["adoption_datetime"].fillna(committed_dt)
 
-            if (
-                time_stats[time_key]["latest_commit_time"] is None
-                or commit_time > time_stats[time_key]["latest_commit_time"]
-            ):
-                time_stats[time_key]["latest_commit"] = commit.hexsha
-                time_stats[time_key]["latest_commit_time"] = commit_time
+    df = df.dropna(subset=["adoption_datetime"])
 
-            contributor_time_stats[time_key][author_str]["commits"] += 1
+    if df.empty:
+        return pd.DataFrame()
 
-            try:
-                if commit.parents:
-                    parent = commit.parents[0]
-                    added_lines = 0
-                    removed_lines = 0
+    df = df.sort_values(["repo_name", "adoption_datetime", "commit_hash"])
+    first_df = df.groupby("repo_name", as_index=False).first()
 
-                    try:
-                        cmd = [
-                            "git",
-                            "-C",
-                            str(repo_path),
-                            "diff",
-                            "--numstat",
-                            f"{parent.hexsha}..{commit.hexsha}",
-                        ]
-                        result = subprocess.run(
-                            cmd, capture_output=True, text=True, check=True
-                        )
+    first_df["adoption_tool"] = "cursor"
+    first_df["adoption_commit"] = first_df["commit_hash"]
+    first_df["adoption_date"] = first_df["adoption_datetime"].dt.strftime("%Y-%m-%d")
+    first_df["adoption_month"] = first_df["adoption_datetime"].dt.strftime("%Y-%m")
+    first_df["evidence_paths"] = first_df.get("paths", "")
+    first_df["evidence_type"] = "cursor_related_path"
+    first_df["confidence"] = "high"
 
-                        if result.stdout.strip():
-                            for line in result.stdout.strip().split("\n"):
-                                if line.strip():
-                                    parts = line.split()
-                                    if len(parts) >= 2:
-                                        if parts[0] != "-":
-                                            try:
-                                                added_lines += int(parts[0])
-                                            except ValueError:
-                                                pass
-                                        if parts[1] != "-":
-                                            try:
-                                                removed_lines += int(parts[1])
-                                            except ValueError:
-                                                pass
+    cols = [
+        "repo_name",
+        "adoption_tool",
+        "adoption_commit",
+        "adoption_date",
+        "adoption_month",
+        "evidence_paths",
+        "evidence_type",
+        "confidence",
+        "message",
+    ]
 
-                        logging.debug(
-                            "%s: +%d -%d lines",
-                            commit.hexsha[:8],
-                            added_lines,
-                            removed_lines,
-                        )
-                    except subprocess.SubprocessError as e:
-                        logging.error("Diff failed for commit %s: %s", commit.hexsha, e)
-                        continue
-
-                    time_stats[time_key]["lines_added"] += added_lines
-                    time_stats[time_key]["lines_removed"] += removed_lines
-                    contributor_time_stats[time_key][author_str][
-                        "lines_added"
-                    ] += added_lines
-                    contributor_time_stats[time_key][author_str][
-                        "lines_removed"
-                    ] += removed_lines
-            except Exception as e:
-                logging.debug("Could not get diff for commit %s: %s", commit.hexsha, e)
-                continue
-
-        result = {}
-        for time_key, stats in time_stats.items():
-            result[time_key] = {
-                "latest_commit": stats["latest_commit"],
-                "commits": stats["commits"],
-                "lines_added": stats["lines_added"],
-                "lines_removed": stats["lines_removed"],
-                "contributors": len(stats["contributors"]),
-                "cursor_commits": stats["cursor_commits"],
-            }
-
-        for time_key, authors in contributor_time_stats.items():
-            for author, stats in authors.items():
-                contributor_stats.append(
-                    {
-                        "repo_name": repo_name,
-                        "author": author,
-                        TIME_KEY: time_key,
-                        "commits": stats["commits"],
-                        "lines_added": stats["lines_added"],
-                        "lines_removed": stats["lines_removed"],
-                    }
-                )
-
-        return result, contributor_stats
-    except Exception as e:
-        logging.error("Failed to get commit info for %s: %s", repo_path, str(e))
-        return None, None
+    available_cols = [c for c in cols if c in first_df.columns]
+    return first_df[available_cols].sort_values("repo_name").reset_index(drop=True)
 
 
-def _is_cursor_related_path(path: Optional[str]) -> bool:
-    """Return True if path is a cursor rules/ignore file or inside .cursor."""
-    if not path:
-        return False
-    try:
-        name = Path(path).name
-    except Exception:
-        name = path
-
-    if name in {".cursorrules", ".cursorignore"}:
-        return True
-
-    try:
-        parts = set(Path(path).parts)
-    except Exception:
-        parts = set(path.split("/"))
-
-    if ".cursor" in parts:
-        return True
-
-    if path.startswith(".cursor/") or "/.cursor/" in path:
-        return True
-
-    return False
-
-
-def find_cursor_commits(repo_path: Path) -> List[Dict]:
+def process_one_repo(args_tuple):
     """
-    Scan all commits in a repository to check for .cursorrules files or cursor/ directories.
+    Process one repo using original process_repository().
 
-    Args:
-        repo_path (Path): Path to the repository
-
-    Returns:
-        List of dictionaries containing commit information for commits that contain
-            .cursorrules files or cursor/ directories
+    We keep this wrapper so multiprocessing can call a top-level function
+    from this v2 file while the actual repository logic remains in the original.
     """
-    commits_data: List[Dict] = []
-
-    try:
-        repo = git.Repo(str(repo_path))
-
-        # Checkout HEAD before analyzing
-        try:
-            logging.info("Checking out HEAD for repo %s", repo_path.name)
-            repo.git.checkout("HEAD")
-        except git.GitCommandError as e:
-            logging.error("Failed to checkout HEAD for %s: %s", repo_path.name, e)
-            # Continue anyway to try to collect what we can
-
-        repo_name = repo_path.name.replace("_", "/")
-
-        for commit in repo.iter_commits():
-            commit_time = datetime.fromtimestamp(commit.committed_date)
-            author_date = datetime.fromtimestamp(commit.authored_date)
-
-            changed_paths: List[str] = []
-
-            try:
-                if commit.parents:
-                    parent = commit.parents[0]
-                    diffs = commit.diff(parent)
-                else:
-                    diffs = commit.diff(git.NULL_TREE)
-
-                for d in diffs:
-                    a_path = getattr(d, "a_path", None)
-                    b_path = getattr(d, "b_path", None)
-                    if _is_cursor_related_path(a_path):
-                        changed_paths.append(a_path)  # type: ignore[arg-type]
-                    if _is_cursor_related_path(b_path):
-                        changed_paths.append(b_path)  # type: ignore[arg-type]
-            except Exception as e:
-                logging.debug("Could not diff commit %s: %s", commit.hexsha, e)
-                continue
-
-            if changed_paths:
-                unique_paths = sorted(set(changed_paths))
-                commits_data.append(
-                    {
-                        "repo_name": repo_name,
-                        "commit_hash": commit.hexsha,
-                        "author": "%s <%s>" % (commit.author.name, commit.author.email),
-                        "authored_at": author_date.isoformat(),
-                        "committer": "%s <%s>"
-                        % (commit.committer.name, commit.committer.email),
-                        "committed_at": commit_time.isoformat(),
-                        "message": commit.message.split("\n")[0],
-                        "paths": ";".join(unique_paths),
-                    }
-                )
-
-        return sorted(commits_data, key=lambda x: x["authored_at"])
-    except Exception as e:
-        logging.error("Failed to find cursor commits in %s: %s", repo_path, e)
-        return []
+    idx, repo_dict, total_repos, aggregation = args_tuple
+    return orig.process_repository(idx, repo_dict, total_repos, aggregation)
 
 
-def count_cursor_commits_by_time(
-    cursor_commits: List[Dict], aggregation: str
-) -> Dict[str, int]:
-    """
-    Count cursor commits by time period.
-
-    Args:
-        cursor_commits: List of cursor commit data
-        aggregation: Either 'week' or 'month'
-
-    Returns:
-        Dictionary mapping time keys to cursor commit counts
-    """
-    time_counts = defaultdict(int)
-
-    for commit in cursor_commits:
-        commit_time = datetime.fromisoformat(commit["committed_at"])
-        time_key = get_time_key(commit_time, aggregation)
-        time_counts[time_key] += 1
-
-    return time_counts
-
-
-def process_repository(
-    idx: int,
-    repo: Dict,
-    total_repos: int,
+def run_analysis(
+    repos_df: pd.DataFrame,
+    clone_dir: Path,
+    output_dir: Path,
     aggregation: str,
-) -> Tuple[List[Dict], List[Dict], List[Dict]]:
+    num_processes: int,
+    seed: int,
+    shuffle: bool,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
-    Process a single repository in a worker process.
-
-    Args:
-        idx: Index of the repository in the dataframe
-        repo: Repository data from the dataframe
-        repo_cursor_files: Mapping of repo names to cursor files
-        total_repos: Total number of repositories
-        aggregation: Either 'week' or 'month'
-
-    Returns:
-        Tuple of (repo_ts, contributor_ts) where:
-            repo_ts: List of time period statistics dictionaries
-            contributor_ts: List of contributor statistics dictionaries
+    Run original analyzer logic and return:
+      ts_repos_df, ts_contributors_df, cursor_commits_df, adoption_dates_df
     """
-    repo_name = repo["repo_name"]
-    repo_path = CLONE_DIR / repo_name.replace("/", "_")
-    repo_ts: List[Dict] = []
-    contributor_ts: List[Dict] = []
-    cursor_commits: List[Dict] = []
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    if not repo_path.exists():
-        return repo_ts, contributor_ts, cursor_commits
+    # Patch original module globals so original functions use our CLI settings.
+    orig.CLONE_DIR = clone_dir
+    orig.OUTPUT_DIR = output_dir
+    orig.TIME_KEY = aggregation
 
-    logging.info("Analyzing repository: %s (%d/%d)", repo_name, idx + 1, total_repos)
+    total_repos = len(repos_df)
 
-    weekly_stats, contributor_stats = get_commit_stats(repo_path, aggregation)
-    cursor_commits = find_cursor_commits(repo_path)
-    cursor_commits_by_time = count_cursor_commits_by_time(cursor_commits, aggregation)
+    args_list = [
+        (idx, repo.to_dict(), total_repos, aggregation)
+        for idx, repo in repos_df.iterrows()
+    ]
 
-    if weekly_stats:
-        for time_key, stats in weekly_stats.items():
-            has_cursor_usage = cursor_commits_by_time.get(time_key, 0) > 0
+    if shuffle:
+        random.seed(seed)
+        random.shuffle(args_list)
 
-            repo_ts.append(
-                {
-                    "repo_name": repo_name,
-                    TIME_KEY: time_key,
-                    "latest_commit": stats["latest_commit"],
-                    "cursor": has_cursor_usage,
-                    "commits": stats["commits"],
-                    "lines_added": stats["lines_added"],
-                    "lines_removed": stats["lines_removed"],
-                    "contributors": stats["contributors"],
-                }
-            )
+    repo_ts = []
+    contributor_ts = []
+    all_cursor_commits = []
 
-    if contributor_stats:
-        contributor_ts.extend(contributor_stats)
+    if total_repos == 0:
+        logging.warning("No repositories to process")
+    elif num_processes <= 1:
+        logging.info("Starting serial processing for %d repos", total_repos)
+        for process_args in args_list:
+            repo_name = process_args[1]["repo_name"]
+            try:
+                repo_time_series, repo_contributor_ts, repo_cursor_commits = process_one_repo(
+                    process_args
+                )
+                repo_ts.extend(repo_time_series)
+                contributor_ts.extend(repo_contributor_ts)
+                all_cursor_commits.extend(repo_cursor_commits)
+            except Exception as exc:
+                logging.error("Error processing repository %s: %s", repo_name, exc)
+    else:
+        logging.info(
+            "Starting multiprocessing pool with %d workers for %d repos",
+            num_processes,
+            total_repos,
+        )
+        with multiprocessing.Pool(processes=num_processes) as pool:
+            async_results = [
+                pool.apply_async(process_one_repo, (process_args,))
+                for process_args in args_list
+            ]
 
-    return repo_ts, contributor_ts, cursor_commits
+            for idx, async_result in enumerate(async_results):
+                repo_name = args_list[idx][1]["repo_name"]
+                try:
+                    repo_time_series, repo_contributor_ts, repo_cursor_commits = (
+                        async_result.get(timeout=orig.REPO_TIMEOUT_SECONDS)
+                    )
+                    repo_ts.extend(repo_time_series)
+                    contributor_ts.extend(repo_contributor_ts)
+                    all_cursor_commits.extend(repo_cursor_commits)
+                except multiprocessing.TimeoutError:
+                    logging.error(
+                        "Repository %s processing timed out after %d seconds",
+                        repo_name,
+                        orig.REPO_TIMEOUT_SECONDS,
+                    )
+                except Exception as exc:
+                    logging.error("Error processing repository %s: %s", repo_name, exc)
+
+    ts_repos_df = pd.DataFrame(repo_ts)
+    ts_contributors_df = pd.DataFrame(contributor_ts)
+    cursor_commits_df = pd.DataFrame(all_cursor_commits)
+    adoption_dates_df = compute_ai_adoption_dates(cursor_commits_df)
+
+    return ts_repos_df, ts_contributors_df, cursor_commits_df, adoption_dates_df
 
 
-def main() -> None:
-    """Main function to analyze repositories, get commit stats and cursor adoption dates."""
-    global TIME_KEY
+def save_outputs(
+    ts_repos_df: pd.DataFrame,
+    ts_contributors_df: pd.DataFrame,
+    cursor_commits_df: pd.DataFrame,
+    adoption_dates_df: pd.DataFrame,
+    output_dir: Path,
+    aggregation: str,
+) -> None:
+    """Save outputs using original-style filenames plus ai_adoption_dates.csv."""
+    output_suffix = "_monthly.csv" if aggregation == "month" else "_weekly.csv"
+
+    ts_repos_file = output_dir / f"ts_repos{output_suffix}"
+    ts_contributors_file = output_dir / f"ts_contributors{output_suffix}"
+    cursor_commits_file = output_dir / "cursor_commits.csv"
+    adoption_dates_file = output_dir / "ai_adoption_dates.csv"
+
+    if not ts_repos_df.empty:
+        sort_cols = ["repo_name", aggregation]
+        sort_cols = [c for c in sort_cols if c in ts_repos_df.columns]
+        if sort_cols:
+            ts_repos_df = ts_repos_df.sort_values(sort_cols)
+        ts_repos_df.to_csv(ts_repos_file, index=False)
+        logging.info("Saved repo time series to %s", ts_repos_file)
+    else:
+        logging.warning("No repo time-series rows generated")
+
+    if not ts_contributors_df.empty:
+        sort_cols = ["repo_name", aggregation, "author"]
+        sort_cols = [c for c in sort_cols if c in ts_contributors_df.columns]
+        if sort_cols:
+            ts_contributors_df = ts_contributors_df.sort_values(sort_cols)
+        ts_contributors_df.to_csv(ts_contributors_file, index=False)
+        logging.info("Saved contributor time series to %s", ts_contributors_file)
+    else:
+        logging.warning("No contributor time-series rows generated")
+
+    if not cursor_commits_df.empty:
+        cursor_commits_df = cursor_commits_df.sort_values(["repo_name", "authored_at"])
+        cursor_commits_df.to_csv(cursor_commits_file, index=False)
+        logging.info("Saved Cursor commit data to %s", cursor_commits_file)
+    else:
+        logging.warning("No Cursor-related commits found")
+
+    adoption_dates_df.to_csv(adoption_dates_file, index=False)
+    logging.info("Saved AI adoption dates to %s", adoption_dates_file)
+
+
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Analyze repository commit history with weekly or monthly aggregation."
+        description="Analyze cloned repos and detect AI code generator adoption dates."
     )
+
+    parser.add_argument(
+        "--repos-file",
+        type=Path,
+        default=PROJECT_DIR / "data" / "repos.csv",
+        help="CSV containing repo_name column. Default: data/repos.csv.",
+    )
+
+    parser.add_argument(
+        "--clone-dir",
+        type=Path,
+        default=PROJECT_DIR.parent / "CursorRepos",
+        help="Directory containing cloned repos as owner_repo folders.",
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=PROJECT_DIR / "data",
+        help="Output directory. Default: data.",
+    )
+
     parser.add_argument(
         "--aggregation",
         choices=["week", "month"],
-        default="week",
-        help="Aggregate data by week or month (default: week)",
+        default="month",
+        help="Aggregate by week or month. Default: month.",
     )
-    args = parser.parse_args()
-    TIME_KEY = args.aggregation
+
+    parser.add_argument(
+        "--max-repos",
+        type=int,
+        default=None,
+        help="Limit number of repos for sample testing.",
+    )
+
+    parser.add_argument(
+        "--repos",
+        nargs="*",
+        default=None,
+        help="Specific repo_name values to process, e.g., owner/repo owner2/repo2.",
+    )
+
+    parser.add_argument(
+        "--num-processes",
+        type=int,
+        default=1,
+        help="Number of worker processes. Default: 1 for safer smoke tests.",
+    )
+
+    parser.add_argument(
+        "--random-sample",
+        action="store_true",
+        help="Use random sampling when --max-repos is set.",
+    )
+
+    parser.add_argument(
+        "--shuffle",
+        action="store_true",
+        help="Shuffle processing order.",
+    )
+
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=114514,
+        help="Random seed for sampling/shuffling.",
+    )
+
+    return parser.parse_args()
+
+
+def main() -> None:
+    multiprocessing.freeze_support()
+    args = parse_args()
 
     logging.basicConfig(
         format="%(asctime)s [%(levelname)s] %(message)s",
@@ -405,75 +377,50 @@ def main() -> None:
         handlers=[logging.StreamHandler(sys.stdout)],
     )
 
-    multiprocessing.freeze_support()
+    repos_file = args.repos_file.expanduser().resolve()
+    clone_dir = args.clone_dir.expanduser().resolve()
+    output_dir = args.output_dir.expanduser().resolve()
 
-    if not CLONE_DIR.exists():
-        logging.error("Clone directory %s does not exist", CLONE_DIR)
-        return
+    logging.info("Original analyzer imported from: %s", ORIGINAL_SCRIPT)
+    logging.info("Repos file: %s", repos_file)
+    logging.info("Clone dir: %s", clone_dir)
+    logging.info("Output dir: %s", output_dir)
+    logging.info("Aggregation: %s", args.aggregation)
 
-    try:
-        repos_df = pd.read_csv(REPOS_CSV)
-    except Exception as e:
-        logging.error("Failed to read CSV files: %s", e)
-        return
+    if not clone_dir.exists():
+        raise SystemExit(f"Clone directory does not exist: {clone_dir}")
 
-    total_repos = len(repos_df)
-    args_list = [
-        (idx, repo, total_repos, args.aggregation) for idx, repo in repos_df.iterrows()
-    ]
-    random.shuffle(args_list)
+    repos_df = load_repos(
+        repos_file=repos_file,
+        repos_filter=args.repos,
+        max_repos=args.max_repos,
+        random_sample=args.random_sample,
+        seed=args.seed,
+    )
 
-    repo_ts: List[Dict] = []
-    contributor_ts: List[Dict] = []
-    all_cursor_commits: List[Dict] = []
+    logging.info("Loaded %d repositories for processing", len(repos_df))
 
-    logging.info("Starting multiprocessing pool with %d workers", NUM_PROCESSES)
-    with multiprocessing.Pool(processes=NUM_PROCESSES) as pool:
-        async_results = []
-        for process_args in args_list:
-            async_results.append(pool.apply_async(process_repository, process_args))
+    ts_repos_df, ts_contributors_df, cursor_commits_df, adoption_dates_df = run_analysis(
+        repos_df=repos_df,
+        clone_dir=clone_dir,
+        output_dir=output_dir,
+        aggregation=args.aggregation,
+        num_processes=args.num_processes,
+        seed=args.seed,
+        shuffle=args.shuffle,
+    )
 
-        for idx, async_result in enumerate(async_results):
-            repo_name = args_list[idx][1]["repo_name"]
-            try:
-                (
-                    repo_time_series,
-                    repo_contributor_ts,
-                    repo_cursor_commits,
-                ) = async_result.get(timeout=REPO_TIMEOUT_SECONDS)
-                repo_ts.extend(repo_time_series)
-                contributor_ts.extend(repo_contributor_ts)
-                all_cursor_commits.extend(repo_cursor_commits)
-            except multiprocessing.TimeoutError:
-                logging.error(
-                    "Repository %s processing timed out after %d seconds",
-                    repo_name,
-                    REPO_TIMEOUT_SECONDS,
-                )
-            except Exception as e:
-                logging.error("Error processing repository %s: %s", repo_name, str(e))
+    save_outputs(
+        ts_repos_df=ts_repos_df,
+        ts_contributors_df=ts_contributors_df,
+        cursor_commits_df=cursor_commits_df,
+        adoption_dates_df=adoption_dates_df,
+        output_dir=output_dir,
+        aggregation=args.aggregation,
+    )
 
-    logging.info("Finished processing %d repos", total_repos)
-
-    # Set output paths based on aggregation level
-    output_suffix = "_monthly.csv" if args.aggregation == "month" else "_weekly.csv"
-    ts_output = OUTPUT_DIR / f"ts_repos{output_suffix}"
-    contributor_output = OUTPUT_DIR / f"ts_contributors{output_suffix}"
-
-    if repo_ts:
-        ts_df = pd.DataFrame(repo_ts)
-        ts_df.to_csv(ts_output, index=False)
-        logging.info("Saved time series data to %s", ts_output)
-
-    if contributor_ts:
-        contributor_df = pd.DataFrame(contributor_ts)
-        contributor_df.to_csv(contributor_output, index=False)
-        logging.info("Saved contributor time series data to %s", contributor_output)
-
-    if all_cursor_commits:
-        commits_df = pd.DataFrame(all_cursor_commits)
-        commits_df.to_csv(CURSOR_COMMITS_CSV, index=False)
-        logging.info("Saved cursor commit data to %s", CURSOR_COMMITS_CSV)
+    logging.info("Finished analyze_repos_v2")
+    logging.info("Repos with Cursor adoption evidence: %d", len(adoption_dates_df))
 
 
 if __name__ == "__main__":
