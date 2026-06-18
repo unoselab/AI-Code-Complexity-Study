@@ -1,0 +1,10 @@
+rule,type,severity,effort,example_message
+python:S1172,CODE_SMELL,MAJOR,5min,"Remove the unused function parameter ""resolved""."
+python:S1192,CODE_SMELL,CRITICAL,6min,"Define a constant instead of duplicating this literal ""latest-44-nixos-25.11"" 3 times."
+python:S3776,CODE_SMELL,CRITICAL,16min,Refactor this function to reduce its Cognitive Complexity from 26 to the 15 allowed.
+python:S7483,CODE_SMELL,MAJOR,5min,"Remove this ""timeout"" parameter and use a timeout context manager instead."
+python:S8517,CODE_SMELL,MAJOR,5min,"Use ""min()"" instead of sorting to find this value."
+typescript:S6479,CODE_SMELL,MAJOR,5min,Do not use Array index in keys
+typescript:S7764,CODE_SMELL,MINOR,2min,Prefer `globalThis` over `window`.
+typescript:S7780,CODE_SMELL,MINOR,5min,`String.raw` should be used to avoid escaping `\`.
+typescript:S7781,CODE_SMELL,MINOR,5min,Prefer `String#replaceAll()` over `String#replace()`.

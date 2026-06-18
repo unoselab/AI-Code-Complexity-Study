@@ -50,11 +50,13 @@ python proc_scripts/run_sonarqube_v2.py \
 echo
 echo "Step 3: Collect detailed SonarQube warning records"
 echo "------------------------------------------------------------"
-python proc_scripts/collect_sonarqube_warnings.py \
+python proc_scripts/collect_sonarqube_warnings_v2.py \
+  --mode timeseries \
   --data-dir "${DATA_DIR}" \
   --timeseries-file "${TS_FILE}" \
   --warnings-output "${WARNINGS_FILE}" \
-  --definitions-output "${WARNING_DEFINITIONS_FILE}"
+  --definitions-output "${WARNING_DEFINITIONS_FILE}" \
+  --repos "${REPOS[@]}"
 
 echo
 echo "Step 4: Display aggregate metric results"
