@@ -402,6 +402,9 @@ def main() -> None:
         START_DATE, END_DATE = infer_date_range_from_input(ts_df, TIME_KEY)
         logging.info("Using input-derived date range: %s to %s", START_DATE, END_DATE)
 
+    global START_DATE, END_DATE
+    START_DATE, END_DATE = infer_date_range_from_input(ts_df, TIME_KEY)
+    logging.info("Using input-derived date range: %s to %s", START_DATE, END_DATE)
     except FileNotFoundError as e:
         logging.error(f"Required file not found: {e}")
         return
