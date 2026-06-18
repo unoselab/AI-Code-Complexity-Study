@@ -1,2 +1,2 @@
 month,repo_name,latest_commit,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,technical_debt
-2025-09,xzq-xu/jvm-mcp-server,6ea176f64f0e92893bb23778108ae96cd1b414c0,True,1.0,5188.0,1930.0,1.0,0,0,0,174,3155.0,3.0,0.0,22.0,2.9,22.7,548.0,,,,
+2025-01,nextml-code/pytorch-datastream,7a3e9411106bcf354a5dd6e660a9b7aac0c52599,True,8.0,2744.0,1486.0,1.0,0,0,0,1016,1671.0,0.0,0.0,13.0,0.0,19.4,124.0,,,,125.0

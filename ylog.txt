@@ -1,8 +1,8 @@
 ============================================================
 SonarQube one-repo smoke test
-Repo name:      xzq-xu/jvm-mcp-server
-Project key:    xzq-xu_jvm-mcp-server
-Repo path:      ../CursorRepos/xzq-xu_jvm-mcp-server
+Repo name:      nextml-code/pytorch-datastream
+Project key:    nextml-code_pytorch-datastream
+Repo path:      ../CursorRepos/nextml-code_pytorch-datastream
 Aggregation:    month
 Month filter:   latest available month
 SONAR_HOST:     http://localhost:9000
@@ -10,22 +10,30 @@ Scanner path:   /home/user1-system12/tools/sonar-scanner/bin/sonar-scanner
 ============================================================
 
 Step 5: Check or clone repository
-Cloning repository...
+Repository already exists: ../CursorRepos/nextml-code_pytorch-datastream
 
 Repository size:
-1.2M	../CursorRepos/xzq-xu_jvm-mcp-server
+1.6M	../CursorRepos/nextml-code_pytorch-datastream
 
 Latest commits:
-1e26fe0 docs: add Fronteir AI hosted deployment link (#28)
-a5cda99 feat: add Kubernetes support via kubectl exec (#26)
-72b4472 fix: improve error handling for permission issues with better detection
-50fc948 fix: add Dockerfile, enhance error handling for permission issues, add JMX remote diagnostic support
-d7314f4 Merge pull request #25 from xzq-xu/native-dev
+7a3e941 doc: instant navigation
+64f74e9 doc: link to new docs
+ce4fbed doc: remove doc status
+3e936f1 build: fix python 3.10 version
+ae25542 build: python 3.9 and above
 
 Step 6: Create temporary one-repo time-series input
+/home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/test_create_tmp_repo_timeseries_input.py:3: DeprecationWarning: 
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+        
+  import pandas as pd
 Wrote: tmp_sonar_one_repo/data/ts_repos_monthly.csv
-            repo_name   month                            latest_commit
-xzq-xu/jvm-mcp-server 2025-09 6ea176f64f0e92893bb23778108ae96cd1b414c0
+                     repo_name   month                            latest_commit
+nextml-code/pytorch-datastream 2025-01 7a3e9411106bcf354a5dd6e660a9b7aac0c52599
 
 Step 7: Create patched one-repo copy of run_sonarqube.py
 
@@ -41,11 +49,29 @@ Patch check:
 380:    with mp.Pool(NUM_PROCESSES) as pool:
 
 Step 8: Run one-repo SonarQube pipeline
-2026-06-17 22:53:53,270 [INFO] Processing xzq-xu/jvm-mcp-server from 2024-01 to 2025-08
-2026-06-17 22:53:53,278 [INFO] Updated metrics saved to /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_one_repo/data/ts_repos_monthly.csv
+/home/user1-system12/project-workspace/ai_code_complexity_study/proc_scripts/run_sonarqube_one_repo_test.py:24: DeprecationWarning: 
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+        
+  import pandas as pd
+2026-06-17 23:06:50,552 [INFO] Processing nextml-code/pytorch-datastream from 2024-01 to 2025-08
+2026-06-17 23:06:50,561 [INFO] Analysis already exists for nextml-code_pytorch-datastream version 2025-01
+2026-06-17 23:06:50,566 [INFO] Found 1 analyses for nextml-code_pytorch-datastream
+2026-06-17 23:06:50,571 [INFO] Metrics for nextml-code/pytorch-datastream at 2025-01: {'bugs': 0.0, 'code_smells': 13.0, 'cognitive_complexity': 124.0, 'comment_lines_density': 19.4, 'duplicated_lines_density': 0.0, 'ncloc': 1671.0, 'software_quality_maintainability_remediation_effort': 125.0, 'vulnerabilities': 0.0}
+2026-06-17 23:06:50,579 [INFO] Updated metrics saved to /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_one_repo/data/ts_repos_monthly.csv
 
 Step 9: Show resulting metrics
-            repo_name   month                            latest_commit  ncloc  bugs  vulnerabilities  code_smells  static_analysis_warnings  duplicated_lines_density  comment_lines_density  cognitive_complexity  technical_debt
-xzq-xu/jvm-mcp-server 2025-09 6ea176f64f0e92893bb23778108ae96cd1b414c0 3155.0   3.0              0.0         22.0                      25.0                       2.9                   22.7                 548.0             NaN
+<stdin>:3: DeprecationWarning: 
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+        
+                     repo_name   month                            latest_commit  ncloc  bugs  vulnerabilities  code_smells  static_analysis_warnings  duplicated_lines_density  comment_lines_density  cognitive_complexity  technical_debt
+nextml-code/pytorch-datastream 2025-01 7a3e9411106bcf354a5dd6e660a9b7aac0c52599 1671.0   0.0              0.0         13.0                      13.0                       0.0                   19.4                 124.0           125.0
 
 SonarQube one-repo smoke test completed successfully.
