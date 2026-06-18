@@ -1,0 +1,2 @@
+month,repo_name,latest_commit,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag
+2025-03,ericzakariasson/uber-eats-mcp-server,ba475ebd9343dc771addd22ecbd19420a8d7534b,True,5.0,230.0,28.0,3.0,132,3,2,0,101.0,0.0,0.0,1.0,0.0,23.5,4.0,5.0,,,

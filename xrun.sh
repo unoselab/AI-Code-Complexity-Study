@@ -1,24 +1,22 @@
-cat > run2a-sonarqube-smoke-test.sh <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
+# python - <<'PY'
+# from pathlib import Path
 
-echo "Step 1: SonarQube connection test"
-python proc_scripts/test_sonarqube_connection.py
-echo
+# p = Path("proc_scripts/run_sonarqube_one_repo_test.py")
+# s = p.read_text()
 
-echo "Step 2: Tiny project scan test"
-python proc_scripts/test_sonarqube_scan.py
-echo
+# # Read/write only the temporary one-repo test data.
+# s = s.replace(
+#     'DATA_DIR = SCRIPT_DIR.parent / "data"',
+#     'DATA_DIR = SCRIPT_DIR.parent / "tmp_sonar_one_repo" / "data"'
+# )
 
-echo "Step 3: Tiny project metrics API test"
-python proc_scripts/test_sonarqube_metrics.py
-echo
+# # Use one process for a controlled smoke test.
+# s = s.replace(
+#     "NUM_PROCESSES = 8",
+#     "NUM_PROCESSES = 1"
+# )
 
-echo "Step 4: Tiny project issues API test"
-python proc_scripts/test_sonarqube_tiny_issues.py
-echo
+# p.write_text(s)
 
-echo "SonarQube smoke test completed successfully."
-EOF
-
-chmod +x run2a-sonarqube-smoke-test.sh
+# print("Patched:", p)
+# PY
