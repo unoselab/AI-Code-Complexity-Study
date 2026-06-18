@@ -187,3 +187,4 @@ cython_debug/
 # dataset
 dataset_zenodo/
 data_baseline_backup
+xrun.sh

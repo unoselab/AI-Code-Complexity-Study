@@ -1,4 +1,10 @@
 repo_name,month,latest_commit,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
-TheSethRose/Agent-Chat,2026-06,464bdbd1b280f5a15358aca50b7c8e60a4d5ff04,356.0,0.0,1.0,12.0,0.0,25.5,77.0,71.0
-nextml-code/pytorch-datastream,2026-06,7a3e9411106bcf354a5dd6e660a9b7aac0c52599,1671.0,0.0,0.0,13.0,0.0,19.4,124.0,125.0
-utensils/mcp-nixos,2026-06,0ef99b6a5674e60ca315dc55a0f458673bb1e4fa,6433.0,0.0,0.0,39.0,1.3,13.6,1431.0,742.0
+TheSethRose/Agent-Chat,2026-03,464bdbd1b280f5a15358aca50b7c8e60a4d5ff04,356.0,0.0,1.0,12.0,0.0,25.5,77.0,71.0
+TheSethRose/Agent-Chat,2026-04,464bdbd1b280f5a15358aca50b7c8e60a4d5ff04,356.0,0.0,1.0,12.0,0.0,25.5,77.0,71.0
+TheSethRose/Agent-Chat,2026-05,464bdbd1b280f5a15358aca50b7c8e60a4d5ff04,356.0,0.0,1.0,12.0,0.0,25.5,77.0,71.0
+nextml-code/pytorch-datastream,2026-03,7a3e9411106bcf354a5dd6e660a9b7aac0c52599,1671.0,0.0,0.0,13.0,0.0,19.4,124.0,125.0
+nextml-code/pytorch-datastream,2026-04,7a3e9411106bcf354a5dd6e660a9b7aac0c52599,1671.0,0.0,0.0,13.0,0.0,19.4,124.0,125.0
+nextml-code/pytorch-datastream,2026-05,7a3e9411106bcf354a5dd6e660a9b7aac0c52599,1671.0,0.0,0.0,13.0,0.0,19.4,124.0,125.0
+utensils/mcp-nixos,2026-03,60c1efbba0de1268b42f1144c904e6c8a9627dde,7055.0,1.0,0.0,49.0,1.0,9.1,1215.0,725.0
+utensils/mcp-nixos,2026-04,fd51bb236e75cfec2fed16353a143faa1398bf2a,6433.0,0.0,0.0,39.0,1.3,13.6,1431.0,742.0
+utensils/mcp-nixos,2026-05,0ef99b6a5674e60ca315dc55a0f458673bb1e4fa,6433.0,0.0,0.0,39.0,1.3,13.6,1431.0,742.0
