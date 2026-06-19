@@ -1,0 +1,14 @@
+repo_name,adoption_tool,adoption_commit,adoption_date,adoption_month,evidence_paths,evidence_type,confidence,message
+Kiln-AI/Kiln,cursor,435cce7a9fa2785be1bee09828251afe35e25569,2025-01-05,2025-01,.cursorrules,cursor_related_path,high,Add cursor rules file
+KroMiose/nekro-agent,cursor,6193cd7815f37a13b5c9bc20e185e22dfc33a1c6,2025-01-14,2025-01,.cursorrules,cursor_related_path,high,fix: admin login 401
+OpenMOSS/Language-Model-SAEs,cursor,122339f3702eecfa420c3d018e376c8178d2d440,2024-12-26,2024-12,.cursorrules,cursor_related_path,high,feat(activation): implement basic activation pipeline
+TextGeneratorio/text-generator.io,cursor,f330b4fd8064ea499385da03f3fc6c297916b674,2025-03-28,2025-03,.cursorrules,cursor_related_path,high,add ai files
+ToolUse/tool-use-ai,cursor,4c30fb7e9ac92ab042fda47dd243e8d6fe52fc5c,2024-12-02,2024-12,.cursorrules,cursor_related_path,high,Add Promptathon script and update related configurations
+VRSEN/agency-swarm,cursor,a825dad9eeaf61a34489476d95914f02f3360140,2024-10-10,2024-10,.cursorrules,cursor_related_path,high,Create .cursorrules
+airweave-ai/airweave,cursor,23759bd5586790d03b549156b5e2d577ec98c10f,2025-03-03,2025-03,.cursor/rules/airweave-overview.mdc;.cursor/rules/backend-rules.mdc;.cursor/rules/frontend-rules.mdc;.cursor/rules/repo-structure.mdc;.cursor/rules/source-integration-rules.mdc;.cursor/rules/sync-architecture.mdc,cursor_related_path,high,feat(cursor): implement cursorrules
+kenshiro-o/nagato-ai,cursor,e998accbfdbd033885f59b54811e9db8880a8e5c,2025-02-15,2025-02,.cursorrules,cursor_related_path,high,Rename test files and fix tests
+sirkirby/unifi-network-rules,cursor,bb9bb341de5c9555da2ea7f7f9dea300933a0701,2025-03-07,2025-03,.cursor/rules/unr-rules.mdc,cursor_related_path,high,feat(rework): Resource mgt improvements (#40)
+ttmouse/Wispr-Flow-CN,cursor,1f182ca97fab24917f76eac5cc3cb79996a101ca,2024-12-31,2024-12,.cursorrules,cursor_related_path,high,进一步开始优化
+wdm0006/elote,cursor,43fd084f9f804109bfc9f68a1fb5fd708077e98e,2025-02-26,2025-02,.cursor/rules/pytest_standards.mdc;.cursor/rules/python_standards.mdc;.cursor/rules/sphinx_docs_standards.mdc,cursor_related_path,high,added rulesfiles
+wdm0006/git-pandas,cursor,7d52cdf168a654ac3baec0a2df3df63389969248,2025-03-13,2025-03,.cursor/rules/project_overview.mdc;.cursor/rules/pytest_standards.mdc;.cursor/rules/python_standards.mdc;.cursor/rules/sphinx_docs_standards.mdc;.cursor/rules/testing.mdc,cursor_related_path,high,"cursorrules, gh actions,  and pyproject"
+wdm0006/pygeohash,cursor,5095348ae3b1f129ed51699f8ade2d99af010634,2025-03-01,2025-03,.cursor/rules/project_overview.mdc;.cursor/rules/pytest_standards.mdc;.cursor/rules/python_standards.mdc;.cursor/rules/sphinx_docs_standards.mdc;.cursor/rules/testing.mdc,cursor_related_path,high,cursor rules
