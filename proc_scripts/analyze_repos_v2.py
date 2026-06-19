@@ -145,15 +145,30 @@ def compute_ai_adoption_dates(cursor_commits_df: pd.DataFrame) -> pd.DataFrame:
     return first_df[available_cols].sort_values("repo_name").reset_index(drop=True)
 
 
-def process_one_repo(args_tuple):
-    """
-    Process one repo using original process_repository().
+# def process_one_repo(args_tuple):
+#     """
+#     Process one repo using original process_repository().
+# 
+#     We keep this wrapper so multiprocessing can call a top-level function
+#     from this v2 file while the actual repository logic remains in the original.
+#     """
+#     idx, repo_dict, total_repos, aggregation = args_tuple
+#     return orig.process_repository(idx, repo_dict, total_repos, aggregation)
 
-    We keep this wrapper so multiprocessing can call a top-level function
-    from this v2 file while the actual repository logic remains in the original.
-    """
+def process_one_repo(args_tuple):
     idx, repo_dict, total_repos, aggregation = args_tuple
-    return orig.process_repository(idx, repo_dict, total_repos, aggregation)
+    repo_ts, contrib_ts, cursor_commits = orig.process_repository(
+        idx, repo_dict, total_repos, aggregation
+    )
+
+    correct_repo_name = str(repo_dict["repo_name"]).strip()
+
+    for rows in (repo_ts, contrib_ts, cursor_commits):
+        for row in rows:
+            row["repo_name"] = correct_repo_name
+
+    return repo_ts, contrib_ts, cursor_commits
+
 
 
 def run_analysis(
