@@ -14,7 +14,10 @@ Use --execute only after checking dry-run bytes.
 from __future__ import annotations
 
 import argparse
+import warnings
 from pathlib import Path
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 import pandas as pd
 from google.cloud import bigquery
@@ -26,7 +29,7 @@ SELECT
   created_at,
   repo.name AS repo,
   actor.login AS actor
-FROM `githubarchive.day.*`
+FROM `githubarchive.day.20*`
 WHERE _TABLE_SUFFIX BETWEEN @start_suffix AND @end_suffix
   AND repo.name IN UNNEST(@repos)
 ORDER BY repo, created_at
@@ -35,7 +38,7 @@ ORDER BY repo, created_at
 
 def to_suffix(date_string: str) -> str:
     """Convert YYYY-MM-DD to YYYYMMDD."""
-    return date_string.replace("-", "")
+    return date_string.replace("-", "")[2:]
 
 
 def load_repos(args: argparse.Namespace) -> list[str]:
