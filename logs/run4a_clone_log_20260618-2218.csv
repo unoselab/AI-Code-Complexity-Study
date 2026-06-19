@@ -1,0 +1,6 @@
+repo_name,status,target_dir,note
+toheart/goanalysis,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/toheart_goanalysis,already_has_git_dir
+grafana/faro-flutter-sdk,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/grafana_faro-flutter-sdk,already_has_git_dir
+airweave-ai/airweave,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/airweave-ai_airweave,already_has_git_dir
+sirkirby/unifi-network-rules,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/sirkirby_unifi-network-rules,already_has_git_dir
+VladSez/easy-invoice-pdf,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/VladSez_easy-invoice-pdf,already_has_git_dir
