@@ -5,7 +5,9 @@ set -euo pipefail
 # run4a: Select top clone candidates, optionally clone them
 # ============================================================
 export GIT_TERMINAL_PROMPT=0
+RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M)}"
 LOG_DIR="${LOG_DIR:-logs}"
+CLONE_LOG="${LOG_DIR}/run4a_clone_log_${RUN_TS}.csv"
 DATA_DIR="${DATA_DIR:-data_baseline_backup}"
 OUTPUT_DIR="${OUTPUT_DIR:-tmp_adoption_test/data}"
 OUTPUT_FILE="${OUTPUT_FILE:-${OUTPUT_DIR}/top_100_clone_candidates.csv}"
@@ -98,32 +100,102 @@ fi
 echo
 }
 
-main() {
-print_config
-validate_mode
-run_candidate_selection
+check_python_repo_clone() {
+echo
+echo "** Check cloned Python repositories"
+echo "------------------------------------------------------------"
 
-if is_true "${INSPECT_CLONE}"; then
-  echo "** Git-clone candidate repositories"
-  echo "------------------------------------------------------------"
-
-  python proc_scripts/clone_repos_v2.py \
-    --repos-file "${OUTPUT_FILE}" \
-    --repo-column repo_name \
-    --clone-root "${CLONE_ROOT}" \
-    --logs-dir "${LOG_DIR}" \
-    --log-prefix run4a_clone_log \
-    --max-repos "${MAX_CLONES}"
-  
-else
-  echo "INSPECT_ONLY mode: candidate CSV was created, but repositories were not cloned."
-  echo
-  echo "To clone next, run:"
-  echo "  INSPECT_ONLY=false INSPECT_CLONE=true ./run4a-detect-ai-adoption.sh"
-  echo
+if [[ ! -f "${OUTPUT_FILE}" ]]; then
+echo "ERROR: candidate file not found: ${OUTPUT_FILE}"
+exit 1
 fi
 
-echo "run4a completed successfully."
+if [[ ! -f "${CLONE_LOG}" ]]; then
+echo "ERROR: clone log not found: ${CLONE_LOG}"
+exit 1
+fi
+
+python - "${OUTPUT_FILE}" "${CLONE_LOG}" <<'PY'
+import sys
+import pandas as pd
+
+candidates_file = sys.argv[1]
+clone_log_file = sys.argv[2]
+
+candidates = pd.read_csv(candidates_file)
+log = pd.read_csv(clone_log_file)
+
+df = candidates.merge(log, on="repo_name", how="left")
+
+py = df[df["repo_primary_language"].eq("Python")].copy()
+
+print("Python candidate repos:", len(py))
+print()
+
+print("Python clone status counts:")
+print(py["status"].value_counts(dropna=False))
+print()
+
+usable = py["status"].isin(["cloned", "skipped_existing", "updated_existing"]).sum()
+failed = py["status"].eq("failed").sum()
+missing = py["status"].isna().sum()
+
+print("Python usable repos:", usable)
+print("Python failed repos:", failed)
+print("Python missing log rows:", missing)
+print()
+
+print("Python repos:")
+cols = [
+"rank",
+"repo_name",
+"event_month",
+"pre_panel_months",
+"post_panel_months",
+"status",
+"target_dir",
+"note",
+]
+cols = [c for c in cols if c in py.columns]
+
+print(py[cols].to_string(index=False))
+PY
+}
+
+
+main() {
+  print_config
+  validate_mode
+  run_candidate_selection
+
+  if is_true "${INSPECT_CLONE}"; then
+    echo
+    echo "** Git-clone candidate repositories"
+    echo "------------------------------------------------------------"
+
+    python proc_scripts/clone_repos_v2.py \
+      --repos-file "${OUTPUT_FILE}" \
+      --repo-column repo_name \
+      --clone-root "${CLONE_ROOT}" \
+      --logs-dir "${LOG_DIR}" \
+      --log-prefix run4a_clone_log \
+      --timestamp "${RUN_TS}" \
+      --max-repos "${MAX_CLONES}"
+
+    echo
+    echo "** Check cloned Python repositories"
+    echo "------------------------------------------------------------"
+
+    python proc_scripts/check_python_repo_clone.py \
+      --candidates-file "${OUTPUT_FILE}" \
+      --clone-log "${CLONE_LOG}" \
+      --output "${OUTPUT_DIR}/ai_adopt_repo_python.csv" \
+      --language Python
+  else
+    echo "INSPECT_ONLY mode: candidate CSV was created, but repositories were not cloned."
+  fi
+
+  echo "run4a completed successfully."
 }
 
 main "$@"

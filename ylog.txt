@@ -1,88 +1,319 @@
+============================================================
+run4a: select top clone candidates for AI/Cursor adoption validation
+Data dir:                 data_baseline_backup
+Output dir:               tmp_adoption_test/data
+Top candidates file:      tmp_adoption_test/data/top_100_clone_candidates.csv
+All eligible file:        tmp_adoption_test/data/top_100_clone_candidates_all_eligible.csv
+Clone root:               ../ai_code_complexity_study_repo_dataset
+Top N:                    100
+Min pre months:           3
+Min post months:          3
+Rank by:                  high_contributor
+Require Cursor evidence:  true
+Inspect only:             false
+Inspect clone:            true
+Max clones:               0
+============================================================
 
-version 1
-
-Data dir: data_baseline_backup
-Panel rows: 22096
-Treatment-source panel rows: 9425
-Treatment repos summarized: 813
-Eligible repos: 501
-Top N written: 100
-Output: tmp_adoption_test/data/top_100_clone_candidates.csv
-All eligible output: tmp_adoption_test/data/top_100_clone_candidates_all_eligible.csv
-
-Top candidates:
-                                 repo_name event_month panel_first_month panel_latest_month  pre_panel_months  event_months  post_panel_months  balanced_window  cursor_commit_rows  cursor_file_rows  ts_rows_with_latest_commit
-                 cameronapak/freedom-stack     2024-10           2024-02            2025-07                16             2                 18               16                   6                 1                          13
-                           yuiseki/TRIDENT     2024-12           2024-01            2025-07                22             2                 14               14                   1                 1                          26
-                v112263/it-autonomos-spain     2025-03           2024-07            2025-08                16             2                 10               10                  10                 1                          14
-                        VRSEN/agency-swarm     2024-10           2024-01            2025-08                 9             1                 10                9                  42                 2                          23
-                             helixml/helix     2024-10           2024-01            2025-08                 9             1                 10                9                  33                 3                          26
-               different-ai/note-companion     2024-10           2024-01            2025-08                 9             1                 10                9                  22                10                          22
-                       metriport/metriport     2024-11           2024-01            2025-08                10             1                  9                9                  16                 2                          34
-reliverse/cli-ai-app-site-anything-builder     2024-11           2024-01            2025-08                10             1                  9                9                  15                 7                          18
-                         YumNumm/EQMonitor     2024-11           2024-01            2025-08                10             1                  9                9                  14                 1                          41
-                            dcramer/peated     2024-10           2024-01            2025-08                 9             1                 10                9                   9                 3                          26
-                         maidsafe/autonomi     2024-11           2024-01            2025-08                10             1                  9                9                   8                 1                          31
-                         owid/owid-grapher     2024-11           2024-01            2025-08                10             1                  9                9                   7                 1                         125
-                 ProcessMaker/processmaker     2024-11           2024-01            2025-08                10             1                  9                9                   5                 1                          90
-                konturio/disaster-ninja-fe     2024-10           2024-01            2025-08                 9             1                 10                9                   4                 1                          50
-                     pockethost/pockethost     2024-11           2024-01            2025-08                10             1                  9                9                   4                 1                          35
-         geeksblabla/geeksblabla.community     2024-10           2024-01            2025-08                 9             1                 10                9                   3                 1                          73
-                           pig-mesh/pig-ui     2024-11           2024-01            2025-08                10             1                  9                9                   3                 1                          52
-          GorvGoyl/Personal-Site-Gourav.io     2024-11           2024-01            2025-08                10             1                  9                9                   3                 1                          50
-                    warmachine028/memories     2024-10           2024-01            2025-08                 9             1                 10                9                   3                 1                          38
-                     haqq-network/frontend     2024-11           2024-01            2025-08                10             1                  9                9                   3                 1                          35
-                     balancer/pool-creator     2024-10           2024-01            2025-08                 9             1                 10                9                   2                 1                          36
-                  databricks-demos/dbdemos     2024-10           2024-01            2025-08                 9             1                 10                9                   2                 1                          32
-                          syntaxfm/website     2024-11           2024-01            2025-08                10             1                  9                9                   1                 1                         100
-                       holochain/holochain     2024-10           2024-01            2025-08                 9             1                 10                9                   1                 1                          69
-                   serversideup/docker-ssh     2024-11           2024-01            2025-08                10             1                  9                9                   1                 1                          18
-                        DataZooDE/erpl-web     2024-10           2024-01            2025-08                 9             1                 10                9                   1                 1                          17
-              rapidruby/rapid-ruby-starter     2024-11           2024-01            2025-08                10             1                  9                9                   1                 1                           9
-                        ohcnetwork/care_fe     2024-10           2024-01            2025-08                 9             1                 10                9                   0                 1                          66
-                            refly-ai/refly     2024-11           2024-02            2025-08                 9             1                  9                9                  21                 1                          20
-                             nevalang/neva     2024-10           2024-01            2025-07                 9             1                  9                9                   3                 2                          42
-
-version 2
-
-Data dir: data_baseline_backup
-Panel rows: 22096
+** Select candidate repositories
+------------------------------------------------------------
+Data dir: data_baseline_backup | rank_by: high_contributor | share_col: cursor_commit_share
 Treatment repos summarized: 813
 Duplicated (repo, month) rows collapsed: 51
-Eligible (>= 1 pre & >= 1 post): 501
-Top N written: 100 -> tmp_adoption_test/data/top_100_clone_candidates_v2.csv
-All eligible output: tmp_adoption_test/data/top_100_clone_candidates_v2_all_eligible.csv
-balanced_window in selection: min=6 max=9 | touching data edge: 96/100
+Eligible repos: 392 | Top N written: 100 -> tmp_adoption_test/data/top_100_clone_candidates.csv
 
 Top candidates:
- rank                                  repo_name event_month panel_first_month panel_latest_month  pre_panel_months  event_months  post_panel_months  balanced_window  cursor_commit_rows  cursor_file_rows  ts_rows_with_latest_commit  repo_stars repo_primary_language
-    1                         VRSEN/agency-swarm     2024-10           2024-01            2025-08                 9             1                 10                9                  42                 2                          23        3605                Python
-    2                              helixml/helix     2024-10           2024-01            2025-08                 9             1                 10                9                  33                 3                          26         476                    Go
-    3                different-ai/note-companion     2024-10           2024-01            2025-08                 9             1                 10                9                  22                10                          22         601            TypeScript
-    4                        metriport/metriport     2024-11           2024-01            2025-08                10             1                  9                9                  16                 2                          34         566            JavaScript
-    5 reliverse/cli-ai-app-site-anything-builder     2024-11           2024-01            2025-08                10             1                  9                9                  15                 7                          18         113            TypeScript
-    6                          YumNumm/EQMonitor     2024-11           2024-01            2025-08                10             1                  9                9                  14                 1                          41         202                  Dart
-    7                             dcramer/peated     2024-10           2024-01            2025-08                 9             1                 10                9                   9                 3                          26          67                  HTML
-    8                          maidsafe/autonomi     2024-11           2024-01            2025-08                10             1                  9                9                   8                 1                          31         125                  Rust
-    9                          owid/owid-grapher     2024-11           2024-01            2025-08                10             1                  9                9                   7                 1                         125        1435            TypeScript
-   10                  ProcessMaker/processmaker     2024-11           2024-01            2025-08                10             1                  9                9                   5                 1                          90         484                   PHP
-   11                 konturio/disaster-ninja-fe     2024-10           2024-01            2025-08                 9             1                 10                9                   4                 1                          50          22            TypeScript
-   12                      pockethost/pockethost     2024-11           2024-01            2025-08                10             1                  9                9                   4                 1                          35        1202            JavaScript
-   13          geeksblabla/geeksblabla.community     2024-10           2024-01            2025-08                 9             1                 10                9                   3                 1                          73         283                 Astro
-   14                            pig-mesh/pig-ui     2024-11           2024-01            2025-08                10             1                  9                9                   3                 1                          52         264                   Vue
-   15           GorvGoyl/Personal-Site-Gourav.io     2024-11           2024-01            2025-08                10             1                  9                9                   3                 1                          50         129            TypeScript
-   16                     warmachine028/memories     2024-10           2024-01            2025-08                 9             1                 10                9                   3                 1                          38          53            JavaScript
-   17                      haqq-network/frontend     2024-11           2024-01            2025-08                10             1                  9                9                   3                 1                          35          44            TypeScript
-   18                      balancer/pool-creator     2024-10           2024-01            2025-08                 9             1                 10                9                   2                 1                          36          11            TypeScript
-   19                   databricks-demos/dbdemos     2024-10           2024-01            2025-08                 9             1                 10                9                   2                 1                          32         321                  HTML
-   20                           syntaxfm/website     2024-11           2024-01            2025-08                10             1                  9                9                   1                 1                         100        1093                Svelte
-   21                        holochain/holochain     2024-10           2024-01            2025-08                 9             1                 10                9                   1                 1                          69        1227                  Rust
-   22                    serversideup/docker-ssh     2024-11           2024-01            2025-08                10             1                  9                9                   1                 1                          18          54                 Shell
-   23                         DataZooDE/erpl-web     2024-10           2024-01            2025-08                 9             1                 10                9                   1                 1                          17          11                   C++
-   24               rapidruby/rapid-ruby-starter     2024-11           2024-01            2025-08                10             1                  9                9                   1                 1                           9          17                  Ruby
-   25                         ohcnetwork/care_fe     2024-10           2024-01            2025-08                 9             1                 10                9                   0                 1                          66         444            TypeScript
-   26                             refly-ai/refly     2024-11           2024-02            2025-08                 9             1                  9                9                  21                 1                          20        3249            TypeScript
-   27                              nevalang/neva     2024-10           2024-01            2025-07                 9             1                  9                9                   3                 2                          42         840                    Go
-   28                             HugoRCD/shelve     2024-11           2024-02            2025-08                 9             1                  9                9                   2                 1                          19         168                   Vue
-   29                 indiesoftby/defold-yagames     2024-10           2024-01            2025-07                 9             1                  9                9                   1                 1                          27          64                   Lua
-   30                         elie222/inbox-zero     2024-09           2024-01            2025-08                 8             1                 11                8                 169                16                          27        3749            TypeScript
+ rank                                  repo_name event_month  pre_panel_months  post_panel_months  balanced_window  cursor_commit_share  cursor_commit_rows  cursor_authors  repo_commits  repo_contributors  repo_stars repo_primary_language
+    1                         toheart/goanalysis     2025-02                11                  6                6             0.264151                  14               6            53                  2         123                    Go
+    2                   grafana/faro-flutter-sdk     2025-03                 9                  5                5             0.184211                   7               1            38                  4          16                  Dart
+    3                       airweave-ai/airweave     2025-03                 3                  5                3             0.163136                  77               9           472                  6         564                Python
+    4               sirkirby/unifi-network-rules     2025-03                 6                  4                4             0.142857                   6               1            42                  1          21                Python
+    5                   VladSez/easy-invoice-pdf     2025-02                 4                  6                4             0.136364                   6               1            44                  1          23            TypeScript
+    6                          IamLiuLv/compoder     2025-03                 3                  4                3             0.122449                  12               4            98                  5          91            TypeScript
+    7 reliverse/cli-ai-app-site-anything-builder     2024-11                10                  9                9             0.111111                  15               1           135                  1         113            TypeScript
+    8                        ai-hero-dev/ai-hero     2025-03                 3                  4                3             0.104348                  24               1           230                  3         680            TypeScript
+    9                      dogokit/dogokit-akita     2024-09                 6                 10                6             0.104167                   5               1            48                  1          24            JavaScript
+   10                            yayxs/ai-coding     2025-01                 5                  3                3             0.096154                   5               1            52                  1          13            TypeScript
+   11                  maciej-trebacz/ff7-ultima     2025-01                 6                  7                6             0.094737                   9               1            95                  1          21            TypeScript
+   12       constROD/template-hono-prisma-kysely     2025-03                12                  5                5             0.094527                  19               1           201                  2          40            TypeScript
+   13                           dgokcin/dotfiles     2024-05                 4                 14                4             0.093694                  52               1           555                  2          45                   Lua
+   14               meta-secret/meta-secret-core     2025-03                14                  4                4             0.076046                  20               1           263                  2          12                  Rust
+   15                    vadxq/nextjs-ai-starter     2025-03                14                  4                4             0.074074                   2               1            27                  1          11            TypeScript
+   16                         VRSEN/agency-swarm     2024-10                 9                 10                9             0.073171                  42               8           574                 16        3605                Python
+   17                        recallnet/js-recall     2025-03                 7                  5                5             0.069231                   9               4           130                  6          12            TypeScript
+   18                    Tmeister/wppb-generator     2024-09                 8                  4                4             0.067416                   6               1            89                  3          85            JavaScript
+   19  makerkit/react-native-expo-turbo-saas-kit     2025-01                 3                  7                3             0.064516                   2               1            31                  2          51            TypeScript
+   20          TextGeneratorio/text-generator.io     2025-03                14                  5                5             0.060976                   5               1            82                  1          33                Python
+   21                     Melvynx/next-zod-route     2025-02                 8                  6                6             0.059524                   5               2            84                  3          20            TypeScript
+   22                 melissamcewen/CurlsBotSite     2024-12                11                  8                8             0.054422                  24               1           441                  1          18            TypeScript
+   23                 QuantGeekDev/mcp-framework     2025-03                 3                  3                3             0.054422                   8               2           147                  5         459            TypeScript
+   24  wakeyi-git/obsidian-card-navigator-plugin     2025-01                 5                  3                3             0.054054                  18               1           333                  1          19            TypeScript
+   25                          benbjurstrom/otpz     2024-12                 3                  3                3             0.050000                   1               1            20                  1         242                   PHP
+   26                          wdm0006/pygeohash     2025-03                14                  4                4             0.049383                   4               2            81                 11         159                Python
+   27                          opentoolsteam/cli     2025-03                 3                  4                3             0.048387                   3               2            62                  4          43            TypeScript
+   28                       fengkx/beancount-lsp     2025-02                13                  6                6             0.047393                  10               1           211                  1          13            TypeScript
+   29                          gjsify/ts-for-gir     2025-03                14                  5                5             0.047127                  73               1          1549                 18         260            TypeScript
+   30 yumemi-inc/flutter-mobile-project-template     2024-12                11                  8                8             0.043360                  64              15          1476                 18          45                  Dart
+
+
+** Git-clone candidate repositories
+------------------------------------------------------------
+2026-06-19 00:42:57,423 [INFO] Repos file: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/top_100_clone_candidates.csv
+2026-06-19 00:42:57,423 [INFO] Clone root: /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset
+2026-06-19 00:42:57,423 [INFO] Log file: /home/user1-system12/project-workspace/ai_code_complexity_study/logs/run4a_clone_log_20260619-0042.csv
+2026-06-19 00:42:57,423 [INFO] Existing action: skip
+2026-06-19 00:42:57,423 [INFO] Repositories to process: 100
+2026-06-19 00:42:57,423 [INFO] [1/100] toheart/goanalysis -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/toheart_goanalysis
+2026-06-19 00:42:57,426 [INFO] Already cloned. Skipping toheart/goanalysis
+2026-06-19 00:42:57,426 [INFO] [2/100] grafana/faro-flutter-sdk -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/grafana_faro-flutter-sdk
+2026-06-19 00:42:57,427 [INFO] Already cloned. Skipping grafana/faro-flutter-sdk
+2026-06-19 00:42:57,428 [INFO] [3/100] airweave-ai/airweave -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/airweave-ai_airweave
+2026-06-19 00:42:57,430 [INFO] Already cloned. Skipping airweave-ai/airweave
+2026-06-19 00:42:57,430 [INFO] [4/100] sirkirby/unifi-network-rules -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/sirkirby_unifi-network-rules
+2026-06-19 00:42:57,432 [INFO] Already cloned. Skipping sirkirby/unifi-network-rules
+2026-06-19 00:42:57,432 [INFO] [5/100] VladSez/easy-invoice-pdf -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/VladSez_easy-invoice-pdf
+2026-06-19 00:42:57,434 [INFO] Already cloned. Skipping VladSez/easy-invoice-pdf
+2026-06-19 00:42:57,434 [INFO] [6/100] IamLiuLv/compoder -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/IamLiuLv_compoder
+2026-06-19 00:42:57,436 [INFO] Already cloned. Skipping IamLiuLv/compoder
+2026-06-19 00:42:57,436 [INFO] [7/100] reliverse/cli-ai-app-site-anything-builder -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/reliverse_cli-ai-app-site-anything-builder
+2026-06-19 00:42:57,438 [INFO] Already cloned. Skipping reliverse/cli-ai-app-site-anything-builder
+2026-06-19 00:42:57,438 [INFO] [8/100] ai-hero-dev/ai-hero -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ai-hero-dev_ai-hero
+2026-06-19 00:42:57,439 [INFO] Already cloned. Skipping ai-hero-dev/ai-hero
+2026-06-19 00:42:57,439 [INFO] [9/100] dogokit/dogokit-akita -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/dogokit_dogokit-akita
+2026-06-19 00:42:57,441 [INFO] Already cloned. Skipping dogokit/dogokit-akita
+2026-06-19 00:42:57,441 [INFO] [10/100] yayxs/ai-coding -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/yayxs_ai-coding
+2026-06-19 00:42:57,443 [INFO] Already cloned. Skipping yayxs/ai-coding
+2026-06-19 00:42:57,443 [INFO] [11/100] maciej-trebacz/ff7-ultima -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/maciej-trebacz_ff7-ultima
+2026-06-19 00:42:57,445 [INFO] Already cloned. Skipping maciej-trebacz/ff7-ultima
+2026-06-19 00:42:57,445 [INFO] [12/100] constROD/template-hono-prisma-kysely -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/constROD_template-hono-prisma-kysely
+2026-06-19 00:42:57,447 [INFO] Already cloned. Skipping constROD/template-hono-prisma-kysely
+2026-06-19 00:42:57,448 [INFO] [13/100] dgokcin/dotfiles -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/dgokcin_dotfiles
+2026-06-19 00:42:57,450 [INFO] Already cloned. Skipping dgokcin/dotfiles
+2026-06-19 00:42:57,450 [INFO] [14/100] meta-secret/meta-secret-core -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/meta-secret_meta-secret-core
+2026-06-19 00:42:57,452 [INFO] Already cloned. Skipping meta-secret/meta-secret-core
+2026-06-19 00:42:57,452 [INFO] [15/100] vadxq/nextjs-ai-starter -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/vadxq_nextjs-ai-starter
+2026-06-19 00:42:57,454 [INFO] Already cloned. Skipping vadxq/nextjs-ai-starter
+2026-06-19 00:42:57,454 [INFO] [16/100] VRSEN/agency-swarm -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/VRSEN_agency-swarm
+2026-06-19 00:42:57,456 [INFO] Already cloned. Skipping VRSEN/agency-swarm
+2026-06-19 00:42:57,456 [INFO] [17/100] recallnet/js-recall -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/recallnet_js-recall
+2026-06-19 00:42:57,458 [INFO] Already cloned. Skipping recallnet/js-recall
+2026-06-19 00:42:57,458 [INFO] [18/100] Tmeister/wppb-generator -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Tmeister_wppb-generator
+2026-06-19 00:42:57,460 [INFO] Already cloned. Skipping Tmeister/wppb-generator
+2026-06-19 00:42:57,460 [INFO] [19/100] makerkit/react-native-expo-turbo-saas-kit -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/makerkit_react-native-expo-turbo-saas-kit
+2026-06-19 00:42:57,462 [INFO] Already cloned. Skipping makerkit/react-native-expo-turbo-saas-kit
+2026-06-19 00:42:57,462 [INFO] [20/100] TextGeneratorio/text-generator.io -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/TextGeneratorio_text-generator.io
+2026-06-19 00:42:57,464 [INFO] Already cloned. Skipping TextGeneratorio/text-generator.io
+2026-06-19 00:42:57,464 [INFO] [21/100] Melvynx/next-zod-route -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Melvynx_next-zod-route
+2026-06-19 00:42:57,465 [INFO] Already cloned. Skipping Melvynx/next-zod-route
+2026-06-19 00:42:57,465 [INFO] [22/100] melissamcewen/CurlsBotSite -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/melissamcewen_CurlsBotSite
+2026-06-19 00:42:57,467 [INFO] Already cloned. Skipping melissamcewen/CurlsBotSite
+2026-06-19 00:42:57,467 [INFO] [23/100] QuantGeekDev/mcp-framework -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/QuantGeekDev_mcp-framework
+2026-06-19 00:42:57,468 [INFO] Already cloned. Skipping QuantGeekDev/mcp-framework
+2026-06-19 00:42:57,468 [INFO] [24/100] wakeyi-git/obsidian-card-navigator-plugin -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wakeyi-git_obsidian-card-navigator-plugin
+2026-06-19 00:42:57,624 [ERROR] Failed to clone wakeyi-git/obsidian-card-navigator-plugin: Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wakeyi-git_obsidian-card-navigator-plugin'...
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+2026-06-19 00:42:57,624 [INFO] [25/100] benbjurstrom/otpz -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/benbjurstrom_otpz
+2026-06-19 00:42:57,627 [INFO] Already cloned. Skipping benbjurstrom/otpz
+2026-06-19 00:42:57,627 [INFO] [26/100] wdm0006/pygeohash -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_pygeohash
+2026-06-19 00:42:57,629 [INFO] Already cloned. Skipping wdm0006/pygeohash
+2026-06-19 00:42:57,630 [INFO] [27/100] opentoolsteam/cli -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/opentoolsteam_cli
+2026-06-19 00:42:57,631 [INFO] Already cloned. Skipping opentoolsteam/cli
+2026-06-19 00:42:57,631 [INFO] [28/100] fengkx/beancount-lsp -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/fengkx_beancount-lsp
+2026-06-19 00:42:57,633 [INFO] Already cloned. Skipping fengkx/beancount-lsp
+2026-06-19 00:42:57,633 [INFO] [29/100] gjsify/ts-for-gir -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/gjsify_ts-for-gir
+2026-06-19 00:42:57,634 [INFO] Already cloned. Skipping gjsify/ts-for-gir
+2026-06-19 00:42:57,635 [INFO] [30/100] yumemi-inc/flutter-mobile-project-template -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/yumemi-inc_flutter-mobile-project-template
+2026-06-19 00:42:57,636 [INFO] Already cloned. Skipping yumemi-inc/flutter-mobile-project-template
+2026-06-19 00:42:57,636 [INFO] [31/100] elie222/inbox-zero -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/elie222_inbox-zero
+2026-06-19 00:42:57,638 [INFO] Already cloned. Skipping elie222/inbox-zero
+2026-06-19 00:42:57,638 [INFO] [32/100] wham/kaja -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wham_kaja
+2026-06-19 00:42:57,640 [INFO] Already cloned. Skipping wham/kaja
+2026-06-19 00:42:57,640 [INFO] [33/100] zkSoju/frame -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/zkSoju_frame
+2026-06-19 00:42:57,641 [INFO] Already cloned. Skipping zkSoju/frame
+2026-06-19 00:42:57,641 [INFO] [34/100] MervinPraison/PraisonAI -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/MervinPraison_PraisonAI
+2026-06-19 00:42:57,643 [INFO] Already cloned. Skipping MervinPraison/PraisonAI
+2026-06-19 00:42:57,643 [INFO] [35/100] wdm0006/elote -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_elote
+2026-06-19 00:42:57,645 [INFO] Already cloned. Skipping wdm0006/elote
+2026-06-19 00:42:57,645 [INFO] [36/100] DutchCryptoDad/bamboo-ta -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/DutchCryptoDad_bamboo-ta
+2026-06-19 00:42:57,795 [ERROR] Failed to clone DutchCryptoDad/bamboo-ta: Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/DutchCryptoDad_bamboo-ta'...
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+2026-06-19 00:42:57,795 [INFO] [37/100] tegnike/aituber-kit -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/tegnike_aituber-kit
+2026-06-19 00:42:57,797 [INFO] Already cloned. Skipping tegnike/aituber-kit
+2026-06-19 00:42:57,798 [INFO] [38/100] DarkSkyTeam/kirara-webui -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/DarkSkyTeam_kirara-webui
+2026-06-19 00:42:57,800 [INFO] Already cloned. Skipping DarkSkyTeam/kirara-webui
+2026-06-19 00:42:57,800 [INFO] [39/100] radzionc/radzionkit -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/radzionc_radzionkit
+2026-06-19 00:42:57,802 [INFO] Already cloned. Skipping radzionc/radzionkit
+2026-06-19 00:42:57,802 [INFO] [40/100] kargnas/laravel-ai-translator -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/kargnas_laravel-ai-translator
+2026-06-19 00:42:57,804 [INFO] Already cloned. Skipping kargnas/laravel-ai-translator
+2026-06-19 00:42:57,804 [INFO] [41/100] serge-0v/next-js-sanity-starter -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/serge-0v_next-js-sanity-starter
+2026-06-19 00:42:57,806 [INFO] Already cloned. Skipping serge-0v/next-js-sanity-starter
+2026-06-19 00:42:57,806 [INFO] [42/100] AdirD/nestjs-context-logger -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/AdirD_nestjs-context-logger
+2026-06-19 00:42:57,808 [INFO] Already cloned. Skipping AdirD/nestjs-context-logger
+2026-06-19 00:42:57,808 [INFO] [43/100] project-89/argOS -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/project-89_argOS
+2026-06-19 00:42:57,809 [INFO] Already cloned. Skipping project-89/argOS
+2026-06-19 00:42:57,810 [INFO] [44/100] unmonk/chainlink -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/unmonk_chainlink
+2026-06-19 00:42:57,811 [INFO] Already cloned. Skipping unmonk/chainlink
+2026-06-19 00:42:57,811 [INFO] [45/100] rohenaz/allaboard-bitchat-nitro -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/rohenaz_allaboard-bitchat-nitro
+2026-06-19 00:42:57,813 [INFO] Already cloned. Skipping rohenaz/allaboard-bitchat-nitro
+2026-06-19 00:42:57,813 [INFO] [46/100] kaushikgopal/playground-android -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/kaushikgopal_playground-android
+2026-06-19 00:42:57,815 [INFO] Already cloned. Skipping kaushikgopal/playground-android
+2026-06-19 00:42:57,815 [INFO] [47/100] boul2gom/yt-dlp -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/boul2gom_yt-dlp
+2026-06-19 00:42:57,816 [INFO] Already cloned. Skipping boul2gom/yt-dlp
+2026-06-19 00:42:57,816 [INFO] [48/100] openintegrations/openint -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/openintegrations_openint
+2026-06-19 00:42:57,957 [ERROR] Failed to clone openintegrations/openint: Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/openintegrations_openint'...
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+2026-06-19 00:42:57,958 [INFO] [49/100] labnol/react-tailwind -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/labnol_react-tailwind
+2026-06-19 00:42:57,960 [INFO] Already cloned. Skipping labnol/react-tailwind
+2026-06-19 00:42:57,960 [INFO] [50/100] jparkerweb/llm-distillery -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/jparkerweb_llm-distillery
+2026-06-19 00:42:57,962 [INFO] Already cloned. Skipping jparkerweb/llm-distillery
+2026-06-19 00:42:57,962 [INFO] [51/100] KroMiose/nekro-agent -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/KroMiose_nekro-agent
+2026-06-19 00:42:57,965 [INFO] Already cloned. Skipping KroMiose/nekro-agent
+2026-06-19 00:42:57,965 [INFO] [52/100] parres-hq/whitenoise -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/parres-hq_whitenoise
+2026-06-19 00:42:57,966 [INFO] Already cloned. Skipping parres-hq/whitenoise
+2026-06-19 00:42:57,966 [INFO] [53/100] rohitrango/FireANTs -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/rohitrango_FireANTs
+2026-06-19 00:42:57,968 [INFO] Already cloned. Skipping rohitrango/FireANTs
+2026-06-19 00:42:57,968 [INFO] [54/100] ttmouse/Wispr-Flow-CN -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ttmouse_Wispr-Flow-CN
+2026-06-19 00:42:57,970 [INFO] Already cloned. Skipping ttmouse/Wispr-Flow-CN
+2026-06-19 00:42:57,971 [INFO] [55/100] maERP/maERP -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/maERP_maERP
+2026-06-19 00:42:57,972 [INFO] Already cloned. Skipping maERP/maERP
+2026-06-19 00:42:57,972 [INFO] [56/100] richardadonnell/Upwork-Job-Scraper -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/richardadonnell_Upwork-Job-Scraper
+2026-06-19 00:42:57,974 [INFO] Already cloned. Skipping richardadonnell/Upwork-Job-Scraper
+2026-06-19 00:42:57,974 [INFO] [57/100] level09/enferno -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/level09_enferno
+2026-06-19 00:42:57,976 [INFO] Already cloned. Skipping level09/enferno
+2026-06-19 00:42:57,976 [INFO] [58/100] EcomExperts-io/Base -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/EcomExperts-io_Base
+2026-06-19 00:42:57,977 [INFO] Already cloned. Skipping EcomExperts-io/Base
+2026-06-19 00:42:57,977 [INFO] [59/100] Metta-AI/metta -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Metta-AI_metta
+2026-06-19 00:42:58,121 [ERROR] Failed to clone Metta-AI/metta: Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Metta-AI_metta'...
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+2026-06-19 00:42:58,121 [INFO] [60/100] cameronapak/freedom-stack -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/cameronapak_freedom-stack
+2026-06-19 00:42:58,124 [INFO] Already cloned. Skipping cameronapak/freedom-stack
+2026-06-19 00:42:58,124 [INFO] [61/100] privatefolio/privatefolio -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/privatefolio_privatefolio
+2026-06-19 00:42:58,126 [INFO] Already cloned. Skipping privatefolio/privatefolio
+2026-06-19 00:42:58,126 [INFO] [62/100] somatic-labs/meteorite -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/somatic-labs_meteorite
+2026-06-19 00:42:58,128 [INFO] Already cloned. Skipping somatic-labs/meteorite
+2026-06-19 00:42:58,128 [INFO] [63/100] ToolUse/tool-use-ai -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ToolUse_tool-use-ai
+2026-06-19 00:42:58,130 [INFO] Already cloned. Skipping ToolUse/tool-use-ai
+2026-06-19 00:42:58,130 [INFO] [64/100] pnd280/complexity -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/pnd280_complexity
+2026-06-19 00:42:58,131 [INFO] Already cloned. Skipping pnd280/complexity
+2026-06-19 00:42:58,132 [INFO] [65/100] pAIrprogio/oai -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/pAIrprogio_oai
+2026-06-19 00:42:58,133 [INFO] Already cloned. Skipping pAIrprogio/oai
+2026-06-19 00:42:58,133 [INFO] [66/100] kenshiro-o/nagato-ai -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/kenshiro-o_nagato-ai
+2026-06-19 00:42:58,135 [INFO] Already cloned. Skipping kenshiro-o/nagato-ai
+2026-06-19 00:42:58,135 [INFO] [67/100] Alickx/nuxt3-blog -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Alickx_nuxt3-blog
+2026-06-19 00:42:58,137 [INFO] Already cloned. Skipping Alickx/nuxt3-blog
+2026-06-19 00:42:58,137 [INFO] [68/100] loglayer/loglayer -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/loglayer_loglayer
+2026-06-19 00:42:58,139 [INFO] Already cloned. Skipping loglayer/loglayer
+2026-06-19 00:42:58,139 [INFO] [69/100] verygoodplugins/wp-fusion-lite -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/verygoodplugins_wp-fusion-lite
+2026-06-19 00:42:58,140 [INFO] Already cloned. Skipping verygoodplugins/wp-fusion-lite
+2026-06-19 00:42:58,140 [INFO] [70/100] jparkerweb/semantic-chunking -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/jparkerweb_semantic-chunking
+2026-06-19 00:42:58,142 [INFO] Already cloned. Skipping jparkerweb/semantic-chunking
+2026-06-19 00:42:58,142 [INFO] [71/100] langfuse/langfuse-docs -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/langfuse_langfuse-docs
+2026-06-19 00:42:58,144 [INFO] Already cloned. Skipping langfuse/langfuse-docs
+2026-06-19 00:42:58,144 [INFO] [72/100] v112263/it-autonomos-spain -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/v112263_it-autonomos-spain
+2026-06-19 00:42:58,146 [INFO] Already cloned. Skipping v112263/it-autonomos-spain
+2026-06-19 00:42:58,146 [INFO] [73/100] netresearch/timetracker -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/netresearch_timetracker
+2026-06-19 00:42:58,147 [INFO] Already cloned. Skipping netresearch/timetracker
+2026-06-19 00:42:58,147 [INFO] [74/100] xlnfinance/xln -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/xlnfinance_xln
+2026-06-19 00:42:58,149 [INFO] Already cloned. Skipping xlnfinance/xln
+2026-06-19 00:42:58,149 [INFO] [75/100] slashequip/laravel-segment -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/slashequip_laravel-segment
+2026-06-19 00:42:58,150 [INFO] Already cloned. Skipping slashequip/laravel-segment
+2026-06-19 00:42:58,150 [INFO] [76/100] creazy231/tools-for-autodarts -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/creazy231_tools-for-autodarts
+2026-06-19 00:42:58,152 [INFO] Already cloned. Skipping creazy231/tools-for-autodarts
+2026-06-19 00:42:58,152 [INFO] [77/100] humanspeak/svelte-markdown -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/humanspeak_svelte-markdown
+2026-06-19 00:42:58,153 [INFO] Already cloned. Skipping humanspeak/svelte-markdown
+2026-06-19 00:42:58,153 [INFO] [78/100] eliheuer/bezy -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/eliheuer_bezy
+2026-06-19 00:42:58,155 [INFO] Already cloned. Skipping eliheuer/bezy
+2026-06-19 00:42:58,155 [INFO] [79/100] MaggieAppleton/maggieappleton.com-V3 -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/MaggieAppleton_maggieappleton.com-V3
+2026-06-19 00:42:58,156 [INFO] Already cloned. Skipping MaggieAppleton/maggieappleton.com-V3
+2026-06-19 00:42:58,157 [INFO] [80/100] dotneet/aica -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/dotneet_aica
+2026-06-19 00:42:58,158 [INFO] Already cloned. Skipping dotneet/aica
+2026-06-19 00:42:58,158 [INFO] [81/100] medusajs/examples -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/medusajs_examples
+2026-06-19 00:42:58,160 [INFO] Already cloned. Skipping medusajs/examples
+2026-06-19 00:42:58,160 [INFO] [82/100] a-polishchuk/mastering-react -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/a-polishchuk_mastering-react
+2026-06-19 00:42:58,161 [INFO] Already cloned. Skipping a-polishchuk/mastering-react
+2026-06-19 00:42:58,161 [INFO] [83/100] daydreamsai/daydreams -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/daydreamsai_daydreams
+2026-06-19 00:42:58,163 [INFO] Already cloned. Skipping daydreamsai/daydreams
+2026-06-19 00:42:58,163 [INFO] [84/100] Kiln-AI/Kiln -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Kiln-AI_Kiln
+2026-06-19 00:42:58,164 [INFO] Already cloned. Skipping Kiln-AI/Kiln
+2026-06-19 00:42:58,164 [INFO] [85/100] transloadit/node-sdk -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/transloadit_node-sdk
+2026-06-19 00:42:58,166 [INFO] Already cloned. Skipping transloadit/node-sdk
+2026-06-19 00:42:58,166 [INFO] [86/100] OpenMOSS/Language-Model-SAEs -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/OpenMOSS_Language-Model-SAEs
+2026-06-19 00:42:58,168 [INFO] Already cloned. Skipping OpenMOSS/Language-Model-SAEs
+2026-06-19 00:42:58,168 [INFO] [87/100] lucasromerodb/impuestito-extension -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/lucasromerodb_impuestito-extension
+2026-06-19 00:42:58,170 [INFO] Already cloned. Skipping lucasromerodb/impuestito-extension
+2026-06-19 00:42:58,170 [INFO] [88/100] hoishing/natal -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/hoishing_natal
+2026-06-19 00:42:58,313 [ERROR] Failed to clone hoishing/natal: Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/hoishing_natal'...
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+2026-06-19 00:42:58,314 [INFO] [89/100] rapidruby/rapid-ruby-starter -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/rapidruby_rapid-ruby-starter
+2026-06-19 00:42:58,316 [INFO] Already cloned. Skipping rapidruby/rapid-ruby-starter
+2026-06-19 00:42:58,316 [INFO] [90/100] jpmorgan-payments/embedded-finance -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/jpmorgan-payments_embedded-finance
+2026-06-19 00:42:58,319 [INFO] Already cloned. Skipping jpmorgan-payments/embedded-finance
+2026-06-19 00:42:58,319 [INFO] [91/100] indiesoftby/defold-sharp-sprite -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/indiesoftby_defold-sharp-sprite
+2026-06-19 00:42:58,321 [INFO] Already cloned. Skipping indiesoftby/defold-sharp-sprite
+2026-06-19 00:42:58,321 [INFO] [92/100] unsend-dev/unsend -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/unsend-dev_unsend
+2026-06-19 00:42:58,323 [INFO] Already cloned. Skipping unsend-dev/unsend
+2026-06-19 00:42:58,323 [INFO] [93/100] kkrt-labs/keth -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/kkrt-labs_keth
+2026-06-19 00:42:58,325 [INFO] Already cloned. Skipping kkrt-labs/keth
+2026-06-19 00:42:58,325 [INFO] [94/100] liam-hq/liam -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/liam-hq_liam
+2026-06-19 00:42:58,327 [INFO] Already cloned. Skipping liam-hq/liam
+2026-06-19 00:42:58,327 [INFO] [95/100] deeeed/expo-audio-stream -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/deeeed_expo-audio-stream
+2026-06-19 00:42:58,329 [INFO] Already cloned. Skipping deeeed/expo-audio-stream
+2026-06-19 00:42:58,329 [INFO] [96/100] latechforce/engine -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/latechforce_engine
+2026-06-19 00:42:58,331 [INFO] Already cloned. Skipping latechforce/engine
+2026-06-19 00:42:58,331 [INFO] [97/100] stacksjs/ts-spreadsheets -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/stacksjs_ts-spreadsheets
+2026-06-19 00:42:58,332 [INFO] Already cloned. Skipping stacksjs/ts-spreadsheets
+2026-06-19 00:42:58,332 [INFO] [98/100] DataDog/datadog-ci-rb -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/DataDog_datadog-ci-rb
+2026-06-19 00:42:58,333 [INFO] Already cloned. Skipping DataDog/datadog-ci-rb
+2026-06-19 00:42:58,334 [INFO] [99/100] wdm0006/git-pandas -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_git-pandas
+2026-06-19 00:42:58,335 [INFO] Already cloned. Skipping wdm0006/git-pandas
+2026-06-19 00:42:58,335 [INFO] [100/100] ditto-assistant/ditto-app -> /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ditto-assistant_ditto-app
+2026-06-19 00:42:58,477 [ERROR] Failed to clone ditto-assistant/ditto-app: Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ditto-assistant_ditto-app'...
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+2026-06-19 00:42:58,477 [INFO] 
+2026-06-19 00:42:58,477 [INFO] Clone summary
+2026-06-19 00:42:58,477 [INFO] -------------
+2026-06-19 00:42:58,478 [INFO] processed: 100
+2026-06-19 00:42:58,478 [INFO] cloned:    0
+2026-06-19 00:42:58,478 [INFO] updated:   0
+2026-06-19 00:42:58,478 [INFO] skipped:   94
+2026-06-19 00:42:58,478 [INFO] failed:    6
+2026-06-19 00:42:58,478 [INFO] clone log: /home/user1-system12/project-workspace/ai_code_complexity_study/logs/run4a_clone_log_20260619-0042.csv
+
+** Check cloned Python repositories
+------------------------------------------------------------
+Candidate file: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/top_100_clone_candidates.csv
+Clone log:      /home/user1-system12/project-workspace/ai_code_complexity_study/logs/run4a_clone_log_20260619-0042.csv
+Output file:    /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/ai_adopt_repo_python.csv
+
+Python candidate repos: 15
+Python usable repos written: 13
+Python failed repos excluded: 2
+Python missing log rows excluded: 0
+
+Python clone status counts before filtering:
+status
+skipped_existing    13
+failed               2
+Name: count, dtype: int64
+
+Usable Python repos written to CSV:
+ rank                         repo_name event_month  pre_panel_months  post_panel_months  cursor_commit_share  cursor_commit_rows  cursor_authors  repo_commits  repo_contributors           status                                                                                                     target_dir                note
+    3              airweave-ai/airweave     2025-03                 3                  5             0.163136                  77               9           472                  6 skipped_existing              /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/airweave-ai_airweave already_has_git_dir
+    4      sirkirby/unifi-network-rules     2025-03                 6                  4             0.142857                   6               1            42                  1 skipped_existing      /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/sirkirby_unifi-network-rules already_has_git_dir
+   16                VRSEN/agency-swarm     2024-10                 9                 10             0.073171                  42               8           574                 16 skipped_existing                /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/VRSEN_agency-swarm already_has_git_dir
+   20 TextGeneratorio/text-generator.io     2025-03                14                  5             0.060976                   5               1            82                  1 skipped_existing /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/TextGeneratorio_text-generator.io already_has_git_dir
+   26                 wdm0006/pygeohash     2025-03                14                  4             0.049383                   4               2            81                 11 skipped_existing                 /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_pygeohash already_has_git_dir
+   35                     wdm0006/elote     2025-02                13                  4             0.038961                   3               2            77                  4 skipped_existing                     /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_elote already_has_git_dir
+   51              KroMiose/nekro-agent     2025-01                 6                  7             0.029954                  13               2           434                  4 skipped_existing              /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/KroMiose_nekro-agent already_has_git_dir
+   54             ttmouse/Wispr-Flow-CN     2024-12                 3                  8             0.029412                   2               1            68                  1 skipped_existing             /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ttmouse_Wispr-Flow-CN already_has_git_dir
+   63               ToolUse/tool-use-ai     2024-12                 3                  4             0.027027                   2               1            74                  3 skipped_existing               /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ToolUse_tool-use-ai already_has_git_dir
+   66              kenshiro-o/nagato-ai     2025-02                11                  6             0.026087                   3               1           115                  1 skipped_existing              /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/kenshiro-o_nagato-ai already_has_git_dir
+   84                      Kiln-AI/Kiln     2025-01                 5                  7             0.018957                  28               4          1477                  6 skipped_existing                      /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Kiln-AI_Kiln already_has_git_dir
+   86      OpenMOSS/Language-Model-SAEs     2024-12                 9                  7             0.017331                  10               3           577                  8 skipped_existing      /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/OpenMOSS_Language-Model-SAEs already_has_git_dir
+   99                wdm0006/git-pandas     2025-03                14                  4             0.015385                   2               2           130                  4 skipped_existing                /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_git-pandas already_has_git_dir
+
+Failed Python repos excluded:
+ rank                repo_name event_month  pre_panel_months  post_panel_months  cursor_commit_share  cursor_commit_rows  cursor_authors  repo_commits  repo_contributors status                                                                                            target_dir                                                                                                                                                                                                       note
+   36 DutchCryptoDad/bamboo-ta     2025-02                13                  6             0.038760                   5               1           129                  1 failed /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/DutchCryptoDad_bamboo-ta Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/DutchCryptoDad_bamboo-ta'... fatal: could not read Username for 'https://github.com': terminal prompts disabled
+   59           Metta-AI/metta     2025-02                 6                  6             0.027697                  19               7           686                  8 failed           /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Metta-AI_metta           Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Metta-AI_metta'... fatal: could not read Username for 'https://github.com': terminal prompts disabled
+run4a completed successfully.
