@@ -294,3 +294,418 @@ sensitivity analyses
 ```
 
 For now, the most important achievement is that the treatment-side pipeline works cleanly and the adoption timing validation is perfect for the 13 Python repositories.
+
+
+---
+---
+---
+
+
+# Plan of Work
+
+**방법 A: paper-style PSM**으로 가려면 다음 단계는 **GHArchive 분석**입니다.
+
+쉽게 말하면:
+
+```text
+지금까지는 Git history로 treatment repo를 검증했다.
+이제는 GHArchive로 treatment와 control repo의 GitHub 활동량을 비교해서 control repo를 찾아야 한다.
+```
+
+## 전체 그림
+
+현재 우리는 여기까지 했습니다.
+
+```text
+13 Python treatment repos
+Cursor adoption month 검증 완료
+event_month == adoption_month 13/13
+```
+
+하지만 DiD에는 control repo가 필요합니다.
+
+Paper-style PSM에서는 control repo를 그냥 아무 Python repo로 고르지 않습니다. 대신 adoption 전 GitHub 활동 패턴이 비슷한 repo를 찾습니다.
+
+그때 쓰는 데이터가 **GHArchive**입니다.
+
+## GHArchive가 필요한 이유
+
+Git history는 이런 정보를 줍니다.
+
+```text
+commits
+lines_added
+lines_removed
+contributors
+Cursor adoption commit
+```
+
+반면 GHArchive는 GitHub 플랫폼 활동을 줍니다.
+
+```text
+WatchEvent
+ForkEvent
+IssuesEvent
+PullRequestEvent
+IssueCommentEvent
+ReleaseEvent
+PushEvent
+```
+
+즉, GHArchive는 repo가 adoption 전에 얼마나 활발했는지를 보여줍니다.
+
+Paper-style PSM은 대략 이런 생각입니다.
+
+```text
+AI adoption repo와 비슷한 GitHub 활동 패턴을 가진 non-adoption repo를 control로 고르자.
+```
+
+## GHArchive 분석 단계
+
+### Step 0. BigQuery / GCP 확인
+
+GHArchive 분석은 보통 BigQuery를 씁니다.
+
+먼저 환경 확인이 필요합니다.
+
+```bash
+python -c "import google.cloud.bigquery, pandas"
+```
+
+그리고 GCP 인증 확인:
+
+```bash
+gcloud auth list
+gcloud config get-value project
+```
+
+만약 BigQuery 인증이 안 되어 있으면 GHArchive 수집 단계에서 막힙니다.
+
+## Step 1. Treatment repo input 준비
+
+현재 treatment repo 파일은 이것입니다.
+
+```text
+tmp_adoption_test/data/ai_adopt_repo_python.csv
+```
+
+여기에는 13개 usable Python treatment repo가 있습니다.
+
+GHArchive 분석을 위해 필요한 핵심 컬럼은:
+
+```text
+repo_name
+event_month
+repo_primary_language
+repo_stars
+repo_commits
+repo_contributors
+repo_size
+```
+
+여기서 `event_month`는 adoption 기준 월입니다.
+
+예:
+
+```text
+airweave-ai/airweave, event_month = 2025-03
+Kiln-AI/Kiln, event_month = 2025-01
+VRSEN/agency-swarm, event_month = 2024-10
+```
+
+## Step 2. Treatment repo의 GHArchive event 수집
+
+각 treatment repo에 대해 adoption 전 몇 개월의 GitHub activity를 수집합니다.
+
+예를 들어 event_month가 `2025-03`이면:
+
+```text
+2024-09
+2024-10
+2024-11
+2024-12
+2025-01
+2025-02
+```
+
+같은 pre-period를 봅니다.
+
+GHArchive에서 수집할 raw event schema는 보통 이런 형태입니다.
+
+```text
+repo
+created_at
+type
+actor
+```
+
+예:
+
+```text
+airweave-ai/airweave, 2025-01-12, PushEvent, some_user
+airweave-ai/airweave, 2025-01-15, IssuesEvent, some_user
+```
+
+이 단계의 목적은:
+
+```text
+treatment repo들이 adoption 전에 어떤 GitHub 활동 패턴을 가졌는지 계산하기
+```
+
+출력 예시:
+
+```text
+tmp_adoption_test/data/python_did_test/gharchive_treatment_events.csv
+```
+
+## Step 3. Control candidate pool 만들기
+
+이제 control 후보 repo가 필요합니다.
+
+조건은 대략 이렇습니다.
+
+```text
+Python repo
+Cursor evidence 없음
+treatment repo 아님
+충분한 GitHub 활동 있음
+충분한 pre-period 데이터 있음
+```
+
+Paper-style에서는 많은 control candidate를 모읍니다.
+
+예:
+
+```text
+수백 개 ~ 수천 개 Python candidate control repos
+```
+
+small-scale에서는 처음부터 너무 크게 하지 말고 이렇게 시작하는 것이 좋습니다.
+
+```text
+13 treatment repos
+각 adoption month별 control candidates 100~500개
+```
+
+출력 예시:
+
+```text
+tmp_adoption_test/data/python_did_test/gharchive_control_candidates.csv
+```
+
+## Step 4. Control candidate의 GHArchive event 수집
+
+control repo에도 pseudo-event month를 줘야 합니다.
+
+예를 들어 treatment repo가 `2025-03` adoption이면, 그 treatment와 비교할 control repo도 `2025-03`을 기준 월로 둡니다.
+
+```text
+treatment repo:
+  airweave-ai/airweave
+  event_month = 2025-03
+
+control repo:
+  some-python/control-repo
+  pseudo_event_month = 2025-03
+```
+
+그리고 control repo도 같은 pre-period의 GHArchive activity를 계산합니다.
+
+```text
+2024-09 ~ 2025-02
+```
+
+## Step 5. GHArchive raw events를 matching feature로 변환
+
+Raw event를 그대로 matching에 쓰지는 않습니다.
+
+이벤트를 월별/기간별 feature로 바꿉니다.
+
+예:
+
+```text
+watch_count_lag_1
+watch_count_lag_2
+fork_count_lag_1
+issue_count_lag_1
+pr_count_lag_1
+comment_count_lag_1
+release_count_lag_1
+push_count_lag_1
+total_events_lag_1
+```
+
+또는 누적 feature:
+
+```text
+watch_count_pre_6mo
+fork_count_pre_6mo
+issues_pre_6mo
+prs_pre_6mo
+comments_pre_6mo
+total_events_pre_6mo
+```
+
+쉽게 말하면:
+
+```text
+adoption 전 GitHub 활동량을 숫자로 요약한다.
+```
+
+## Step 6. Propensity score 계산
+
+이제 treatment repo와 control candidate repo를 한 테이블에 넣고 logistic regression을 합니다.
+
+목적은:
+
+```text
+이 repo가 treatment repo처럼 보일 확률을 계산한다.
+```
+
+이 확률이 propensity score입니다.
+
+예:
+
+```text
+repo_name                         treatment   propensity_score
+airweave-ai/airweave              1           0.72
+some-python/control-repo          0           0.70
+another-python/control-repo       0           0.31
+```
+
+`0.72` treatment repo와 `0.70` control repo는 비슷하다고 볼 수 있습니다.
+
+## Step 7. Nearest-neighbor matching
+
+각 treatment repo마다 propensity score가 가까운 control repo를 고릅니다.
+
+Paper-style은 보통 1:N matching을 씁니다.
+
+예:
+
+```text
+1 treatment repo
+→ 3 matched control repos
+```
+
+출력 예시:
+
+```text
+tmp_adoption_test/data/python_did_test/python_psm_matches.csv
+```
+
+예상 컬럼:
+
+```text
+treatment_repo
+control_repo
+event_month
+propensity_score_treated
+propensity_score_control
+distance
+matched_group
+```
+
+## Step 8. Control repo clone
+
+matching 결과로 control repo가 정해지면, 이제 control repo를 clone합니다.
+
+출력:
+
+```text
+../ai_code_complexity_study_control_repo_dataset
+```
+
+또는 기존 clone root 안에 control도 같이 넣을 수 있지만, 처음에는 분리하는 것이 더 안전합니다.
+
+```text
+../ai_code_complexity_study_control_repo_dataset
+```
+
+## Step 9. Control repo 검증
+
+control repo는 Cursor adoption이 없어야 합니다.
+
+따라서 control repo도 Git history로 검사해야 합니다.
+
+목적:
+
+```text
+control repo에 .cursorrules, .cursor/rules/* 같은 evidence가 없어야 한다.
+```
+
+만약 control repo에서 Cursor evidence가 나오면 control에서 제외합니다.
+
+## Step 10. DiD repo list 만들기
+
+최종적으로 treated + control repo를 합친 파일을 만듭니다.
+
+예:
+
+```text
+tmp_adoption_test/data/python_did_test/python_did_repos.csv
+```
+
+형태:
+
+```text
+repo_name,treatment,event_month,matched_group,target_dir
+airweave-ai/airweave,1,2025-03,group_001,/path/to/treatment
+some-python/control-repo,0,2025-03,group_001,/path/to/control
+```
+
+이 파일이 이후 SonarQube + DiD panel construction의 기준이 됩니다.
+
+## 정리하면 GHArchive 단계는 이것입니다
+
+```text
+1. BigQuery/GHArchive 환경 확인
+2. treatment repo의 GHArchive events 수집
+3. Python control candidate pool 만들기
+4. control candidate의 GHArchive events 수집
+5. raw events를 PSM feature로 변환
+6. propensity score 계산
+7. nearest-neighbor matching
+8. matched control repo clone
+9. control repo에 Cursor evidence 없는지 검증
+10. treated + control combined repo list 생성
+```
+
+## 지금 바로 해야 할 첫 작업
+
+가장 먼저 확인할 것은 BigQuery 사용 가능 여부입니다.
+
+```bash
+python -c "from google.cloud import bigquery; print('BigQuery OK')"
+```
+
+그리고:
+
+```bash
+gcloud auth list
+gcloud config get-value project
+```
+
+이게 정상이어야 GHArchive 분석을 시작할 수 있습니다.
+
+## 추천하는 다음 스크립트 흐름
+
+앞으로는 이렇게 가면 좋습니다.
+
+```text
+run5a-fetch-gharchive-treatment.sh
+run5b-fetch-gharchive-control-candidates.sh
+run5c-match-controls-psm.sh
+run5d-clone-control-repos.sh
+run5e-validate-control-repos.sh
+```
+
+하지만 처음에는 너무 크게 가지 말고, small-scale smoke test로 시작하는 게 좋습니다.
+
+```text
+13 treatment repos
+각 event_month별 control 후보 100~500개
+1 treatment : 1 or 3 controls
+```
+
+그 다음 pipeline이 잘 되면 paper-scale로 늘리면 됩니다.
