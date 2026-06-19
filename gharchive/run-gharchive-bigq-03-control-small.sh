@@ -15,15 +15,15 @@ python gharchive/test_fetch_gharchive_control_seeded.py \
   --max-gib 1
 
 # 2) once the bytes look safe, actually run it
-echo "--- 2 CONTROL ACTUAL RUN"
-echo
-python gharchive/test_fetch_gharchive_control_seeded.py \
-  --project-id se-project-438721 \
-  --repos-file tmp_adoption_test/data/ai_adopt_repo_python.csv \
-  --target-month 202501 \
-  --history-start-month 202401 \
-  --max-gib 1 \
-  --execute
+# echo "--- 2 CONTROL ACTUAL RUN"
+# echo
+# python gharchive/test_fetch_gharchive_control_seeded.py \
+#   --project-id se-project-438721 \
+#   --repos-file tmp_adoption_test/data/ai_adopt_repo_python.csv \
+#   --target-month 202501 \
+#   --history-start-month 202401 \
+#   --max-gib 1 \
+#   --execute
 
 
 

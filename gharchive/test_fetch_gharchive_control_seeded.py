@@ -30,7 +30,10 @@ Use --execute only after checking the dry-run bytes.
 from __future__ import annotations
 
 import argparse
+import warnings
 from pathlib import Path
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 import pandas as pd
 from google.cloud import bigquery
@@ -414,7 +417,7 @@ def main() -> None:
         print("\nSTOP: dry-run estimate exceeds max_bytes_billed.")
         print("This query is too large for the current safety cap.")
         print("Do not execute unless you intentionally raise --max-gib.")
-        return
+        raise SystemExit(2)
 
     if not args.execute:
         print("\nDry run only. Add --execute to run the query with the safety cap.")
