@@ -20,6 +20,7 @@ New v2 logic:
 
 from __future__ import annotations
 
+import os
 import argparse
 import csv
 import importlib.util
@@ -158,11 +159,15 @@ def clone_repository_v2(
     cmd = ["git", "clone", *extra_args, repo_url, str(clone_path)]
 
     try:
+        env = os.environ.copy()
+        env["GIT_TERMINAL_PROMPT"] = "0"
+
         result = subprocess.run(
             cmd,
             check=True,
             capture_output=True,
             text=True,
+            env=env,
         )
         logging.info("Successfully cloned %s", repo_name)
         return True, "ok"

@@ -4,6 +4,7 @@ set -euo pipefail
 # ============================================================
 # run4a: Select top clone candidates, optionally clone them
 # ============================================================
+export GIT_TERMINAL_PROMPT=0
 LOG_DIR="${LOG_DIR:-logs}"
 DATA_DIR="${DATA_DIR:-data_baseline_backup}"
 OUTPUT_DIR="${OUTPUT_DIR:-tmp_adoption_test/data}"
