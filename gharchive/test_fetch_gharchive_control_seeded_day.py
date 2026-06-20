@@ -9,7 +9,7 @@ Why a "_day" variant exists:
   not bytes scanned: BigQuery still reads the selected columns across every
   monthly table the wildcard matches, and each monthly table is huge.
 - The cost lever for GHArchive is the NUMBER/SIZE of tables scanned, not repos.
-  `githubarchive.day.*` over a 1-2 day window touches one or two small daily
+  `githubarchive.day.20*` over a 1-2 day window touches one or two small daily
   tables, so it stays well under a 1 GiB cap (this is exactly why the treatment
   smoke test test_fetch_gharchive_small.py is cheap).
 
@@ -35,8 +35,11 @@ Use --execute only after checking the dry-run bytes.
 from __future__ import annotations
 
 import argparse
+import warnings
 from datetime import datetime
 from pathlib import Path
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 import pandas as pd
 from google.cloud import bigquery
@@ -68,9 +71,9 @@ WITH
       created_at,
       type,
       actor.id                   AS actor_id,
-      SUBSTR(_TABLE_SUFFIX, 1, 6) AS ym
+      CONCAT('20', SUBSTR(_TABLE_SUFFIX, 1, 4)) AS ym
     FROM
-      `githubarchive.day.*`
+      `githubarchive.day.20*`
     WHERE
       _TABLE_SUFFIX BETWEEN @start_suffix AND @end_suffix
       AND repo.name IN UNNEST(@repos)
@@ -280,7 +283,7 @@ METRIC_COLUMNS = [
 
 def to_suffix(date_string: str) -> str:
     """Convert YYYY-MM-DD to the YYYYMMDD table suffix."""
-    return date_string.replace("-", "")
+    return date_string.replace("-", "")[2:]
 
 
 def validate_date(value: str) -> str:
@@ -463,7 +466,7 @@ def main() -> None:
         print("\nSTOP: dry-run estimate exceeds max_bytes_billed.")
         print("This query is too large for the current safety cap.")
         print("Narrow the date window, or intentionally raise --max-gib.")
-        return
+        raise SystemExit(2)
 
     if not args.execute:
         print("\nDry run only. Add --execute to run the query with the safety cap.")

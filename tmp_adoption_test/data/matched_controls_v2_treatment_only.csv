@@ -1,0 +1,14 @@
+repo_name,matched_period,group,propensity_score,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events,matched_control_1,matched_control_2,matched_control_3,event_month,adoption_month,repo_primary_language
+VRSEN/agency-swarm,202409,treatment,0.7575364521639198,312,2829,2320,647,19,84,187,303,4001,txstc55/ugly-avatar,mrrfv/cloudflare-gateway-pihole-scripts,freeCodeCamp/boilerplate-express,2024-10,202410,Python
+OpenMOSS/Language-Model-SAEs,202411,treatment,0.004814883870534892,222,87,50,7,2,91,27,53,563,ctrlplanedev/ctrlplane,kakao-tech-campus-2nd-step3/Team10_BE,elfhosted/infra,2024-12,202412,Python
+ToolUse/tool-use-ai,202411,treatment,0.0018667797130690032,41,22,13,2,0,29,9,26,166,crvvdev/vac-bypass-kernel,ddesmond/deadline-container,OmarSZamzam/PixelShuffler,2024-12,202412,Python
+ttmouse/Wispr-Flow-CN,202411,treatment,0.0020361294103907294,0,0,0,0,0,0,0,0,0,Rails-Designer/stimulus-fx,babaktaremi/MiniApi,apostolosgabaldon6/hello-wormhole,2024-12,202412,Python
+Kiln-AI/Kiln,202412,treatment,0.12958514969161566,66,93,88,3,8,128,33,55,789,microsoft/mattersim,k-orc/openstack-resource-controller,UnstoppableSwap/core,2025-01,202501,Python
+KroMiose/nekro-agent,202412,treatment,0.0018272141413970741,139,80,76,6,11,8,6,16,270,NewbieIndieGameDev/steam-insights,yomidevs/kaikki-to-yomitan,wntg/LLaMA-Omni,2025-01,202501,Python
+kenshiro-o/nagato-ai,202501,treatment,0.00047030000960764237,305,105,100,7,0,41,1,0,250,Norconex/commons-lang,anisurrahman072/React-Native-News-2024,DareFail/AI-Video-Boilerplate-Simple,2025-02,202502,Python
+wdm0006/elote,202501,treatment,0.00043634063335559037,2622,19,11,3,0,9,3,7,59,Amit-Ashok-Swain/Doctor-s-Appointment-Application,adahfbch/DGM-EIT,egauk/m5restore,2025-02,202502,Python
+TextGeneratorio/text-generator.io,202502,treatment,0.0005439496322937168,610,40,31,12,0,1,0,0,119,krjemelikk/SnowShader,simmsb/rusty-dilemma,jostorge/diffusion-hopping,2025-03,202503,Python
+airweave-ai/airweave,202502,treatment,0.014664531240946427,65,270,266,16,1,13,6,35,629,AsmitNepali/filament-mention,facebookresearch/large_concept_model,allenzren/open-pi-zero,2025-03,202503,Python
+sirkirby/unifi-network-rules,202502,treatment,0.5359146257351294,27,12,2,0,19,31,20,45,234,iwyxdxl/WeChatBot_WXAUTO_SE,bassamsdata/namu.nvim,scpcom/sophgo-sg200x-debian,2025-03,202503,Python
+wdm0006/git-pandas,202502,treatment,0.0014172371419446117,3411,234,212,26,0,10,16,8,411,ncss-tech/ncss-tech.github.io,openpreserve/jpylyzer-test-files,RWTH-EBC/uesgraphs,2025-03,202503,Python
+wdm0006/pygeohash,202502,treatment,0.012430145414286449,3339,200,165,33,4,27,26,48,370,allenzren/open-pi-zero,algorandfoundation/algokit-utils-py,humbertodias/RetroUnityFE,2025-03,202503,Python

@@ -1,18 +1,52 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 1) dry run only — confirm the estimate is well under 1 GiB
-echo "--- 1 CONTROL DRY RUN"
-echo
-
-python gharchive/test_fetch_gharchive_control_seeded.py \
+echo "1) dry run only — confirm the estimate is under 1 GiB"
+echo ""
+python gharchive/test_fetch_gharchive_control_seeded_day.py \
   --project-id se-project-438721 \
   --repo VRSEN/agency-swarm \
   --repo helixml/helix \
   --repo different-ai/note-companion \
   --target-month 202501 \
-  --history-start-month 202401 \
+  --start-date 2024-12-01 --end-date 2024-12-03 \
   --max-gib 1
+
+# echo "2) once the bytes look safe, execute and emit the CSV"
+# echo
+# python gharchive/test_fetch_gharchive_control_seeded_day.py \
+#   --project-id se-project-438721 \
+#   --repos-file tmp_adoption_test/data/ai_adopt_repo_python.csv \
+#   --target-month 202501 \
+#   --start-date 2024-12-01 --end-date 2024-12-01 \
+#   --max-gib 1 \
+#   --execute
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1) dry run only — confirm the estimate is well under 1 GiB
+# echo "--- 1 CONTROL DRY RUN"
+# echo
+
+# python gharchive/test_fetch_gharchive_control_seeded.py \
+#   --project-id se-project-438721 \
+#   --repo VRSEN/agency-swarm \
+#   --repo helixml/helix \
+#   --repo different-ai/note-companion \
+#   --target-month 202501 \
+#   --history-start-month 202401 \
+#   --max-gib 1
 
 # 2) once the bytes look safe, actually run it
 # echo "--- 2 CONTROL ACTUAL RUN"
