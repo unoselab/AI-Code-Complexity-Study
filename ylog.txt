@@ -1,174 +1,119 @@
-echo "[1]"
-echo
-python - <<'PY'
-import pandas as pd
-from pathlib import Path
+commit c4b0f317622f7476168fe70d15b999601ab3665e
+Author: Song <song@example.com>
+Date:   Sat Jun 20 02:14:34 2026 -0500
 
-files = sorted(Path("data").glob("control_repo_candidates_*.csv"))
+    Update matched controls dataset and add control repositories for cloning
+    
+    - Modified matched_controls_v2_treatment_only.csv to update propensity scores and matched controls for various repositories.
+    - Added new log file run5b_control_clone_log_20260620-0211.csv to track cloning status of repositories.
+    - Created control_repos_to_clone_v2.csv with a comprehensive list of repositories to be cloned for analysis.
 
-for f in files:
-    df = pd.read_csv(f, nrows=5)
-    print("\n", f)
-    print(df.columns.tolist())
-    print(df.head(2).to_string(index=False))
-PY
-
-echo "[2]"
-echo
-
-python - <<'PY'
-import pandas as pd
-from pathlib import Path
-
-path = Path("tmp_adoption_test/data/ai_adopt_repo_python.csv")
-df = pd.read_csv(path)
-
-print("Rows:", len(df))
-print("Columns:", df.columns.tolist())
-print(df.head(20).to_string(index=False))
-
-for col in ["repo_name", "event", "event_month", "cursor_adoption_time"]:
-    if col in df.columns:
-        print("\nColumn:", col)
-        print(df[col].head(20).to_string(index=False))
-PY
-
-echo "[3]"
-echo
-python - <<'PY'
-import pandas as pd, pathlib
-
-t = pd.read_csv("tmp_adoption_test/data/ai_adopt_repo_python.csv")
-t["m"] = pd.to_datetime(t["event_month"].astype(str)).dt.strftime("%Y%m")
-
-for m, grp in t.groupby("m"):
-    f = pathlib.Path(f"data/control_repo_candidates_{m}.csv")
-    if not f.exists():
-        print(f"[{m}] NO CANDIDATE FILE -> {list(grp['repo_name'])}")
-        continue
-    names = set(pd.read_csv(f, usecols=["repo_name"])["repo_name"].unique())
-    for repo in grp["repo_name"]:
-        flag = "present" if repo in names else "MISSING"
-        print(f"[{m}] {flag:7s} {repo}")
-PY
-
-
-
-
-
-
-
-[1]
-
-
- data/control_repo_candidates_202408.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-        repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-0000/MiniExtend  202407      within       613               1        1        0           0        0         0           0             1
-0-0000/MiniExtend  202406      within       582               0        0        0           0        0         0           0             0
-
- data/control_repo_candidates_202409.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-        repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-0000/MiniExtend  202408      within       644               1        1        0           0        0         0           0             1
-0-0000/MiniExtend  202407      within       613               1        1        0           0        0         0           0             1
-
- data/control_repo_candidates_202410.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-                repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-5788719150923125/praxis  202409      within        28               2        2        1           0        0         3           3           180
-0-5788719150923125/praxis  202408      within         0               0        0        0           0        0         0           0             0
-
- data/control_repo_candidates_202411.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-                repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-5788719150923125/praxis  202410      within        59               2        0        0           0       12        10          17           299
-0-5788719150923125/praxis  202409      within        28               2        2        1           0        0         3           3           180
-
- data/control_repo_candidates_202412.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-                repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-5788719150923125/praxis  202411      within        89               2        1        0           0        4        11           8           331
-0-5788719150923125/praxis  202410      within        59               2        0        0           0       12        10          17           299
-
- data/control_repo_candidates_202501.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-                repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-5788719150923125/praxis  202412      within       120               2        1        0           0        4         6           6           220
-0-5788719150923125/praxis  202411      within        89               2        1        0           0        4        11           8           331
-
- data/control_repo_candidates_202502.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-   repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-14N/NDroid  202501      within      3653               0        0        0           0        0         0           0             0
-0-14N/NDroid  202412      within      3622               0        0        0           0        0         0           0             0
-
- data/control_repo_candidates_202503.csv
-['repo_name', 'period', 'period_type', 'age_days', 'users_involved', 'n_stars', 'n_forks', 'n_releases', 'n_pulls', 'n_issues', 'n_comments', 'total_events']
-                repo_name  period period_type  age_days  users_involved  n_stars  n_forks  n_releases  n_pulls  n_issues  n_comments  total_events
-0-5788719150923125/praxis  202502      within       179               3        2        0           0        2         5           6            92
-0-5788719150923125/praxis  202501      within       151               6        5        0           0        0         7           5           185
-[2]
-
-Rows: 13
-Columns: ['rank', 'repo_name', 'event_month', 'panel_first_month', 'panel_latest_month', 'panel_month_count', 'min_relative_month', 'max_relative_month', 'pre_panel_months', 'event_months', 'post_panel_months', 'ts_month_count', 'ts_rows_with_latest_commit', 'cursor_commit_rows', 'cursor_authors', 'cursor_file_rows', 'repo_stars', 'repo_primary_language', 'repo_size', 'repo_commits', 'repo_contributors', 'cursor_commit_share', 'balanced_window', 'total_pre_post', 'status', 'target_dir', 'note']
- rank                         repo_name event_month panel_first_month panel_latest_month  panel_month_count  min_relative_month  max_relative_month  pre_panel_months  event_months  post_panel_months  ts_month_count  ts_rows_with_latest_commit  cursor_commit_rows  cursor_authors  cursor_file_rows  repo_stars repo_primary_language  repo_size  repo_commits  repo_contributors  cursor_commit_share  balanced_window  total_pre_post           status                                                                                                     target_dir                note
-    3              airweave-ai/airweave     2025-03           2024-12            2025-08                  9                  -3                   5                 3             1                  5              10                          10                  77               9                 9         564                Python       3418           472                  6             0.163136                3               8 skipped_existing              /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/airweave-ai_airweave already_has_git_dir
-    4      sirkirby/unifi-network-rules     2025-03           2024-09            2025-07                 11                  -6                   4                 6             1                  4              11                           9                   6               1                 1          21                Python        305            42                  1             0.142857                4              10 skipped_existing      /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/sirkirby_unifi-network-rules already_has_git_dir
-   16                VRSEN/agency-swarm     2024-10           2024-01            2025-08                 20                  -9                  10                 9             1                 10              23                          23                  42               8                 2        3605                Python       5947           574                 16             0.073171                9              19 skipped_existing                /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/VRSEN_agency-swarm already_has_git_dir
-   20 TextGeneratorio/text-generator.io     2025-03           2024-01            2025-08                 20                 -14                   5                14             1                  5              28                          20                   5               1                 1          33                Python      22315            82                  1             0.060976                5              19 skipped_existing /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/TextGeneratorio_text-generator.io already_has_git_dir
-   26                 wdm0006/pygeohash     2025-03           2024-01            2025-07                 19                 -14                   4                14             1                  4             115                          23                   4               2                 5         159                Python       6309            81                 11             0.049383                4              18 skipped_existing                 /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_pygeohash already_has_git_dir
-   35                     wdm0006/elote     2025-02           2024-01            2025-06                 18                 -13                   4                13             1                  4              92                          11                   3               2                 5          24                Python       8927            77                  4             0.038961                4              17 skipped_existing                     /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_elote already_has_git_dir
-   51              KroMiose/nekro-agent     2025-01           2024-07            2025-08                 14                  -6                   7                 6             1                  7              15                          15                  13               2                 3         149                Python       5649           434                  4             0.029954                6              13 skipped_existing              /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/KroMiose_nekro-agent already_has_git_dir
-   54             ttmouse/Wispr-Flow-CN     2024-12           2024-09            2025-08                 12                  -3                   8                 3             1                  8              12                           5                   2               1                 1          19                Python       3182            68                  1             0.029412                3              11 skipped_existing             /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ttmouse_Wispr-Flow-CN already_has_git_dir
-   63               ToolUse/tool-use-ai     2024-12           2024-09            2025-04                  8                  -3                   4                 3             1                  4               8                           5                   2               1                 1          23                Python        219            74                  3             0.027027                3               7 skipped_existing               /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/ToolUse_tool-use-ai already_has_git_dir
-   66              kenshiro-o/nagato-ai     2025-02           2024-03            2025-08                 18                 -11                   6                11             1                  6              18                          11                   3               1                 1         115                Python      38216           115                  1             0.026087                6              17 skipped_existing              /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/kenshiro-o_nagato-ai already_has_git_dir
-   84                      Kiln-AI/Kiln     2025-01           2024-08            2025-08                 13                  -5                   7                 5             1                  7              14                          14                  28               4                 1        3284                Python      14657          1477                  6             0.018957                5              12 skipped_existing                      /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/Kiln-AI_Kiln already_has_git_dir
-   86      OpenMOSS/Language-Model-SAEs     2024-12           2024-03            2025-07                 17                  -9                   7                 9             1                  7              17                          17                  10               3                 1         105                Python      10244           577                  8             0.017331                7              16 skipped_existing      /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/OpenMOSS_Language-Model-SAEs already_has_git_dir
-   99                wdm0006/git-pandas     2025-03           2024-01            2025-07                 19                 -14                   4                14             1                  4             118                          22                   2               2                 5         189                Python       6650           130                  4             0.015385                4              18 skipped_existing                /home/user1-system12/project-workspace/ai_code_complexity_study_repo_dataset/wdm0006_git-pandas already_has_git_dir
-
-Column: repo_name
-             airweave-ai/airweave
-     sirkirby/unifi-network-rules
-               VRSEN/agency-swarm
-TextGeneratorio/text-generator.io
-                wdm0006/pygeohash
-                    wdm0006/elote
-             KroMiose/nekro-agent
-            ttmouse/Wispr-Flow-CN
-              ToolUse/tool-use-ai
-             kenshiro-o/nagato-ai
-                     Kiln-AI/Kiln
-     OpenMOSS/Language-Model-SAEs
-               wdm0006/git-pandas
-
-Column: event_month
-2025-03
-2025-03
-2024-10
-2025-03
-2025-03
-2025-02
-2025-01
-2024-12
-2024-12
-2025-02
-2025-01
-2024-12
-2025-03
-[3]
-
-[202410] present VRSEN/agency-swarm
-[202412] MISSING ttmouse/Wispr-Flow-CN
-[202412] present ToolUse/tool-use-ai
-[202412] present OpenMOSS/Language-Model-SAEs
-[202501] present KroMiose/nekro-agent
-[202501] present Kiln-AI/Kiln
-[202502] present wdm0006/elote
-[202502] present kenshiro-o/nagato-ai
-[202503] present airweave-ai/airweave
-[202503] MISSING sirkirby/unifi-network-rules
-[202503] present TextGeneratorio/text-generator.io
-[202503] present wdm0006/pygeohash
-[202503] present wdm0006/git-pandas
-
+diff --git a/proc_scripts/clone_repos_v2.py b/proc_scripts/clone_repos_v2.py
+index b2ee4da..26fa400 100755
+--- a/proc_scripts/clone_repos_v2.py
++++ b/proc_scripts/clone_repos_v2.py
+@@ -54,7 +54,7 @@ def parse_args() -> argparse.Namespace:
+         "--repos-file",
+         type=Path,
+         required=True,
+-        help="CSV file containing repo_name column.",
++        help="CSV file containing repo_name column, or TXT file with one repo per line.",
+     )
+ 
+     parser.add_argument(
+@@ -119,18 +119,73 @@ def parse_args() -> argparse.Namespace:
+     return parser.parse_args()
+ 
+ 
+-def read_repo_names(csv_path: Path, repo_column: str) -> list[str]:
+-    if not csv_path.exists():
+-        raise FileNotFoundError(f"Repos file not found: {csv_path}")
++def deduplicate_repo_names(repos: list[str]) -> list[str]:
++    """Preserve input order while removing duplicate repo names."""
++    seen = set()
++    unique_repos = []
++
++    for repo in repos:
++        repo = str(repo).strip()
++        if not repo:
++            continue
++        if repo not in seen:
++            unique_repos.append(repo)
++            seen.add(repo)
++
++    return unique_repos
++
++
++def write_normalized_csv(input_path: Path, repos: list[str], repo_column: str) -> Path:
++    """
++    Write a normalized CSV next to a TXT input file.
++
++    Example:
++      control_repos_to_clone_v2.txt
++      -> control_repos_to_clone_v2.csv
++    """
++    output_path = input_path.with_suffix(".csv")
++
++    with output_path.open("w", newline="", encoding="utf-8") as f:
++        writer = csv.DictWriter(f, fieldnames=[repo_column])
++        writer.writeheader()
++        for repo in repos:
++            writer.writerow({repo_column: repo})
++
++    logging.info("Wrote normalized CSV: %s", output_path)
++    logging.info("Normalized CSV repositories: %d", len(repos))
++
++    return output_path
++
++
++def read_repo_names(repos_path: Path, repo_column: str) -> list[str]:
++    """
++    Read repository names from either:
++      - CSV file with repo_column
++      - TXT file with one owner/repo per line
++
++    If a TXT file is provided, also write a normalized sibling CSV.
++    """
++    if not repos_path.exists():
++        raise FileNotFoundError(f"Repos file not found: {repos_path}")
+ 
+     repos: list[str] = []
+ 
+-    with csv_path.open(newline="", encoding="utf-8") as f:
++    if repos_path.suffix.lower() == ".txt":
++        repos = [
++            line.strip()
++            for line in repos_path.read_text(encoding="utf-8").splitlines()
++            if line.strip()
++        ]
++        repos = deduplicate_repo_names(repos)
++        write_normalized_csv(repos_path, repos, repo_column)
++        return repos
++
++    with repos_path.open(newline="", encoding="utf-8") as f:
+         reader = csv.DictReader(f)
+ 
+         if reader.fieldnames is None or repo_column not in reader.fieldnames:
+             raise ValueError(
+-                f"Column {repo_column!r} not found in {csv_path}. "
++                f"Column {repo_column!r} not found in {repos_path}. "
+                 f"Available columns: {reader.fieldnames}"
+             )
+ 
+@@ -139,15 +194,7 @@ def read_repo_names(csv_path: Path, repo_column: str) -> list[str]:
+             if repo:
+                 repos.append(repo)
+ 
+-    # Preserve input order while removing duplicates.
+-    seen = set()
+-    unique_repos = []
+-    for repo in repos:
+-        if repo not in seen:
+-            unique_repos.append(repo)
+-            seen.add(repo)
+-
+-    return unique_repos
++    return deduplicate_repo_names(repos)
+ 
+ 
+ def clone_repository_v2(

@@ -1,0 +1,1362 @@
+repo_name,author,month,commits,lines_added,lines_removed
+Arcanum-Sec/msftrecon,Jason Haddix <j.haddix56@gmail.com>,2025-02,6,150,8
+Arcanum-Sec/msftrecon,six2dez <six2dez@gmail.com>,2025-02,1,24,9
+Arcanum-Sec/msftrecon,t0x-1k <karnietheclown@yahoo.com>,2025-02,2,70,12
+Arcanum-Sec/msftrecon,Ellis Springe <ellis.springe@ibm.com>,2025-03,2,159,147
+Arcanum-Sec/msftrecon,Jason Haddix <j.haddix56@gmail.com>,2025-03,1,24,9
+Arcanum-Sec/msftrecon,Jason Haddix <j.haddix56@gmail.com>,2025-05,1,158,146
+BytedanceSpeech/seed-tts-eval,Dongya Jia <faceless-rex@users.noreply.github.com>,2024-06,4,9,8
+BytedanceSpeech/seed-tts-eval,Jian Cong <npujcong@gmail.com>,2024-06,1,1,2
+BytedanceSpeech/seed-tts-eval,jiadongya <faceless-rex@users.noreply.github.com>,2024-06,1,34,0
+BytedanceSpeech/seed-tts-eval,jiadongya <jiadongya@bytedance.com>,2024-06,4,4070671,3995446
+DareFail/AI-Video-Boilerplate-Simple,James <jamespsteinberg@gmail.com>,2024-08,22,2254,332
+DareFail/AI-Video-Boilerplate-Simple,James Steinberg <jamespsteinberg@gmail.com>,2024-08,4,13,4
+DareFail/AI-Video-Boilerplate-Simple,James <jamespsteinberg@gmail.com>,2025-03,64,17167,4756
+DareFail/AI-Video-Boilerplate-Simple,James Steinberg <jamespsteinberg@gmail.com>,2025-03,4,211,4
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2013-02,9,120,8
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2013-09,1,1,1
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2014-09,6,22,26
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2015-05,8,92,10
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2016-03,2,12,32
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2016-05,15,581,610
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2016-07,5,73,31
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2016-08,1,10,3
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2016-08,2,39,3
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2017-02,1,1,1
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2017-02,3,16,9
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2017-06,1,2,4
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2017-06,2,3,5
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2019-01,1,7,1
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2019-07,1,8,8
+DavidWittman/csrgenerator.com,Emmanuel Sackey <esackey15@alustudent.com>,2019-07,2,8,8
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2019-08,3,562,58
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2020-10,1,93,81
+DavidWittman/csrgenerator.com,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2020-10,1,93,81
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2020-11,1,93,62
+DavidWittman/csrgenerator.com,David Wittman <david@wittman.com>,2021-03,1,102,93
+DavidWittman/csrgenerator.com,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2021-03,1,102,93
+DavidWittman/csrgenerator.com,David Wittman <dave@wittman.xyz>,2021-08,3,26,5
+DavidWittman/csrgenerator.com,peter279k <peter279k@gmail.com>,2021-08,1,5,4
+DavidWittman/csrgenerator.com,David Wittman <dave@wittman.xyz>,2021-09,1,9,9
+DavidWittman/csrgenerator.com,R0GGER <8298741+R0GGER@users.noreply.github.com>,2021-09,1,9,9
+DavidWittman/csrgenerator.com,David Wittman <dave@wittman.xyz>,2022-01,1,300,277
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2022-01,2,321,279
+DavidWittman/csrgenerator.com,David Wittman <dave@wittman.xyz>,2024-01,4,448,374
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2024-01,3,506,362
+DavidWittman/csrgenerator.com,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-01,1,2,2
+DavidWittman/csrgenerator.com,David Wittman <dave@wittman.xyz>,2026-04,7,1062,518
+DavidWittman/csrgenerator.com,David Wittman <dwittman@gmail.com>,2026-04,3,1049,497
+GALIAIS/LimbusCompanySRA,GALIAIS <blampo@163.com>,2024-11,1,0,0
+GALIAIS/LimbusCompanySRA,GALIAIS <z67x8c99b@gmail.com>,2024-11,108,17719,5538
+GALIAIS/LimbusCompanySRA,GALIAIS <z67x8c99b@gmail.com>,2024-12,31,3617,933
+GALIAIS/LimbusCompanySRA,GALIAIS <z67x8c99b@gmail.com>,2025-01,3,19,13
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-05,73,2365,0
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-06,148,5693,4
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-07,210,8435,395
+Heir-of-God/Project-S,Saransh-ss <saranshs@thrillophilia.com>,2024-07,1,29,19
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-08,288,11396,8
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-09,140,5490,0
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-10,98,2342,0
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-11,92,2255,6
+Heir-of-God/Project-S,Heir-of-God <140493860+Heir-of-God@users.noreply.github.com>,2024-12,24,458,0
+KylinMountain/graphrag-server,AbdulHamid Merii <43741215+AH-Merii@users.noreply.github.com>,2024-07,1,1,1
+KylinMountain/graphrag-server,Alex Chao <5111035+alexchaomander@users.noreply.github.com>,2024-07,1,1,0
+KylinMountain/graphrag-server,Alonso Guevara <alonsog@microsoft.com>,2024-07,27,1001,234
+KylinMountain/graphrag-server,Chris Trevino <darthtrevino@users.noreply.github.com>,2024-07,7,308,85
+KylinMountain/graphrag-server,Fabian Schwarzkopf <f.schwarzkopf@yahoo.de>,2024-07,1,529,0
+KylinMountain/graphrag-server,Gabriel Nieves-Ponce <39567323+nievespg1@users.noreply.github.com>,2024-07,2,236,135
+KylinMountain/graphrag-server,Ha Trinh <90728133+ha2trinh@users.noreply.github.com>,2024-07,2,214,167
+KylinMountain/graphrag-server,Ikko Eltociear Ashimine <eltociear@gmail.com>,2024-07,1,1,1
+KylinMountain/graphrag-server,Josh Bradley <joshbradley@microsoft.com>,2024-07,3,355,292
+KylinMountain/graphrag-server,Julian Whiting <48572565+j2whiting@users.noreply.github.com>,2024-07,1,112,12
+KylinMountain/graphrag-server,Kapil Sachdeva <ksachdeva17@gmail.com>,2024-07,1,4,1
+KylinMountain/graphrag-server,Kartik Chopra <k5chopra@uwaterloo.ca>,2024-07,1,1,1
+KylinMountain/graphrag-server,Kylin <kose2livs@gmail.com>,2024-07,3,43,12
+KylinMountain/graphrag-server,Nathan Evans <github@talkswithnumbers.com>,2024-07,2,15,5
+KylinMountain/graphrag-server,Steven Truitt <aintitthetruitt@gmail.com>,2024-07,1,2,0
+KylinMountain/graphrag-server,YangJiaqi <yang.jiaqi.hadoop@gmail.com>,2024-07,1,1,1
+KylinMountain/graphrag-server,Zi Nean Teoh <58854510+zineanteoh@users.noreply.github.com>,2024-07,1,1,1
+KylinMountain/graphrag-server,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-07,17,520,514
+KylinMountain/graphrag-server,glide-the <2533736852@qq.com>,2024-07,1,83,5
+KylinMountain/graphrag-server,s106916 <paul.guo@iag.com.au>,2024-07,1,12,2
+KylinMountain/graphrag-server,wangJm <mggis0or1@gmail.com>,2024-07,1,1,1
+KylinMountain/graphrag-server,王俊 <wangjuncode@126.com>,2024-07,1,6,0
+KylinMountain/graphrag-server,Alonso Guevara <alonsog@microsoft.com>,2024-08,28,3009,3430
+KylinMountain/graphrag-server,Andres Morales <86074752+andresmor-ms@users.noreply.github.com>,2024-08,1,185,167
+KylinMountain/graphrag-server,Dayenne Souza <dcs.souza@outlook.com>,2024-08,1,114,21
+KylinMountain/graphrag-server,Derek Worthen <worthend.derek@gmail.com>,2024-08,1,593,202
+KylinMountain/graphrag-server,Ha Trinh <90728133+ha2trinh@users.noreply.github.com>,2024-08,2,27,3
+KylinMountain/graphrag-server,Ikko Eltociear Ashimine <eltociear@gmail.com>,2024-08,1,1,1
+KylinMountain/graphrag-server,Josh Bradley <joshbradley@microsoft.com>,2024-08,6,1198,477
+KylinMountain/graphrag-server,KennyZhang1 <90438893+KennyZhang1@users.noreply.github.com>,2024-08,2,84,3
+KylinMountain/graphrag-server,Konstantin Gukov <gukkos@gmail.com>,2024-08,1,3,0
+KylinMountain/graphrag-server,Nathan Evans <github@talkswithnumbers.com>,2024-08,6,238,217
+KylinMountain/graphrag-server,Nayeon Kim <76769919+n-y-kim@users.noreply.github.com>,2024-08,1,1,1
+KylinMountain/graphrag-server,TLP <104315397+TLongP@users.noreply.github.com>,2024-08,1,6,2
+KylinMountain/graphrag-server,benx13 <32802278+benx13@users.noreply.github.com>,2024-08,1,2,2
+KylinMountain/graphrag-server,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-08,15,197,184
+KylinMountain/graphrag-server,fantom845 <77169323+fantom845@users.noreply.github.com>,2024-08,1,5,1
+KylinMountain/graphrag-server,guangxiangdebizi <154864206+guangxiangdebizi@users.noreply.github.com>,2024-08,1,2,2
+KylinMountain/graphrag-server,longyunfeigu <2514553187@qq.com>,2024-08,2,3,2
+KylinMountain/graphrag-server,Alonso Guevara <alonsog@microsoft.com>,2024-09,17,2361,2322
+KylinMountain/graphrag-server,Chris Trevino <darthtrevino@users.noreply.github.com>,2024-09,1,8,9
+KylinMountain/graphrag-server,Derek Worthen <worthend.derek@gmail.com>,2024-09,4,854,777
+KylinMountain/graphrag-server,Doug Orbaker <107270698+dorbaker@users.noreply.github.com>,2024-09,1,5,1
+KylinMountain/graphrag-server,Josh Bradley <joshbradley@microsoft.com>,2024-09,2,171,129
+KylinMountain/graphrag-server,JunHo Kim (김준호) <june.kim@kakaocorp.com>,2024-09,1,1,1
+KylinMountain/graphrag-server,JunHo Kim (김준호) <junho85@gmail.com>,2024-09,1,6,6
+KylinMountain/graphrag-server,KennyZhang1 <90438893+KennyZhang1@users.noreply.github.com>,2024-09,1,76,27
+KylinMountain/graphrag-server,Nathan Evans <github@talkswithnumbers.com>,2024-09,17,3461,1779
+KylinMountain/graphrag-server,Roberto Corno <35002086+nriviera@users.noreply.github.com>,2024-09,1,1,0
+KylinMountain/graphrag-server,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-09,2,4,4
+KylinMountain/graphrag-server,longyunfeigu <2514553187@qq.com>,2024-09,1,1,1
+KylinMountain/graphrag-server,9prodhi <mahatoa9.us@gmail.com>,2024-10,1,1,1
+KylinMountain/graphrag-server,Alonso Guevara <alonsog@microsoft.com>,2024-10,7,3066,904
+KylinMountain/graphrag-server,Andres Morales <86074752+andresmor-ms@users.noreply.github.com>,2024-10,3,643,4411
+KylinMountain/graphrag-server,Chris Trevino <darthtrevino@users.noreply.github.com>,2024-10,1,346,333
+KylinMountain/graphrag-server,Josh Bradley <joshbradley@microsoft.com>,2024-10,5,1092,920
+KylinMountain/graphrag-server,JunHo Kim (김준호) <junho85@gmail.com>,2024-10,3,7,7
+KylinMountain/graphrag-server,KennyZhang1 <90438893+KennyZhang1@users.noreply.github.com>,2024-10,1,203,194
+KylinMountain/graphrag-server,Matthieu Maitre <mmaitre@live.com>,2024-10,1,388,13
+KylinMountain/graphrag-server,Nathan Evans <github@talkswithnumbers.com>,2024-10,6,3035,4557
+KylinMountain/graphrag-server,Sumit K Bhuttan <sumitbhuttan@gmail.com>,2024-10,1,1,1
+KylinMountain/graphrag-server,Alonso Guevara <alonsog@microsoft.com>,2024-11,15,6382,719
+KylinMountain/graphrag-server,Gabriel Nieves-Ponce <39567323+nievespg1@users.noreply.github.com>,2024-11,1,275,275
+KylinMountain/graphrag-server,Jeff Baumes <jeff.baumes@kitware.com>,2024-11,1,1,1
+KylinMountain/graphrag-server,Josh Bradley <joshbradley@microsoft.com>,2024-11,5,1282,1849
+KylinMountain/graphrag-server,JunHo Kim (김준호) <junho85@gmail.com>,2024-11,1,1,1
+KylinMountain/graphrag-server,Kylin <kose2livs@gmail.com>,2024-11,1,5,1
+KylinMountain/graphrag-server,Nathan Evans <github@talkswithnumbers.com>,2024-11,6,2673,2697
+KylinMountain/graphrag-server,Yuan Chai <46665034+nauyiahc@users.noreply.github.com>,2024-11,1,1,1
+KylinMountain/graphrag-server,gaudyb <85708998+gaudyb@users.noreply.github.com>,2024-11,1,693,804
+KylinMountain/graphrag-server,Alonso Guevara <alonsog@microsoft.com>,2024-12,12,1185,1046
+KylinMountain/graphrag-server,Chris Trevino <darthtrevino@users.noreply.github.com>,2024-12,1,670,2747
+KylinMountain/graphrag-server,Gijs Segerink <gijs@intelligencecompany.net>,2024-12,1,1,0
+KylinMountain/graphrag-server,Josh Bradley <joshbradley@microsoft.com>,2024-12,3,1490,1173
+KylinMountain/graphrag-server,KennyZhang1 <90438893+KennyZhang1@users.noreply.github.com>,2024-12,2,946,314
+KylinMountain/graphrag-server,Nathan Evans <github@talkswithnumbers.com>,2024-12,6,2256,3568
+KylinMountain/graphrag-server,Theo Beigbeder <theo.arthur.beigbeder@gmail.com>,2024-12,1,0,0
+KylinMountain/graphrag-server,ex0ns <ex0ns@users.noreply.github.com>,2024-12,1,0,0
+KylinMountain/graphrag-server,joeyhacker <jhacker7@gmail.com>,2024-12,1,1,1
+KylinMountain/graphrag-server,volksen <Michael.Volkhardt@gmail.com>,2024-12,1,1,0
+KylinMountain/graphrag-server,Alonso Guevara <alonsog@microsoft.com>,2025-01,6,137,78
+KylinMountain/graphrag-server,Derek Worthen <worthend.derek@gmail.com>,2025-01,1,10,836
+KylinMountain/graphrag-server,Josh Bradley <joshbradley@microsoft.com>,2025-01,1,92,8
+KylinMountain/graphrag-server,Kylin <kose2livs@gmail.com>,2025-01,3,1062,5
+KylinMountain/graphrag-server,Nathan Evans <github@talkswithnumbers.com>,2025-01,4,2285,4488
+KylinMountain/graphrag-server,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-01,1,26,22
+KylinMountain/graphrag-server,gaudyb <85708998+gaudyb@users.noreply.github.com>,2025-01,2,920,199
+KylinMountain/graphrag-server,mountain <kose2livs@gmail.com>,2025-01,2,1403,52634
+KylinMountain/graphrag-server,Kylin <kose2livs@gmail.com>,2025-03,1,33,0
+Lightning-AI/lightning-thunder,Luca Antiga <luca.antiga@gmail.com>,2022-10,1,0,0
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-02,12,1504,186
+Lightning-AI/lightning-thunder,Jacob Hinkle <1454944+jacobhinkle@users.noreply.github.com>,2023-02,1,41,0
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-02,8,571,602
+Lightning-AI/lightning-thunder,Kevin Stephano <kevin.stephano@gmail.com>,2023-02,2,249,0
+Lightning-AI/lightning-thunder,Liqiang Lu <116412316+liqiangxl@users.noreply.github.com>,2023-02,1,41,0
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2023-02,4,644,93
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-02,17,2194,1526
+Lightning-AI/lightning-thunder,Rick Izzo <rlizzo@users.noreply.github.com>,2023-02,1,67,65
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-02,1,63,0
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-02,10,554,252
+Lightning-AI/lightning-thunder,jjsjann123 <alex.jann2012@gmail.com>,2023-02,1,90,3
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2023-02,1,1,1
+Lightning-AI/lightning-thunder,Adrian Wälchli <aedu.waelchli@gmail.com>,2023-03,1,34,0
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-03,11,1268,79
+Lightning-AI/lightning-thunder,Jacob Hinkle <1454944+jacobhinkle@users.noreply.github.com>,2023-03,7,297,45
+Lightning-AI/lightning-thunder,Kevin Stephano <kevin.stephano@gmail.com>,2023-03,1,9,2
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2023-03,5,570,35
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-03,10,898,114
+Lightning-AI/lightning-thunder,Mike Ruberry <mike.ruberry@lightning.ai>,2023-03,1,22,15
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-03,2,182,12
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.aiken.robie@gmail.com>,2023-03,10,869,707
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-03,5,449,296
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2023-03,2,82,4
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2023-04,1,8,2
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-04,12,889,347
+Lightning-AI/lightning-thunder,Jacob Hinkle <1454944+jacobhinkle@users.noreply.github.com>,2023-04,2,201,13
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2023-04,1,52,13
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-04,2,1,2
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-04,1,110,92
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-04,3,578,33
+Lightning-AI/lightning-thunder,jjsjann123 <alex.jann2012@gmail.com>,2023-04,1,109,43
+Lightning-AI/lightning-thunder,Aidyn-A <31858918+Aidyn-A@users.noreply.github.com>,2023-05,1,1,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-05,15,809,486
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-05,11,193,113
+Lightning-AI/lightning-thunder,Kevin Stephano <kevin.stephano@gmail.com>,2023-05,1,4,1
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-05,2,25,7
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-05,23,14411,10293
+Lightning-AI/lightning-thunder,Mike Ruberry <mike.ruberry@lightning.ai>,2023-05,1,37,20
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-05,1,1,5
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.aiken.robie@gmail.com>,2023-05,2,2144,628
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-05,5,394,58
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2023-05,1,7,0
+Lightning-AI/lightning-thunder,jjsjann123 <alex.jann2012@gmail.com>,2023-05,1,367,13
+Lightning-AI/lightning-thunder,Adrian Wälchli <aedu.waelchli@gmail.com>,2023-06,2,45,5
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-06,12,1142,160
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-06,10,701,507
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-06,5,207,5
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-06,20,2851,1434
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.aiken.robie@gmail.com>,2023-06,1,57,31
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-06,3,152,32
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2023-06,4,555,19
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-06,5,6,6
+Lightning-AI/lightning-thunder,jjsjann123 <alex.jann2012@gmail.com>,2023-06,2,34,1
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2023-06,3,573,77
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2023-07,3,163,13
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-07,11,404,113
+Lightning-AI/lightning-thunder,Jacob Hinkle <1454944+jacobhinkle@users.noreply.github.com>,2023-07,1,4,3
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-07,1,12,10
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-07,5,973,178
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-07,12,1612,338
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-07,1,145,13
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.aiken.robie@gmail.com>,2023-07,5,1589,1184
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.robie@lightning.ai>,2023-07,2,211,15
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-07,2,183,22
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2023-07,2,219,34
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-07,2,3,3
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-08,28,2402,1317
+Lightning-AI/lightning-thunder,Izzy Putterman <carlipp176@gmail.com>,2023-08,1,598,16
+Lightning-AI/lightning-thunder,Izzy Putterman <iputterman@nvidia.com>,2023-08,1,122,59
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-08,4,37,18
+Lightning-AI/lightning-thunder,Kevin Stephano <kstephano@nvidia.com>,2023-08,1,3,1
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-08,3,458,503
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-08,38,5510,2309
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-08,2,168,32
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.robie@lightning.ai>,2023-08,12,565,248
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-08,5,117,54
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2023-08,3,109,1
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2023-08,1,215,30
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2023-08,9,647,145
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2023-08,5,987,8
+Lightning-AI/lightning-thunder,vedaanta-nvidia <142048820+vedaanta-nvidia@users.noreply.github.com>,2023-08,1,285,1
+Lightning-AI/lightning-thunder,Anerudhan Gopal <agopal@nvidia.com>,2023-09,2,25,88
+Lightning-AI/lightning-thunder,Anerudhan Gopal <ane1606@gmail.com>,2023-09,1,146,6
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2023-09,7,505,561
+Lightning-AI/lightning-thunder,Donglin Yang <dongliny@nvidia.com>,2023-09,3,144,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-09,17,2811,270
+Lightning-AI/lightning-thunder,Izzy Putterman <iputterman@nvidia.com>,2023-09,1,283,82
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-09,12,553,438
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2023-09,2,1410,16
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-09,5,444,70
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-09,14,637,487
+Lightning-AI/lightning-thunder,PL Ghost <75324987+pl-ghost@users.noreply.github.com>,2023-09,1,16,30
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-09,2,114,2
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.robie@lightning.ai>,2023-09,9,1412,869
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-09,6,1151,31
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2023-09,3,136,42
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-09,2,3,3
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2023-09,2,18,8
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2023-09,9,839,10
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2023-09,12,262,176
+Lightning-AI/lightning-thunder,vedaanta-nvidia <142048820+vedaanta-nvidia@users.noreply.github.com>,2023-09,3,280,74
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2023-10,2,1768,18
+Lightning-AI/lightning-thunder,Donglin Yang <dongliny@nvidia.com>,2023-10,1,35,0
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-10,23,931,465
+Lightning-AI/lightning-thunder,Jacob Hinkle <1454944+jacobhinkle@users.noreply.github.com>,2023-10,1,1,1
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2023-10,1,4,1
+Lightning-AI/lightning-thunder,Jirka <jirka.borovec@seznam.cz>,2023-10,1,2,2
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-10,9,475,329
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-10,4,51,37
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-10,7,1353,1514
+Lightning-AI/lightning-thunder,PL Ghost <75324987+pl-ghost@users.noreply.github.com>,2023-10,2,17,22
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-10,8,1288,55
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.robie@lightning.ai>,2023-10,5,1503,1599
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-10,2,115,46
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2023-10,1,37,0
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2023-10,3,337,3
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-10,4,10,10
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2023-10,5,196,21
+Lightning-AI/lightning-thunder,vedaanta-nvidia <142048820+vedaanta-nvidia@users.noreply.github.com>,2023-10,1,2,3
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2023-11,13,981,276
+Lightning-AI/lightning-thunder,Donglin Yang <dongliny@nvidia.com>,2023-11,1,67,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-11,18,1442,258
+Lightning-AI/lightning-thunder,Izzy Putterman <iputterman@nvidia.com>,2023-11,1,46,67
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2023-11,2,10,73
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-11,6,396,419
+Lightning-AI/lightning-thunder,Kevin Stephano <kstephano@nvidia.com>,2023-11,1,4,1
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-11,2,479,49
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-11,31,15515,9298
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2023-11,2,73,5
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-11,7,1205,289
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.robie@lightning.ai>,2023-11,9,1824,966
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-11,8,807,173
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2023-11,2,287,256
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2023-11,4,345,56
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-11,5,5,5
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2023-11,3,51,31
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2023-11,2,203,8
+Lightning-AI/lightning-thunder,vedaanta-nvidia <142048820+vedaanta-nvidia@users.noreply.github.com>,2023-11,1,15,17
+Lightning-AI/lightning-thunder,Donglin Yang <dongliny@nvidia.com>,2023-12,2,70,46
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2023-12,11,280,596
+Lightning-AI/lightning-thunder,Jacob Hinkle <1454944+jacobhinkle@users.noreply.github.com>,2023-12,1,1,2
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2023-12,1,29,4
+Lightning-AI/lightning-thunder,Jirka <jirka.borovec@seznam.cz>,2023-12,1,0,1
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2023-12,5,158,88
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2023-12,5,199,161
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2023-12,40,3968,1278
+Lightning-AI/lightning-thunder,Mike Ruberry <mike.ruberry@lightning.ai>,2023-12,4,284,188
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2023-12,5,270,12
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2023-12,2,51,34
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.robie@lightning.ai>,2023-12,9,495,82
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2023-12,29,2759,726
+Lightning-AI/lightning-thunder,Yan Wang <wayan@nvidia.com>,2023-12,2,208,1
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2023-12,6,852,302
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-12,5,6,6
+Lightning-AI/lightning-thunder,jjsjann123 <alex.jann2012@gmail.com>,2023-12,2,10,5
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2023-12,6,646,108
+Lightning-AI/lightning-thunder,vedaanta-nvidia <142048820+vedaanta-nvidia@users.noreply.github.com>,2023-12,3,77,23
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2024-01,4,410,106
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-01,6,321,246
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2024-01,4,125,62
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-01,5,108,77
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-01,9,293,30
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-01,3,1633,178
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2024-01,8,1130,2280
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-01,2,186,0
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2024-01,2,30,19
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-01,9,1103,352
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-01,1,10,3
+Lightning-AI/lightning-thunder,Yan Wang <wayan@nvidia.com>,2024-01,1,317,10
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2024-01,9,1132,115
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-01,10,37,27
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-01,1,1,1
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2024-01,12,1136,83
+Lightning-AI/lightning-thunder,vedaanta-nvidia <142048820+vedaanta-nvidia@users.noreply.github.com>,2024-01,1,3,3
+Lightning-AI/lightning-thunder,Aidyn-A <31858918+Aidyn-A@users.noreply.github.com>,2024-02,1,254,0
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2024-02,17,761,787
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-02,6,386,2061
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2024-02,2,75,2
+Lightning-AI/lightning-thunder,Jirka <jirka.borovec@seznam.cz>,2024-02,1,1,1
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-02,7,50,101
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-02,9,1165,56
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-02,16,1128,317
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2024-02,38,7474,2711
+Lightning-AI/lightning-thunder,Mike Ruberry <mruberry@nvidia.com>,2024-02,4,55,55
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-02,3,45,34
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2024-02,2,435,5
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-02,28,5032,2059
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-02,1,31,5
+Lightning-AI/lightning-thunder,Vedaanta Agarwalla <142048820+vedaanta-nvidia@users.noreply.github.com>,2024-02,2,714,46
+Lightning-AI/lightning-thunder,Yan Wang <wayan@nvidia.com>,2024-02,6,1020,346
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2024-02,1,312,66
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-02,5,5,5
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-02,1,41,13
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2024-02,15,518,175
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2024-03,18,1752,2603
+Lightning-AI/lightning-thunder,Ikko Eltociear Ashimine <eltociear@gmail.com>,2024-03,1,1,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-03,7,307,2476
+Lightning-AI/lightning-thunder,Jacob Hinkle <1454944+jacobhinkle@users.noreply.github.com>,2024-03,1,34,23
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2024-03,8,172,136
+Lightning-AI/lightning-thunder,Jirka <jirka.borovec@seznam.cz>,2024-03,6,31,18
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-03,22,396,152
+Lightning-AI/lightning-thunder,John Paul Hennessy <likethecognac@users.noreply.github.com>,2024-03,2,2,1
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-03,12,2297,697
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2024-03,9,594,817
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-03,9,65,55
+Lightning-AI/lightning-thunder,Mike Ruberry <38511765+mruberry@users.noreply.github.com>,2024-03,1,420,0
+Lightning-AI/lightning-thunder,Mike Ruberry <mike.ruberry@lightning.ai>,2024-03,1,16644,1
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-03,1,43,35
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2024-03,1,36,0
+Lightning-AI/lightning-thunder,Sebastian Raschka <mail@sebastianraschka.com>,2024-03,2,86,40
+Lightning-AI/lightning-thunder,Sugato Ray <sugatoray@users.noreply.github.com>,2024-03,1,0,0
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-03,34,11560,15207
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv@beamnet.de>,2024-03,5,101,46
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-03,3,282,725
+Lightning-AI/lightning-thunder,Vedaanta Agarwalla <142048820+vedaanta-nvidia@users.noreply.github.com>,2024-03,2,10,14
+Lightning-AI/lightning-thunder,William Falcon <waf2107@columbia.edu>,2024-03,1,54,22
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2024-03,5,278,83
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-03,9,15,15
+Lightning-AI/lightning-thunder,nikitaved <nik@lightning.ai>,2024-03,12,415,117
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2024-03,3,268,19
+Lightning-AI/lightning-thunder,parthmannan <38387286+parthmannan@users.noreply.github.com>,2024-03,2,751,7
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-03,1,31,26
+Lightning-AI/lightning-thunder,Aidyn-A <31858918+Aidyn-A@users.noreply.github.com>,2024-04,1,14,7
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2024-04,5,156,122
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-04,6,115,206
+Lightning-AI/lightning-thunder,Jirka <jirka.borovec@seznam.cz>,2024-04,1,3,3
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-04,8,585,447
+Lightning-AI/lightning-thunder,Kaeun Kim <51257208+k223kim@users.noreply.github.com>,2024-04,4,337,12
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-04,6,745,60
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-04,6,117,56
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-04,1,74,0
+Lightning-AI/lightning-thunder,Ryan Spring <rdspring1@gmail.com>,2024-04,1,102,1
+Lightning-AI/lightning-thunder,Shahar Elyashiv <73384589+shaharelys@users.noreply.github.com>,2024-04,2,89,0
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv@beamnet.de>,2024-04,8,1342,83
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-04,1,4,2
+Lightning-AI/lightning-thunder,Vedaanta Agarwalla <142048820+vedaanta-nvidia@users.noreply.github.com>,2024-04,4,99,63
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-04,4,764,371
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2024-04,5,669,297
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-04,7,11,11
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-04,3,195,8
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2024-04,2,508,4
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-04,2,2,2
+Lightning-AI/lightning-thunder,Carlos Mocholí <carlossmocholi@gmail.com>,2024-05,3,198,116
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-05,9,244,626
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2024-05,1,16,15
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-05,2,7,20
+Lightning-AI/lightning-thunder,Kaeun Kim <51257208+k223kim@users.noreply.github.com>,2024-05,10,775,24
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-05,13,346,155
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2024-05,1,1,1
+Lightning-AI/lightning-thunder,Martyna Patelka <149149379+mpatel31415@users.noreply.github.com>,2024-05,1,27,0
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-05,15,2482,479
+Lightning-AI/lightning-thunder,Patrick Wang <zonghan2000@gmail.com>,2024-05,2,27,19
+Lightning-AI/lightning-thunder,Priya Mishra <52657555+Priya2698@users.noreply.github.com>,2024-05,4,188,49
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-05,1,95,24
+Lightning-AI/lightning-thunder,Ryan Spring <rspring@nvidia.com>,2024-05,4,82,8
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv@beamnet.de>,2024-05,12,1061,463
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-05,3,130,3
+Lightning-AI/lightning-thunder,Vedaanta Agarwalla <142048820+vedaanta@users.noreply.github.com>,2024-05,3,99,41
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-05,6,406,21
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-05,7,8,8
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-05,7,326,250
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2024-05,2,28,6
+Lightning-AI/lightning-thunder,parthmannan <38387286+parthmannan@users.noreply.github.com>,2024-05,1,4,4
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-05,1,2,2
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-06,7,350,712
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-06,1,4,4
+Lightning-AI/lightning-thunder,Kaeun Kim <51257208+k223kim@users.noreply.github.com>,2024-06,6,237,19
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-06,16,1212,254
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-06,18,1537,211
+Lightning-AI/lightning-thunder,Pranava <pranavakumar196@gmail.com>,2024-06,1,32,0
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-06,7,251,128
+Lightning-AI/lightning-thunder,Ryan Spring <rspring@nvidia.com>,2024-06,3,352,356
+Lightning-AI/lightning-thunder,Taylor Robie <taylor.robie@lightning.ai>,2024-06,1,1,1
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv@beamnet.de>,2024-06,14,526,81
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-06,2,13,8
+Lightning-AI/lightning-thunder,Vedaanta Agarwalla <142048820+vedaanta@users.noreply.github.com>,2024-06,3,156,115
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-06,6,416,28
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-06,3,4,4
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-06,4,342,41
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2024-06,4,333,175
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-06,1,1,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-07,2,73,126
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2024-07,2,5,9
+Lightning-AI/lightning-thunder,Kaeun Kim <51257208+k223kim@users.noreply.github.com>,2024-07,5,385,105
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-07,18,693,212
+Lightning-AI/lightning-thunder,Martyna Patelka <149149379+mpatel31415@users.noreply.github.com>,2024-07,1,39,41
+Lightning-AI/lightning-thunder,Masahiro Hiramori <mhg00g13@gmail.com>,2024-07,1,74,74
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-07,20,2761,1734
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-07,2,294,9
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-07,20,1334,576
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv@beamnet.de>,2024-07,12,1513,69
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-07,4,65,6
+Lightning-AI/lightning-thunder,Vedaanta Agarwalla <142048820+vedaanta@users.noreply.github.com>,2024-07,1,3,36
+Lightning-AI/lightning-thunder,Wojciech Prazuch <wojciechprazuch3@gmail.com>,2024-07,2,61,5
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-07,3,28,5
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-07,3,6,6
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-07,4,115,102
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2024-07,11,663,88
+Lightning-AI/lightning-thunder,parthmannan <38387286+parthmannan@users.noreply.github.com>,2024-07,1,40,29
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-07,1,1,1
+Lightning-AI/lightning-thunder,David González Martínez <me@davidgonmar.me>,2024-08,1,313,26
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-08,9,485,137
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2024-08,1,33,27
+Lightning-AI/lightning-thunder,Kaeun Kim <51257208+k223kim@users.noreply.github.com>,2024-08,2,21,39
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-08,11,1565,85
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-08,23,2214,1057
+Lightning-AI/lightning-thunder,Patrick Wang <zonghan2000@gmail.com>,2024-08,1,473,0
+Lightning-AI/lightning-thunder,Priya Mishra <52657555+Priya2698@users.noreply.github.com>,2024-08,3,568,235
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-08,1,151,42
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-08,27,1718,792
+Lightning-AI/lightning-thunder,"Wang, Xiao <24860335+xwang233@users.noreply.github.com>",2024-08,1,5,2
+Lightning-AI/lightning-thunder,Wojciech Prazuch <wojciechprazuch3@gmail.com>,2024-08,1,59,4
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-08,7,1354,49
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2024-08,2,95,8
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-08,3,5,5
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-08,1,1,2
+Lightning-AI/lightning-thunder,nikitaved <nikitavedeneev@gmail.com>,2024-08,1,58,0
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-08,1,1,1
+Lightning-AI/lightning-thunder,shino16 <mshinokawa@nvidia.com>,2024-08,4,42,25
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2024-09,2,73,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-09,8,543,1560
+Lightning-AI/lightning-thunder,Kaeun Kim <51257208+k223kim@users.noreply.github.com>,2024-09,2,363,42
+Lightning-AI/lightning-thunder,Kevin Stephano <kevin.stephano@gmail.com>,2024-09,1,6,3
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-09,14,1096,173
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2024-09,1,105,26
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-09,15,489,98
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-09,1,208,9
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-09,14,1063,4925
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-09,7,310,52
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-09,5,10,10
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-09,4,259,41
+Lightning-AI/lightning-thunder,shino16 <40788005+shino16@users.noreply.github.com>,2024-09,5,530,211
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-10,9,343,117
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2024-10,2,53,15
+Lightning-AI/lightning-thunder,Kevin Stephano <kevin.stephano@gmail.com>,2024-10,2,18,3
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-10,9,751,74
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2024-10,2,163,27
+Lightning-AI/lightning-thunder,Maciej (MJ) Mikulski <mjmikulski@users.noreply.github.com>,2024-10,1,1,1
+Lightning-AI/lightning-thunder,Martyna Patelka <149149379+mpatel31415@users.noreply.github.com>,2024-10,2,7,5
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-10,20,407,235
+Lightning-AI/lightning-thunder,Nachiket18 <nachideo.em@gmail.com>,2024-10,1,78,0
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-10,5,328,10
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-10,10,1320,84
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-10,2,59,2
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-10,6,374,63
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2024-10,1,42,5
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-10,4,8,8
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-10,3,108,48
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-10,2,6,6
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2024-11,1,25,12
+Lightning-AI/lightning-thunder,Byron Hsu <byronhsu1230@gmail.com>,2024-11,1,1,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2024-11,7,144,64
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-11,1,1,1
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-11,6,399,59
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-11,11,139,72
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-11,9,392,56
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-11,2,60,0
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-11,3,706,59
+Lightning-AI/lightning-thunder,apaz <aarpazdera@gmail.com>,2024-11,1,44,10
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2024-11,4,91,31
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-11,6,13,13
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2024-11,1,3,3
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2024-12,1,38,0
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2024-12,1,4,0
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2024-12,4,132,30
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2024-12,14,561,367
+Lightning-AI/lightning-thunder,Priya Mishra <52657555+Priya2698@users.noreply.github.com>,2024-12,1,63,1
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2024-12,1,0,6
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2024-12,6,452,198
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2024-12,1,23,12
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2024-12,9,683,199
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2024-12,6,250,75
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-12,9,15,15
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2024-12,2,30,45
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2025-01,5,260,52
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-01,6,108,34
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-01,12,1126,51
+Lightning-AI/lightning-thunder,Li-Huai (Allan) Lin <qqaatw@gmail.com>,2025-01,1,1,1
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2025-01,4,30,3
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-01,4,39,87
+Lightning-AI/lightning-thunder,Priya Mishra <52657555+Priya2698@users.noreply.github.com>,2025-01,1,79,2
+Lightning-AI/lightning-thunder,Protonu <pbasu@nvidia.com>,2025-01,1,58,2
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-01,2,9,4
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-01,32,1630,1338
+Lightning-AI/lightning-thunder,Tom Fogal <60981+tfogal@users.noreply.github.com>,2025-01,1,72,2
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-01,3,428,83
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-01,3,332,269
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-01,1,1,1
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-01,2,124,7
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-01,1,3,3
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2025-02,3,169,60
+Lightning-AI/lightning-thunder,Gianni Crivello <gianniemperado@gmail.com>,2025-02,2,64,26
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-02,4,482,136
+Lightning-AI/lightning-thunder,Khushi Agrawal <khushiagrawal411@gmail.com>,2025-02,1,21,0
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-02,7,311,220
+Lightning-AI/lightning-thunder,Li-Huai (Allan) Lin <qqaatw@gmail.com>,2025-02,1,2,2
+Lightning-AI/lightning-thunder,Liana Koleva <43767763+lianakoleva@users.noreply.github.com>,2025-02,1,26,158
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-02,3,7,8
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-02,6,463,52
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-02,4,14,8
+Lightning-AI/lightning-thunder,Vedaanta Agarwalla <142048820+vedaanta@users.noreply.github.com>,2025-02,1,11,5
+Lightning-AI/lightning-thunder,Wojciech Prazuch <wojciechprazuch3@gmail.com>,2025-02,1,34,2
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-02,8,2681,750
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-02,3,123,36
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-02,4,8,8
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-02,3,128,25
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-02,1,5,5
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2025-03,1,72,0
+Lightning-AI/lightning-thunder,Christian Sarofeen <csarofeen@nvidia.com>,2025-03,1,16,16
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-03,5,28,59
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2025-03,4,50,56
+Lightning-AI/lightning-thunder,Kaeun Kim <k223kim@uwaterloo.ca>,2025-03,1,7,3
+Lightning-AI/lightning-thunder,Khushi Agrawal <khushiagrawal411@gmail.com>,2025-03,4,489,10
+Lightning-AI/lightning-thunder,Kirthi Shankar Sivamani <ksivamani@nvidia.com>,2025-03,1,9,12
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-03,2,99,21
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2025-03,8,1105,3459
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-03,3,74,89
+Lightning-AI/lightning-thunder,Matt Walsh <walshmatt@google.com>,2025-03,1,3,2
+Lightning-AI/lightning-thunder,Priya Mishra <52657555+Priya2698@users.noreply.github.com>,2025-03,1,21,14
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-03,3,40,10
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-03,9,681,215
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-03,11,888,416
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-03,8,578,33
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-03,2,3,3
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-03,2,38,6
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2025-04,3,69,20
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-04,2,29,41
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2025-04,2,12,38
+Lightning-AI/lightning-thunder,KaelanDt <kaelandonatella@gmail.com>,2025-04,2,139,30
+Lightning-AI/lightning-thunder,Kaeun Kim <kaeun@lightning.ai>,2025-04,1,130,2
+Lightning-AI/lightning-thunder,Khushi Agrawal <khushiagrawal411@gmail.com>,2025-04,6,393,61
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-04,3,67,86
+Lightning-AI/lightning-thunder,Liana Koleva <43767763+lianakoleva@users.noreply.github.com>,2025-04,2,72,11
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2025-04,2,2,29
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-04,6,101,92
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-04,1,68,8
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-04,8,163,36
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-04,3,433,56
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-04,7,417,34
+Lightning-AI/lightning-thunder,craig pfeifer <craig@lightning.ai>,2025-04,1,1,1
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-04,3,4,4
+Lightning-AI/lightning-thunder,Ali Alshaarawy <45029495+ali-alshaar7@users.noreply.github.com>,2025-05,2,41,7
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2025-05,10,223,107
+Lightning-AI/lightning-thunder,KaelanDt <kaelandonatella@gmail.com>,2025-05,8,591,61
+Lightning-AI/lightning-thunder,Kaeun Kim <kaeun@lightning.ai>,2025-05,2,77,20
+Lightning-AI/lightning-thunder,Kevin Stephano <kevin.stephano@gmail.com>,2025-05,1,0,1
+Lightning-AI/lightning-thunder,Khushi Agrawal <khushiagrawal411@gmail.com>,2025-05,2,216,13
+Lightning-AI/lightning-thunder,Kirthi Shankar Sivamani <ksivamani@nvidia.com>,2025-05,1,22,10
+Lightning-AI/lightning-thunder,Liana Koleva <43767763+lianakoleva@users.noreply.github.com>,2025-05,2,41,3
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-05,6,71,33
+Lightning-AI/lightning-thunder,Protonu <pbasu@nvidia.com>,2025-05,1,313,5
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-05,4,1107,92
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-05,22,1044,253
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-05,5,210,105
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-05,1,1,1
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-05,5,6,6
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-05,1,7,2
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-05,1,1,1
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-06,1,11,10
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2025-06,8,55,43
+Lightning-AI/lightning-thunder,KaelanDt <kaelandonatella@gmail.com>,2025-06,8,1164,827
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-06,7,970,73
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-06,14,646,768
+Lightning-AI/lightning-thunder,Protonu <pbasu@nvidia.com>,2025-06,3,183,2
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-06,1,3,1
+Lightning-AI/lightning-thunder,Teja Pulagam <88987427+tejapulagam@users.noreply.github.com>,2025-06,1,131,14
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-06,20,638,491
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-06,7,207,50
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-06,3,227,90
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-06,7,8,8
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-06,1,5,3
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-06,3,4,4
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-07,1,2,13
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2025-07,2,7,7
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2025-07,5,171,29
+Lightning-AI/lightning-thunder,KaelanDt <kaelandonatella@gmail.com>,2025-07,2,16,5
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-07,6,225,52
+Lightning-AI/lightning-thunder,Liana Koleva <43767763+lianakoleva@users.noreply.github.com>,2025-07,1,2,2
+Lightning-AI/lightning-thunder,Luca Antiga <luca@lightning.ai>,2025-07,3,623,30
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-07,5,49,29
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-07,5,796,55
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-07,4,46,15
+Lightning-AI/lightning-thunder,Wei Wang <143543872+nWEIdia@users.noreply.github.com>,2025-07,1,2,2
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-07,1,34,8
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-07,6,317,1940
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-07,4,4,4
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-07,1,1,1
+Lightning-AI/lightning-thunder,shino16 <40788005+shino16@users.noreply.github.com>,2025-07,1,10,2
+Lightning-AI/lightning-thunder,Felix Hirwa Nshuti <hirwanshutiflx@gmail.com>,2025-08,1,1,1
+Lightning-AI/lightning-thunder,"Gao, Xiang <qasdfgtyuiop@gmail.com>",2025-08,1,1,1
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2025-08,4,90,415
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2025-08,13,261,363
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-08,19,584,190
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-08,18,1148,274
+Lightning-AI/lightning-thunder,Protonu <pbasu@nvidia.com>,2025-08,1,200,0
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-08,5,844,29
+Lightning-AI/lightning-thunder,Teja Pulagam <88987427+tejapulagam@users.noreply.github.com>,2025-08,1,23,3
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-08,5,47,15
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-08,4,306,58
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-08,6,193,1222
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-08,2,2,2
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-08,4,193,44
+Lightning-AI/lightning-thunder,kilpelainenj <145921484+kilpelainenj@users.noreply.github.com>,2025-08,1,136,64
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-08,2,3,3
+Lightning-AI/lightning-thunder,shino16 <40788005+shino16@users.noreply.github.com>,2025-08,1,14,14
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-09,1,45,119
+Lightning-AI/lightning-thunder,Jirka Borovec <6035284+Borda@users.noreply.github.com>,2025-09,1,12,1
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-09,7,565,107
+Lightning-AI/lightning-thunder,Liana Koleva <43767763+lianakoleva@users.noreply.github.com>,2025-09,4,268,35
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-09,5,162,69
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-09,2,1381,1352
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-09,8,51,27
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-09,1,3,2
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-09,3,14,14
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-09,1,18,17
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-09,3,3,3
+Lightning-AI/lightning-thunder,shino16 <40788005+shino16@users.noreply.github.com>,2025-09,2,73,1
+Lightning-AI/lightning-thunder,Arseniy Obolenskiy <gooddoog@student.su>,2025-10,6,104,53
+Lightning-AI/lightning-thunder,Copilot <198982749+Copilot@users.noreply.github.com>,2025-10,1,6,29
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2025-10,6,90,31
+Lightning-AI/lightning-thunder,Kaixi <matteochen3@gmail.com>,2025-10,2,229,25
+Lightning-AI/lightning-thunder,Kirthi Shankar Sivamani <ksivamani@nvidia.com>,2025-10,1,1,1
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-10,15,1123,332
+Lightning-AI/lightning-thunder,Masaki <mkozuki@nvidia.com>,2025-10,10,1603,60
+Lightning-AI/lightning-thunder,Masaki Kozuki <mkozuki@nvidia.com>,2025-10,2,16,2
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-10,4,248,142
+Lightning-AI/lightning-thunder,Ryan Spring <rspring@nvidia.com>,2025-10,1,18,55
+Lightning-AI/lightning-thunder,Teja Pulagam <88987427+tejapulagam@users.noreply.github.com>,2025-10,1,66,38
+Lightning-AI/lightning-thunder,Thiti Premrudeepreechacharn <43939442+tpremrud@users.noreply.github.com>,2025-10,1,284,283
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-10,17,977,166
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-10,5,123,26
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-10,2,38,1
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-10,4,18,18
+Lightning-AI/lightning-thunder,jjsjann123 <jiej@nvidia.com>,2025-10,2,16,1
+Lightning-AI/lightning-thunder,matteochen <kaiximatteoc@nvidia.com>,2025-10,1,26,12
+Lightning-AI/lightning-thunder,pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>,2025-10,2,3,3
+Lightning-AI/lightning-thunder,shino16 <40788005+shino16@users.noreply.github.com>,2025-10,2,184,24
+Lightning-AI/lightning-thunder,Copilot <198982749+Copilot@users.noreply.github.com>,2025-11,1,9,11
+Lightning-AI/lightning-thunder,Ivan Yashchuk <IvanYashchuk@users.noreply.github.com>,2025-11,1,1,5
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2025-11,1,2,0
+Lightning-AI/lightning-thunder,Kaixi <kaiximatteoc@nvidia.com>,2025-11,3,576,9
+Lightning-AI/lightning-thunder,Kshiteej K <kshitijkalambarkar@gmail.com>,2025-11,5,85,21
+Lightning-AI/lightning-thunder,Masaki <mkozuki@nvidia.com>,2025-11,2,260,163
+Lightning-AI/lightning-thunder,Masato Shinokawa <40788005+shino16@users.noreply.github.com>,2025-11,5,154,86
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-11,2,102,1484
+Lightning-AI/lightning-thunder,Thomas Viehmann <tv.code@beamnet.de>,2025-11,3,177,34
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-11,3,77,13
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-11,2,53,17
+Lightning-AI/lightning-thunder,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-11,1,1,1
+Lightning-AI/lightning-thunder,Arseniy Obolenskiy <gooddoog@student.su>,2025-12,1,25,1
+Lightning-AI/lightning-thunder,Kaixi <kaiximatteoc@nvidia.com>,2025-12,1,46,1
+Lightning-AI/lightning-thunder,Kaixi <matteochen3@gmail.com>,2025-12,1,110,3
+Lightning-AI/lightning-thunder,Masaki <mkozuki@nvidia.com>,2025-12,1,402,0
+Lightning-AI/lightning-thunder,Masato Shinokawa <40788005+shino16@users.noreply.github.com>,2025-12,3,303,97
+Lightning-AI/lightning-thunder,Riccardo Felluga <11768013+riccardofelluga@users.noreply.github.com>,2025-12,3,9,14
+Lightning-AI/lightning-thunder,Yan Wang <kiya00wy@gmail.com>,2025-12,2,171,29
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2025-12,2,53,21
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2026-01,3,4,9
+Lightning-AI/lightning-thunder,Kaixi <kaiximatteoc@nvidia.com>,2026-01,2,238,71
+Lightning-AI/lightning-thunder,Masato Shinokawa <40788005+shino16@users.noreply.github.com>,2026-01,1,2,1
+Lightning-AI/lightning-thunder,beverlylytle <57254617+beverlylytle@users.noreply.github.com>,2026-01,1,92,29
+Lightning-AI/lightning-thunder,Jingyue Wu <wujingyue@gmail.com>,2026-02,1,14,33
+Lightning-AI/lightning-thunder,teja-pulagam <teja@lightning.ai>,2026-02,1,1,1
+Lightning-AI/lightning-thunder,thecaptain789 <257642323+thecaptain789@users.noreply.github.com>,2026-02,1,10,10
+Lightning-AI/lightning-thunder,Mano Bharathi M <immanobharathi21@gmail.com>,2026-03,1,93,34
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-04,7,27,22
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-05,2,24,20
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2024-06,1,81,13
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-06,2,19,18
+NVIDIA/RULER,Ying Sheng <sqy1415@gmail.com>,2024-06,7,18887,18819
+NVIDIA/RULER,Chandler-Bing <brp12138@163.com>,2024-07,1,2,2
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2024-07,3,134,62
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-07,4,168,108
+NVIDIA/RULER,Viktor Shcherbakov <viktoroo.sch@gmail.com>,2024-07,1,118,58
+NVIDIA/RULER,Ying Sheng <sqy1415@gmail.com>,2024-07,2,60,39
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2024-08,5,54,43
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-08,6,120,90
+NVIDIA/RULER,LU <792823239@qq.com>,2024-08,2,3,1
+NVIDIA/RULER,Luc1an0-H3 <luc1an0o0h3@gmail.com>,2024-08,1,26,24
+NVIDIA/RULER,Siyuan Wang <sywang0227@gmail.com>,2024-08,1,4,1
+NVIDIA/RULER,Wang Siyuan <v-siywang@microsoft.com>,2024-08,1,2,2
+NVIDIA/RULER,Wang Siyuan <wsy0227@sjtu.edu.cn>,2024-08,2,79,62
+NVIDIA/RULER,prateekvellala <136360150+prateekvellala@users.noreply.github.com>,2024-08,1,0,3
+NVIDIA/RULER,AinL <gmlwns5176@gmail.com>,2024-09,1,1,1
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2024-09,2,2,2
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-09,2,68,64
+NVIDIA/RULER,Ikko Eltociear Ashimine <eltociear@gmail.com>,2024-09,1,1,1
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-10,3,31,17
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2024-12,1,5,0
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2024-12,2,39,30
+NVIDIA/RULER,Wang Siyuan <v-siywang@microsoft.com>,2024-12,1,5,0
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2025-01,1,1,1
+NVIDIA/RULER,fayejf <36722593+fayejf@users.noreply.github.com>,2025-01,1,1,1
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2025-05,3,109,25
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2025-05,8,193,77
+NVIDIA/RULER,fayejf <36722593+fayejf@users.noreply.github.com>,2025-05,1,3,5
+NVIDIA/RULER,fayejf <fayejf07@gmail.com>,2025-05,5,147,62
+NVIDIA/RULER,kcirred <16872435+kcirred@users.noreply.github.com>,2025-05,1,2,2
+NVIDIA/RULER,yukiy927 <1015997408@qq.com>,2025-05,1,2,1
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2025-06,3,123,88
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2025-06,2,154,82
+NVIDIA/RULER,Igor Gitman <igitman@nvidia.com>,2025-06,2,108,76
+NVIDIA/RULER,Shantanu Acharya <shantanua@nvidia.com>,2025-06,1,9,10
+NVIDIA/RULER,Wang Siyuan <wsy0227@sjtu.edu.cn>,2025-06,1,6,2
+NVIDIA/RULER,Cheng-Ping Hsieh <37269846+hsiehjackson@users.noreply.github.com>,2025-07,1,14,0
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2025-07,1,3,3
+NVIDIA/RULER,ExtReMLapin <3909752+ExtReMLapin@users.noreply.github.com>,2025-07,2,18,4
+NVIDIA/RULER,Cheng-Ping Hsieh <chsieh@nvidia.com>,2025-10,5,9,6
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2014-05,17,4870,148
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2014-06,7,181,194
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2014-07,2,74,70
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2014-08,2,430,168
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2014-09,1,5,3
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2014-10,7,494,366
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2014-12,3,189,133
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-01,16,294,69
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-02,16,3832,61
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-03,10,606,555
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-04,24,579,3228
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-05,14,52,51
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-08,4,100,71
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-09,4,10122,93
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2015-11,13,3576,3089
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2016-01,8,213,3715
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2016-05,2,31,16
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2016-07,3,181,115
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2016-09,1,5,1
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2017-04,2,37,40
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2017-09,9,199,145
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2017-10,9,316,598
+RI-imaging/radontea,Paul Müller <paul.mueller@biotec.tu-dresden.de>,2017-11,1,7,2
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2018-03,2,409,548
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2018-04,21,43852,11997
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2018-05,3,42,34
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2018-07,2,14,3
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2018-11,1,16,11
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2018-12,1,1,1
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2019-01,1,2,2
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2019-02,3,133,13
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2019-04,4,19,23
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2019-05,2,77,54
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2019-11,2,87,26
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2020-06,9,10198,10191
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2021-01,2,5,2
+RI-imaging/radontea,SZanko <38001059+SZanko@users.noreply.github.com>,2021-01,1,47,31
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2021-02,1,5,1
+RI-imaging/radontea,SZanko <38001059+SZanko@users.noreply.github.com>,2021-02,1,38,111
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2021-04,6,138,248
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2021-11,1,3,4
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2022-10,22,161,62
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2023-01,2,11,12
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2023-04,1,3,5
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2025-01,1,25,23
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2025-02,1,5,4
+RI-imaging/radontea,Paul Müller <dev@craban.de>,2025-11,9,55,250
+RI-imaging/radontea,Tim Hetkämper <transistortim@hetkaemper.it>,2025-11,1,2,2
+Rosan-D43/Design-project-1,Rosan-D43 <rosandrd25@gmail.com>,2024-12,1,0,0
+TTPlanetPig/Comfyui_JC2,TTPlanetPig <152850462+TTPlanetPig@users.noreply.github.com>,2024-10,23,1530,451
+TTPlanetPig/Comfyui_JC2,snomiao <snomiao+comfy-pr@gmail.com>,2024-10,2,39,0
+TTPlanetPig/Comfyui_JC2,TTPlanetPig <152850462+TTPlanetPig@users.noreply.github.com>,2025-05,4,1084,60
+algorandfoundation/algokit-utils-py,Loedn <loedn@pm.me>,2022-12,1,0,0
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2023-03,58,12395,4487
+algorandfoundation/algokit-utils-py,Michael Chuang <github@michaeltchuang.com>,2023-03,1,1,1
+algorandfoundation/algokit-utils-py,Rob Moore (MakerX) <rob.moore@makerx.com.au>,2023-03,3,132,169
+algorandfoundation/algokit-utils-py,Rob Moore <rob.moore@makerx.com.au>,2023-03,1,87,136
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-03,7,71,7
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2023-04,17,11498,1175
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-04,2,18,2
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2023-05,22,3223,819
+algorandfoundation/algokit-utils-py,Patrick Dinh <patrick.dinh@makerx.com.au>,2023-05,1,58,0
+algorandfoundation/algokit-utils-py,Rob Moore (MakerX) <rob.moore@makerx.com.au>,2023-05,1,58,0
+algorandfoundation/algokit-utils-py,inaie ignacio <inaie.ignacio@makerx.com.au>,2023-05,1,1,1
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-05,2,23,2
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2023-06,5,3504,1405
+algorandfoundation/algokit-utils-py,Negar <abbasi_negar@outlook.com>,2023-06,1,182,6
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-06,2,35,2
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2023-07,1,114,233
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-07,1,7,1
+algorandfoundation/algokit-utils-py,Inaie Ignacio <129017070+inaie-makerx@users.noreply.github.com>,2023-09,2,1614,1420
+algorandfoundation/algokit-utils-py,Negar <abbasi_negar@outlook.com>,2023-09,1,181,121
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-09,1,11,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2023-10,4,1783,802
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2023-10,2,201,12
+algorandfoundation/algokit-utils-py,Negar <abbasi_negar@outlook.com>,2023-10,1,366,26
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-10,4,32,4
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2023-11,1,51,152
+algorandfoundation/algokit-utils-py,Negar <abbasi_negar@outlook.com>,2023-11,1,87,526
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-11,1,5,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2023-12,2,1731,228
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2023-12,1,7,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2024-02,1,54,0
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2024-02,1,644,622
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2024-02,1,8,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2024-04,2,1693,507
+algorandfoundation/algokit-utils-py,Joe Polny <50534337+joe-p@users.noreply.github.com>,2024-04,1,1737,2
+algorandfoundation/algokit-utils-py,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-04,2,77,98
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2024-04,1,7,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2024-05,1,84,1231
+algorandfoundation/algokit-utils-py,Neil Campbell <neil.campbell@makerx.com.au>,2024-05,4,2651,2571
+algorandfoundation/algokit-utils-py,inaie ignacio <inaie.ignacio@makerx.com.au>,2024-05,3,2643,2539
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2024-05,1,14,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2024-07,1,2413,1256
+algorandfoundation/algokit-utils-py,Larkin Young <larkin.young@gmail.com>,2024-07,1,31,89
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2024-08,1,59,49
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2024-08,1,12,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2024-10,1,180,180
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2024-10,3,834,735
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2024-10,1,8,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2024-11,1,218,112
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2024-11,1,12,1
+algorandfoundation/algokit-utils-py,uhudo <115161770+uhudo@users.noreply.github.com>,2024-11,2,2,2
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2025-01,3,37994,8125
+algorandfoundation/algokit-utils-py,Altynbek Orumbayev <altynbek.orumbayev@makerx.com.au>,2025-01,1,42,0
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2025-02,12,69767,12800
+algorandfoundation/algokit-utils-py,Neil Campbell <neil.campbell@makerx.com.au>,2025-02,2,4630,15
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-02,3,49,3
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2025-03,2,584,495
+algorandfoundation/algokit-utils-py,David Rojas <lempira@gmail.com>,2025-03,1,989,1277
+algorandfoundation/algokit-utils-py,David Rojas <lempira@users.noreply.github.com>,2025-03,1,836,1114
+algorandfoundation/algokit-utils-py,Joe Polny <50534337+joe-p@users.noreply.github.com>,2025-03,1,45,114
+algorandfoundation/algokit-utils-py,Larkin Young <larkin.young@algorand.foundation>,2025-03,3,223,213
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-03,1,16,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2025-04,1,172,30
+algorandfoundation/algokit-utils-py,David Rojas <lempira@gmail.com>,2025-04,1,39,41
+algorandfoundation/algokit-utils-py,David Rojas <lempira@users.noreply.github.com>,2025-04,1,39,41
+algorandfoundation/algokit-utils-py,Giorgio Ciotti <giorgio.ciotti@algorand.foundation>,2025-04,1,16,3
+algorandfoundation/algokit-utils-py,CiottiGiorgio <giorgio.ciotti@algorand.foundation>,2025-05,26,961,568
+algorandfoundation/algokit-utils-py,David Rojas <lempira@gmail.com>,2025-05,2,82,95
+algorandfoundation/algokit-utils-py,David Rojas <lempira@users.noreply.github.com>,2025-05,1,181,244
+algorandfoundation/algokit-utils-py,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-05,1,100,150
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-05,1,7,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2025-06,3,338,556
+algorandfoundation/algokit-utils-py,David Rojas <lempira@gmail.com>,2025-06,4,100,685
+algorandfoundation/algokit-utils-py,David Rojas <lempira@users.noreply.github.com>,2025-06,2,523,652
+algorandfoundation/algokit-utils-py,Giorgio Ciotti <giorgio.ciotti@algorand.foundation>,2025-06,1,2,7
+algorandfoundation/algokit-utils-py,Hoang Dinh <patrick.dinh@makerx.com.au>,2025-06,8,1607,296
+algorandfoundation/algokit-utils-py,Neil Campbell <neil.campbell@makerx.com.au>,2025-06,4,2809,304
+algorandfoundation/algokit-utils-py,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-06,2,143,14
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-06,1,21,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2025-08,1,1169,69
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-08,1,7,1
+algorandfoundation/algokit-utils-py,Altynbek Orumbayev <altynbek.orumbayev@makerx.com.au>,2025-09,1,2,2
+algorandfoundation/algokit-utils-py,Neil Campbell <neil.campbell@makerx.com.au>,2025-09,6,167,15
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-09,1,13,1
+algorandfoundation/algokit-utils-py,Al <aorumbayev@pm.me>,2025-10,1,1589,66126
+algorandfoundation/algokit-utils-py,Daniel McGregor <daniel.mcgregor@makerx.com.au>,2025-10,7,238,94
+algorandfoundation/algokit-utils-py,Neil Campbell <neil.campbell@makerx.com.au>,2025-10,3,202,120
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-10,1,8,1
+algorandfoundation/algokit-utils-py,Neil Campbell <neil.campbell@makerx.com.au>,2025-11,1,45,17
+algorandfoundation/algokit-utils-py,Neil Campbell <neil.campbell@makerx.com.au>,2025-12,2,48,25
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2025-12,1,13,1
+algorandfoundation/algokit-utils-py,Joe Polny <joe@algorand.foundation>,2026-04,2,117637,33548
+algorandfoundation/algokit-utils-py,Luca Martini <luca.martini@algorand.foundation>,2026-04,2,15,12
+algorandfoundation/algokit-utils-py,mrcointreau <45950216+mrcointreau@users.noreply.github.com>,2026-04,1,15,12
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2026-04,3,3,3
+algorandfoundation/algokit-utils-py,Joe Polny <joepolny@gmail.com>,2026-05,1,1162,1162
+algorandfoundation/algokit-utils-py,Luca Martini <luca.martini@algorand.foundation>,2026-05,6,1060,1490
+algorandfoundation/algokit-utils-py,mrcointreau <45950216+mrcointreau@users.noreply.github.com>,2026-05,3,1042,1267
+algorandfoundation/algokit-utils-py,semantic-release <semantic-release>,2026-05,2,2,2
+andrei8055/SOAPI,Andrei <agape.andrei93@gmail.com>,2024-12,4,907,7
+andrei8055/SOAPI,Andrei Agape <agape.andrei93@yahoo.com>,2024-12,1,0,0
+andrei8055/SOAPI,Andrei <agape.andrei93@gmail.com>,2025-01,6,516,80
+andrei8055/SOAPI,Andrei Agape <agape.andrei93@yahoo.com>,2025-01,4,240,24
+andrei8055/SOAPI,Andrei Agape <agape.andrei93@yahoo.com>,2025-02,2,3,2
+ayushtewari/DFM,Ayush <ayushtewaridav@gmail.com>,2023-10,3,3,75
+ayushtewari/DFM,Tianwei Yin <tianweiy@mit.edu>,2023-10,1,1,1
+ayushtewari/DFM,Tianwei Yin <tianweiy@mit.edu>,2023-11,4,70,11
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-05,82,4841,2964
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-06,11,46,26
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-07,10,30,12
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-08,4,29,16
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-09,3,11,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-10,2,2,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-11,2,2,2
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2019-12,18,120,109
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-01,8,56,23
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-02,3,10,4
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-04,1,1,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-06,8,20,7
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-07,4,18,6
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-08,2,5,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-10,7,20,2
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2020-12,9,43,21
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2021-01,2,7,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2021-02,1,1,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2021-04,2,6,3
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2021-06,1,2,0
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2021-07,7,75,32
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2021-08,3,30,10
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2021-11,2,13,5
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2022-03,1,1,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2022-06,2,14,4
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2022-09,1,1,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2022-10,3,22,2
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2022-11,1,4,8
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2022-12,1,5,0
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2023-01,1,1,2
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2023-07,3,40,13
+benedekrozemberczki/awesome-gradient-boosting-papers,Olivier Meslin <44379737+oliviermeslin@users.noreply.github.com>,2023-07,1,4,0
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2024-03,1,1,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2025-12,2,5,1
+benedekrozemberczki/awesome-gradient-boosting-papers,Benedek Rozemberczki <benedek.rozemberczki@gmail.com>,2026-01,8,1565,1486
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2015-07,25,19232,18529
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2015-08,1,127,62
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2016-07,19,2588,829
+cmaclell/py_search,Christopher MacLellan <maclellan.christopher@gmail.com>,2016-07,7,1435,860
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2016-10,9,600,204
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2017-01,3,15,7
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2017-04,4,477,284
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2017-06,1,27,15
+cmaclell/py_search,Chris MacLellan <chris.maclellan@soartech.com>,2017-10,10,583,267
+cmaclell/py_search,Chris MacLellan <chris.maclellan@soartech.com>,2017-11,1,1,1
+cmaclell/py_search,Chris MacLellan <chris.maclellan@soartech.com>,2018-02,3,68,26
+cmaclell/py_search,Chris MacLellan <chris.maclellan@soartech.com>,2018-04,7,705,306
+cmaclell/py_search,cmaclell <maclellan.christopher@gmail.com>,2019-02,17,202,74
+cmaclell/py_search,cmaclell <maclellan.christopher@gmail.com>,2019-04,2,100,11
+cmaclell/py_search,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2022-01,1,1,1
+cmaclell/py_search,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2022-06,1,1,1
+cmaclell/py_search,salahmak <salah-eddine.makdour@ensia.edu.dz>,2023-04,1,1,1
+cmaclell/py_search,moshe <mosheofer1@gmail.com>,2024-06,6,238872,238166
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2024-07,1,665,6
+cmaclell/py_search,moshe <mosheofer1@gmail.com>,2024-07,6,602,649
+cmaclell/py_search,Chris MacLellan <maclellan.christopher@gmail.com>,2025-09,3,3,3
+community-of-python/circuit-breaker-box,Nikita Kozlovtsev <nikita.kozlovtcev@gmail.com>,2025-02,9,208,149
+community-of-python/circuit-breaker-box,NikitaKozlovtcev <72300582+NikitaKozlovtcev@users.noreply.github.com>,2025-02,2,411,154
+community-of-python/circuit-breaker-box,NikitaKozlovtcev <72300582+nikitakozlovtcev@users.noreply.github.com>,2025-02,1,34,12
+community-of-python/circuit-breaker-box,KOZLOVTSEV Nikita <ruakznv@n-msk-mackznv-1.raiffeisen.ru>,2025-03,1,10,5
+community-of-python/circuit-breaker-box,Nikita Kozlovtsev <nikita.kozlovtcev@gmail.com>,2025-03,2,196,3
+community-of-python/circuit-breaker-box,Nikita Kozlovtsev <Nikita.KOZLOVTSEV@raiffeisen.ru>,2025-04,2,5,4
+community-of-python/circuit-breaker-box,Artur Shiriev <krenix@yandex.ru>,2025-08,4,99,80
+community-of-python/circuit-breaker-box,Artur Shiriev <lesnik512@gmail.com>,2025-08,1,14,11
+community-of-python/circuit-breaker-box,ruaabrw <artur.shiriev@raiffeisen.ru>,2025-08,3,85,69
+explosion/spacy-layout,Ines Montani <ines@ines.io>,2024-11,53,935,400
+explosion/spacy-layout,Ines Montani <ines@ines.io>,2024-12,15,348,71
+explosion/spacy-layout,magdaaniol <magda@explosion.ai>,2024-12,2,17,1
+explosion/spacy-layout,William Mattingly <62964060+wjbmattingly@users.noreply.github.com>,2025-01,1,49,0
+explosion/spacy-layout,Ines Montani <ines@ines.io>,2025-02,1,1,1
+explosion/spacy-layout,mkessy <kokokessy@gmail.com>,2025-02,1,22,2
+explosion/spacy-layout,svlandeg <svlandeg@github.com>,2025-02,1,1,1
+explosion/spacy-layout,Ines Montani <ines@ines.io>,2025-03,12,413,86
+explosion/spacy-layout,Matthew Honnibal <honnibal+gh@gmail.com>,2026-03,3,7,43
+facebookresearch/videoseal,Atticus White <contact@atticuswhite.com>,2024-12,1,1,1
+facebookresearch/videoseal,Hady Elsahar <hadyelsahar@gmail.com>,2024-12,3,4,4
+facebookresearch/videoseal,Mughees Ahmad <itsmughees@gmail.com>,2024-12,2,2,2
+facebookresearch/videoseal,Pierre Fernandez <45875332+pierrefdz@users.noreply.github.com>,2024-12,5,11,6
+facebookresearch/videoseal,Pierre Fernandez <pfz@fb.com>,2024-12,19,2227,378945
+facebookresearch/videoseal,Pierre Fernandez <pfz@fb.com>,2025-01,2,150,119
+facebookresearch/videoseal,pierrefdz <pfz@fb.com>,2025-01,4,122,118
+facebookresearch/videoseal,TheFrenchDemos <genai-demos@googlegroups.com>,2025-02,1,25,1
+facebookresearch/videoseal,pierrefdz <pfz@fb.com>,2025-02,1,2,3
+facebookresearch/videoseal,Pierre Fernandez <45875332+pierrefdz@users.noreply.github.com>,2025-03,6,257,32
+facebookresearch/videoseal,pierrefdz <pfz@fb.com>,2025-03,10,7340,381211
+facebookresearch/videoseal,John Ho <jho.yvr+git@gmail.com>,2025-04,1,82,61
+facebookresearch/videoseal,Pierre Fernandez <45875332+pierrefdz@users.noreply.github.com>,2025-04,1,82,61
+facebookresearch/videoseal,Pierre Fernandez <45875332+pierrefdz@users.noreply.github.com>,2025-05,3,3,3
+facebookresearch/videoseal,Pierre Fernandez <45875332+pierrefdz@users.noreply.github.com>,2025-06,5,64,127
+facebookresearch/videoseal,Tuan Tran <1254753+antoine-tran@users.noreply.github.com>,2025-06,2,59,26
+facebookresearch/videoseal,Tuan Tran <{ID}+{username}@users.noreply.github.com>,2025-06,11,39,20
+facebookresearch/videoseal,Pierre Fernandez <45875332+pierrefdz@users.noreply.github.com>,2025-07,1,3,3
+facebookresearch/videoseal,Valeriu <valeriu@meta.com>,2025-07,3,106,25
+facebookresearch/videoseal,Valeriu Lacatusu <lacatusu.valeriu@gmail.com>,2025-07,1,82,1
+facebookresearch/videoseal,Tomas Soucek <soucek@meta.com>,2025-10,2,5847,4
+facebookresearch/videoseal,Tomáš Souček <soucek@meta.com>,2025-10,2,5847,4
+facebookresearch/videoseal,Pierre Fernandez <45875332+pierrefdz@users.noreply.github.com>,2025-11,8,25,12
+facebookresearch/videoseal,hadyelsahar <hadyelsahar@gmail.com>,2025-12,1,20,1
+facebookresearch/videoseal,Tomáš Souček <soucek@meta.com>,2026-01,1,608,24
+facebookresearch/videoseal,hadyelsahar <hadyelsahar@gmail.com>,2026-01,3,1103,247
+facebookresearch/videoseal,pierrefdz <monpierre113@gmail.com>,2026-05,1,13,15
+hjhxy/2023-Chinese-Collegiate-Computing-Competition,tzw-csuft <91881028+tzw-csuft@users.noreply.github.com>,2023-04,1,2,0
+hjhxy/2023-Chinese-Collegiate-Computing-Competition,zxy <3057472776@qq.com>,2023-04,1,0,0
+hjhxy/2023-Chinese-Collegiate-Computing-Competition,zxy <3057472776@qq.com>,2023-05,5,4303478,11413
+hjhxy/2023-Chinese-Collegiate-Computing-Competition,高兴 <80154778+XingGao-cn@users.noreply.github.com>,2023-05,1,1,1
+hjhxy/2023-Chinese-Collegiate-Computing-Competition,高兴 <80154778+XingGao-cn@users.noreply.github.com>,2023-11,1,4,0
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-02,23,79,45
+iwyxdxl/WeChatBot_WXAUTO_SE,unknown <iwyxdxl@gmail.com>,2025-02,30,5544,2986
+iwyxdxl/WeChatBot_WXAUTO_SE,unknown <iwyxdxl@gmail.com>,2025-03,10,1751,927
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-04,1,2,1
+iwyxdxl/WeChatBot_WXAUTO_SE,unknown <iwyxdxl@gmail.com>,2025-04,18,17498,2424
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-05,2,83,28
+iwyxdxl/WeChatBot_WXAUTO_SE,onebai123 <135291067+onebai123@users.noreply.github.com>,2025-05,3,90,29
+iwyxdxl/WeChatBot_WXAUTO_SE,unknown <iwyxdxl@gmail.com>,2025-05,6,13434,13172
+iwyxdxl/WeChatBot_WXAUTO_SE,zhonghaocheng <zhongruan0522@gmail.com>,2025-05,1,49,0
+iwyxdxl/WeChatBot_WXAUTO_SE,ZJU_llk <41889114+yuanhongyi@users.noreply.github.com>,2025-06,1,1,4
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-06,6,113,10
+iwyxdxl/WeChatBot_WXAUTO_SE,liang <2424123787@qq.com>,2025-06,3,2986,373
+iwyxdxl/WeChatBot_WXAUTO_SE,onebai123 <135291067+onebai123@users.noreply.github.com>,2025-06,3,569,12318
+iwyxdxl/WeChatBot_WXAUTO_SE,unknown <iwyxdxl@gmail.com>,2025-06,9,1492,11358
+iwyxdxl/WeChatBot_WXAUTO_SE,zhonghaocheng <zhongruan0522@gmail.com>,2025-06,1,49,0
+iwyxdxl/WeChatBot_WXAUTO_SE,butteryiyi <xyyszbz666@163.com>,2025-07,3,327,16
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-07,2,6102,6004
+iwyxdxl/WeChatBot_WXAUTO_SE,unknown <iwyxdxl@gmail.com>,2025-07,1,4,4
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-08,4,10164,5242
+iwyxdxl/WeChatBot_WXAUTO_SE,liang <2424123787@qq.com>,2025-08,1,1,1
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-09,5,7677,954
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2025-10,6,3890,1824
+iwyxdxl/WeChatBot_WXAUTO_SE,liang <2424123787@qq.com>,2025-10,1,1,1
+iwyxdxl/WeChatBot_WXAUTO_SE,zhangl <2424123787@qq.com>,2025-10,1,109,40
+iwyxdxl/WeChatBot_WXAUTO_SE,iwyxdxl <iwyxdxl@gmail.com>,2026-01,1,18,5
+iwyxdxl/WeChatBot_WXAUTO_SE,unknown <iwyxdxl@gmail.com>,2026-01,1,3,3
+janbjorge/pipegate,JeyBee <janbjorge@gmail.com>,2024-12,5,595,216
+janbjorge/pipegate,Brandon Scott <contact@brandonscott.me>,2025-01,2,30,16
+janbjorge/pipegate,JeyBee <janbjorge@gmail.com>,2025-01,4,47,29
+janbjorge/pipegate,JeyBee <janbjorge@gmail.com>,2026-03,16,3953,3470
+janbjorge/pipegate,JeyBee <janbjorge@gmail.com>,2026-04,3,619,216
+janbjorge/pipegate,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-04,1,3,3
+kienmarkdo/Cybersecurity-Mini-Projects,Kien Do <67518620+kienmarkdo@users.noreply.github.com>,2022-12,7,56,10
+kienmarkdo/Cybersecurity-Mini-Projects,Kien Do <kienmarkdo@gmail.com>,2022-12,3,298,7
+lezhang7/MSAGen,zhangle <zl18300720002@gmail.com>,2022-07,4,3432,0
+lezhang7/MSAGen,le zhang <57939690+Magiccircuit@users.noreply.github.com>,2022-10,1,21,0
+lezhang7/MSAGen,Le Zhang <57939690+Magiccircuit@users.noreply.github.com>,2023-05,2,9,2
+lezhang7/MSAGen,Le Zhang <57939690+lezhang7@users.noreply.github.com>,2023-07,1,1,0
+lezhang7/MSAGen,le zhang <le.zhang@mila.quebec>,2023-08,15,5852,2793
+lezhang7/MSAGen,Daniel Wu <wurining@gmail.com>,2024-12,3,1066,1062
+lezhang7/MSAGen,Le Zhang <57939690+lezhang7@users.noreply.github.com>,2024-12,4,1068,1063
+lezhang7/MSAGen,Le Zhang <57939690+lezhang7@users.noreply.github.com>,2025-03,1,1,1
+multimodal-art-projection/YuE,Liang Yiming <154485721+Yiming-Liang@users.noreply.github.com>,2025-01,4,850,12
+multimodal-art-projection/YuE,Ruibin Yuan <30723625+a43992899@users.noreply.github.com>,2025-01,9,20,18
+multimodal-art-projection/YuE,Yizhi Li <yizhi.li@hotmail.com>,2025-01,1,0,0
+multimodal-art-projection/YuE,a43992899 <a43992899@gmail.com>,2025-01,25,658,299
+multimodal-art-projection/YuE,hf-lin <hanfenglin.new@gmail.com>,2025-01,15,27567,27147
+multimodal-art-projection/YuE,Manal ML <mm.elaidouni@gmail.com>,2025-02,1,1,1
+multimodal-art-projection/YuE,Ruibin Yuan <30723625+a43992899@users.noreply.github.com>,2025-02,42,73,53
+multimodal-art-projection/YuE,a43992899 <a43992899@gmail.com>,2025-02,6,72,88
+multimodal-art-projection/YuE,askmyteapot <62238146+askmyteapot@users.noreply.github.com>,2025-02,1,2,2
+multimodal-art-projection/YuE,hf-lin <153443201+hf-lin@users.noreply.github.com>,2025-02,4,3,5
+multimodal-art-projection/YuE,hf-lin <hanfenglin.new@gmail.com>,2025-02,4,103,48
+multimodal-art-projection/YuE,DJ Magar <85457381+DJStompZone@users.noreply.github.com>,2025-03,2,170,1
+multimodal-art-projection/YuE,Ruibin Yuan <30723625+a43992899@users.noreply.github.com>,2025-03,10,5499374,8
+multimodal-art-projection/YuE,yongyizang <yzang4@u.rochester.edu>,2025-03,2,5499185,0
+multimodal-art-projection/YuE,Ruibin Yuan <30723625+a43992899@users.noreply.github.com>,2025-05,1,2,2
+multimodal-art-projection/YuE,Skrill2001 <1902203898@qq.com>,2025-05,2,30,13
+multimodal-art-projection/YuE,hf-lin <hanfenglin.new@gmail.com>,2025-05,1,8173,0
+multimodal-art-projection/YuE,Ruibin Yuan <30723625+a43992899@users.noreply.github.com>,2025-06,5,8225,16
+robotframework/statuschecker,Janne Piironen <janne.piironen@gmail.com>,2013-12,6,60,962
+robotframework/statuschecker,Pekka Klärck <peke@iki.fi>,2013-12,34,581,393
+robotframework/statuschecker,Tatu Kairi <tatu.kairi@eficode.com>,2013-12,27,610,329
+robotframework/statuschecker,Tatu Kairi <tatu.kairi@gmail.com>,2013-12,3,13,11
+robotframework/statuschecker,robotframework <robotframework@gmail.com>,2013-12,1,6,6
+robotframework/statuschecker,Pekka Klärck <peke@iki.fi>,2014-02,1,11,6
+robotframework/statuschecker,Pekka Klärck <peke@iki.fi>,2014-08,5,57,13
+robotframework/statuschecker,Pekka Klärck <peke@iki.fi>,2016-02,2,35,36
+robotframework/statuschecker,Pekka Klärck <peke@iki.fi>,2016-04,12,139,118
+robotframework/statuschecker,"Stanislaw ""Stan"" Wolowski <stanislaw.wolowski@nokia.com>",2016-04,3,13,9
+robotframework/statuschecker,wolowski <stanislaw.wolowski@nokia.com>,2016-04,2,4,3
+robotframework/statuschecker,Tatu Aalto <2665023+aaltat@users.noreply.github.com>,2019-05,1,7,3
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2019-05,2,2,2
+robotframework/statuschecker,Tatu Aalto <2665023+aaltat@users.noreply.github.com>,2021-03,4,31,4
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2021-03,11,361,44
+robotframework/statuschecker,Tatu Aalto <2665023+aaltat@users.noreply.github.com>,2021-04,1,1,1
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2021-04,30,532,177
+robotframework/statuschecker,Jari <jari.nurminen@segron.com>,2021-10,6,242,99
+robotframework/statuschecker,Jari Nurminen <8724383+yahman72@users.noreply.github.com>,2021-10,1,83,38
+robotframework/statuschecker,Pekka Klärck <peke@iki.fi>,2021-10,1,112,14
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2021-10,4,135,40
+robotframework/statuschecker,Eric Jones <ebj.ericjones@gmail.com>,2021-11,1,52,4
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2021-11,3,44,2
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2023-02,9,106,70
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2023-06,6,69,5
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2025-01,2,15,8
+robotframework/statuschecker,Pekka Klärck <peke@iki.fi>,2025-02,22,1146,1044
+robotframework/statuschecker,Tatu Aalto <2665023+aaltat@users.noreply.github.com>,2025-02,1,1,1
+robotframework/statuschecker,Tatu Aalto <aalto.tatu@gmail.com>,2025-02,9,664,202
+sair-lab/iMTSP,gyf23205 <41114485+gyf23205@users.noreply.github.com>,2024-02,4,1081,56
+sair-lab/iMTSP,gyf23205 <41114485+gyf23205@users.noreply.github.com>,2024-03,1,1,1
+sair-lab/iMTSP,Chen Wang <jeffsan@gmx.com>,2024-04,3,184,20
+sair-lab/iMTSP,Yifan Guo <632181372@qq.com>,2024-04,7,520,270
+sair-lab/iMTSP,gyf23205 <41114485+gyf23205@users.noreply.github.com>,2024-04,7,39,11
+sair-lab/iMTSP,Chen Wang <jeffsan@gmx.com>,2024-05,1,15,1
+sair-lab/iMTSP,Chen Wang <jeffsan@gmx.com>,2024-10,3,7,7
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2024-09,5,198,9
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2024-10,10,878,0
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2024-11,2,114,0
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2024-12,14,3424,11
+selfedu-rus/neuro-pytorch,selfedu-rus <gresnam@gmail.com>,2024-12,1,0,0
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2025-01,1,439,0
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2025-02,39,545,0
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2025-03,143,3110,2
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2025-04,3,5,5
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2025-05,1,1,1
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2025-08,1,23,0
+selfedu-rus/neuro-pytorch,selfedu-rus <65663799+selfedu-rus@users.noreply.github.com>,2026-06,1,2,2
+shinjiwlab/versa,Jiatong <728307998@qq.com>,2024-05,1,0,0
+shinjiwlab/versa,ftshijt <728307998@qq.com>,2024-05,2,646,0
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2024-06,11,30,20
+shinjiwlab/versa,Jinchuan <jinchuat@andrew.cmu.edu>,2024-06,1,14,0
+shinjiwlab/versa,Jinchuan Tian <92212251+jctian98@users.noreply.github.com>,2024-06,1,3,3
+shinjiwlab/versa,Jinchuan Tian <jinchuat@andrew.cmu.edu>,2024-06,1,13,0
+shinjiwlab/versa,ftshijt <728307998@qq.com>,2024-06,13,1362,260
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2024-06,11,474,157
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2024-07,8,130,39
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2024-07,5,423,11
+shinjiwlab/versa,shimhz <shimhz6.6@gmail.com>,2024-07,4,153,15
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2024-08,16,75,70
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2024-08,10,269,298
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2024-09,6,81,11
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2024-09,4,118,65
+shinjiwlab/versa,shimhz <shimhz6.6@gmail.com>,2024-09,1,67,0
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2024-10,2,1,3
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2024-10,21,1650,1172
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2024-11,9,59,10
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2024-11,22,779,182
+shinjiwlab/versa,Dareen Alharthi <alharthi@br012.ib.bridges2.psc.edu>,2024-12,3,124,326
+shinjiwlab/versa,Dareen Alharthi <alharthi@br013.ib.bridges2.psc.edu>,2024-12,1,2,1
+shinjiwlab/versa,Dareen Alharthi <alharthi@v001.ib.bridges2.psc.edu>,2024-12,2,1725,46
+shinjiwlab/versa,Hye-jin Shim <shimhz6.6@gmail.com>,2024-12,1,158,19
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2024-12,26,3976,338
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2024-12,48,9913,1562
+shinjiwlab/versa,shimhz <shimhz6.6@gmail.com>,2024-12,9,1395,74
+shinjiwlab/versa,whaledolphin6om <whaledolphin666@gmail.com>,2024-12,1,23,19
+shinjiwlab/versa,yzyouzhang <yzyouzhang@gmail.com>,2024-12,4,529,20
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-02,24,170,78
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2025-02,9,1184,422
+shinjiwlab/versa,shimhz <shimhz6.6@gmail.com>,2025-02,5,44,30
+shinjiwlab/versa,Hye-jin <shimhz6.6@gmail.com>,2025-03,2,3323,100
+shinjiwlab/versa,Hye-jin Shim <hshim2@dt-login03.delta.ncsa.illinois.edu>,2025-03,1,1,1
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-03,27,2034,601
+shinjiwlab/versa,ftshijt <728307998@qq.com>,2025-03,4,1776,512
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2025-03,21,7673,3215
+shinjiwlab/versa,shimhz <shimhz6.6@gmail.com>,2025-03,1,2,2
+shinjiwlab/versa,BohaoSu <s0983813130@gmail.com>,2025-04,10,298,29
+shinjiwlab/versa,Jiatong <728307998@qq.com>,2025-04,2,1,1
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-04,43,1406,913
+shinjiwlab/versa,ftshijt <728307998@qq.com>,2025-04,21,937,171
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2025-04,69,13633,4686
+shinjiwlab/versa,BohaoSu <s0983813130@gmail.com>,2025-05,1,876,48
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-05,7,244,20
+shinjiwlab/versa,Jiatong Shi <jiatong.shi@anuttacon.com>,2025-05,2,6,9
+shinjiwlab/versa,ftshijt <728307998@qq.com>,2025-05,1,288,4
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2025-05,7,825,54
+shinjiwlab/versa,BohaoSu <s0983813130@gmail.com>,2025-06,7,1074,45
+shinjiwlab/versa,Han Jionghao <65654978+HANJionghao@users.noreply.github.com>,2025-06,3,6,13
+shinjiwlab/versa,Haoran Wang <2472356642@qq.com>,2025-06,6,766,163
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-06,17,5215,404
+shinjiwlab/versa,Jiatong Shi <jiatong.shi@anuttacon.com>,2025-06,2,795,57
+shinjiwlab/versa,Jon Barker <j.p.barker@sheffield.ac.uk>,2025-06,1,0,2
+shinjiwlab/versa,Nezih Topaloğlu <nezih_t@yahoo.com>,2025-06,1,207,11
+shinjiwlab/versa,Wangyou Zhang <C0me_On@163.com>,2025-06,1,203,0
+shinjiwlab/versa,Yiwen Zhao <317038932@qq.com>,2025-06,2,266,2
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2025-06,37,18065,4317
+shinjiwlab/versa,icecreamww <wangwei.sjtu@sjtu.edu.cn>,2025-06,3,179,5
+shinjiwlab/versa,jhan <hanjionghao@126.com>,2025-06,9,325,24
+shinjiwlab/versa,nezihtopaloglu <nezih.topaloglu@babblelabs.com>,2025-06,6,560,137
+shinjiwlab/versa,root <1214946890@qq.com>,2025-06,2,3,1
+shinjiwlab/versa,weiwang <wangweidmail0809@gmail.com>,2025-06,1,198,0
+shinjiwlab/versa,王巍 <wangweidmail0809@gmail.com>,2025-06,4,3607,466
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-07,3,425,20
+shinjiwlab/versa,Samuele Cornell <cornellsamuele@gmail.com>,2025-07,1,4,0
+shinjiwlab/versa,Yiwen Zhao <317038932@qq.com>,2025-07,1,102,68
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2025-07,5,4403,1212
+shinjiwlab/versa,nezihtopaloglu <nezih.topaloglu@babblelabs.com>,2025-07,1,8,3
+shinjiwlab/versa,root <1214946890@qq.com>,2025-07,3,3965,367
+shinjiwlab/versa,BohaoSu <s0983813130@gmail.com>,2025-08,6,803,209
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-08,1,3,3
+shinjiwlab/versa,Zhuoyan Tao <terryt@usc.edu>,2025-08,1,1,1
+shinjiwlab/versa,BohaoSu <s0983813130@gmail.com>,2025-09,4,786,20
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-09,11,1248,13
+shinjiwlab/versa,Naoyuki Kamo <naoyuki.kamo829@gmail.com>,2025-09,1,2,0
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2025-09,3,11723,255
+shinjiwlab/versa,Jiatong <728307998@qq.com>,2025-10,1,1,1
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-10,3,34,3
+shinjiwlab/versa,Han Jionghao <65654978+HANJionghao@users.noreply.github.com>,2025-11,1,13416,277
+shinjiwlab/versa,jhan <hanjionghao@126.com>,2025-11,1,46,10
+shinjiwlab/versa,root <1214946890@qq.com>,2025-11,1,25,26
+shinjiwlab/versa,FengJin1117 <2907998218@qq.com>,2025-12,2,244,15
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2025-12,1,25,26
+shinjiwlab/versa,Wenhao Feng <110388670+FengJin1117@users.noreply.github.com>,2025-12,1,13308,263
+shinjiwlab/versa,jhan <hanjionghao@126.com>,2025-12,8,113,14
+shinjiwlab/versa,root <1214946890@qq.com>,2025-12,2,17126,371
+shinjiwlab/versa,Han Jionghao <65654978+HANJionghao@users.noreply.github.com>,2026-01,1,26,26
+shinjiwlab/versa,Jiatong <728307998@qq.com>,2026-04,1,5036,1032
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2026-04,5,5806,1707
+shinjiwlab/versa,Jiatong <728307998@qq.com>,2026-05,1,3364,1976
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2026-05,19,22416,7143
+shinjiwlab/versa,ftshijt <ftshijt@gmail.com>,2026-05,43,144856,39037
+shinjiwlab/versa,Jiatong <ftshijt@gmail.com>,2026-06,1,1120,5
+simonw/llm-jq,Simon Willison <swillison@gmail.com>,2024-10,12,89,13
+smkrv/ha-text-ai,SMKRV <smkrv@github.com>,2024-11,322,56363,51650
+smkrv/ha-text-ai,Sergey Makarov <makarov@Sergeys-MacBook-Pro.local>,2024-11,4,687,988
+smkrv/ha-text-ai,smkrv <17809065+smkrv@users.noreply.github.com>,2024-11,55,1744,674
+smkrv/ha-text-ai,SMKRV <smkrv@github.com>,2024-12,62,2371,1232
+smkrv/ha-text-ai,smkrv <17809065+smkrv@users.noreply.github.com>,2024-12,1,5,4
+smkrv/ha-text-ai,SMKRV <smkrv@github.com>,2025-01,14,143,205
+smkrv/ha-text-ai,Azzedde <ja_aitsaid@esi.dz>,2025-05,1,71,3
+smkrv/ha-text-ai,SMKRV <smkrv@github.com>,2025-05,10,464,189
+smkrv/ha-text-ai,smkrv <17809065+smkrv@users.noreply.github.com>,2025-05,1,71,3
+smkrv/ha-text-ai,SMKRV <smkrv@github.com>,2025-09,10,638,219
+smkrv/ha-text-ai,SMKRV <smkrv@users.noreply.github.com>,2025-09,2,71,5
+smkrv/ha-text-ai,smkrv <17809065+smkrv@users.noreply.github.com>,2025-09,4,6,11
+smkrv/ha-text-ai,smkrv <smkrv@users.noreply.github.com>,2025-09,1,1,1
+smkrv/ha-text-ai,SMKRV <SMKRV@users.noreply.github.com>,2025-12,6,637,165
+smkrv/ha-text-ai,smkrv <17809065+smkrv@users.noreply.github.com>,2025-12,1,35,0
+smkrv/ha-text-ai,SMKRV <SMKRV@users.noreply.github.com>,2026-03,17,3345,3556
+weaviate/Verba,Erika Cardenas <110841617+erika-cardenas@users.noreply.github.com>,2023-07,2,1,1
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2023-08,1,8469,9319
+weaviate/Verba,Erika Cardenas <110841617+erika-cardenas@users.noreply.github.com>,2023-08,7,46758,37399
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2023-08,59,58921,53460
+weaviate/Verba,Duda Nogueira <dudanogueira@gmail.com>,2023-09,6,126,26
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2023-09,3,2916,31
+weaviate/Verba,Erika Cardenas <110841617+erika-cardenas@users.noreply.github.com>,2023-09,1,7,7
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2023-09,13,7450,2743
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2023-10,13,3683,795
+weaviate/Verba,Cam <camerond.barts@gmail.com>,2023-11,1,9,3
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2023-11,5,8370,5709
+weaviate/Verba,Olaf Górski <olafgorski@proton.me>,2023-11,1,123,2
+weaviate/Verba,recursionbane <9662059+recursionbane@users.noreply.github.com>,2023-11,1,2,2
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2023-11,45,4095,6203
+weaviate/Verba,Julien Carme <julien.carme@worldline.com>,2023-12,1,168,17
+weaviate/Verba,Marina Rosa <marina@tecno.capital>,2023-12,1,6,7
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2023-12,6,44,9
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-01,2,174,24
+weaviate/Verba,ajit283 <55892788+ajit283@users.noreply.github.com>,2024-04,1,208,14
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-04,5,133,619
+weaviate/Verba,Badhan Sen <badhan.cse@gmail.com>,2024-05,3,15,3
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-05,8,9174,6669
+weaviate/Verba,Ghata <95705479+LotzF@users.noreply.github.com>,2024-05,2,4,3
+weaviate/Verba,Hendrik Holtmann <holtmann@mac.com>,2024-05,1,1,1
+weaviate/Verba,Ikko Eltociear Ashimine <eltociear@gmail.com>,2024-05,1,1,1
+weaviate/Verba,Isik Huseyin <huseyin.isik000@gmail.com>,2024-05,1,165,194
+weaviate/Verba,Jacob Kjeldahl <jacob@kjeldahl.it>,2024-05,5,15,7
+weaviate/Verba,Laurens Van Keer <laurens@appvision.be>,2024-05,1,118,0
+weaviate/Verba,Sam Stoelinga <sammiestoel@gmail.com>,2024-05,3,24,10
+weaviate/Verba,Tom Aarsen <Cubiegamedev@gmail.com>,2024-05,1,91,117
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-05,9,9190,6713
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-06,2,8982,6576
+weaviate/Verba,Tim Snow <tim.snow@diamond.ac.uk>,2024-06,1,45,4
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-06,9,618,173
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-07,9,10636,7262
+weaviate/Verba,JanEggers-hr <jan.eggers@hr.de>,2024-07,1,2,1
+weaviate/Verba,Kraxner Thomas <thomas.kraxner@illwerkevkw.at>,2024-07,1,0,0
+weaviate/Verba,Nason <66695083+NasonZ@users.noreply.github.com>,2024-07,1,4,4
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-07,39,12371,12266
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-08,2,145,35
+weaviate/Verba,Rugved Darwhekar <rugveddarwhekar@gmail.com>,2024-08,1,1,1
+weaviate/Verba,dannyjameswilliams <danny@weaviate.io>,2024-08,1,144,34
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-08,35,17310,11367
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-09,2,342,434
+weaviate/Verba,Kuniaki Shimizu <kun432@users.noreply.github.com>,2024-09,1,13,1
+weaviate/Verba,Tai Groot <tai@taigrr.com>,2024-09,3,171,22
+weaviate/Verba,cragwolfe <crag@unstructured.io>,2024-09,2,2,2
+weaviate/Verba,kyn76 <simon.dcmbl@gmail.com>,2024-09,5,218,7
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-09,14,20809,14327
+weaviate/Verba,Duda Nogueira <dudanogueira@gmail.com>,2024-10,1,1,0
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-10,6,557,65
+weaviate/Verba,Matthias Zepper <MatthiasZepper@users.noreply.github.com>,2024-10,4,21,16
+weaviate/Verba,Prajjwal Yadav <prajjwalyd@gmail.com>,2024-10,2,31,1
+weaviate/Verba,che_shuai <che_shuai@massclouds.com>,2024-10,1,111,8
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-10,2,33,27
+weaviate/Verba,Alex Chao <alex.h.chao@gmail.com>,2024-11,1,33,11
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-11,1,1,0
+weaviate/Verba,Ikko Eltociear Ashimine <eltociear@gmail.com>,2024-11,1,1,1
+weaviate/Verba,Kieran Sears <kieran_sears@hotmail.com>,2024-11,1,5,4
+weaviate/Verba,Sung Kim <hunkim@gmail.com>,2024-11,3,362,2
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2024-12,5,511,25
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2024-12,20,475,532
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2025-01,3,456,90
+weaviate/Verba,Jason <ggbbddjm@gmail.com>,2025-01,5,1125,562
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2025-01,3,179,97
+weaviate/Verba,vercel <vercel@infrai.com>,2025-01,1,17,8
+weaviate/Verba,Duda Nogueira <dudanogueira@gmail.com>,2025-02,1,2,2
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2025-02,1,2,2
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2025-02,2,51,24
+weaviate/Verba,Edward <43848523+thomashacker@users.noreply.github.com>,2025-03,2,111,61
+weaviate/Verba,gcheron <guilhem.cheron35@gmail.com>,2025-03,1,9,1
+weaviate/Verba,gcheron <guilhem.cheron@flex.ai>,2025-03,3,59,20
+weaviate/Verba,ian <ian@gregson.me>,2025-03,1,56,45
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2025-03,3,11,3
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2025-07,1,902,54
+weaviate/Verba,Anwar Rezk <33953443+AnwarRezk@users.noreply.github.com>,2026-04,1,35,3
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2026-04,1,32,2
+weaviate/Verba,lucaszhu-hue <lucas.zhu@atlascloud.ai>,2026-05,1,180,0
+weaviate/Verba,thomashacker <EdwardSchmuhl@web.de>,2026-06,1,48,40
+xairy/lights-out,Andrey Konovalov <andreyknvl@gmail.com>,2024-11,4,588,14
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2024-12,1,5,4
+xob0t/google_photos_mobile_client,xob0t <5348245@gmail.com>,2024-12,31,1691,778
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2025-01,1,1,1
+xob0t/google_photos_mobile_client,xob0t <5348245@gmail.com>,2025-01,21,580,235
+xob0t/google_photos_mobile_client,Sergey Pavlenko <sergey.pavlenko@rosbank.ru>,2025-02,1,11,3
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2025-02,1,11,3
+xob0t/google_photos_mobile_client,xob0t <5348245@gmail.com>,2025-02,27,529,201
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2025-03,3,160,180
+xob0t/google_photos_mobile_client,xob0t <5348245@gmail.com>,2025-03,15,374,259
+xob0t/google_photos_mobile_client,crocsnosockz <149334440+crocsnosockz@users.noreply.github.com>,2025-04,1,5,0
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2025-04,2,4010,634
+xob0t/google_photos_mobile_client,xob0t <5348245@gmail.com>,2025-04,4,56,24
+xob0t/google_photos_mobile_client,xob0t <5348245@gmail.com>,2025-05,1,2,0
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2025-06,1,4,0
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2025-11,2,15,10
+xob0t/google_photos_mobile_client,cdtj <cdtj@ya.ru>,2026-02,1,29,0
+xob0t/google_photos_mobile_client,marveljo-alt <shooter.boy.abc@gmail.com>,2026-03,2,65,0
+xob0t/google_photos_mobile_client,xob0t <32616886+xob0t@users.noreply.github.com>,2026-03,12,631,237
+xob0t/google_photos_mobile_client,xob0t <5348245@gmail.com>,2026-03,16,556,234
+xob0t/google_photos_mobile_client,Davide Palma <github@davidepalma.it>,2026-04,1,172,64
+yuvraj108c/ComfyUI_InvSR,Yuvraj Seegolam <yuvraj.seegolam@umail.uom.ac.mu>,2025-01,6,891,373461
+yuvraj108c/ComfyUI_InvSR,snomiao <snomiao+comfy-pr@gmail.com>,2025-01,2,43,0
+yuvraj108c/ComfyUI_InvSR,wfjsw <wfjsw@users.noreply.github.com>,2025-01,2,880,373457
+yuvraj108c/ComfyUI_InvSR,yuvraj108c <yuvraj108c@gmail.com>,2025-01,11,433,151
+yuvraj108c/ComfyUI_InvSR,Yuvraj Seegolam <yuvraj.seegolam@umail.uom.ac.mu>,2025-02,4,57,16
+yuvraj108c/ComfyUI_InvSR,yuvraj108c <yuvraj108c@gmail.com>,2025-02,6,134,136
+yuvraj108c/ComfyUI_InvSR,Yuvraj Seegolam <yuvraj108c@gmail.com>,2025-04,14,85,18
+yuvraj108c/ComfyUI_InvSR,Yuvraj Seegolam <yuvraj108c@gmail.com>,2025-06,1,1,2
+yuvraj108c/ComfyUI_InvSR,goedzo <git@nims.nl>,2025-06,2,3,4
+yuvraj108c/ComfyUI_InvSR,Yuvraj Seegolam <yuvraj108c@gmail.com>,2025-07,2,1,2
+yuvraj108c/ComfyUI_InvSR,Yuvraj Seegolam <yuvraj108c@gmail.com>,2026-01,1,2,0
+yuvraj108c/ComfyUI_InvSR,Yuvraj Seegolam <yuvraj108c@gmail.com>,2026-06,1,1,4
+yuweihao/MambaOut,Weihao Yu <1090924009@qq.com>,2024-05,1,0,0
+yuweihao/MambaOut,Weihao Yu <weihaoyu6@gmail.com>,2024-05,20,2059,38
+yuweihao/MambaOut,Weihao Yu <weihaoyu6@gmail.com>,2024-06,2,12,12
+yuweihao/MambaOut,Weihao Yu <weihaoyu6@gmail.com>,2024-10,1,2,0
+yuweihao/MambaOut,Weihao Yu <weihaoyu6@gmail.com>,2025-03,1,5,5
+zlynpu/3DFMNet,zlynpu <103632029+zlynpu@users.noreply.github.com>,2025-01,2,0,1
+zlynpu/3DFMNet,zlynpu <zly_dsg@163.com>,2025-01,7,106,19
