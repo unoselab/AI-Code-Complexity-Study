@@ -54,7 +54,7 @@ def parse_args() -> argparse.Namespace:
         "--repos-file",
         type=Path,
         required=True,
-        help="CSV file containing repo_name column.",
+        help="CSV file containing repo_name column, or TXT file with one repo per line.",
     )
 
     parser.add_argument(
@@ -119,18 +119,73 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def read_repo_names(csv_path: Path, repo_column: str) -> list[str]:
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Repos file not found: {csv_path}")
+def deduplicate_repo_names(repos: list[str]) -> list[str]:
+    """Preserve input order while removing duplicate repo names."""
+    seen = set()
+    unique_repos = []
+
+    for repo in repos:
+        repo = str(repo).strip()
+        if not repo:
+            continue
+        if repo not in seen:
+            unique_repos.append(repo)
+            seen.add(repo)
+
+    return unique_repos
+
+
+def write_normalized_csv(input_path: Path, repos: list[str], repo_column: str) -> Path:
+    """
+    Write a normalized CSV next to a TXT input file.
+
+    Example:
+      control_repos_to_clone_v2.txt
+      -> control_repos_to_clone_v2.csv
+    """
+    output_path = input_path.with_suffix(".csv")
+
+    with output_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=[repo_column])
+        writer.writeheader()
+        for repo in repos:
+            writer.writerow({repo_column: repo})
+
+    logging.info("Wrote normalized CSV: %s", output_path)
+    logging.info("Normalized CSV repositories: %d", len(repos))
+
+    return output_path
+
+
+def read_repo_names(repos_path: Path, repo_column: str) -> list[str]:
+    """
+    Read repository names from either:
+      - CSV file with repo_column
+      - TXT file with one owner/repo per line
+
+    If a TXT file is provided, also write a normalized sibling CSV.
+    """
+    if not repos_path.exists():
+        raise FileNotFoundError(f"Repos file not found: {repos_path}")
 
     repos: list[str] = []
 
-    with csv_path.open(newline="", encoding="utf-8") as f:
+    if repos_path.suffix.lower() == ".txt":
+        repos = [
+            line.strip()
+            for line in repos_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        repos = deduplicate_repo_names(repos)
+        write_normalized_csv(repos_path, repos, repo_column)
+        return repos
+
+    with repos_path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
 
         if reader.fieldnames is None or repo_column not in reader.fieldnames:
             raise ValueError(
-                f"Column {repo_column!r} not found in {csv_path}. "
+                f"Column {repo_column!r} not found in {repos_path}. "
                 f"Available columns: {reader.fieldnames}"
             )
 
@@ -139,15 +194,7 @@ def read_repo_names(csv_path: Path, repo_column: str) -> list[str]:
             if repo:
                 repos.append(repo)
 
-    # Preserve input order while removing duplicates.
-    seen = set()
-    unique_repos = []
-    for repo in repos:
-        if repo not in seen:
-            unique_repos.append(repo)
-            seen.add(repo)
-
-    return unique_repos
+    return deduplicate_repo_names(repos)
 
 
 def clone_repository_v2(
