@@ -209,9 +209,18 @@ def build_control_panel(control_ts: pd.DataFrame, provenance: pd.DataFrame) -> p
     leaked = panel.loc[panel["cursor"] == True, "repo_name"].unique()  # noqa: E712
     if len(leaked):
         logging.warning("Control repos with cursor evidence (NOT never-treated): %s", list(leaked))
-    no_prov = panel.loc[panel["matched_as_control"] == 0, "repo_name"].unique()
-    if len(no_prov):
-        logging.warning("Control repos without PSM provenance: %s", list(no_prov))
+
+
+    # no_prov = panel.loc[panel["matched_as_control"] == 0, "repo_name"].unique()
+    # if len(no_prov):
+    #     logging.warning("Control repos without PSM provenance: %s", list(no_prov))
+
+    valid_controls = set(provenance["repo_name"])
+    before = control_ts["repo_name"].nunique()
+    control_ts = control_ts[control_ts["repo_name"].isin(valid_controls)].copy()
+    after = control_ts["repo_name"].nunique()
+    logging.info("Filtered controls to PSM-selected repos: %d -> %d", before, after)
+
     return panel
 
 
