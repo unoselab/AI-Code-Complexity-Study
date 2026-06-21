@@ -64,16 +64,18 @@ ACTIVITY_FILL_ZERO = ["commits", "lines_added", "lines_removed", "contributors",
 
 
 def coerce_cursor(series: pd.Series) -> pd.Series:
-    """Return a clean boolean cursor series (handles bool, 'True'/'False', NaN)."""
+    """Return a clean boolean cursor series (handles bool, 'True'/'False', NaN).
+
+    Avoids ``.fillna(False)`` on an object-dtype array: after a left-merge the
+    cursor column is object (python bools + NaN for filled rows), and fillna on
+    object dtype emits pandas' downcasting FutureWarning (a hard error under
+    PYTHONWARNINGS=error::FutureWarning). Mapping each value to a python bool
+    yields no NaN, so astype(bool) is a clean, warning-free cast.
+    """
     if series.dtype == bool:
-        return series.fillna(False)
-    mapped = (
-        series.astype(str)
-        .str.strip()
-        .str.lower()
-        .map({"true": True, "false": False, "1": True, "0": False})
-    )
-    return mapped.fillna(False).astype(bool)
+        return series  # numpy bool cannot hold NaN; nothing to fill
+    truthy = {"true", "1"}
+    return series.map(lambda v: str(v).strip().lower() in truthy).astype(bool)
 
 
 def month_diff(month_str: str, event_str: str) -> int:
