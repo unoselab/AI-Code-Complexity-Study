@@ -1,119 +1,25 @@
-commit c4b0f317622f7476168fe70d15b999601ab3665e
-Author: Song <song@example.com>
-Date:   Sat Jun 20 02:14:34 2026 -0500
+2026-06-21 01:22:06,260 [INFO] Loaded 13 treatment repos with event_month
+2026-06-21 01:22:06,270 [INFO] === Building UNBALANCED panel ===
+2026-06-21 01:22:06,358 [WARNING] Treated repo wdm0006/elote has empty/zero pre-adoption window
+2026-06-21 01:22:06,358 [WARNING] Treated repo wdm0006/git-pandas has empty/zero pre-adoption window
+2026-06-21 01:22:06,363 [INFO] Date filter [2024-01-01..2025-08-31]: 649 -> 324 rows
+2026-06-21 01:22:06,366 [INFO] Saved unbalanced panel: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2.csv
+2026-06-21 01:22:06,367 [INFO] [UNBALANCED] Rows: 324 | treated repos: 13 | control repos: 35
 
-    Update matched controls dataset and add control repositories for cloning
-    
-    - Modified matched_controls_v2_treatment_only.csv to update propensity scores and matched controls for various repositories.
-    - Added new log file run5b_control_clone_log_20260620-0211.csv to track cloning status of repositories.
-    - Created control_repos_to_clone_v2.csv with a comprehensive list of repositories to be cloned for analysis.
+=== UNBALANCED panel summary ===
+dataset_source  repos  rows  post_rows
+       control     35   185          0
+     treatment     13   139         75
+2026-06-21 01:22:06,371 [INFO] === Building BALANCED panel (window completion) ===
+2026-06-21 01:22:06,394 [INFO] Window completion [2024-01..2025-08]: 254 -> 208 rows (13 repos)
+2026-06-21 01:22:06,457 [INFO] Window completion [2024-01..2025-08]: 395 -> 530 rows (38 repos)
+2026-06-21 01:22:06,535 [WARNING] Treated repo wdm0006/elote has empty/zero pre-adoption window
+2026-06-21 01:22:06,535 [WARNING] Treated repo wdm0006/git-pandas has empty/zero pre-adoption window
+2026-06-21 01:22:06,540 [INFO] Date filter [2024-01-01..2025-08-31]: 738 -> 738 rows
+2026-06-21 01:22:06,543 [INFO] Saved balanced panel: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced.csv
+2026-06-21 01:22:06,544 [INFO] [BALANCED] Rows: 738 | treated repos: 13 | control repos: 38
 
-diff --git a/proc_scripts/clone_repos_v2.py b/proc_scripts/clone_repos_v2.py
-index b2ee4da..26fa400 100755
---- a/proc_scripts/clone_repos_v2.py
-+++ b/proc_scripts/clone_repos_v2.py
-@@ -54,7 +54,7 @@ def parse_args() -> argparse.Namespace:
-         "--repos-file",
-         type=Path,
-         required=True,
--        help="CSV file containing repo_name column.",
-+        help="CSV file containing repo_name column, or TXT file with one repo per line.",
-     )
- 
-     parser.add_argument(
-@@ -119,18 +119,73 @@ def parse_args() -> argparse.Namespace:
-     return parser.parse_args()
- 
- 
--def read_repo_names(csv_path: Path, repo_column: str) -> list[str]:
--    if not csv_path.exists():
--        raise FileNotFoundError(f"Repos file not found: {csv_path}")
-+def deduplicate_repo_names(repos: list[str]) -> list[str]:
-+    """Preserve input order while removing duplicate repo names."""
-+    seen = set()
-+    unique_repos = []
-+
-+    for repo in repos:
-+        repo = str(repo).strip()
-+        if not repo:
-+            continue
-+        if repo not in seen:
-+            unique_repos.append(repo)
-+            seen.add(repo)
-+
-+    return unique_repos
-+
-+
-+def write_normalized_csv(input_path: Path, repos: list[str], repo_column: str) -> Path:
-+    """
-+    Write a normalized CSV next to a TXT input file.
-+
-+    Example:
-+      control_repos_to_clone_v2.txt
-+      -> control_repos_to_clone_v2.csv
-+    """
-+    output_path = input_path.with_suffix(".csv")
-+
-+    with output_path.open("w", newline="", encoding="utf-8") as f:
-+        writer = csv.DictWriter(f, fieldnames=[repo_column])
-+        writer.writeheader()
-+        for repo in repos:
-+            writer.writerow({repo_column: repo})
-+
-+    logging.info("Wrote normalized CSV: %s", output_path)
-+    logging.info("Normalized CSV repositories: %d", len(repos))
-+
-+    return output_path
-+
-+
-+def read_repo_names(repos_path: Path, repo_column: str) -> list[str]:
-+    """
-+    Read repository names from either:
-+      - CSV file with repo_column
-+      - TXT file with one owner/repo per line
-+
-+    If a TXT file is provided, also write a normalized sibling CSV.
-+    """
-+    if not repos_path.exists():
-+        raise FileNotFoundError(f"Repos file not found: {repos_path}")
- 
-     repos: list[str] = []
- 
--    with csv_path.open(newline="", encoding="utf-8") as f:
-+    if repos_path.suffix.lower() == ".txt":
-+        repos = [
-+            line.strip()
-+            for line in repos_path.read_text(encoding="utf-8").splitlines()
-+            if line.strip()
-+        ]
-+        repos = deduplicate_repo_names(repos)
-+        write_normalized_csv(repos_path, repos, repo_column)
-+        return repos
-+
-+    with repos_path.open(newline="", encoding="utf-8") as f:
-         reader = csv.DictReader(f)
- 
-         if reader.fieldnames is None or repo_column not in reader.fieldnames:
-             raise ValueError(
--                f"Column {repo_column!r} not found in {csv_path}. "
-+                f"Column {repo_column!r} not found in {repos_path}. "
-                 f"Available columns: {reader.fieldnames}"
-             )
- 
-@@ -139,15 +194,7 @@ def read_repo_names(csv_path: Path, repo_column: str) -> list[str]:
-             if repo:
-                 repos.append(repo)
- 
--    # Preserve input order while removing duplicates.
--    seen = set()
--    unique_repos = []
--    for repo in repos:
--        if repo not in seen:
--            unique_repos.append(repo)
--            seen.add(repo)
--
--    return unique_repos
-+    return deduplicate_repo_names(repos)
- 
- 
- def clone_repository_v2(
+=== BALANCED panel summary ===
+dataset_source  repos  rows  post_rows
+       control     38   530          0
+     treatment     13   208         98
