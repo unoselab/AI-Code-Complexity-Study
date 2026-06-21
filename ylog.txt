@@ -1,133 +1,69 @@
-echo "--- check 1 ---"
-echo
-
-python - <<'PY'
-import pandas as pd
-
-b = pd.read_csv("tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced.csv")
-
-print("rows:", len(b))
-print("treated repos:", b[b["ever_treated"] == 1]["repo_name"].nunique())
-print("control repos:", b[b["ever_treated"] == 0]["repo_name"].nunique())
-
-print()
-print("summary:")
-print(b.groupby("dataset_source").agg(
-    repos=("repo_name", "nunique"),
-    rows=("repo_name", "size"),
-    post_rows=("post_event", "sum"),
-    commits_sum=("commits", "sum"),
-    lines_added_sum=("lines_added", "sum"),
-    dynamic_rows=("is_treatment_dynamic", "sum"),
-).to_string())
-
-print()
-print("control checks:")
-c = b[b["ever_treated"] == 0]
-print("control post_event sum:", c["post_event"].sum())
-print("control dynamic sum:", c["is_treatment_dynamic"].sum())
-
-print()
-print("restored controls:")
-for repo in [
-    "ayushtewari/DFM",
-    "hjhxy/2023-Chinese-Collegiate-Computing-Competition",
-    "kienmarkdo/Cybersecurity-Mini-Projects",
-]:
-    x = b[b["repo_name"] == repo]
-    print()
-    print(repo)
-    print("rows:", len(x))
-    if len(x):
-        print("time:", x["time"].min(), "to", x["time"].max())
-        print("commits sum:", x["commits"].sum())
-        print("lines_added sum:", x["lines_added"].sum())
-        print("contributors sum:", x["contributors"].sum())
-PY
-
-echo
-
-echo "--- check 2 ---"
-echo
-python - <<'PY'
-import pandas as pd
-B = pd.read_csv("tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced.csv")
-t = B[B.dataset_source=="treatment"]
-
-# 1) post_event는 정확히 time_to_event>=0과 일치해야 함 (도입 전이 post로 새지 않았는지)
-bad = t[((t.time_to_event>=0)!=(t.post_event==1))]
-print("post_event != (time_to_event>=0) rows:", len(bad), "(must be 0)")
-
-# 2) 늘어난 post 달이 전부 '도입 후 0-활동 달'인지
-post = t[t.post_event==1]
-print("treated post rows:", len(post), "| zero-activity among them:",
-      int((post[["commits","lines_added"]].sum(axis=1)==0).sum()))
-
-# 3) repo별 post 개월수 = (panel_latest 또는 2025-08) - event_month + 1 인지 spot check
-print(t.groupby("repo_name").agg(post=("post_event","sum"),
-      first=("time","min"), last=("time","max")).to_string())
-PY
-
-
---------------------------------------------------------------------------------
-
-
-
---- check 1 ---
-
-rows: 738
-treated repos: 13
-control repos: 38
-
-summary:
-                repos  rows  post_rows  commits_sum  lines_added_sum  dynamic_rows
-dataset_source                                                                    
-control            38   530          0       5978.0       16150073.0             0
-treatment          13   208         98       7911.0        2527994.0            46
-
-control checks:
-control post_event sum: 0
-control dynamic sum: 0
-
-restored controls:
-
-ayushtewari/DFM
-rows: 20
-time: 2024-01 to 2025-08
-commits sum: 0.0
-lines_added sum: 0.0
-contributors sum: 0.0
-
-hjhxy/2023-Chinese-Collegiate-Computing-Competition
-rows: 20
-time: 2024-01 to 2025-08
-commits sum: 0.0
-lines_added sum: 0.0
-contributors sum: 0.0
-
-kienmarkdo/Cybersecurity-Mini-Projects
-rows: 20
-time: 2024-01 to 2025-08
-commits sum: 0.0
-lines_added sum: 0.0
-contributors sum: 0.0
-
---- check 2 ---
-
-post_event != (time_to_event>=0) rows: 0 (must be 0)
-treated post rows: 98 | zero-activity among them: 23
-                                   post    first     last
-repo_name                                                
-Kiln-AI/Kiln                          8  2024-08  2025-08
-KroMiose/nekro-agent                  8  2024-07  2025-08
-OpenMOSS/Language-Model-SAEs          9  2024-03  2025-08
-TextGeneratorio/text-generator.io     6  2024-01  2025-08
-ToolUse/tool-use-ai                   9  2024-09  2025-08
-VRSEN/agency-swarm                   11  2024-01  2025-08
-airweave-ai/airweave                  6  2024-12  2025-08
-kenshiro-o/nagato-ai                  7  2024-03  2025-08
-sirkirby/unifi-network-rules          6  2024-09  2025-08
-ttmouse/Wispr-Flow-CN                 9  2024-09  2025-08
-wdm0006/elote                         7  2024-01  2025-08
-wdm0006/git-pandas                    6  2024-01  2025-08
-wdm0006/pygeohash                     6  2024-01  2025-08
+expression(run_borusyak_static <- function(data, outcome_var, 
+    first_stage_formula) {
+    didimputation::did_imputation(data = data, yname = outcome_var, 
+        gname = "event", tname = "time", idname = "repo_name", 
+        first_stage = first_stage_formula)
+}, run_borusyak_dynamic <- function(data, outcome_var, first_stage_formula, 
+    horizon = -6:6, pretrends = -6:-2) {
+    didimputation::did_imputation(data = data, yname = outcome_var, 
+        gname = "event", tname = "time", idname = "repo_name", 
+        first_stage = first_stage_formula, horizon = horizon, 
+        pretrends = pretrends)
+}, extract_static_result <- function(result, outcome) {
+    if (is.null(result)) {
+        return(data.frame(outcome = outcome, term = "treat", 
+            estimate = NA_real_, std_error = NA_real_, conf_low = NA_real_, 
+            conf_high = NA_real_, note = "model failed"))
+    }
+    result_df <- as.data.frame(result)
+    if (!("term" %in% names(result_df))) {
+        return(data.frame(outcome = outcome, term = "treat", 
+            estimate = NA_real_, std_error = NA_real_, conf_low = NA_real_, 
+            conf_high = NA_real_, note = "term column not found"))
+    }
+    row <- result_df[result_df$term == "treat", , drop = FALSE]
+    if (nrow(row) == 0) {
+        return(data.frame(outcome = outcome, term = "treat", 
+            estimate = NA_real_, std_error = NA_real_, conf_low = NA_real_, 
+            conf_high = NA_real_, note = "treat term not found"))
+    }
+    data.frame(outcome = outcome, term = row$term, estimate = row$estimate, 
+        std_error = if ("std.error" %in% names(row)) 
+            row$std.error
+        else NA_real_, conf_low = if ("conf.low" %in% names(row)) 
+            row$conf.low
+        else NA_real_, conf_high = if ("conf.high" %in% names(row)) 
+            row$conf.high
+        else NA_real_, note = "smoke test only; do not interpret as final estimate")
+}, get_col_or_na <- function(df, col) {
+    if (col %in% names(df)) {
+        return(df[[col]])
+    }
+    rep(NA_real_, nrow(df))
+}, extract_dynamic_result <- function(result, outcome, outcome_label) {
+    if (is.null(result)) {
+        return(data.frame())
+    }
+    result_df <- as.data.frame(result)
+    if (!("term" %in% names(result_df))) {
+        return(data.frame())
+    }
+    term_chr <- gsub("[−–—]", "-", as.character(result_df$term))
+    time_numeric <- suppressWarnings(as.numeric(term_chr))
+    valid <- !is.na(time_numeric) & time_numeric >= -6 & time_numeric <= 
+        6
+    if (!any(valid)) {
+        return(data.frame())
+    }
+    out <- data.frame(outcome = outcome, outcome_label = outcome_label, 
+        time = time_numeric[valid], estimate = result_df$estimate[valid], 
+        conf_low = get_col_or_na(result_df, "conf.low")[valid], 
+        conf_high = get_col_or_na(result_df, "conf.high")[valid], 
+        std_error = get_col_or_na(result_df, "std.error")[valid])
+    out$significant <- !is.na(out$conf_low) & !is.na(out$conf_high) & 
+        ((out$conf_low > 0) | (out$conf_high < 0))
+    out
+})
+helper parse OK
+[1] "extract_dynamic_result" "extract_static_result"  "get_col_or_na"         
+[4] "run_borusyak_dynamic"   "run_borusyak_static"   

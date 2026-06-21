@@ -1,0 +1,12 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_v2.Rmd
+derived_from,notebooks/DiffInDiffBorusyak.Rmd
+helper_file,proc_r/diff_in_diff_borusyak_helpers.R
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced.csv
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/activity_did_smoke_borusyak_v2
+panel_type,balanced activity panel with zero-commit months
+outcomes,"commits, lines_added"
+covariates,contributors
+estimator,Borusyak imputation via didimputation::did_imputation
+purpose,Structural smoke test for balanced Python activity panel
+interpretation_warning,Small-N pipeline validation only; estimates and p-values are not final empirical findings

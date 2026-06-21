@@ -1,0 +1,3 @@
+outcome,term,estimate,std_error,conf_low,conf_high,note
+commits,treat,0.214721656745066,0.128643683259993,-0.0374199624445209,0.466863275934652,smoke test only; do not interpret as final estimate
+lines_added,treat,0.863774589964313,0.343606900365949,0.190305065247053,1.53724411468157,smoke test only; do not interpret as final estimate
