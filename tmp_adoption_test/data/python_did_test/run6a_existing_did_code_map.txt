@@ -1,0 +1,159 @@
+notebooks/DiffInDiffAll.Rmd:31:panel_data <- fread("../data/panel_event_monthly.csv")
+notebooks/DiffInDiffAll.Rmd:33:# panel_data <- panel_data[panel_data$commits > 0]
+notebooks/DiffInDiffAll.Rmd:89:panel_data$post_event <- ifelse(panel_data$time >= panel_data$event & panel_data$event > 0, 1, 0)
+notebooks/DiffInDiffAll.Rmd:98:        lead_6 = ifelse(time == event - 6, 1, 0),
+notebooks/DiffInDiffAll.Rmd:103:        lag_0 = ifelse(time == event, 1, 0),
+notebooks/DiffInDiffAll.Rmd:117:outcome_vars <- c(
+notebooks/DiffInDiffAll.Rmd:138:    result <- att_gt(
+notebooks/DiffInDiffAll.Rmd:143:        xformla = ~ age + ncloc + contributors + stars + issues,
+notebooks/DiffInDiffAll.Rmd:155:    result <- did_imputation(
+notebooks/DiffInDiffAll.Rmd:161:        first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time
+notebooks/DiffInDiffAll.Rmd:169:        outcome_var, " ~ post_event + age + ncloc + contributors + stars + issues | repo_name_fac + time_fac"
+notebooks/DiffInDiffAll.Rmd:171:    model <- feols(as.formula(formula_str), data = data)
+notebooks/DiffInDiffAll.Rmd:180:for (var in outcome_vars) {
+notebooks/DiffInDiffAll.Rmd:194:    # Use provided variables or default to outcome_vars
+notebooks/DiffInDiffAll.Rmd:195:    vars_to_use <- if (is.null(variables)) outcome_vars else variables
+notebooks/DiffInDiffAll.Rmd:224:                estimate = coef_table["post_event", "Estimate"],
+notebooks/DiffInDiffAll.Rmd:225:                se = coef_table["post_event", "Std. Error"],
+notebooks/DiffInDiffAll.Rmd:226:                conf.low = coef_table["post_event", "Estimate"] - 1.96 * coef_table["post_event", "Std. Error"],
+notebooks/DiffInDiffAll.Rmd:227:                conf.high = coef_table["post_event", "Estimate"] + 1.96 * coef_table["post_event", "Std. Error"]
+notebooks/DiffInDiffAll.Rmd:244:                                 levels = outcome_vars,
+notebooks/DiffInDiffAll.Rmd:311:    # Use provided variables or default to outcome_vars
+notebooks/DiffInDiffAll.Rmd:312:    vars_to_use <- if (is.null(variables)) outcome_vars else variables
+notebooks/DiffInDiffAll.Rmd:347:                var, " ~ lead_6 + lead_5 + lead_4 + lead_3 + lead_2 + ",
+notebooks/DiffInDiffAll.Rmd:348:                "lag_0 + lag_1 + lag_2 + lag_3 + lag_4 + lag_5 + lag_6 + ",
+notebooks/DiffInDiffAll.Rmd:351:            event_model <- feols(as.formula(formula_str), data = panel_data)
+notebooks/DiffInDiffAll.Rmd:388:for (var in outcome_vars) {
+notebooks/DiffInDiffAll.Rmd:391:    borusyak_dynamic[[var]] <- did_imputation(
+notebooks/DiffInDiffAll.Rmd:397:        first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+notebooks/DiffInDiffAll.Rmd:412:                                  levels = outcome_vars,
+notebooks/DiffInDiffAll.Rmd:514:        outcome_var, " ~ lead_6 + lead_5 + lead_4 + lead_3 + lead_2 + ",
+notebooks/DiffInDiffAll.Rmd:515:        "lag_0 + lag_1 + lag_2 + lag_3 + lag_4 + lag_5 + lag_6 + ",
+notebooks/DiffInDiffAll.Rmd:518:    model <- feols(as.formula(formula_str), data = data)
+notebooks/DiffInDiffAll.Rmd:576:        stop("Standard errors not found in did_imputation output.")
+notebooks/DiffInDiffAll.Rmd:593:for (var in outcome_vars) {
+notebooks/DiffInDiffAll.Rmd:611:        outcome = factor(outcome, levels = outcome_vars, labels = outcome_names),
+notebooks/DynamicPanel.Rmd:28:panel_data <- fread("../data/panel_event_monthly.csv")
+notebooks/DynamicPanel.Rmd:79:        post_event +
+notebooks/DynamicPanel.Rmd:96:        post_event +
+notebooks/DynamicPanel.Rmd:117:        post_event +
+notebooks/DynamicPanel.Rmd:138:        post_event +
+notebooks/DynamicPanel.Rmd:157:        post_event +
+notebooks/DynamicPanel.Rmd:174:        post_event +
+notebooks/DynamicPanel.Rmd:192:        post_event +
+notebooks/DynamicPanel.Rmd:210:        post_event +
+notebooks/DynamicPanel.Rmd:321:    "post_event" = "Post-Cursor Adoption",
+notebooks/DiffInDiffCallaway.Rmd:23:panel_data <- fread("../data/panel_event_monthly.csv")
+notebooks/DiffInDiffCallaway.Rmd:25:panel_data <- panel_data[panel_data$commits > 0]
+notebooks/DiffInDiffCallaway.Rmd:57:    did_result <- att_gt(
+notebooks/DiffInDiffCallaway.Rmd:62:        xformla = ~ age + ncloc + contributors + stars + issues,
+notebooks/DiffInDiffCallaway.Rmd:73:outcome_vars <- c(
+notebooks/DiffInDiffCallaway.Rmd:96:for (var in outcome_vars) {
+notebooks/DiffInDiffCallaway.Rmd:167:for (i in seq_along(outcome_vars)) {
+notebooks/DiffInDiffCallaway.Rmd:168:    if (outcome_vars[i] %in% names(did_results)) {
+notebooks/DiffInDiffCallaway.Rmd:169:        plot_list[[length(plot_list) + 1]] <- plot_event_study(did_results[[outcome_vars[i]]], outcome_names[i])
+notebooks/DiffInDiffBorusyak.Rmd:32:panel_data <- fread("../data/panel_event_monthly.csv")
+notebooks/DiffInDiffBorusyak.Rmd:100:outcome_vars <- c(
+notebooks/DiffInDiffBorusyak.Rmd:122:    static_result <- did_imputation(
+notebooks/DiffInDiffBorusyak.Rmd:128:        first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time
+notebooks/DiffInDiffBorusyak.Rmd:136:for (var in outcome_vars) {
+notebooks/DiffInDiffBorusyak.Rmd:167:    dynamic_result <- did_imputation(
+notebooks/DiffInDiffBorusyak.Rmd:173:        first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+notebooks/DiffInDiffBorusyak.Rmd:183:for (var in outcome_vars) {
+notebooks/DiffInDiffBorusyak.Rmd:203:  outcome    = outcome_vars,
+notebooks/DiffInDiffBorusyak.Rmd:212:  my_avg_pct = round(sapply(outcome_vars, function(v)
+notebooks/DiffInDiffBorusyak.Rmd:214:  my_m0_pct  = round(sapply(outcome_vars, function(v)
+notebooks/DiffInDiffBorusyak.Rmd:216:  my_m1_pct  = round(sapply(outcome_vars, function(v)
+notebooks/DiffInDiffBorusyak.Rmd:227:for (v in outcome_vars) {
+notebooks/DiffInDiffBorusyak.Rmd:242:for (i in seq_along(outcome_vars)) {
+notebooks/DiffInDiffBorusyak.Rmd:243:    if (outcome_vars[i] %in% names(dynamic_results)) {
+notebooks/DiffInDiffBorusyak.Rmd:244:        did_result <- dynamic_results[[outcome_vars[i]]]
+notebooks/DiffInDiffBorusyak.Rmd:256:                outcome = outcome_vars[i],
+notebooks/DiffInDiffBorusyak.Rmd:271:# Enforce facet order to match outcome_vars
+notebooks/DiffInDiffBorusyak.Rmd:333:        dt <- dt[dt$commits > 0, ]
+notebooks/DiffInDiffBorusyak.Rmd:454:                dyn <- didimputation::did_imputation(
+notebooks/DiffInDiffBorusyak.Rmd:460:                    first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+notebooks/DiffInDiffBorusyak.Rmd:465:                dyn <- didimputation::did_imputation(
+notebooks/DiffInDiffBorusyak.Rmd:471:                    first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+notebooks/DiffInDiffBorusyak.Rmd:486:                                    outcomes = outcome_vars, outcome_labels = outcome_names,
+notebooks/DiffInDiffBorusyak.Rmd:558:outcomes_all <- outcome_vars
+notebooks/DiffInDiffTWFE.Rmd:25:panel_data <- fread("../data/panel_event_monthly.csv")
+notebooks/DiffInDiffTWFE.Rmd:28:# panel_data <- panel_data[panel_data$commits > 0] # exclude inactive months
+notebooks/DiffInDiffTWFE.Rmd:103:        outcome_var, " ~ post_event + log(ncloc + 1) + log(age + 1) +
+notebooks/DiffInDiffTWFE.Rmd:108:    model <- feols(as.formula(formula_str), data = data)
+notebooks/DiffInDiffTWFE.Rmd:112:fit_multiple_did_models <- function(outcome_vars, data) {
+notebooks/DiffInDiffTWFE.Rmd:115:    for (outcome in names(outcome_vars)) {
+notebooks/DiffInDiffTWFE.Rmd:116:        models_list[[outcome_vars[outcome]]] <- fit_did_model(outcome, data)
+notebooks/DiffInDiffTWFE.Rmd:129:        "post_event" = "Post Cursor Adoption",
+notebooks/DiffInDiffTWFE.Rmd:154:    filter(post_event == 1) %>%
+notebooks/DiffInDiffTWFE.Rmd:201:    estimate <- coef_table["post_event", "Estimate"]
+notebooks/DiffInDiffTWFE.Rmd:202:    p_value <- coef_table["post_event", "Pr(>|t|)"]
+notebooks/DiffInDiffTWFE.Rmd:240:        outcome_var, " ~ lead_6 + lead_5 + lead_4 + lead_3 + lead_2 +
+notebooks/DiffInDiffTWFE.Rmd:241:        lag_0 + lag_1 + lag_2 + lag_3 + lag_4 + lag_5 + lag_6 +
+notebooks/DiffInDiffTWFE.Rmd:246:    model <- feols(as.formula(formula_str), data = data)
+notebooks/NonCausalMethods.Rmd:26:panel_data <- fread("../data/panel_event_monthly.csv")
+notebooks/NonCausalMethods.Rmd:76:outcome_vars <- c(
+notebooks/NonCausalMethods.Rmd:100:for (i in seq_along(outcome_vars)) {
+notebooks/NonCausalMethods.Rmd:101:    var <- outcome_vars[i]
+notebooks/NonCausalMethods.Rmd:148:        across(all_of(outcome_vars), ~ mean(.x, na.rm = TRUE)),
+notebooks/NonCausalMethods.Rmd:158:        across(all_of(outcome_vars), ~ mean(.x, na.rm = TRUE)),
+notebooks/NonCausalMethods.Rmd:169:for (var in outcome_vars) {
+notebooks/NonCausalMethods.Rmd:175:for (var in outcome_vars) {
+notebooks/NonCausalMethods.Rmd:181:for (var in outcome_vars) {
+notebooks/NonCausalMethods.Rmd:199:          align = c("l", "r", rep("r", length(outcome_vars)))) %>%
+notebooks/NonCausalMethods.Rmd:244:for (i in seq_along(outcome_vars)) {
+notebooks/NonCausalMethods.Rmd:245:    var <- outcome_vars[i]
+notebooks/NonCausalMethods.Rmd:259:    model3 <- feols(formula3, data = its_data)
+notebooks/NonCausalMethods.Rmd:264:    model4 <- feols(formula4, data = its_data)
+notebooks/DiffInDiffPosterFigures.Rmd:34:panel_data <- fread("../data/panel_event_monthly.csv")
+notebooks/DiffInDiffPosterFigures.Rmd:81:outcome_vars <- c(
+notebooks/DiffInDiffPosterFigures.Rmd:97:    dynamic_result <- did_imputation(
+notebooks/DiffInDiffPosterFigures.Rmd:103:        first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+notebooks/DiffInDiffPosterFigures.Rmd:113:for (var in outcome_vars) {
+proc_scripts/collect_sonarqube_warnings_v2.py:12:    Reads panel_event_monthly.csv, identifies treated repos and event_time,
+proc_scripts/collect_sonarqube_warnings_v2.py:424:    Read treatment repositories and event times from panel_event_monthly.csv.
+proc_scripts/collect_sonarqube_warnings_v2.py:647:        help="Panel CSV for event mode. Default: DATA_DIR/panel_event_monthly.csv.",
+proc_scripts/collect_sonarqube_warnings_v2.py:724:        else data_dir / "panel_event_monthly.csv"
+proc_scripts/prepare_panel_event_v2.py:25:  - Treatment post_event is ABSORBING: post_event = (month >= event_month);
+proc_scripts/prepare_panel_event_v2.py:190:    """lead_1..5 / lag_0..5 exact; lead_6 / lag_6 cumulative (matches original)."""
+proc_scripts/prepare_panel_event_v2.py:212:        repo_ts["post_event"] = (repo_ts["time_to_event"] >= 0).astype(int)  # ABSORBING
+proc_scripts/prepare_panel_event_v2.py:214:        repo_ts["is_treatment"] = repo_ts["post_event"]
+proc_scripts/prepare_panel_event_v2.py:235:    panel["post_event"] = 0
+proc_scripts/prepare_panel_event_v2.py:270:         "is_treatment_dynamic", "event", "post_event", "time_to_event"]
+proc_scripts/prepare_panel_event_v2.py:301:        .agg(repos=("repo_name", "nunique"), rows=("repo_name", "size"), post_rows=("post_event", "sum"))
+proc_scripts/prepare_panel_event_v2.py:314:    parser.add_argument("--output", default="tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2.csv",
+proc_scripts/prepare_panel_event_v2.py:316:    parser.add_argument("--balanced-output", default="tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced.csv",
+proc_scripts/bak/find_repo_pre_post_ai_adoption_bck02.py:7:- Use data_baseline_backup/panel_event_monthly.csv to find repositories with
+proc_scripts/bak/find_repo_pre_post_ai_adoption_bck02.py:166:    panel = read_csv(data_dir / "panel_event_monthly.csv")
+proc_scripts/bak/find_repo_pre_post_ai_adoption_bak01.py:7:- Use data_baseline_backup/panel_event_monthly.csv to find repositories with
+proc_scripts/bak/find_repo_pre_post_ai_adoption_bak01.py:77:    panel_path = data_dir / "panel_event_monthly.csv"
+proc_scripts/prepare_panel_event_v2-bak01.py:10:  - Treatment post_event is ABSORBING: post_event = (month >= event_month).
+proc_scripts/prepare_panel_event_v2-bak01.py:11:    The original's cursor-abandonment reset (post_event -> 0 when cursor==False)
+proc_scripts/prepare_panel_event_v2-bak01.py:19:      is_treatment         : absorbing treated status (post_event for treated, 0 for control)
+proc_scripts/prepare_panel_event_v2-bak01.py:32:  --output : tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2.csv
+proc_scripts/prepare_panel_event_v2-bak01.py:36:later step, so this file has fewer columns than the baseline panel_event_monthly.csv.
+proc_scripts/prepare_panel_event_v2-bak01.py:143:    """Replicate original lead/lag bins: lead_1..5 / lag_0..5 exact, lead_6/lag_6 cumulative."""
+proc_scripts/prepare_panel_event_v2-bak01.py:168:        repo_ts["post_event"] = (repo_ts["time_to_event"] >= 0).astype(int)
+proc_scripts/prepare_panel_event_v2-bak01.py:170:        repo_ts["is_treatment"] = repo_ts["post_event"]
+proc_scripts/prepare_panel_event_v2-bak01.py:195:    panel["post_event"] = 0
+proc_scripts/prepare_panel_event_v2-bak01.py:241:         "is_treatment_dynamic", "event", "post_event", "time_to_event"]
+proc_scripts/prepare_panel_event_v2-bak01.py:258:    parser.add_argument("--output", default="tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2.csv")
+proc_scripts/prepare_panel_event_v2-bak01.py:302:             post_rows=("post_event", "sum"))
+proc_scripts/find_repo_pre_post_ai_adoption.py:7:- Use data_baseline_backup/panel_event_monthly.csv to find repositories with
+proc_scripts/find_repo_pre_post_ai_adoption.py:240:    panel = read_csv(data_dir / "panel_event_monthly.csv")
+scripts/add_confidence_and_agents.py:2:Standalone script to add high_confidence and other_agents columns to panel_event_monthly.csv
+scripts/add_confidence_and_agents.py:5:1. Reads panel_event_monthly.csv
+scripts/add_confidence_and_agents.py:10:6. Outputs panel_event_monthly_modified.csv
+scripts/add_confidence_and_agents.py:13:- panel_event_monthly.csv: Input panel data file
+scripts/add_confidence_and_agents.py:566:    """Main function to process panel_event_monthly.csv and add columns."""
+scripts/add_confidence_and_agents.py:569:    input_file = '../data/panel_event_monthly.csv'
+scripts/add_confidence_and_agents.py:570:    output_file = '../data/panel_event_monthly_modified.csv'
+scripts/add_confidence_and_agents.py:578:    print("Processing panel_event_monthly.csv to add confidence and agent columns")
+scripts/compute_repo_level_metrics.py:152:                if total_commits > 0
+scripts/prepare_panel_event.py:63:    result_df["post_event"] = (result_df["time_dt"] >= event_dt).astype(int)
+scripts/prepare_panel_event.py:80:    # Handle cursor abandonment: set post_event=0 and all indicators=0 when cursor=False
+scripts/prepare_panel_event.py:85:    # Set post_event to 0 for abandonment periods
+scripts/prepare_panel_event.py:86:    result_df.loc[cursor_abandonment_mask, "post_event"] = 0
+scripts/prepare_panel_event.py:112:    repo_ts["post_event"] = 0
+scripts/prepare_panel_event.py:260:    event_columns = ["event", "post_event", "time_to_event"]
+scripts/collect_sonarqube_warnings.py:309:    panel_file = DATA_DIR / "panel_event_monthly.csv"
