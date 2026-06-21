@@ -122,7 +122,7 @@ def complete_repo_months(df: pd.DataFrame, analysis_start: str, analysis_end: st
             if c in merged.columns:
                 merged[c] = pd.to_numeric(merged[c], errors="coerce").fillna(0)
         if "cursor" in merged.columns:
-            merged["cursor"] = coerce_cursor(merged["cursor"])
+            merged["cursor"] = merged["cursor"].fillna(False).astype(bool)
         out.append(merged)
     completed = pd.concat(out, ignore_index=True)
     logging.info(
@@ -240,7 +240,7 @@ def build_control_panel(control_ts: pd.DataFrame, provenance: pd.DataFrame) -> p
         panel[f"lag_{lag}"] = 0
 
     panel = panel.merge(provenance, on="repo_name", how="left")
-    panel["matched_as_control"] = pd.to_numeric(panel["matched_as_control"], errors="coerce").fillna(0).astype(int)
+    panel["matched_as_control"] = panel["matched_as_control"].fillna(0).astype(int)
 
     leaked = panel.loc[panel["cursor"] == True, "repo_name"].unique()  # noqa: E712
     if len(leaked):
