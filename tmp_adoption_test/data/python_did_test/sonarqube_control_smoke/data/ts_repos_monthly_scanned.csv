@@ -1,0 +1,4 @@
+repo_name,month,latest_commit,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
+robotframework/statuschecker,2024-01,7a0b582082036e3c39e89e04a2bcf160a5d68cb4,389.0,0.0,0.0,1.0,0.0,19.8,90.0,5.0
+robotframework/statuschecker,2024-02,7a0b582082036e3c39e89e04a2bcf160a5d68cb4,389.0,0.0,0.0,1.0,0.0,19.8,90.0,5.0
+robotframework/statuschecker,2024-03,7a0b582082036e3c39e89e04a2bcf160a5d68cb4,389.0,0.0,0.0,1.0,0.0,19.8,90.0,5.0

@@ -1,0 +1,31 @@
+rule,type,severity,effort,example_message
+Web:S5725,VULNERABILITY,MINOR,5min,Make sure not using resource integrity feature is safe here.
+ipython:S112,CODE_SMELL,MAJOR,20min,Replace this generic exception class with a more specific one.
+ipython:S125,CODE_SMELL,MAJOR,5min,Remove this commented out code.
+ipython:S3457,CODE_SMELL,MAJOR,1min,Add replacement fields or use a normal string instead of an f-string.
+ipython:S3776,CODE_SMELL,CRITICAL,25min,Refactor this function to reduce its Cognitive Complexity from 35 to the 15 allowed.
+python:S1066,CODE_SMELL,MAJOR,5min,Merge this if statement with the enclosing one.
+python:S107,CODE_SMELL,MAJOR,20min,"Method ""__init__"" has 25 parameters, which is greater than the 13 authorized."
+python:S108,CODE_SMELL,MAJOR,5min,Either remove or fill this block of code.
+python:S112,CODE_SMELL,MAJOR,20min,Replace this generic exception class with a more specific one.
+python:S1135,CODE_SMELL,INFO,0min,"Complete the task associated to this ""TODO"" comment."
+python:S116,CODE_SMELL,MINOR,2min,"Rename this field ""ThreadType"" to match the regular expression ^[_a-z][_a-z0-9]*$."
+python:S1186,CODE_SMELL,CRITICAL,5min,"Add a nested comment explaining why this method is empty, or complete the implementation."
+python:S1192,CODE_SMELL,CRITICAL,8min,"Define a constant instead of duplicating this literal ""Invalid tool call type: "" 4 times."
+python:S125,CODE_SMELL,MAJOR,5min,Remove this commented out code.
+python:S1481,CODE_SMELL,MINOR,5min,"Remove the unused local variable ""e""."
+python:S1515,CODE_SMELL,MAJOR,30min,"Add a parameter to function ""callback"" and use variable ""method"" as its default value;The value of ""method"" might change at the next loop iteration."
+python:S1656,BUG,MAJOR,3min,Remove or correct this useless self-assignment.
+python:S1700,CODE_SMELL,MAJOR,10min,"Rename field ""thread"""
+python:S1940,CODE_SMELL,MINOR,2min,"Use the opposite operator (""!="") instead."
+python:S2772,CODE_SMELL,MINOR,2min,"Remove this unneeded ""pass""."
+python:S3457,CODE_SMELL,MAJOR,1min,Add replacement fields or use a normal string instead of an f-string.
+python:S3626,CODE_SMELL,MINOR,1min,Remove this redundant return.
+python:S3776,CODE_SMELL,CRITICAL,1h49min,Refactor this function to reduce its Cognitive Complexity from 119 to the 15 allowed.
+python:S5754,CODE_SMELL,CRITICAL,5min,Specify an exception class to catch or reraise the exception
+python:S5857,CODE_SMELL,MINOR,3min,"Replace this use of a reluctant quantifier with ""[^\]]*""."
+python:S5890,CODE_SMELL,MAJOR,5min,"Replace the type hint ""SharedState"" with ""Optional[SharedState]"" or don't assign ""None"" to ""_shared_state"""
+python:S5899,CODE_SMELL,MAJOR,2min,"Rename this method so that it starts with ""test"" or remove this unused helper."
+python:S5906,CODE_SMELL,MINOR,1min,"Consider using ""assertIn"" instead."
+python:S5914,CODE_SMELL,MAJOR,5min,Replace this expression; its boolean value is constant.
+python:S8519,CODE_SMELL,MAJOR,5min,"Replace ""list(...)[0]"" with ""next(iter(...))"" to avoid materializing the entire iterable."
