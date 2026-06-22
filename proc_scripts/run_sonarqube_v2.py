@@ -447,6 +447,43 @@ def infer_date_range_from_input(ts_df: pd.DataFrame, time_key: str) -> tuple[str
     return min(normalized), max(normalized)
 
 
+
+def save_progress(
+    full_df: pd.DataFrame,
+    processed_results: list[pd.DataFrame],
+    output_file: Path,
+    time_key: str,
+) -> None:
+    """Save partial SonarQube metrics after completed repositories.
+
+    The saved file contains all original rows. Rows for completed repositories
+    are replaced with their updated metric values; rows for unprocessed
+    repositories remain present with missing metric values.
+    """
+    if processed_results:
+        processed_df = pd.concat(processed_results, ignore_index=True)
+        processed_repos = set(processed_df["repo_name"].unique())
+        remaining_df = full_df[~full_df["repo_name"].isin(processed_repos)].copy()
+        save_df = pd.concat([processed_df, remaining_df], ignore_index=True)
+    else:
+        save_df = full_df.copy()
+
+    if "technical_debt" in save_df.columns:
+        save_df.drop(columns=["technical_debt"], inplace=True)
+
+    save_df.rename(
+        columns={
+            "software_quality_maintainability_remediation_effort": "technical_debt"
+        },
+        inplace=True,
+    )
+
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    save_df.sort_values(by=["repo_name", time_key]).to_csv(output_file, index=False)
+    logging.info("Progress saved to %s", output_file)
+
+
+
 def main() -> None:
     """Main function to run SonarQube analysis on repositories."""
     global TIME_KEY
@@ -506,6 +543,14 @@ def main() -> None:
         default=NUM_PROCESSES,
         help="Number of worker processes. Default: %(default)s",
     )
+    parser.add_argument(
+        "--incremental-save",
+        action="store_true",
+        help=(
+            "Save the output CSV after each completed repository. "
+            "Recommended for long full scans."
+        ),
+    )
     args = parser.parse_args()
     TIME_KEY = "week" if args.aggregation == "week" else "month"
 
@@ -560,28 +605,61 @@ def main() -> None:
         if col not in ts_df.columns:
             ts_df[col] = None
 
-    # Get unique repository names
-    repo_names = set(ts_df["repo_name"].unique()) - set(REPO_IGNORE)
-    with mp.Pool(args.num_processes) as pool:
-        args_list = [
-            (ts_df, repo_name, args.aggregation, clone_dir)
-            for repo_name in repo_names
-        ]
-        results = pool.starmap(process_repository, args_list, chunksize=1)
+    # Get unique repository names.
+    repo_names = sorted(set(ts_df["repo_name"].unique()) - set(REPO_IGNORE))
+    args_list = [
+        (ts_df, repo_name, args.aggregation, clone_dir)
+        for repo_name in repo_names
+    ]
 
-    updated_df = pd.concat(results)
-    if "technical_debt" in updated_df.columns:
-        updated_df.drop(columns=["technical_debt"], inplace=True)
-    updated_df.rename(
-        columns={
-            "software_quality_maintainability_remediation_effort": "technical_debt"
-        },
-        inplace=True,
-    )
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    updated_df.sort_values(by=["repo_name", TIME_KEY]).to_csv(
-        output_file, index=False
-    )
+    results: list[pd.DataFrame] = []
+
+    if args.incremental_save or args.num_processes == 1:
+        logging.info("Using repo-level incremental save mode")
+
+        try:
+            for i, repo_args in enumerate(args_list, start=1):
+                repo_name = repo_args[1]
+                logging.info(
+                    "Incremental progress: repository %d/%d: %s",
+                    i,
+                    len(args_list),
+                    repo_name,
+                )
+
+                repo_result = process_repository(*repo_args)
+                results.append(repo_result)
+
+                save_progress(
+                    full_df=ts_df,
+                    processed_results=results,
+                    output_file=output_file,
+                    time_key=TIME_KEY,
+                )
+
+        except KeyboardInterrupt:
+            logging.warning("Interrupted by user; saving partial progress")
+            save_progress(
+                full_df=ts_df,
+                processed_results=results,
+                output_file=output_file,
+                time_key=TIME_KEY,
+            )
+            raise
+
+    else:
+        logging.info("Using multiprocessing mode without incremental save")
+
+        with mp.Pool(args.num_processes) as pool:
+            results = pool.starmap(process_repository, args_list, chunksize=1)
+
+        save_progress(
+            full_df=ts_df,
+            processed_results=results,
+            output_file=output_file,
+            time_key=TIME_KEY,
+        )
+
     logging.info("Updated metrics saved to %s", output_file)
 
 

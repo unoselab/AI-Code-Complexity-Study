@@ -19,6 +19,7 @@ echo "============================================================"
   echo "Input:   tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly.csv"
   echo "Output:  tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly_scanned.csv"
   echo "Clone:   ../ai_code_complexity_control_repo_dataset"
+  echo "Mode:    repo-level incremental save"
   echo "============================================================"
   echo
 
@@ -27,7 +28,8 @@ echo "============================================================"
     --input-file tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly.csv \
     --output-file tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly_scanned.csv \
     --clone-dir ../ai_code_complexity_control_repo_dataset \
-    --num-processes 1
+    --num-processes 1 \
+    --incremental-save
 
   echo
   echo "============================================================"
