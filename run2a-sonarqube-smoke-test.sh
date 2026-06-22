@@ -22,7 +22,7 @@ REPO_NAME="ericzakariasson/uber-eats-mcp-server"
 AGGREGATION="month"
 TIME_PERIOD=""
 CLONE_ROOT="../CursorRepos"
-RUN_INFRA_TESTS="0"
+RUN_INFRA_TESTS="1"
 
 usage() {
   cat <<'USAGE'
@@ -143,6 +143,10 @@ if [[ "${RUN_INFRA_TESTS}" == "1" ]]; then
   echo "Step 4: Tiny project issues API test"
   python proc_scripts/test_sonarqube_tiny_issues.py
   echo
+
+  echo "TEST: RUN_INFRA_TESTS"
+  exit 0
+
 fi
 
 echo "Step 5: Check or clone repository"

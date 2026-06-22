@@ -1,0 +1,172 @@
+scripts/add_confidence_and_agents.py:15:- ts_repos_monthly.csv: Treatment analyzed data
+scripts/add_confidence_and_agents.py:98:        repo_dir = repo_name.replace('/', '_')
+scripts/add_confidence_and_agents.py:282:        repo_dir = repo_name.replace('/', '_')
+scripts/add_confidence_and_agents.py:390:def create_rules_dataframe(cursor_files_path, ts_repos_monthly_path, base_repo_path):
+scripts/add_confidence_and_agents.py:396:        ts_repos_monthly_path: Path to ts_repos_monthly.csv
+scripts/add_confidence_and_agents.py:406:    df_treatment_analyzed = pd.read_csv(ts_repos_monthly_path)
+scripts/add_confidence_and_agents.py:536:        repo_dir = repo_name.replace('/', '_')
+scripts/add_confidence_and_agents.py:574:    ts_repos_monthly_path = '../data/ts_repos_monthly.csv'
+scripts/add_confidence_and_agents.py:587:    if not os.path.exists(ts_repos_monthly_path):
+scripts/add_confidence_and_agents.py:588:        raise FileNotFoundError(f"Required file not found: {ts_repos_monthly_path}")
+scripts/add_confidence_and_agents.py:607:    print("Using cursor_files.csv and ts_repos_monthly.csv...")
+scripts/add_confidence_and_agents.py:608:    df_rules = create_rules_dataframe(cursor_files_path, ts_repos_monthly_path, base_repo_path)
+scripts/analyze_repos_control.py:71:        # Checkout HEAD before collecting any metrics
+scripts/analyze_repos_control.py:74:            repo.git.checkout("HEAD")
+scripts/analyze_repos_control.py:76:            logging.error("Failed to checkout HEAD for %s: %s", repo_path.name, e)
+scripts/analyze_repos_control.py:87:                "latest_commit": None,
+scripts/analyze_repos_control.py:88:                "latest_commit_time": None,
+scripts/analyze_repos_control.py:101:                time_stats[time_key]["latest_commit_time"] is None
+scripts/analyze_repos_control.py:102:                or commit_time > time_stats[time_key]["latest_commit_time"]
+scripts/analyze_repos_control.py:104:                time_stats[time_key]["latest_commit"] = commit.hexsha
+scripts/analyze_repos_control.py:105:                time_stats[time_key]["latest_commit_time"] = commit_time
+scripts/analyze_repos_control.py:161:                "latest_commit": stats["latest_commit"],
+scripts/analyze_repos_control.py:174:def process_repository(
+scripts/analyze_repos_control.py:192:    repo_path = CONTROL_CLONE_DIR / repo_name.replace("/", "_")
+scripts/analyze_repos_control.py:213:                    "latest_commit": stats["latest_commit"],
+scripts/analyze_repos_control.py:289:            async_results.append(pool.apply_async(process_repository, process_args))
+scripts/analyze_repos.py:74:        # Checkout HEAD before collecting any metrics
+scripts/analyze_repos.py:77:            repo.git.checkout("HEAD")
+scripts/analyze_repos.py:79:            logging.error("Failed to checkout HEAD for %s: %s", repo_path.name, e)
+scripts/analyze_repos.py:90:                "latest_commit": None,
+scripts/analyze_repos.py:91:                "latest_commit_time": None,
+scripts/analyze_repos.py:112:                time_stats[time_key]["latest_commit_time"] is None
+scripts/analyze_repos.py:113:                or commit_time > time_stats[time_key]["latest_commit_time"]
+scripts/analyze_repos.py:115:                time_stats[time_key]["latest_commit"] = commit.hexsha
+scripts/analyze_repos.py:116:                time_stats[time_key]["latest_commit_time"] = commit_time
+scripts/analyze_repos.py:180:                "latest_commit": stats["latest_commit"],
+scripts/analyze_repos.py:249:        # Checkout HEAD before analyzing
+scripts/analyze_repos.py:252:            repo.git.checkout("HEAD")
+scripts/analyze_repos.py:254:            logging.error("Failed to checkout HEAD for %s: %s", repo_path.name, e)
+scripts/analyze_repos.py:328:def process_repository(
+scripts/analyze_repos.py:350:    repo_path = CLONE_DIR / repo_name.replace("/", "_")
+scripts/analyze_repos.py:372:                    "latest_commit": stats["latest_commit"],
+scripts/analyze_repos.py:434:            async_results.append(pool.apply_async(process_repository, process_args))
+scripts/clone_repos.py:97:        # Now identify and checkout the default branch (main or master)
+scripts/clone_repos.py:115:        # Checkout the default branch
+scripts/clone_repos.py:117:            ["git", "-C", str(repo_path), "checkout", default_branch],
+scripts/clone_repos.py:290:        clone_path = target_dir / repo_name.replace("/", "_")
+scripts/collect_repo_dep_data.py:5:For each row in data/ts_repos_monthly.csv (or data/ts_repos_control_monthly.csv with --control):
+scripts/collect_repo_dep_data.py:6:- For each (repo_name, month, latest_commit), check if package.json exists at that commit
+scripts/collect_repo_dep_data.py:30:TS_REPOS_CSV = Path(__file__).parent.parent / "data" / "ts_repos_monthly.csv"
+scripts/collect_repo_dep_data.py:463:        CONTROL_REPOS_DIR / repo_name.replace("/", "_")
+scripts/collect_repo_dep_data.py:465:        else CURSOR_REPOS_DIR / repo_name.replace("/", "_")
+scripts/collect_repo_dep_data.py:468:        commit_hash = row["latest_commit"]
+scripts/collect_repo_dep_data.py:499:        help="Read and update data/ts_repos_control_monthly.csv instead of data/ts_repos_monthly.csv",
+scripts/collect_sonarqube_warnings.py:145:                if analysis.get("projectVersion"):
+scripts/collect_sonarqube_warnings.py:148:                            "version": analysis["projectVersion"],
+scripts/collect_sonarqube_warnings.py:235:    project_key = repo_name.replace("/", "_")
+scripts/prepare_panel_event.py:397:    panel_df.drop(columns=[str(args.aggregation), "latest_commit"], inplace=True)
+scripts/run_sonarqube.py:6:1. Reads the time series repository stats from ts_repos_weekly.csv or ts_repos_monthly.csv
+scripts/run_sonarqube.py:105:                if analysis.get("projectVersion") == version:
+scripts/run_sonarqube.py:128:def run_sonar_scan(
+scripts/run_sonarqube.py:144:        # Checkout the specific commit
+scripts/run_sonarqube.py:148:        # Force checkout and clean the working directory
+scripts/run_sonarqube.py:151:        repo.git.checkout(commit_hash, force=True)
+scripts/run_sonarqube.py:159:                f"-Dsonar.projectVersion={version}",
+scripts/run_sonarqube.py:175:            repo.git.checkout(current)
+scripts/run_sonarqube.py:187:def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
+scripts/run_sonarqube.py:223:                    if analysis.get("projectVersion") == version:
+scripts/run_sonarqube.py:239:        # Now get the measures for this specific date using search_history
+scripts/run_sonarqube.py:240:        url = f"{SONAR_HOST}/api/measures/search_history"
+scripts/run_sonarqube.py:272:def process_repository(
+scripts/run_sonarqube.py:288:    project_key = repo_name.replace("/", "_")
+scripts/run_sonarqube.py:313:        commit_hash = repo_df.loc[row_idx, "latest_commit"]
+scripts/run_sonarqube.py:321:            run_sonar_scan(repo_path, commit_hash, time_period, project_key)
+scripts/run_sonarqube.py:324:        if metrics := get_sonar_metrics(project_key, time_period):
+scripts/run_sonarqube.py:385:        results = pool.starmap(process_repository, args_list, chunksize=1)
+proc_scripts/analyze_repos_v2.py:9:  - process_repository()
+proc_scripts/analyze_repos_v2.py:150:#     Process one repo using original process_repository().
+proc_scripts/analyze_repos_v2.py:156:#     return orig.process_repository(idx, repo_dict, total_repos, aggregation)
+proc_scripts/analyze_repos_v2.py:160:    repo_ts, contrib_ts, cursor_commits = orig.process_repository(
+proc_scripts/clone_repos_v2.py:282:            target_dir = clone_root / repo_name.replace("/", "_")
+proc_scripts/collect_sonarqube_warnings_v2.py:17:    Reads ts_repos_monthly.csv with repo_name, month, latest_commit,
+proc_scripts/collect_sonarqube_warnings_v2.py:82:    return repo_name.replace("/", "_")
+proc_scripts/collect_sonarqube_warnings_v2.py:130:            version = analysis.get("projectVersion")
+proc_scripts/collect_sonarqube_warnings_v2.py:354:    latest_commit: str,
+proc_scripts/collect_sonarqube_warnings_v2.py:409:        issue["latest_commit"] = latest_commit
+proc_scripts/collect_sonarqube_warnings_v2.py:504:            "latest_commit": str,
+proc_scripts/collect_sonarqube_warnings_v2.py:508:    required_cols = {"repo_name", "month", "latest_commit"}
+proc_scripts/collect_sonarqube_warnings_v2.py:524:        latest_commit = str(row["latest_commit"]).strip()
+proc_scripts/collect_sonarqube_warnings_v2.py:531:            latest_commit=latest_commit,
+proc_scripts/collect_sonarqube_warnings_v2.py:591:            "latest_commit",
+proc_scripts/collect_sonarqube_warnings_v2.py:654:        help="Time-series CSV for timeseries mode. Default: DATA_DIR/ts_repos_monthly.csv.",
+proc_scripts/collect_sonarqube_warnings_v2.py:730:        else data_dir / "ts_repos_monthly.csv"
+proc_scripts/create_tmp_repo_timeseries_history.py:8:    git rev-list -n 1 --before <month-end> HEAD
+proc_scripts/create_tmp_repo_timeseries_history.py:24:    return repo_name.replace("/", "_")
+proc_scripts/create_tmp_repo_timeseries_history.py:33:def get_latest_commit_before(repo_path: Path, before_time: str) -> str | None:
+proc_scripts/create_tmp_repo_timeseries_history.py:35:        ["git", "-C", str(repo_path), "rev-list", "-n", "1", "--before", before_time, "HEAD"],
+proc_scripts/create_tmp_repo_timeseries_history.py:59:        help="Output CSV path, e.g., tmp_sonar_batch/data/ts_repos_monthly.csv.",
+proc_scripts/create_tmp_repo_timeseries_history.py:91:            commit = get_latest_commit_before(repo_path, before_time)
+proc_scripts/create_tmp_repo_timeseries_history.py:101:                    "latest_commit": commit,
+proc_scripts/create_tmp_repo_timeseries_input.py:5:This script does not depend on the original paper's data/ts_repos_monthly.csv.
+proc_scripts/create_tmp_repo_timeseries_input.py:11:      --output tmp_sonar_batch/data/ts_repos_monthly.csv \
+proc_scripts/create_tmp_repo_timeseries_input.py:30:    return repo_name.replace("/", "_")
+proc_scripts/create_tmp_repo_timeseries_input.py:55:        latest_commit = get_head_commit(repo_path)
+proc_scripts/create_tmp_repo_timeseries_input.py:61:                "latest_commit": latest_commit,
+proc_scripts/create_tmp_repo_timeseries_input.py:82:        help="Output CSV path, e.g., tmp_sonar_batch/data/ts_repos_monthly.csv.",
+proc_scripts/find_repo_pre_post_ai_adoption.py:156:    commit = ts.get("latest_commit", pd.Series("", index=ts.index)).astype(str).str.strip().str.lower()
+proc_scripts/find_repo_pre_post_ai_adoption.py:157:    ts["has_latest_commit"] = ~commit.isin(["", "nan", "nat", "none"])
+proc_scripts/find_repo_pre_post_ai_adoption.py:161:             ts_rows_with_latest_commit=("has_latest_commit", "sum"))
+proc_scripts/find_repo_pre_post_ai_adoption.py:249:    summary = add_ts_coverage(summary, data_dir / "ts_repos_monthly.csv")
+proc_scripts/find_repo_pre_post_ai_adoption.py:255:                "ts_month_count", "ts_rows_with_latest_commit",
+proc_scripts/find_repo_pre_post_ai_adoption.py:295:                     "total_pre_post", "ts_rows_with_latest_commit", "repo_name"]
+proc_scripts/find_repo_pre_post_ai_adoption.py:299:                     "cursor_file_rows", "ts_rows_with_latest_commit",
+proc_scripts/prepare_panel_event_v2.py:55:    "latest_commit",
+proc_scripts/prepare_panel_event_v2.py:63:ACTIVITY_FILL_ZERO = ["commits", "lines_added", "lines_removed", "contributors", "latest_commit"]
+proc_scripts/prepare_panel_event_v2.py:277:    ordered += [c for c in panel.columns if c not in ordered and c not in ("latest_commit",)]
+proc_scripts/prepare_panel_event_v2.py:312:    parser.add_argument("--treatment-ts", default="tmp_adoption_test/data/python_did_test/ts_repos_monthly.csv")
+proc_scripts/prepare_panel_event_v2.py:313:    parser.add_argument("--control-ts", default="tmp_adoption_test/data/python_control_did_test/ts_repos_monthly.csv")
+proc_scripts/run_sonarqube_one_repo_test.py:6:1. Reads the time series repository stats from ts_repos_weekly.csv or ts_repos_monthly.csv
+proc_scripts/run_sonarqube_one_repo_test.py:105:                if analysis.get("projectVersion") == version:
+proc_scripts/run_sonarqube_one_repo_test.py:128:def run_sonar_scan(
+proc_scripts/run_sonarqube_one_repo_test.py:144:        # Checkout the specific commit
+proc_scripts/run_sonarqube_one_repo_test.py:148:        # Force checkout and clean the working directory
+proc_scripts/run_sonarqube_one_repo_test.py:151:        repo.git.checkout(commit_hash, force=True)
+proc_scripts/run_sonarqube_one_repo_test.py:159:                f"-Dsonar.projectVersion={version}",
+proc_scripts/run_sonarqube_one_repo_test.py:175:            repo.git.checkout(current)
+proc_scripts/run_sonarqube_one_repo_test.py:187:def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
+proc_scripts/run_sonarqube_one_repo_test.py:223:                    if analysis.get("projectVersion") == version:
+proc_scripts/run_sonarqube_one_repo_test.py:239:        # Now get the measures for this specific date using search_history
+proc_scripts/run_sonarqube_one_repo_test.py:240:        url = f"{SONAR_HOST}/api/measures/search_history"
+proc_scripts/run_sonarqube_one_repo_test.py:272:def process_repository(
+proc_scripts/run_sonarqube_one_repo_test.py:288:    project_key = repo_name.replace("/", "_")
+proc_scripts/run_sonarqube_one_repo_test.py:313:        commit_hash = repo_df.loc[row_idx, "latest_commit"]
+proc_scripts/run_sonarqube_one_repo_test.py:321:            run_sonar_scan(repo_path, commit_hash, time_period, project_key)
+proc_scripts/run_sonarqube_one_repo_test.py:324:        if metrics := get_sonar_metrics(project_key, time_period):
+proc_scripts/run_sonarqube_one_repo_test.py:385:        results = pool.starmap(process_repository, args_list, chunksize=1)
+proc_scripts/run_sonarqube_v2.py:6:1. Reads the time series repository stats from ts_repos_weekly.csv or ts_repos_monthly.csv
+proc_scripts/run_sonarqube_v2.py:107:                if analysis.get("projectVersion") == version:
+proc_scripts/run_sonarqube_v2.py:130:def run_sonar_scan(
+proc_scripts/run_sonarqube_v2.py:146:        # Checkout the specific commit
+proc_scripts/run_sonarqube_v2.py:150:        # Force checkout and clean the working directory
+proc_scripts/run_sonarqube_v2.py:153:        repo.git.checkout(commit_hash, force=True)
+proc_scripts/run_sonarqube_v2.py:161:                f"-Dsonar.projectVersion={version}",
+proc_scripts/run_sonarqube_v2.py:177:            repo.git.checkout(current)
+proc_scripts/run_sonarqube_v2.py:189:def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
+proc_scripts/run_sonarqube_v2.py:225:                    if analysis.get("projectVersion") == version:
+proc_scripts/run_sonarqube_v2.py:241:        # Now get the measures for this specific date using search_history
+proc_scripts/run_sonarqube_v2.py:242:        url = f"{SONAR_HOST}/api/measures/search_history"
+proc_scripts/run_sonarqube_v2.py:307:def process_repository(
+proc_scripts/run_sonarqube_v2.py:323:    project_key = repo_name.replace("/", "_")
+proc_scripts/run_sonarqube_v2.py:352:        commit_hash = repo_df.loc[row_idx, "latest_commit"]
+proc_scripts/run_sonarqube_v2.py:367:            scan_result = run_sonar_scan(
+proc_scripts/run_sonarqube_v2.py:374:            # Some versions of run_sonar_scan may return None on success.
+proc_scripts/run_sonarqube_v2.py:402:        metrics = get_sonar_metrics(project_key, time_period)
+proc_scripts/run_sonarqube_v2.py:470:            "Directory containing ts_repos_monthly.csv or ts_repos_weekly.csv. "
+proc_scripts/run_sonarqube_v2.py:517:        results = pool.starmap(process_repository, args_list, chunksize=1)
+proc_scripts/test_create_tmp_repo_timeseries_input_batch.py:8:src = Path("data/ts_repos_monthly.csv")
+proc_scripts/test_create_tmp_repo_timeseries_input_batch.py:15:required = ["repo_name", "month", "latest_commit"]
+proc_scripts/test_create_tmp_repo_timeseries_input_batch.py:29:        one["latest_commit"].notna()
+proc_scripts/test_create_tmp_repo_timeseries_input_batch.py:30:        & (one["latest_commit"].astype(str).str.len() > 0)
+proc_scripts/test_create_tmp_repo_timeseries_input_batch.py:34:        raise SystemExit(f"No valid latest_commit for repo: {repo_name}")
+proc_scripts/test_create_tmp_repo_timeseries_input_batch.py:45:print(batch[["repo_name", "month", "latest_commit"]].to_string(index=False))
+proc_scripts/test_create_tmp_repo_timeseries_input.py:25:if "latest_commit" not in df.columns:
+proc_scripts/test_create_tmp_repo_timeseries_input.py:26:    raise SystemExit(f"Missing latest_commit column in {src}")
+proc_scripts/test_create_tmp_repo_timeseries_input.py:34:    one["latest_commit"].notna()
+proc_scripts/test_create_tmp_repo_timeseries_input.py:35:    & (one["latest_commit"].astype(str).str.len() > 0)
+proc_scripts/test_create_tmp_repo_timeseries_input.py:39:    raise SystemExit(f"No valid latest_commit for repo: {repo_name}")
+proc_scripts/test_create_tmp_repo_timeseries_input.py:51:print(one[["repo_name", time_key, "latest_commit"]].to_string(index=False))
+proc_scripts/test_display_metrics.py:19:    "latest_commit",
+proc_scripts/test_find_candidate_repo.py:4:ts = pd.read_csv("data/ts_repos_monthly.csv")
+proc_scripts/test_find_candidate_repo.py:7:    ts["latest_commit"].notna()
+proc_scripts/test_find_candidate_repo.py:8:    & (ts["latest_commit"].astype(str).str.len() > 0)

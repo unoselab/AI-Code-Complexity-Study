@@ -1,0 +1,13 @@
+Kiln-AI/Kiln
+KroMiose/nekro-agent
+OpenMOSS/Language-Model-SAEs
+TextGeneratorio/text-generator.io
+ToolUse/tool-use-ai
+VRSEN/agency-swarm
+airweave-ai/airweave
+kenshiro-o/nagato-ai
+sirkirby/unifi-network-rules
+ttmouse/Wispr-Flow-CN
+wdm0006/elote
+wdm0006/git-pandas
+wdm0006/pygeohash
