@@ -305,7 +305,10 @@ def wait_for_analysis_ready(
 
 
 def process_repository(
-    ts_df: pd.DataFrame, repo_name: str, aggregation: str, is_control: bool = False
+    ts_df: pd.DataFrame,
+    repo_name: str,
+    aggregation: str,
+    clone_dir: Path,
 ) -> pd.DataFrame:
     """
     Process a single repository's SonarQube analysis.
@@ -314,14 +317,14 @@ def process_repository(
         ts_df: Time series dataframe.
         repo_name: Name of the repository to process.
         aggregation: Either "week" or "month".
-        is_control: Whether this is a control repository.
+        clone_dir: Directory containing cloned repositories.
 
     Returns:
         pd.DataFrame: Updated time series dataframe for this repository.
     """
     # Setup repository info and data.
     project_key = repo_name.replace("/", "_")
-    repo_path = (CONTROL_CLONE_DIR if is_control else CLONE_DIR) / project_key
+    repo_path = Path(clone_dir) / project_key
 
     if not repo_path.exists():
         logging.warning("Repository %s not found at %s", repo_name, repo_path)
@@ -471,6 +474,38 @@ def main() -> None:
             "Default: %(default)s"
         ),
     )
+    parser.add_argument(
+        "--input-file",
+        type=Path,
+        default=None,
+        help=(
+            "Explicit input time-series CSV. "
+            "If provided, this overrides --data-dir and --control file-name selection."
+        ),
+    )
+    parser.add_argument(
+        "--output-file",
+        type=Path,
+        default=None,
+        help=(
+            "Output CSV path. Default: overwrite the selected input file."
+        ),
+    )
+    parser.add_argument(
+        "--clone-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Directory containing cloned repositories. "
+            "Default: treatment clone dir, or control clone dir when --control is used."
+        ),
+    )
+    parser.add_argument(
+        "--num-processes",
+        type=int,
+        default=NUM_PROCESSES,
+        help="Number of worker processes. Default: %(default)s",
+    )
     args = parser.parse_args()
     TIME_KEY = "week" if args.aggregation == "week" else "month"
 
@@ -484,12 +519,30 @@ def main() -> None:
         logging.error("SONAR_PATH and SONAR_TOKEN must be set in .env file")
         return
 
-    # Set input file path based on aggregation level and control flag
+    # Set input/output file paths.
     data_dir = Path(args.data_dir).expanduser().resolve()
     logging.info("Using data directory: %s", data_dir)
 
-    file_prefix = "ts_repos_control_" if args.control else "ts_repos_"
-    ts_repos_file = data_dir / f"{file_prefix}{args.aggregation}ly.csv"
+    if args.input_file is not None:
+        ts_repos_file = Path(args.input_file).expanduser().resolve()
+    else:
+        file_prefix = "ts_repos_control_" if args.control else "ts_repos_"
+        ts_repos_file = data_dir / f"{file_prefix}{args.aggregation}ly.csv"
+
+    if args.output_file is not None:
+        output_file = Path(args.output_file).expanduser().resolve()
+    else:
+        output_file = ts_repos_file
+
+    if args.clone_dir is not None:
+        clone_dir = Path(args.clone_dir).expanduser().resolve()
+    else:
+        clone_dir = CONTROL_CLONE_DIR if args.control else CLONE_DIR
+
+    logging.info("Using input file: %s", ts_repos_file)
+    logging.info("Using output file: %s", output_file)
+    logging.info("Using clone directory: %s", clone_dir)
+    logging.info("Using num processes: %s", args.num_processes)
 
     # Read repository time series data and adoption data
     try:
@@ -509,9 +562,9 @@ def main() -> None:
 
     # Get unique repository names
     repo_names = set(ts_df["repo_name"].unique()) - set(REPO_IGNORE)
-    with mp.Pool(NUM_PROCESSES) as pool:
+    with mp.Pool(args.num_processes) as pool:
         args_list = [
-            (ts_df, repo_name, args.aggregation, args.control)
+            (ts_df, repo_name, args.aggregation, clone_dir)
             for repo_name in repo_names
         ]
         results = pool.starmap(process_repository, args_list, chunksize=1)
@@ -525,10 +578,11 @@ def main() -> None:
         },
         inplace=True,
     )
+    output_file.parent.mkdir(parents=True, exist_ok=True)
     updated_df.sort_values(by=["repo_name", TIME_KEY]).to_csv(
-        ts_repos_file, index=False
+        output_file, index=False
     )
-    logging.info("Updated metrics saved to %s", ts_repos_file)
+    logging.info("Updated metrics saved to %s", output_file)
 
 
 if __name__ == "__main__":

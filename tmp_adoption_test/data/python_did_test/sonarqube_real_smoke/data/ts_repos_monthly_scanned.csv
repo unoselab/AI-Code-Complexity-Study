@@ -1,0 +1,4 @@
+repo_name,month,latest_commit,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,static_analysis_warnings
+VRSEN/agency-swarm,2024-09,f7d31f6c3adc7643c7cd2a8ecf179727eb472c4c,5708.0,1.0,2.0,157.0,0.0,13.2,1465.0,1578.0,160.0
+VRSEN/agency-swarm,2024-10,fbf3cb6670e5a8c4cba18f52353cd90fdf0505b1,5742.0,1.0,2.0,157.0,0.0,13.2,1492.0,1605.0,160.0
+VRSEN/agency-swarm,2024-11,85180da2f42fec93ac9252567feb3f02f0a86c44,7064.0,1.0,2.0,161.0,0.0,11.5,1529.0,1655.0,164.0
