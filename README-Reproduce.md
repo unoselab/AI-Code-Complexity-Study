@@ -793,7 +793,7 @@ Control repositories do not have their own adoption month. Instead, each control
 
 For each observation:
 
-$event_time_{it} = month_{it} - event_month_i$
+$event\_time_{it} = month_{it} - event\_month_i$
 
 where $i$ is a repository and $t$ is a month.
 
@@ -874,7 +874,7 @@ where:
 
 For a static post-adoption effect, the target can be written as:
 
-$\widehat{\tau}*{static} = \frac{1}{|\Omega*{post}|}\sum_{it \in \Omega_{post}} \widehat{\tau}_{it}$
+$\widehat{\tau}_{static} = \frac{1}{|\Omega_{post}|}\sum_{it \in \Omega_{post}} \widehat{\tau}_{it}$
 
 where $\Omega_{post}$ is the set of post-adoption treated observations.
 
@@ -882,7 +882,7 @@ where $\Omega_{post}$ is the set of post-adoption treated observations.
 
 For an event-time-specific effect at horizon $h$:
 
-$\widehat{\tau}*{h} = \frac{1}{|\Omega_h|}\sum*{it \in \Omega_h} \widehat{\tau}_{it}$
+$\widehat{\tau}_{h} = \frac{1}{|\Omega_h|}\sum_{it \in \Omega_h} \widehat{\tau}_{it}$
 
 where:
 
