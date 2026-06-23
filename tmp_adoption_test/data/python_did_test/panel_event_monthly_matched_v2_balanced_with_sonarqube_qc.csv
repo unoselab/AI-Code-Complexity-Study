@@ -1,0 +1,17 @@
+check,value
+merged_rows,738
+treatment_rows,208
+control_rows,530
+treatment_repos,13
+control_repos,38
+rows_with_any_raw_metric_missing,1
+source_less_commits,1
+ncloc_analysis_nonmissing,738
+bugs_analysis_nonmissing,738
+vulnerabilities_analysis_nonmissing,738
+code_smells_analysis_nonmissing,738
+duplicated_lines_density_analysis_nonmissing,738
+comment_lines_density_analysis_nonmissing,738
+cognitive_complexity_analysis_nonmissing,738
+technical_debt_analysis_nonmissing,738
+static_analysis_warnings_analysis_nonmissing,738
