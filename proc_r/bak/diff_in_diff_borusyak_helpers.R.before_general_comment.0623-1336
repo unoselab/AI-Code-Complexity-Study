@@ -1,11 +1,7 @@
-# Helper functions for Borusyak DiD v2 analyses.
+# Helper functions for Borusyak DiD v2 activity smoke tests.
 #
 # Reused/refactored from:
 #   notebooks/DiffInDiffBorusyak.Rmd
-#
-# These helpers are shared by multiple v2 analyses:
-#   - activity / velocity smoke tests
-#   - SonarQube quality outcome analyses
 #
 # Reused logic:
 #   1. Static Borusyak did_imputation call:
@@ -23,7 +19,8 @@
 #      -6 to -2 months for the pre-trend check. This function preserves
 #      that event-study logic by parameterizing the original
 #      did_imputation(..., horizon = -6:6, pretrends = -6:-2) call.
-#
+# 
+#  
 #   3. Static "treat" term extraction:
 #      original static_df construction
 #      -> extract_static_result()
@@ -35,17 +32,15 @@
 # Deliberately not reused:
 #   - original baseline panel loading
 #   - repo_metrics / matching / language-group logic
+#   - SonarQube quality outcomes
+#   - full-paper covariates: age, ncloc, stars, issues
 #   - robustness settings and publication plot sections
 #
 # Main v2 difference:
-#   first_stage is parameterized so each analysis can choose covariates.
-#   Examples:
-#     activity smoke test:
-#       ~ contributors | repo_name + time
-#     SonarQube quality test:
-#       ~ contributors + log_ncloc | repo_name + time
-#     full-paper-style model, once covariates are available:
-#       ~ age + ncloc + contributors + stars + issues | repo_name + time
+#   first_stage is parameterized so activity-only panels can use:
+#     ~ contributors | repo_name + time
+#   instead of the full-paper formula:
+#     ~ age + ncloc + contributors + stars + issues | repo_name + time
 
 #' Run the static Borusyak imputation estimator for one outcome.
 #'

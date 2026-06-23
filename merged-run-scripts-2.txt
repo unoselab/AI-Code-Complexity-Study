@@ -1,0 +1,1258 @@
+============================================================
+FILE: run2-sonarqube-server.sh
+============================================================
+
+docker run -d \
+  --name sonarqube \
+  -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
+  -p 9000:9000 \
+  sonarqube:latest
+
+============================================================
+FILE: run2a-sonarqube-smoke-candidates.sh
+============================================================
+
+# 
+python proc_scripts/test_find_candidate_repo.py
+# 
+
+============================================================
+FILE: run2a-sonarqube-smoke-test.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_NAME="ericzakariasson/uber-eats-mcp-server"
+AGGREGATION="month"
+TIME_PERIOD=""
+CLONE_ROOT="../CursorRepos"
+RUN_INFRA_TESTS="1"
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  ./run2a-sonarqube-smoke-test.sh [options]
+
+Options:
+  --repo OWNER/REPO       GitHub repository name. Default: ericzakariasson/uber-eats-mcp-server
+  --aggregation month     Aggregation level. Default: month
+  --month YYYY-MM         Optional month to select from ts_repos_monthly.csv
+  --clone-root PATH       Clone root directory. Default: ../CursorRepos
+  --run-infra-tests       Also run connection, tiny scan, metrics, and issues tests
+  -h, --help              Show this help
+
+Examples:
+  ./run2a-sonarqube-smoke-test.sh
+  ./run2a-sonarqube-smoke-test.sh --repo ericzakariasson/uber-eats-mcp-server
+  ./run2a-sonarqube-smoke-test.sh --repo OWNER/REPO --month 2025-03
+USAGE
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --repo)
+      REPO_NAME="$2"
+      shift 2
+      ;;
+    --aggregation)
+      AGGREGATION="$2"
+      shift 2
+      ;;
+    --month)
+      TIME_PERIOD="$2"
+      shift 2
+      ;;
+    --clone-root)
+      CLONE_ROOT="$2"
+      shift 2
+      ;;
+    --run-infra-tests)
+      RUN_INFRA_TESTS="1"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "ERROR: Unknown argument: $1"
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+if [[ "${AGGREGATION}" != "month" ]]; then
+  echo "ERROR: This smoke-test wrapper currently supports --aggregation month only."
+  exit 1
+fi
+
+if [[ ! -f ".env" ]]; then
+  echo "ERROR: .env file not found. Run this script from the repository root."
+  exit 1
+fi
+
+if [[ ! -f "scripts/run_sonarqube.py" ]]; then
+  echo "ERROR: scripts/run_sonarqube.py not found. Run this script from the repository root."
+  exit 1
+fi
+
+set -a
+source .env
+set +a
+
+if [[ -z "${SONAR_HOST:-}" ]]; then
+  echo "ERROR: SONAR_HOST is missing in .env"
+  exit 1
+fi
+
+if [[ -z "${SONAR_TOKEN:-}" ]]; then
+  echo "ERROR: SONAR_TOKEN is missing in .env"
+  exit 1
+fi
+
+if [[ -z "${SONAR_SCANNER_PATH:-}" ]]; then
+  echo "ERROR: SONAR_SCANNER_PATH is missing in .env"
+  exit 1
+fi
+
+PROJECT_KEY="${REPO_NAME//\//_}"
+REPO_PATH="${CLONE_ROOT}/${PROJECT_KEY}"
+
+echo "============================================================"
+echo "SonarQube one-repo smoke test"
+echo "Repo name:      ${REPO_NAME}"
+echo "Project key:    ${PROJECT_KEY}"
+echo "Repo path:      ${REPO_PATH}"
+echo "Aggregation:    ${AGGREGATION}"
+echo "Month filter:   ${TIME_PERIOD:-latest available month}"
+echo "SONAR_HOST:     ${SONAR_HOST}"
+echo "Scanner path:   ${SONAR_SCANNER_PATH}"
+echo "============================================================"
+echo
+
+if [[ "${RUN_INFRA_TESTS}" == "1" ]]; then
+  echo "Step 1: SonarQube connection test"
+  python proc_scripts/test_sonarqube_connection.py
+  echo
+
+  echo "Step 2: Tiny project scan test"
+  python proc_scripts/test_sonarqube_scan.py
+  echo
+
+  echo "Step 3: Tiny project metrics API test"
+  python proc_scripts/test_sonarqube_metrics.py
+  echo
+
+  echo "Step 4: Tiny project issues API test"
+  python proc_scripts/test_sonarqube_tiny_issues.py
+  echo
+
+  echo "TEST: RUN_INFRA_TESTS"
+  exit 0
+
+fi
+
+echo "Step 5: Check or clone repository"
+mkdir -p "${CLONE_ROOT}"
+
+if [[ -d "${REPO_PATH}/.git" ]]; then
+  echo "Repository already exists: ${REPO_PATH}"
+else
+  echo "Cloning repository..."
+  git clone "https://github.com/${REPO_NAME}.git" "${REPO_PATH}"
+fi
+
+echo
+echo "Repository size:"
+du -sh "${REPO_PATH}" || true
+
+echo
+echo "Latest commits:"
+git -C "${REPO_PATH}" log --oneline -5 || true
+echo
+
+# proc_scripts/test_create_tmp_repo_timeseries_input.py
+echo "Step 6: Create temporary one-repo time-series input"
+python proc_scripts/test_create_tmp_repo_timeseries_input.py "${REPO_NAME}" "${AGGREGATION}" "${TIME_PERIOD}"
+echo
+
+echo "Step 8: Run one-repo SonarQube pipeline"
+python proc_scripts/run_sonarqube_one_repo_test.py --aggregation "${AGGREGATION}"
+echo
+
+echo "Step 9: Show resulting metrics"
+python - "${AGGREGATION}" <<'PY'
+import sys
+from pathlib import Path
+import pandas as pd
+
+aggregation = sys.argv[1]
+path = Path("tmp_sonar_one_repo/data") / f"ts_repos_{aggregation}ly.csv"
+
+df = pd.read_csv(path)
+
+if {"bugs", "vulnerabilities", "code_smells"}.issubset(df.columns):
+    df["static_analysis_warnings"] = (
+        df["bugs"].fillna(0)
+        + df["vulnerabilities"].fillna(0)
+        + df["code_smells"].fillna(0)
+    )
+
+cols = [
+    "repo_name",
+    aggregation,
+    "latest_commit",
+    "ncloc",
+    "bugs",
+    "vulnerabilities",
+    "code_smells",
+    "static_analysis_warnings",
+    "duplicated_lines_density",
+    "comment_lines_density",
+    "cognitive_complexity",
+    "software_quality_maintainability_remediation_effort",
+    "technical_debt",
+]
+
+cols = [c for c in cols if c in df.columns]
+print(df[cols].to_string(index=False))
+PY
+
+echo
+echo "SonarQube one-repo smoke test completed successfully."
+
+
+============================================================
+FILE: run2b-sonarqube-smoke-test.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_NAME="nextml-code/pytorch-datastream"
+exec ./run2a-sonarqube-smoke-test.sh --repo "${REPO_NAME}" 
+
+
+============================================================
+FILE: run2c-sonarqube-small-batch-test.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+AGGREGATION="month"
+CLONE_ROOT="../CursorRepos"
+TMP_ROOT="tmp_sonar_batch"
+TMP_DATA_DIR="${TMP_ROOT}/data"
+TMP_TS_FILE="${TMP_DATA_DIR}/ts_repos_monthly.csv"
+BATCH_SCRIPT="proc_scripts/run_sonarqube_v2.py"
+
+REPOS=(
+  "TheSethRose/Agent-Chat"
+  "utensils/mcp-nixos"
+  "nextml-code/pytorch-datastream"
+)
+
+if [[ ! -f ".env" ]]; then
+  echo "ERROR: .env file not found. Run this script from the repository root."
+  exit 1
+fi
+
+if [[ ! -f "scripts/run_sonarqube.py" ]]; then
+  echo "ERROR: scripts/run_sonarqube.py not found. Run this script from the repository root."
+  exit 1
+fi
+
+set -a
+source .env
+set +a
+
+if [[ -z "${SONAR_HOST:-}" ]]; then
+  echo "ERROR: SONAR_HOST is missing in .env"
+  exit 1
+fi
+
+if [[ -z "${SONAR_TOKEN:-}" ]]; then
+  echo "ERROR: SONAR_TOKEN is missing in .env"
+  exit 1
+fi
+
+if [[ -z "${SONAR_SCANNER_PATH:-}" ]]; then
+  echo "ERROR: SONAR_SCANNER_PATH is missing in .env"
+  exit 1
+fi
+
+echo "============================================================"
+echo "SonarQube small-batch smoke test"
+echo "Aggregation:    ${AGGREGATION}"
+echo "Clone root:     ${CLONE_ROOT}"
+echo "Temp data:      ${TMP_TS_FILE}"
+echo "SONAR_HOST:     ${SONAR_HOST}"
+echo "Scanner path:   ${SONAR_SCANNER_PATH}"
+echo "Repositories:"
+for repo in "${REPOS[@]}"; do
+  echo "  - ${repo}"
+done
+echo "============================================================"
+echo
+
+echo "Step 1: Clone missing repositories"
+mkdir -p "${CLONE_ROOT}"
+
+for repo in "${REPOS[@]}"; do
+  project_key="${repo//\//_}"
+  repo_path="${CLONE_ROOT}/${project_key}"
+
+  echo "------------------------------------------------------------"
+  echo "Repo:       ${repo}"
+  echo "Project:    ${project_key}"
+  echo "Repo path:  ${repo_path}"
+
+  if [[ -d "${repo_path}/.git" ]]; then
+    echo "Repository already exists."
+  else
+    echo "Cloning repository..."
+    git clone "https://github.com/${repo}.git" "${repo_path}"
+  fi
+
+  echo "Repository size:"
+  du -sh "${repo_path}" || true
+
+  echo "Latest commits:"
+  git -C "${repo_path}" log --oneline -3 || true
+done
+
+echo "============================================================"
+echo
+
+echo "Step 2: Create temporary batch time-series input from cloned repo HEAD commits"
+mkdir -p "${TMP_DATA_DIR}"
+
+python proc_scripts/create_tmp_repo_timeseries_input.py \
+  --output "${TMP_TS_FILE}" \
+  --clone-root "${CLONE_ROOT}" \
+  --month "2026-06" \
+  "${REPOS[@]}"
+
+echo "============================================================"
+echo
+
+echo "Step 3: Run small-batch SonarQube pipeline"
+python "${BATCH_SCRIPT}" --aggregation "${AGGREGATION}"
+echo "============================================================"
+echo
+
+echo "Step 4: Show resulting metrics"
+python proc_scripts/test_display_metrics.py "${TMP_TS_FILE}"
+echo "============================================================"
+echo
+
+echo "Step 5: SonarQube Docker memory snapshot"
+docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.PIDs}}" sonarqube || true
+echo "============================================================"
+echo
+echo "SonarQube small-batch smoke test completed successfully."
+
+
+============================================================
+FILE: run2d-sonarqube-small-batch-test.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+bash ./run2c-sonarqube-small-batch-test.sh
+  
+
+============================================================
+FILE: run3a-detect-prog-warnings.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+AGGREGATION="month"
+CLONE_ROOT="../CursorRepos"
+DATA_DIR="tmp_sonar_batch/data"
+TS_FILE="${DATA_DIR}/ts_repos_monthly.csv"
+MONTHS="${MONTHS:-2026-03,2026-04,2026-05}"
+
+WARNINGS_FILE="${DATA_DIR}/sonarqube_warnings.csv"
+WARNING_DEFINITIONS_FILE="${DATA_DIR}/sonarqube_warning_definitions.csv"
+
+REPOS=(
+  "TheSethRose/Agent-Chat"
+  "utensils/mcp-nixos"
+  "nextml-code/pytorch-datastream"
+)
+
+echo "============================================================"
+echo "run3a: multi-month SonarQube smoke test with real Git history"
+echo "Aggregation: ${AGGREGATION}"
+echo "Clone root:  ${CLONE_ROOT}"
+echo "Data dir:    ${DATA_DIR}"
+echo "Input CSV:   ${TS_FILE}"
+echo "Months:      ${MONTHS}"
+echo "Warnings:    ${WARNINGS_FILE}"
+echo "Definitions: ${WARNING_DEFINITIONS_FILE}"
+echo "Repositories:"
+printf '  - %s\n' "${REPOS[@]}"
+echo "============================================================"
+echo
+
+mkdir -p "${DATA_DIR}"
+
+echo "Step 1: Create historical month input"
+echo "------------------------------------------------------------"
+python proc_scripts/create_tmp_repo_timeseries_history.py \
+  --output "${TS_FILE}" \
+  --clone-root "${CLONE_ROOT}" \
+  --months "${MONTHS}" \
+  "${REPOS[@]}"
+
+echo
+echo "Step 2: Run SonarQube aggregate metrics on the multi-month input"
+echo "------------------------------------------------------------"
+python proc_scripts/run_sonarqube_v2.py \
+  --aggregation "${AGGREGATION}" \
+  --data-dir "${DATA_DIR}"
+
+echo
+echo "Step 3: Collect detailed SonarQube warning records"
+echo "------------------------------------------------------------"
+python proc_scripts/collect_sonarqube_warnings_v2.py \
+  --mode timeseries \
+  --data-dir "${DATA_DIR}" \
+  --timeseries-file "${TS_FILE}" \
+  --warnings-output "${WARNINGS_FILE}" \
+  --definitions-output "${WARNING_DEFINITIONS_FILE}" \
+  --repos "${REPOS[@]}"
+
+echo
+echo "Step 4: Display aggregate metric results"
+echo "------------------------------------------------------------"
+python proc_scripts/test_display_metrics.py "${TS_FILE}"
+
+echo
+echo "Step 5: Show warning output files"
+echo "------------------------------------------------------------"
+ls -lh "${WARNINGS_FILE}" "${WARNING_DEFINITIONS_FILE}" || true
+
+echo
+echo "Step 6: SonarQube Docker memory snapshot"
+echo "------------------------------------------------------------"
+docker stats sonarqube --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.PIDs}}" || true
+
+echo
+echo "run3a completed successfully."
+
+
+============================================================
+FILE: run4a-detect-ai-adoption.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ============================================================
+# run4a: Select top clone candidates, optionally clone them
+# ============================================================
+export GIT_TERMINAL_PROMPT=0
+RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M)}"
+LOG_DIR="${LOG_DIR:-logs}"
+CLONE_LOG="${LOG_DIR}/run4a_clone_log_${RUN_TS}.csv"
+DATA_DIR="${DATA_DIR:-data_baseline_backup}"
+OUTPUT_DIR="${OUTPUT_DIR:-tmp_adoption_test/data}"
+OUTPUT_FILE="${OUTPUT_FILE:-${OUTPUT_DIR}/top_100_clone_candidates.csv}"
+ALL_ELIGIBLE_FILE="${OUTPUT_FILE%.csv}_all_eligible.csv"
+
+CLONE_ROOT="${CLONE_ROOT:-../ai_code_complexity_study_repo_dataset}"
+
+TOP_N="${TOP_N:-100}"
+MIN_PRE_MONTHS="${MIN_PRE_MONTHS:-3}"
+MIN_POST_MONTHS="${MIN_POST_MONTHS:-3}"
+RANK_BY="${RANK_BY:-high_contributor}"
+REQUIRE_CURSOR_EVIDENCE="${REQUIRE_CURSOR_EVIDENCE:-true}"
+
+# Modes:
+# INSPECT_ONLY=true,  INSPECT_CLONE=false  -> only create/check candidate CSV
+# INSPECT_ONLY=false, INSPECT_CLONE=true   -> create/check CSV, then clone repos
+
+INSPECT_ONLY="${INSPECT_ONLY:-true}"
+INSPECT_CLONE="${INSPECT_CLONE:-false}"
+
+# Optional: limit clone count for testing.
+# Use 0 to clone all rows in OUTPUT_FILE.
+
+MAX_CLONES="${MAX_CLONES:-0}"
+
+# Optional extra git clone args.
+# Do NOT use --depth 1 because we need full Git history for adoption-date detection.
+GIT_CLONE_EXTRA_ARGS="${GIT_CLONE_EXTRA_ARGS:-}"
+
+is_true() {
+case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" in
+true|1|yes|y) return 0 ;;
+*) return 1 ;;
+esac
+}
+
+print_config() {
+echo "============================================================"
+echo "run4a: select top clone candidates for AI/Cursor adoption validation"
+echo "Data dir:                 ${DATA_DIR}"
+echo "Output dir:               ${OUTPUT_DIR}"
+echo "Top candidates file:      ${OUTPUT_FILE}"
+echo "All eligible file:        ${ALL_ELIGIBLE_FILE}"
+echo "Clone root:               ${CLONE_ROOT}"
+echo "Top N:                    ${TOP_N}"
+echo "Min pre months:           ${MIN_PRE_MONTHS}"
+echo "Min post months:          ${MIN_POST_MONTHS}"
+echo "Rank by:                  ${RANK_BY}"
+echo "Require Cursor evidence:  ${REQUIRE_CURSOR_EVIDENCE}"
+echo "Inspect only:             ${INSPECT_ONLY}"
+echo "Inspect clone:            ${INSPECT_CLONE}"
+echo "Max clones:               ${MAX_CLONES}"
+echo "============================================================"
+echo
+}
+
+validate_mode() {
+if is_true "${INSPECT_ONLY}" && is_true "${INSPECT_CLONE}"; then
+echo "ERROR: INSPECT_ONLY and INSPECT_CLONE cannot both be true."
+echo
+echo "Use one of these:"
+echo "  INSPECT_ONLY=true  INSPECT_CLONE=false ./run4a-detect-ai-adoption.sh"
+echo "  INSPECT_ONLY=false INSPECT_CLONE=true  ./run4a-detect-ai-adoption.sh"
+exit 1
+fi
+}
+
+run_candidate_selection() {
+mkdir -p "${OUTPUT_DIR}"
+
+echo "** Select candidate repositories"
+echo "------------------------------------------------------------"
+
+cmd=(
+python proc_scripts/find_repo_pre_post_ai_adoption.py
+--data-dir "${DATA_DIR}"
+--top-n "${TOP_N}"
+--min-pre-months "${MIN_PRE_MONTHS}"
+--min-post-months "${MIN_POST_MONTHS}"
+--rank-by "${RANK_BY}"
+--output "${OUTPUT_FILE}"
+)
+
+if is_true "${REQUIRE_CURSOR_EVIDENCE}"; then
+cmd+=(--require-cursor-evidence)
+fi
+
+"${cmd[@]}"
+
+echo
+}
+
+check_python_repo_clone() {
+echo
+echo "** Check cloned Python repositories"
+echo "------------------------------------------------------------"
+
+if [[ ! -f "${OUTPUT_FILE}" ]]; then
+echo "ERROR: candidate file not found: ${OUTPUT_FILE}"
+exit 1
+fi
+
+if [[ ! -f "${CLONE_LOG}" ]]; then
+echo "ERROR: clone log not found: ${CLONE_LOG}"
+exit 1
+fi
+
+python - "${OUTPUT_FILE}" "${CLONE_LOG}" <<'PY'
+import sys
+import pandas as pd
+
+candidates_file = sys.argv[1]
+clone_log_file = sys.argv[2]
+
+candidates = pd.read_csv(candidates_file)
+log = pd.read_csv(clone_log_file)
+
+df = candidates.merge(log, on="repo_name", how="left")
+
+py = df[df["repo_primary_language"].eq("Python")].copy()
+
+print("Python candidate repos:", len(py))
+print()
+
+print("Python clone status counts:")
+print(py["status"].value_counts(dropna=False))
+print()
+
+usable = py["status"].isin(["cloned", "skipped_existing", "updated_existing"]).sum()
+failed = py["status"].eq("failed").sum()
+missing = py["status"].isna().sum()
+
+print("Python usable repos:", usable)
+print("Python failed repos:", failed)
+print("Python missing log rows:", missing)
+print()
+
+print("Python repos:")
+cols = [
+"rank",
+"repo_name",
+"event_month",
+"pre_panel_months",
+"post_panel_months",
+"status",
+"target_dir",
+"note",
+]
+cols = [c for c in cols if c in py.columns]
+
+print(py[cols].to_string(index=False))
+PY
+}
+
+
+main() {
+  print_config
+  validate_mode
+  run_candidate_selection
+
+  if is_true "${INSPECT_CLONE}"; then
+    echo
+    echo "** Git-clone candidate repositories"
+    echo "------------------------------------------------------------"
+
+    python proc_scripts/clone_repos_v2.py \
+      --repos-file "${OUTPUT_FILE}" \
+      --repo-column repo_name \
+      --clone-root "${CLONE_ROOT}" \
+      --logs-dir "${LOG_DIR}" \
+      --log-prefix run4a_clone_log \
+      --timestamp "${RUN_TS}" \
+      --max-repos "${MAX_CLONES}"
+
+    echo
+    echo "** Check cloned Python repositories"
+    echo "------------------------------------------------------------"
+
+    python proc_scripts/check_python_repo_clone.py \
+      --candidates-file "${OUTPUT_FILE}" \
+      --clone-log "${CLONE_LOG}" \
+      --output "${OUTPUT_DIR}/ai_adopt_repo_python.csv" \
+      --language Python
+  else
+    echo "INSPECT_ONLY mode: candidate CSV was created, but repositories were not cloned."
+  fi
+
+  echo "run4a completed successfully."
+}
+
+main "$@"
+
+
+============================================================
+FILE: run4b-detect-ai-adoption.sh
+============================================================
+
+# INSPECT_ONLY=false INSPECT_CLONE=true MAX_CLONES=5 ./run4a-detect-ai-adoption.sh
+GIT_TERMINAL_PROMPT=0 \
+INSPECT_ONLY=false INSPECT_CLONE=true MAX_CLONES=0 \
+./run4a-detect-ai-adoption.sh
+
+============================================================
+FILE: run4c-analyze-repo.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Analyze cloned Python AI-adopting repositories and verify adoption timing.
+
+REPOS_FILE="${REPOS_FILE:-tmp_adoption_test/data/ai_adopt_repo_python.csv}"
+CLONE_DIR="${CLONE_DIR:-../ai_code_complexity_study_repo_dataset}"
+OUTPUT_DIR="${OUTPUT_DIR:-tmp_adoption_test/data/python_did_test}"
+AGGREGATION="${AGGREGATION:-month}"
+NUM_PROCESSES="${NUM_PROCESSES:-1}"
+
+LOG_DIR="${LOG_DIR:-logs}"
+RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M)}"
+LOG_FILE="${LOG_DIR}/run4c_analyze_repo_${RUN_TS}.log"
+
+ADOPTION_FILE="${ADOPTION_FILE:-${OUTPUT_DIR}/ai_adoption_dates.csv}"
+ADOPTION_MATCH_FILE="${ADOPTION_MATCH_FILE:-${OUTPUT_DIR}/adoption_month_check.csv}"
+
+mkdir -p "${LOG_DIR}"
+mkdir -p "${OUTPUT_DIR}"
+
+echo "============================================================" | tee "${LOG_FILE}"
+echo "run4c: analyze cloned Python AI-adopting repositories" | tee -a "${LOG_FILE}"
+echo "Repos file:            ${REPOS_FILE}" | tee -a "${LOG_FILE}"
+echo "Clone dir:             ${CLONE_DIR}" | tee -a "${LOG_FILE}"
+echo "Output dir:            ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Aggregation:           ${AGGREGATION}" | tee -a "${LOG_FILE}"
+echo "Num processes:         ${NUM_PROCESSES}" | tee -a "${LOG_FILE}"
+echo "Adoption file:         ${ADOPTION_FILE}" | tee -a "${LOG_FILE}"
+echo "Adoption match file:   ${ADOPTION_MATCH_FILE}" | tee -a "${LOG_FILE}"
+echo "Log file:              ${LOG_FILE}" | tee -a "${LOG_FILE}"
+echo "============================================================" | tee -a "${LOG_FILE}"
+echo | tee -a "${LOG_FILE}"
+
+if [[ ! -f "${REPOS_FILE}" ]]; then
+  echo "ERROR: repos file not found: ${REPOS_FILE}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -d "${CLONE_DIR}" ]]; then
+  echo "ERROR: clone directory not found: ${CLONE_DIR}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -f "proc_scripts/analyze_repos_v2.py" ]]; then
+  echo "ERROR: script not found: proc_scripts/analyze_repos_v2.py" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -f "proc_scripts/check_time_of_event_and_adoption.py" ]]; then
+  echo "ERROR: script not found: proc_scripts/check_time_of_event_and_adoption.py" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+echo "** Step 1: Run repository history analysis" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+
+set +e
+python proc_scripts/analyze_repos_v2.py \
+  --repos-file "${REPOS_FILE}" \
+  --clone-dir "${CLONE_DIR}" \
+  --output-dir "${OUTPUT_DIR}" \
+  --aggregation "${AGGREGATION}" \
+  --num-processes "${NUM_PROCESSES}" \
+  2>&1 | tee -a "${LOG_FILE}"
+
+analyze_status=${PIPESTATUS[0]}
+set -e
+
+if [[ "${analyze_status}" -ne 0 ]]; then
+  echo | tee -a "${LOG_FILE}"
+  echo "run4c failed during repository history analysis with exit code ${analyze_status}" | tee -a "${LOG_FILE}"
+  echo "See log: ${LOG_FILE}" | tee -a "${LOG_FILE}"
+  exit "${analyze_status}"
+fi
+
+echo | tee -a "${LOG_FILE}"
+echo "** Step 2: Compare event_month and adoption_month" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+
+if [[ ! -f "${ADOPTION_FILE}" ]]; then
+  echo "ERROR: adoption file not found after analysis: ${ADOPTION_FILE}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+set +e
+python proc_scripts/check_time_of_event_and_adoption.py \
+  --candidate-file "${REPOS_FILE}" \
+  --adoption-file "${ADOPTION_FILE}" \
+  --output-match-file "${ADOPTION_MATCH_FILE}" \
+  2>&1 | tee -a "${LOG_FILE}"
+
+check_status=${PIPESTATUS[0]}
+set -e
+
+if [[ "${check_status}" -ne 0 ]]; then
+  echo | tee -a "${LOG_FILE}"
+  echo "run4c failed during event/adoption month check with exit code ${check_status}" | tee -a "${LOG_FILE}"
+  echo "See log: ${LOG_FILE}" | tee -a "${LOG_FILE}"
+  exit "${check_status}"
+fi
+
+echo | tee -a "${LOG_FILE}"
+echo "** Output files" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+find "${OUTPUT_DIR}" -maxdepth 1 -type f -printf "%p\n" | sort | tee -a "${LOG_FILE}"
+
+echo | tee -a "${LOG_FILE}"
+echo "run4c completed successfully." | tee -a "${LOG_FILE}"
+echo "Log saved to: ${LOG_FILE}" | tee -a "${LOG_FILE}"
+
+
+============================================================
+FILE: run5a-find-control-group.sh
+============================================================
+
+# --- Step 1
+# python proc_scripts/find_control_groups_v2.py \
+#   --no-language-matching \
+#   --max-control-repos 5000 \
+#   --random-state 42
+
+# --- Step 2
+# python proc_scripts/find_control_groups_v2.py \
+#   --language-matching \
+#   --max-control-repos 10000 \
+#   --random-state 42
+
+# --- Step 3
+RUN_TS="$(date +%Y%m%d-%H%M)"
+OUTPUT_FILE="tmp_adoption_test/data/control_repos_to_clone_v2.txt"
+CLONE_ROOT="/home/user1-system12/project-workspace/ai_code_complexity_control_repo_dataset"
+LOG_DIR="logs"
+MAX_CLONES=0
+
+python proc_scripts/clone_repos_v2.py \
+  --repos-file "${OUTPUT_FILE}" \
+  --repo-column repo_name \
+  --clone-root "${CLONE_ROOT}" \
+  --logs-dir "${LOG_DIR}" \
+  --log-prefix run5b_control_clone_log \
+  --timestamp "${RUN_TS}" \
+  --max-repos "${MAX_CLONES}" \
+  --existing-action skip
+
+  
+
+============================================================
+FILE: run5b-analyze-repo-control-group.sh
+============================================================
+
+echo "python proc_scripts/analyze_repos_v2.py ..."
+echo "--------------------------------------------"
+
+python proc_scripts/analyze_repos_v2.py \
+  --repos-file tmp_adoption_test/data/control_repos_to_clone_v2.csv \
+  --clone-dir /home/user1-system12/project-workspace/ai_code_complexity_control_repo_dataset \
+  --output-dir tmp_adoption_test/data/python_control_did_test \
+  --aggregation month \
+  --num-processes 1
+
+echo "--------------------------------------------"
+echo
+
+
+============================================================
+FILE: run5c-prepare-panel-event.sh
+============================================================
+
+python proc_scripts/prepare_panel_event_v2.py \
+  --treatment-meta tmp_adoption_test/data/matched_controls_v2_treatment_only.csv \
+  --pairs tmp_adoption_test/data/matched_controls_v2_pairs.csv \
+  --treatment-ts tmp_adoption_test/data/python_did_test/ts_repos_monthly.csv \
+  --control-ts tmp_adoption_test/data/python_control_did_test/ts_repos_monthly.csv \
+  --output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2.csv \
+  --balanced-output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced.csv
+
+# python proc_scripts/prepare_panel_event_v2.py \
+#   --treatment-meta tmp_adoption_test/data/matched_controls_v2_treatment_only.csv \
+#   --pairs tmp_adoption_test/data/matched_controls_v2_pairs.csv \
+#   --treatment-ts tmp_adoption_test/data/python_did_test/ts_repos_monthly.csv \
+#   --control-ts tmp_adoption_test/data/python_control_did_test/ts_repos_monthly.csv \
+#   --output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2.csv
+
+
+
+============================================================
+FILE: run5d-did-borusyak.sh
+============================================================
+
+export PROJECT_ROOT="$(pwd)"
+
+Rscript -e "rmarkdown::render(
+  'proc_r/DiffInDiffBorusyak_v2.Rmd',
+  output_dir = 'tmp_adoption_test/data/python_did_test/activity_did_smoke_borusyak_v2',
+  envir = new.env()
+)"
+
+============================================================
+FILE: run6a-sonarq.sh
+============================================================
+
+python proc_scripts/run_sonarqube_v2.py \
+  --aggregation month \
+  --input-file tmp_adoption_test/data/python_did_test/sonarqube_real_smoke/data/ts_repos_monthly.csv \
+  --output-file tmp_adoption_test/data/python_did_test/sonarqube_real_smoke/data/ts_repos_monthly_scanned.csv \
+  --clone-dir ../ai_code_complexity_study_repo_dataset \
+  --num-processes 1
+
+
+
+============================================================
+FILE: run6b-sonarq-collect-warnings.sh
+============================================================
+
+python proc_scripts/collect_sonarqube_warnings_v2.py --help
+
+python proc_scripts/collect_sonarqube_warnings_v2.py \
+  --mode timeseries \
+  --data-dir tmp_adoption_test/data/python_did_test/sonarqube_real_smoke/data \
+  --timeseries-file tmp_adoption_test/data/python_did_test/sonarqube_real_smoke/data/ts_repos_monthly_scanned.csv \
+  --warnings-output tmp_adoption_test/data/python_did_test/sonarqube_real_smoke/data/sonarqube_warnings.csv \
+  --definitions-output tmp_adoption_test/data/python_did_test/sonarqube_real_smoke/data/sonarqube_warning_definitions.csv \
+  --repos "VRSEN/agency-swarm"
+
+============================================================
+FILE: run6c-create-input.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo
+echo "--- Step 1 Create full treatment/control scan input ---"
+echo
+mkdir -p tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data
+mkdir -p tmp_adoption_test/data/python_did_test/sonarqube_full_control/data
+
+python - <<'PY'
+import pandas as pd
+from pathlib import Path
+
+src = "tmp_adoption_test/data/python_did_test/sonarqube_input_check/sonarqube_scan_input_balanced_history_lookup.csv"
+
+treat_out = "tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data/ts_repos_monthly.csv"
+ctrl_out = "tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly.csv"
+
+df = pd.read_csv(src)
+
+required = {"repo_name", "time", "dataset_source", "latest_commit"}
+missing = required - set(df.columns)
+if missing:
+    raise SystemExit(f"Missing required columns: {missing}")
+
+df = df[df["latest_commit"].notna()].copy()
+
+def make_scan_input(dataset_source, out_path):
+    x = df[df["dataset_source"] == dataset_source].copy()
+    x = x.rename(columns={"time": "month"})
+    x = x[["repo_name", "month", "latest_commit"]]
+    x = x.drop_duplicates()
+    x = x.sort_values(["repo_name", "month"])
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    x.to_csv(out_path, index=False)
+    print()
+    print(dataset_source)
+    print("saved:", out_path)
+    print("rows:", len(x))
+    print("repos:", x["repo_name"].nunique())
+    print("months:", x["month"].min(), "to", x["month"].max())
+    print("missing latest_commit:", x["latest_commit"].isna().sum())
+
+make_scan_input("treatment", treat_out)
+make_scan_input("control", ctrl_out)
+PY
+
+echo
+echo "--- Step 2 Check duplicated commits before full SonarQube scan ---"
+echo
+python - <<'PY'
+import pandas as pd
+
+files = {
+    "treatment": "tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data/ts_repos_monthly.csv",
+    "control": "tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly.csv",
+}
+
+for name, path in files.items():
+    df = pd.read_csv(path)
+    print()
+    print(name)
+    print("rows:", len(df))
+    print("repos:", df["repo_name"].nunique())
+    print("unique repo-commit pairs:", df[["repo_name", "latest_commit"]].drop_duplicates().shape[0])
+    print("same-commit repeated rows:", len(df) - df[["repo_name", "latest_commit"]].drop_duplicates().shape[0])
+PY
+
+
+============================================================
+FILE: run6d-sonarqube-full-treatment.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+
+TS="$(date +%Y%m%d-%H%M%S)"
+LOG_FILE="logs/run6d-sonarqube-full-treatment-${TS}.log"
+
+echo "============================================================"
+echo "run6d: full treatment SonarQube scan"
+echo "Started:  $(date)"
+echo "Log file: ${LOG_FILE}"
+echo "============================================================"
+
+{
+  echo "============================================================"
+  echo "run6d: full treatment SonarQube scan"
+  echo "Started: $(date)"
+  echo "Input:   tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data/ts_repos_monthly.csv"
+  echo "Output:  tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data/ts_repos_monthly_scanned.csv"
+  echo "Clone:   ../ai_code_complexity_study_repo_dataset"
+  echo "============================================================"
+  echo
+
+  python proc_scripts/run_sonarqube_v2.py \
+    --aggregation month \
+    --input-file tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data/ts_repos_monthly.csv \
+    --output-file tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data/ts_repos_monthly_scanned.csv \
+    --clone-dir ../ai_code_complexity_study_repo_dataset \
+    --num-processes 1
+
+  echo
+  echo "============================================================"
+  echo "Completed: $(date)"
+  echo "============================================================"
+
+} 2>&1 | tee "${LOG_FILE}"
+
+
+============================================================
+FILE: run6e-sonarqube-full-control.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+
+TS="$(date +%Y%m%d-%H%M%S)"
+LOG_FILE="logs/run6e-sonarqube-full-control-${TS}.log"
+
+echo "============================================================"
+echo "run6e: full control SonarQube scan"
+echo "Started:  $(date)"
+echo "Log file: ${LOG_FILE}"
+echo "============================================================"
+
+{
+  echo "============================================================"
+  echo "run6e: full control SonarQube scan"
+  echo "Started: $(date)"
+  echo "Input:   tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly.csv"
+  echo "Output:  tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly_scanned.csv"
+  echo "Clone:   ../ai_code_complexity_control_repo_dataset"
+  echo "Mode:    repo-level incremental save"
+  echo "============================================================"
+  echo
+
+  python proc_scripts/run_sonarqube_v2.py \
+    --aggregation month \
+    --input-file tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly.csv \
+    --output-file tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly_scanned.csv \
+    --clone-dir ../ai_code_complexity_control_repo_dataset \
+    --num-processes 1 \
+    --incremental-save
+
+  echo
+  echo "============================================================"
+  echo "Completed: $(date)"
+  echo "============================================================"
+
+} 2>&1 | tee "${LOG_FILE}"
+
+
+============================================================
+FILE: run6f-check-sonarqube-coverage.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+TS="$(date +%Y%m%d-%H%M%S)"
+LOG_FILE="logs/run6f-check-sonarqube-coverage-${TS}.log"
+
+python proc_scripts/check-sonarqube-coverage.py 2>&1 | tee "${LOG_FILE}"
+
+echo "Saved coverage log to ${LOG_FILE}"
+
+
+============================================================
+FILE: run6g-merge-sonarqube-panel.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+
+TS="$(date +%m%d-%H%M)"
+LOG_FILE="logs/run6g-merge-sonarqube-panel-${TS}.log"
+
+{
+  echo "============================================================"
+  echo "run6g: merge SonarQube metrics into balanced panel"
+  echo "Started: $(date)"
+  echo "Log file: ${LOG_FILE}"
+  echo "============================================================"
+  echo
+
+  python proc_scripts/merge-sonarqube-panel.py \
+    --panel tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced.csv \
+    --treatment-metrics tmp_adoption_test/data/python_did_test/sonarqube_full_treatment/data/ts_repos_monthly_scanned.csv \
+    --control-metrics tmp_adoption_test/data/python_did_test/sonarqube_full_control/data/ts_repos_monthly_scanned.csv \
+    --output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_with_sonarqube.csv \
+    --qc-output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_with_sonarqube_qc.csv
+
+  echo
+  echo "============================================================"
+  echo "Completed: $(date)"
+  echo "============================================================"
+
+} 2>&1 | tee "${LOG_FILE}"
+
+echo "Saved log to ${LOG_FILE}"
+
+
+============================================================
+FILE: run6h-check-sonarqube-panel.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+
+TS="$(date +%m%d-%H%M)"
+LOG_FILE="logs/run6h-check-sonarqube-panel-${TS}.log"
+
+{
+  echo "============================================================"
+  echo "run6h: check merged SonarQube panel"
+  echo "Started: $(date)"
+  echo "Log file: ${LOG_FILE}"
+  echo "============================================================"
+  echo
+
+  python proc_scripts/check-sonarqube-panel.py \
+    --input tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_with_sonarqube.csv \
+    --summary-output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_with_sonarqube_summary.csv \
+    --missing-output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_with_sonarqube_missing_analysis_outcomes.csv
+
+  echo
+  echo "============================================================"
+  echo "Completed: $(date)"
+  echo "============================================================"
+
+} 2>&1 | tee "${LOG_FILE}"
+
+echo "Saved log to ${LOG_FILE}"
+
+
+============================================================
+FILE: run6i-prepare-quality-did-input.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+
+TS="$(date +%m%d-%H%M)"
+LOG_FILE="logs/run6i-prepare-quality-did-input-${TS}.log"
+
+{
+  echo "============================================================"
+  echo "run6i: prepare quality DiD input"
+  echo "Started: $(date)"
+  echo "Log file: ${LOG_FILE}"
+  echo "============================================================"
+  echo
+
+  python proc_scripts/prepare-quality-did-input.py \
+    --input tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_with_sonarqube.csv \
+    --output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_quality_did_input.csv \
+    --qc-output tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_quality_did_input_qc.csv
+
+  echo
+  echo "============================================================"
+  echo "Completed: $(date)"
+  echo "============================================================"
+
+} 2>&1 | tee "${LOG_FILE}"
+
+echo "Saved log to ${LOG_FILE}"
+
+
+============================================================
+FILE: run6j-did-borusyak-quality.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+
+TS="$(date +%m%d-%H%M)"
+LOG_FILE="logs/run6j-did-borusyak-quality-${TS}.log"
+
+export PROJECT_ROOT="$(pwd)"
+
+{
+  echo "============================================================"
+  echo "run6j: Borusyak DiD for SonarQube quality outcomes"
+  echo "Started: $(date)"
+  echo "Log file: ${LOG_FILE}"
+  echo "PROJECT_ROOT: ${PROJECT_ROOT}"
+  echo "============================================================"
+  echo
+
+  Rscript -e "rmarkdown::render(
+    'proc_r/DiffInDiffBorusyak_quality_v2.Rmd',
+    output_dir = 'tmp_adoption_test/data/python_did_test/quality_did_borusyak_v2',
+    envir = new.env()
+  )"
+
+  echo
+  echo "============================================================"
+  echo "Completed: $(date)"
+  echo "============================================================"
+
+} 2>&1 | tee "${LOG_FILE}"
+
+echo "Saved log to ${LOG_FILE}"
+
+
+============================================================
+FILE: run6k-summarize-borusyak-quality-results.sh
+============================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p logs
+
+TS="$(date +%m%d-%H%M)"
+LOG_FILE="logs/run6k-summarize-borusyak-quality-results-${TS}.log"
+
+OUT_DIR="tmp_adoption_test/data/python_did_test/quality_did_borusyak_v2"
+
+{
+  echo "============================================================"
+  echo "run6k: summarize Borusyak quality DiD results"
+  echo "Started: $(date)"
+  echo "Log file: ${LOG_FILE}"
+  echo "============================================================"
+  echo
+
+  python proc_scripts/summarize-borusyak-quality-results.py \
+    --static-effects "${OUT_DIR}/borusyak_quality_v2_static_effects.csv" \
+    --dynamic-effects "${OUT_DIR}/borusyak_quality_v2_dynamic_effects.csv" \
+    --panel-checks "${OUT_DIR}/borusyak_quality_v2_panel_checks.csv" \
+    --output-summary "${OUT_DIR}/borusyak_quality_v2_report_summary.csv" \
+    --output-static "${OUT_DIR}/borusyak_quality_v2_static_effects_with_pct.csv" \
+    --output-dynamic-summary "${OUT_DIR}/borusyak_quality_v2_dynamic_pretrend_summary.csv"
+
+  echo
+  echo "============================================================"
+  echo "Completed: $(date)"
+  echo "============================================================"
+
+} 2>&1 | tee "${LOG_FILE}"
+
+echo "Saved log to ${LOG_FILE}"

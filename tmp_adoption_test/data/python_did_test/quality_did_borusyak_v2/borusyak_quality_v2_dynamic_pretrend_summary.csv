@@ -1,0 +1,4 @@
+outcome,outcome_label,pre_period_rows,pre_significant_count,post_period_rows,post_significant_count,post_mean_estimate,post_mean_percent_change,pretrend_warning
+log_cognitive_complexity,Code Complexity,5,0,7,0,-0.2550412908717933,-22.511549835610445,0
+log_duplicated_lines_density,Duplicated Lines Density,5,1,7,1,-0.16317107296190417,-15.055414123507827,1
+log_static_analysis_warnings,Static Analysis Warnings,5,4,7,0,0.031829742969914275,3.2341726905332324,1

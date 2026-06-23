@@ -1,0 +1,13 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_quality_v2.Rmd
+derived_from,proc_r/DiffInDiffBorusyak_v2.Rmd and notebooks/DiffInDiffBorusyak.Rmd
+helper_file,proc_r/diff_in_diff_borusyak_helpers.R
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_quality_did_input.csv
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/quality_did_borusyak_v2
+panel_type,balanced SonarQube quality panel with zero-commit months
+outcomes,"log_static_analysis_warnings, log_duplicated_lines_density, log_cognitive_complexity"
+covariates,contributors + log_ncloc
+estimator,Borusyak imputation via didimputation::did_imputation
+purpose,Small-scale quality DiD validation for the Python treatment/control panel
+full_paper_covariates_not_yet_included,"age, stars, and issues will be added later from GHArchive/BigQuery or GitHub-derived covariate tables"
+interpretation_warning,Small-N pipeline validation only; estimates and p-values are not final empirical findings

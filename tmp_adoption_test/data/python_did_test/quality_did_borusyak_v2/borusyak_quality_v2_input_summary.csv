@@ -1,0 +1,3 @@
+dataset_source,rows,repos,mean_log_static_warnings,mean_log_dup_density,mean_log_complexity,source_less_rows
+treatment,208,13,4.92353261186058,1.01150040763521,7.08564907031963,1
+control,530,38,4.09798852474457,1.28808516923066,5.82373034769842,0

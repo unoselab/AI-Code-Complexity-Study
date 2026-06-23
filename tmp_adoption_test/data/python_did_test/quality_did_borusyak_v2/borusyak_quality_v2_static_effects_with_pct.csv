@@ -1,0 +1,4 @@
+outcome,term,estimate,std_error,conf_low,conf_high,note,outcome_label,percent_change,percent_change_ci_low,percent_change_ci_high,static_significant
+log_static_analysis_warnings,treat,0.0864350997720815,0.203870481240252,-0.313151043458812,0.486021243002975,smoke test only; do not interpret as final estimate,Static Analysis Warnings,9.028060596175514,-26.886052960617434,62.58345334523339,False
+log_duplicated_lines_density,treat,-0.0541120405887191,0.196526128969742,-0.439303253369413,0.331079172191975,smoke test only; do not interpret as final estimate,Duplicated Lines Density,-5.267403840280571,-35.551469234855126,39.24700328489041,False
+log_cognitive_complexity,treat,-0.0855366994476331,0.193071473043697,-0.46395678661328,0.292883387718014,smoke test only; do not interpret as final estimate,Code Complexity,-8.198054837085689,-37.1209273943183,34.02864874526181,False

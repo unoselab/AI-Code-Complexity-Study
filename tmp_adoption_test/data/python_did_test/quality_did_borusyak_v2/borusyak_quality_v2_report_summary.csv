@@ -1,0 +1,9 @@
+check,value
+rows,738
+treated_repos,13
+control_repos,38
+source_less_commit_rows,1
+raw_metric_missing_rows,1
+static_outcomes,3
+dynamic_outcomes,3
+outcomes_with_pretrend_warning,2

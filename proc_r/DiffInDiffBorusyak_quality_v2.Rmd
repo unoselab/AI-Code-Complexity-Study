@@ -1,0 +1,449 @@
+---
+title: "Diff-in-Diff Borusyak v2: SonarQube Quality Outcomes"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- Sys.getenv("PROJECT_ROOT", unset = normalizePath(".", mustWork = TRUE))
+
+panel_path <- file.path(
+  project_root,
+  "tmp_adoption_test/data/python_did_test/panel_event_monthly_matched_v2_balanced_quality_did_input.csv"
+)
+
+out_dir <- file.path(
+  project_root,
+  "tmp_adoption_test/data/python_did_test/quality_did_borusyak_v2"
+)
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+# Purpose
+
+This notebook runs a small-scale Borusyak imputation DiD analysis for SonarQube quality outcomes.
+
+It uses the balanced repository-month quality panel created from:
+
+```text
+Git history activity outcomes
++ SonarQube static-analysis quality metrics
++ treatment/control event-study variables
+```
+
+This is a small Python-panel pipeline validation analysis, not the final full-scale causal result.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+
+source(file.path(project_root, "proc_r/diff_in_diff_borusyak_helpers.R"))
+```
+
+# Load Quality Panel
+
+```{r load-panel}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Output dir:", out_dir, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+
+required_cols <- c(
+  "repo_name",
+  "time",
+  "event",
+  "dataset_source",
+  "ever_treated",
+  "post_event",
+  "time_to_event",
+  "is_treatment",
+  "is_treatment_dynamic",
+  "contributors",
+  "ncloc",
+  "log_ncloc",
+  "static_analysis_warnings",
+  "log_static_analysis_warnings",
+  "duplicated_lines_density",
+  "cognitive_complexity",
+  "log_cognitive_complexity",
+  "technical_debt",
+  "log_technical_debt",
+  "sonarqube_source_less_commit",
+  "sonarqube_any_raw_metric_missing"
+)
+
+missing_cols <- setdiff(required_cols, names(panel_raw))
+if (length(missing_cols) > 0) {
+  stop("Missing required columns: ", paste(missing_cols, collapse = ", "))
+}
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repos:", uniqueN(panel_raw$repo_name), "\n")
+cat("Months:", min(panel_raw$time), "to", max(panel_raw$time), "\n")
+```
+
+# Panel Sanity Checks
+
+```{r panel-checks}
+panel_checks <- data.frame(
+  check = c(
+    "rows",
+    "treated_repos",
+    "control_repos",
+    "control_post_event_sum",
+    "control_dynamic_sum",
+    "treated_post_rows",
+    "post_event_mismatch_rows",
+    "source_less_commit_rows",
+    "raw_metric_missing_rows",
+    "static_analysis_warnings_nonmissing",
+    "duplicated_lines_density_nonmissing",
+    "cognitive_complexity_nonmissing"
+  ),
+  value = c(
+    nrow(panel_raw),
+    uniqueN(panel_raw[ever_treated == 1, repo_name]),
+    uniqueN(panel_raw[ever_treated == 0, repo_name]),
+    sum(panel_raw[ever_treated == 0, post_event], na.rm = TRUE),
+    sum(panel_raw[ever_treated == 0, is_treatment_dynamic], na.rm = TRUE),
+    sum(panel_raw[ever_treated == 1, post_event], na.rm = TRUE),
+    sum(
+      panel_raw$ever_treated == 1 &
+        ((panel_raw$time_to_event >= 0) != (panel_raw$post_event == 1)),
+      na.rm = TRUE
+    ),
+    sum(panel_raw$sonarqube_source_less_commit, na.rm = TRUE),
+    sum(panel_raw$sonarqube_any_raw_metric_missing, na.rm = TRUE),
+    sum(!is.na(panel_raw$static_analysis_warnings)),
+    sum(!is.na(panel_raw$duplicated_lines_density)),
+    sum(!is.na(panel_raw$cognitive_complexity))
+  )
+)
+
+print(panel_checks)
+
+fwrite(
+  panel_checks,
+  file.path(out_dir, "borusyak_quality_v2_panel_checks.csv")
+)
+```
+
+# Prepare Data for Borusyak Estimator
+
+```{r prepare-data}
+panel_data <- copy(panel_raw)
+
+panel_data[, repo_name_str := repo_name]
+panel_data[, repo_name := as.numeric(factor(repo_name))]
+
+panel_data[, time := as.integer(gsub("-", "", as.character(time)))]
+
+event_chr <- as.character(panel_data$event)
+event_chr[event_chr %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+
+panel_data[, event := suppressWarnings(as.integer(gsub("-", "", event_chr)))]
+panel_data[is.na(event), event := 0L]
+
+# Match the original Borusyak notebook cohort-window logic.
+# Controls are event = 0. Treatment cohorts are retained from 2024-08 to 2025-03.
+panel_data <- panel_data[
+  event < 202401 |
+    (event > 202407 & event <= 202503)
+]
+
+panel_data[, event := as.integer(event)]
+
+# Quality outcomes.
+# run6i already created:
+#   log_static_analysis_warnings
+#   log_cognitive_complexity
+#   log_technical_debt
+#   log_ncloc
+#
+# For paper-style log handling, create a log version of duplicated line density.
+panel_data[, log_duplicated_lines_density := log(duplicated_lines_density + 1)]
+
+# First-stage covariates.
+# contributors comes from Git history. Use log1p as in the activity smoke test.
+panel_data[, contributors := log(contributors + 1)]
+
+panel_data[, treated := ifelse(event > 0, 1, 0)]
+
+cat("Rows after cohort filtering:", nrow(panel_data), "\n")
+cat("Treated repos:", uniqueN(panel_data[treated == 1, repo_name]), "\n")
+cat("Control repos:", uniqueN(panel_data[treated == 0, repo_name]), "\n")
+
+quality_summary <- panel_data[, .(
+  rows = .N,
+  repos = uniqueN(repo_name),
+  mean_log_static_warnings = mean(log_static_analysis_warnings, na.rm = TRUE),
+  mean_log_dup_density = mean(log_duplicated_lines_density, na.rm = TRUE),
+  mean_log_complexity = mean(log_cognitive_complexity, na.rm = TRUE),
+  source_less_rows = sum(sonarqube_source_less_commit, na.rm = TRUE)
+), by = dataset_source]
+
+print(quality_summary)
+
+fwrite(
+  quality_summary,
+  file.path(out_dir, "borusyak_quality_v2_input_summary.csv")
+)
+```
+
+# Outcomes and First Stage
+
+```{r outcomes}
+outcome_vars <- c(
+  "log_static_analysis_warnings",
+  "log_duplicated_lines_density",
+  "log_cognitive_complexity"
+)
+
+outcome_names <- c(
+  "Static Analysis Warnings",
+  "Duplicated Lines Density",
+  "Code Complexity"
+)
+
+# Small-panel quality first stage.
+# This controls for contributor activity and codebase size.
+# Full-paper covariates such as age, stars, and issues are not yet included.
+first_stage_formula <- ~ contributors + log_ncloc | repo_name + time
+
+cat("Outcomes:\n")
+print(data.frame(outcome = outcome_vars, label = outcome_names))
+
+cat("\nFirst-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Static Borusyak Effects
+
+```{r static-effects}
+static_results <- list()
+static_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running static Borusyak model for:", var, "\n")
+
+  static_results[[var]] <- tryCatch(
+    run_borusyak_static(
+      data = panel_data,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula
+    ),
+    error = function(e) {
+      static_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+static_df <- bind_rows(lapply(outcome_vars, function(v) {
+  extract_static_result(static_results[[v]], v)
+}))
+
+static_df$outcome_label <- outcome_names[match(static_df$outcome, outcome_vars)]
+
+print(static_df)
+
+fwrite(
+  static_df,
+  file.path(out_dir, "borusyak_quality_v2_static_effects.csv")
+)
+
+if (length(static_errors) > 0) {
+  static_error_df <- data.frame(
+    outcome = names(static_errors),
+    error = unlist(static_errors),
+    row.names = NULL
+  )
+
+  print(static_error_df)
+
+  fwrite(
+    static_error_df,
+    file.path(out_dir, "borusyak_quality_v2_static_errors.csv")
+  )
+}
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_results <- list()
+dynamic_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running dynamic Borusyak model for:", var, "\n")
+
+  dynamic_results[[var]] <- tryCatch(
+    run_borusyak_dynamic(
+      data = panel_data,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      horizon = -6:6,
+      pretrends = -6:-2
+    ),
+    error = function(e) {
+      dynamic_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+dynamic_df <- bind_rows(lapply(seq_along(outcome_vars), function(i) {
+  extract_dynamic_result(
+    dynamic_results[[outcome_vars[i]]],
+    outcome = outcome_vars[i],
+    outcome_label = outcome_names[i]
+  )
+}))
+
+print(dynamic_df)
+
+fwrite(
+  dynamic_df,
+  file.path(out_dir, "borusyak_quality_v2_dynamic_effects.csv")
+)
+
+if (length(dynamic_errors) > 0) {
+  dynamic_error_df <- data.frame(
+    outcome = names(dynamic_errors),
+    error = unlist(dynamic_errors),
+    row.names = NULL
+  )
+
+  print(dynamic_error_df)
+
+  fwrite(
+    dynamic_error_df,
+    file.path(out_dir, "borusyak_quality_v2_dynamic_errors.csv")
+  )
+}
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=9, fig.height=3.5}
+if (nrow(dynamic_df) > 0) {
+  dynamic_df$outcome_label <- factor(dynamic_df$outcome_label, levels = outcome_names)
+
+  p <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_errorbar(
+      data = subset(dynamic_df, significant %in% TRUE),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "solid"
+    ) +
+    geom_errorbar(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "dotted"
+    ) +
+    geom_point(
+      data = subset(dynamic_df, significant %in% TRUE),
+      shape = 19,
+      size = 1.7
+    ) +
+    geom_point(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      shape = 21,
+      fill = "transparent",
+      size = 1.7
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
+    labs(
+      title = "Borusyak Quality DiD: SonarQube Outcomes",
+      subtitle = "Balanced Python panel; small-N pipeline validation only",
+      x = "Months Relative to Cursor Adoption",
+      y = "Treatment Effect",
+      caption = "Filled dots: CI excludes 0. Hollow dots: CI includes 0. Small-N estimates are not final empirical findings."
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
+
+  print(p)
+
+  ggsave(
+    filename = file.path(out_dir, "dynamic_effects_borusyak_v2_quality.pdf"),
+    plot = p,
+    width = 9,
+    height = 3.5
+  )
+} else {
+  cat("No dynamic effects to plot.\n")
+}
+```
+
+# Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "derived_from",
+    "helper_file",
+    "panel_path",
+    "out_dir",
+    "panel_type",
+    "outcomes",
+    "covariates",
+    "estimator",
+    "purpose",
+    "full_paper_covariates_not_yet_included",
+    "interpretation_warning"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_quality_v2.Rmd",
+    "proc_r/DiffInDiffBorusyak_v2.Rmd and notebooks/DiffInDiffBorusyak.Rmd",
+    "proc_r/diff_in_diff_borusyak_helpers.R",
+    panel_path,
+    out_dir,
+    "balanced SonarQube quality panel with zero-commit months",
+    paste(outcome_vars, collapse = ", "),
+    "contributors + log_ncloc",
+    "Borusyak imputation via didimputation::did_imputation",
+    "Small-scale quality DiD validation for the Python treatment/control panel",
+    "age, stars, and issues will be added later from GHArchive/BigQuery or GitHub-derived covariate tables",
+    "Small-N pipeline validation only; estimates and p-values are not final empirical findings"
+  )
+)
+
+print(metadata)
+
+fwrite(
+  metadata,
+  file.path(out_dir, "borusyak_quality_v2_metadata.csv")
+)
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```
