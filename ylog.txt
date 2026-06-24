@@ -1,83 +1,167 @@
+Panel file: data_baseline_backup/panel_event_monthly.csv
+Repos file: data_baseline_backup/repos.csv
+panel rows: 22096
+repos rows: 8621
 
---- Step 1: Show candidate control repos ---
+dataset_source counts:
+dataset_source
+control      12203
+treatment     9893
 
-                           repo_name  rows first_month last_month  commits_sum  lines_added_sum  latest_commit_count
-      Lightning-AI/lightning-thunder    20     2024-01    2025-08       1739.0         142800.0                   20
-               Heir-of-God/Project-S    16     2024-05    2025-08       1074.0          38463.0                   16
-                    shinjiwlab/versa    16     2024-05    2025-08        625.0         100096.0                   16
-                    smkrv/ha-text-ai    10     2024-11    2025-08        470.0          61919.0                   10
-       KylinMountain/graphrag-server    14     2024-07    2025-08        308.0          48677.0                   14
-                      weaviate/Verba    20     2024-01    2025-08        247.0          96248.0                   20
-           selfedu-rus/neuro-pytorch    12     2024-09    2025-08        220.0           8737.0                   12
-            GALIAIS/LimbusCompanySRA    10     2024-11    2025-08        143.0          21355.0                   10
-       multimodal-art-projection/YuE     8     2025-01    2025-08        135.0       11044508.0                    8
-         iwyxdxl/WeChatBot_WXAUTO_SE     7     2025-02    2025-08        128.0          60338.0                    7
- algorandfoundation/algokit-utils-py    20     2024-01    2025-08        123.0         136872.0                   20
-   xob0t/google_photos_mobile_client     9     2024-12    2025-08        110.0           7439.0                    9
-                        NVIDIA/RULER    17     2024-04    2025-08         96.0          20853.0                   17
-DareFail/AI-Video-Boilerplate-Simple    13     2024-08    2025-08         94.0          19645.0                   13
-              explosion/spacy-layout    10     2024-11    2025-08         86.0           1786.0                   10
-          facebookresearch/videoseal     9     2024-12    2025-08         82.0          10661.0                    9
-            yuvraj108c/ComfyUI_InvSR     8     2025-01    2025-08         50.0           2528.0                    8
-        robotframework/statuschecker    20     2024-01    2025-08         34.0           1826.0                   20
-             TTPlanetPig/Comfyui_JC2    11     2024-10    2025-08         29.0           2653.0                   11
-                      sair-lab/iMTSP    19     2024-02    2025-08         26.0           1847.0                   19
+unique treatment repos from panel: 858
+repos after metadata join: 858
+missing primary language: 24
 
---- Step 2: Create control smoke-test input ---
-CONTROL_REPO=robotframework/statuschecker
+Primary language counts among treatment repos:
+repo_primary_language
+TypeScript          379
+Python              128
+JavaScript           62
+Go                   36
+(missing)            24
+Rust                 24
+PHP                  23
+Vue                  16
+HTML                 16
+C#                   13
+Jupyter Notebook     13
+Dart                 12
+Swift                11
+C++                  11
+Shell                11
+Ruby                 10
+Elixir                8
+Svelte                7
+CSS                   7
+MDX                   6
+Astro                 5
+Java                  5
+C                     4
+Solidity              4
+Lua                   4
+Kotlin                3
+OCaml                 2
+HCL                   1
+Liquid                1
+Mathematica           1
 
-Saved: tmp_adoption_test/data/python_did_test/sonarqube_control_smoke/data/ts_repos_monthly.csv
-                   repo_name   month                            latest_commit
-robotframework/statuschecker 2024-01 7a0b582082036e3c39e89e04a2bcf160a5d68cb4
-robotframework/statuschecker 2024-02 7a0b582082036e3c39e89e04a2bcf160a5d68cb4
-robotframework/statuschecker 2024-03 7a0b582082036e3c39e89e04a2bcf160a5d68cb4
+Selected languages: TypeScript, JavaScript
+Group name: JavaScript_TypeScript
+JavaScript_TypeScript treatment repos: 441
+Unique repos: 441
 
---- Step 3: Run control SonarQube smoke scan ---
+Saved language subset: tmp_jsts_test/data/original_paper_treatment_jsts_repos.csv
 
-2026-06-22 13:22:30,750 [INFO] Using data directory: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_sonar_batch/data
-2026-06-22 13:22:30,750 [INFO] Using input file: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/sonarqube_control_smoke/data/ts_repos_monthly.csv
-2026-06-22 13:22:30,750 [INFO] Using output file: /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/sonarqube_control_smoke/data/ts_repos_monthly_scanned.csv
-2026-06-22 13:22:30,750 [INFO] Using clone directory: /home/user1-system12/project-workspace/ai_code_complexity_control_repo_dataset
-2026-06-22 13:22:30,750 [INFO] Using num processes: 1
-2026-06-22 13:22:30,751 [INFO] Using input-derived date range: 2024-01 to 2024-03
-2026-06-22 13:22:30,764 [INFO] Processing robotframework/statuschecker from 2024-01 to 2024-03
-2026-06-22 13:22:30,771 [ERROR] Failed to check existing analysis for robotframework_statuschecker: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=robotframework_statuschecker&category=VERSION&p=1&ps=100
-2026-06-22 13:22:30,771 [INFO] robotframework/statuschecker at 2024-01 (7a0b5820)
-2026-06-22 13:22:37,859 [INFO] SonarQube scan completed for robotframework_statuschecker at 2024-01
-2026-06-22 13:22:37,868 [INFO] Waiting for SonarQube analysis for robotframework_statuschecker version 2024-01...
-2026-06-22 13:22:42,875 [INFO] Analysis already exists for robotframework_statuschecker version 2024-01
-2026-06-22 13:22:42,875 [INFO] SonarQube analysis is ready for robotframework_statuschecker version 2024-01
-2026-06-22 13:22:42,881 [INFO] Found 1 analyses for robotframework_statuschecker
-2026-06-22 13:22:42,887 [INFO] Metrics for robotframework/statuschecker at 2024-01: {'bugs': 0.0, 'code_smells': 1.0, 'cognitive_complexity': 90.0, 'comment_lines_density': 19.8, 'duplicated_lines_density': 0.0, 'ncloc': 389.0, 'software_quality_maintainability_remediation_effort': 5.0, 'vulnerabilities': 0.0}
-2026-06-22 13:22:42,891 [INFO] robotframework/statuschecker at 2024-02 (7a0b5820)
-2026-06-22 13:22:49,962 [INFO] SonarQube scan completed for robotframework_statuschecker at 2024-02
-2026-06-22 13:22:49,972 [INFO] Waiting for SonarQube analysis for robotframework_statuschecker version 2024-02...
-2026-06-22 13:22:54,979 [INFO] Analysis already exists for robotframework_statuschecker version 2024-02
-2026-06-22 13:22:54,979 [INFO] SonarQube analysis is ready for robotframework_statuschecker version 2024-02
-2026-06-22 13:22:54,983 [INFO] Found 2 analyses for robotframework_statuschecker
-2026-06-22 13:22:54,988 [INFO] Metrics for robotframework/statuschecker at 2024-02: {'bugs': 0.0, 'code_smells': 1.0, 'cognitive_complexity': 90.0, 'comment_lines_density': 19.8, 'duplicated_lines_density': 0.0, 'ncloc': 389.0, 'software_quality_maintainability_remediation_effort': 5.0, 'vulnerabilities': 0.0}
-2026-06-22 13:22:54,994 [INFO] robotframework/statuschecker at 2024-03 (7a0b5820)
-2026-06-22 13:23:02,074 [INFO] SonarQube scan completed for robotframework_statuschecker at 2024-03
-2026-06-22 13:23:02,084 [INFO] Waiting for SonarQube analysis for robotframework_statuschecker version 2024-03...
-2026-06-22 13:23:07,091 [INFO] Analysis already exists for robotframework_statuschecker version 2024-03
-2026-06-22 13:23:07,091 [INFO] SonarQube analysis is ready for robotframework_statuschecker version 2024-03
-2026-06-22 13:23:07,094 [INFO] Found 3 analyses for robotframework_statuschecker
-2026-06-22 13:23:07,099 [INFO] Metrics for robotframework/statuschecker at 2024-03: {'bugs': 0.0, 'code_smells': 1.0, 'cognitive_complexity': 90.0, 'comment_lines_density': 19.8, 'duplicated_lines_density': 0.0, 'ncloc': 389.0, 'software_quality_maintainability_remediation_effort': 5.0, 'vulnerabilities': 0.0}
-2026-06-22 13:23:07,107 [INFO] Updated metrics saved to /home/user1-system12/project-workspace/ai_code_complexity_study/tmp_adoption_test/data/python_did_test/sonarqube_control_smoke/data/ts_repos_monthly_scanned.csv
+Top 30 JavaScript_TypeScript repos:
+                                 repo_name repo_primary_language repo_stars repo_commits repo_contributors repo_size
+                      0xAquaWolf/portfolio            TypeScript         60        161.0               1.0   26580.0
+                             0xfrankz/Kaas            TypeScript         69        492.0               1.0   13872.0
+                            0xsend/sendapp            TypeScript         24       1670.0              15.0   21291.0
+                   AIDC-AI/ComfyUI-Copilot            TypeScript       1215        177.0               9.0   39404.0
+               AdirD/nestjs-context-logger            TypeScript         32         57.0               2.0     183.0
+                      AlbertoBasalo/ng-lab            TypeScript         28        345.0               1.0    6621.0
+                        Alezander9/WiiWork            TypeScript         10         50.0               1.0    1251.0
+                     AnEntrypoint/apptoapp            JavaScript         18        628.0               2.0     700.0
+                   Ashref-dev/entretien-ai            TypeScript         43        292.0               3.0    9576.0
+             AudiusProject/audius-protocol            TypeScript        577      15427.0              43.0  738514.0
+                     Automattic/wp-calypso            TypeScript      12469      74301.0             354.0  911263.0
+                        Bistutu/FluentRead            TypeScript       2307        368.0               4.0   18126.0
+      CodeGuide-dev/codeguide-starter-lite            TypeScript        318         12.0               1.0     221.0
+                Comfy-Org/ComfyUI_frontend            TypeScript        959       2237.0              59.0  140584.0
+                         Comfy-Org/desktop            TypeScript       1330        846.0              11.0   25474.0
+                    Comfy-Org/litegraph.js            TypeScript        151       1528.0              74.0   31753.0
+                      Coyenn/personal-site            TypeScript         12         92.0               1.0   81449.0
+               Cunninger/grok-remain-count            JavaScript         18         20.0               3.0      99.0
+                  Dankovk/browser-use-node            TypeScript         48         56.0               1.0    4452.0
+                        Darlley/saas-admin            TypeScript         10        109.0               1.0   24643.0
+                       David-Sola/AIGaming            JavaScript         64          6.0               1.0   27562.0
+         Dhravya/mcp-durable-object-client            TypeScript         52          4.0               1.0     226.0
+           DiscourseGraphs/discourse-graph            TypeScript         11        745.0               5.0   30704.0
+                       DumbWareio/DumbDrop            JavaScript        271         89.0               8.0     357.0
+                        DumbWareio/DumbPad            JavaScript        172        116.0               5.0     269.0
+                       Dwtexe/cursor-stats            TypeScript         57         51.0               4.0   16847.0
+                    EugenEistrach/et-stack            TypeScript         16        207.0               2.0    2211.0
+                      FradSer/qa-generator            TypeScript         51         34.0               1.0     327.0
+FurkanKayaDev/react-native-spotlight-guide            TypeScript         12         10.0               1.0    9339.0
+                       GODrums/BetterFloat            TypeScript         55        757.0               9.0    8336.0
 
---- Step 4: Check scanned metrics ---
+============================================================
+Event-window coverage among selected language-group repos
+============================================================
+Duplicated repo-month rows collapsed: 51
+All JavaScript_TypeScript treatment repos with window summary: 418
+Unique repos: 418
 
-                   repo_name   month                            latest_commit  ncloc  bugs  vulnerabilities  code_smells  duplicated_lines_density  comment_lines_density  cognitive_complexity  technical_debt
-robotframework/statuschecker 2024-01 7a0b582082036e3c39e89e04a2bcf160a5d68cb4  389.0   0.0              0.0          1.0                       0.0                   19.8                  90.0             5.0
-robotframework/statuschecker 2024-02 7a0b582082036e3c39e89e04a2bcf160a5d68cb4  389.0   0.0              0.0          1.0                       0.0                   19.8                  90.0             5.0
-robotframework/statuschecker 2024-03 7a0b582082036e3c39e89e04a2bcf160a5d68cb4  389.0   0.0              0.0          1.0                       0.0                   19.8                  90.0             5.0
+Primary language counts in window-summary subset:
+repo_primary_language
+TypeScript    360
+JavaScript     58
 
-metric coverage:
-ncloc 3 / 3
-bugs 3 / 3
-vulnerabilities 3 / 3
-code_smells 3 / 3
-duplicated_lines_density 3 / 3
-comment_lines_density 3 / 3
-cognitive_complexity 3 / 3
-technical_debt 3 / 3
+balanced_window counts:
+balanced_window
+0    172
+1     43
+2     11
+3     27
+4     23
+5     50
+6     43
+7     21
+8     16
+9     12
+
+balanced_window >= 3: 192
+balanced_window >= 4: 165
+balanced_window >= 5: 142
+balanced_window >= 6: 92
+balanced_window >= 7: 49
+balanced_window >= 8: 28
+balanced_window >= 9: 12
+
+Good-window JavaScript_TypeScript repos, balanced_window >= 6: 92
+Unique good-window repos: 92
+
+Event month counts for balanced_window >= 6:
+event_month
+2024-08     5
+2024-09     9
+2024-10     6
+2024-11    11
+2024-12    12
+2025-01    16
+2025-02    33
+
+Saved good-window subset: tmp_jsts_test/data/original_paper_treatment_jsts_repos_bw6.csv
+
+Top 30 good-window JavaScript_TypeScript repos:
+                                 repo_name event_month  pre_panel_months  post_panel_months  balanced_window repo_primary_language repo_stars repo_commits repo_contributors
+          GorvGoyl/Personal-Site-Gourav.io     2024-11                10                  9                9            TypeScript        129        581.0               7.0
+                     balancer/pool-creator     2024-10                 9                 10                9            TypeScript         11        632.0              49.0
+               different-ai/note-companion     2024-10                 9                 10                9            TypeScript        601       1940.0              12.0
+                     haqq-network/frontend     2024-11                10                  9                9            TypeScript         44       3225.0              11.0
+                konturio/disaster-ninja-fe     2024-10                 9                 10                9            TypeScript         22       1880.0              26.0
+                       metriport/metriport     2024-11                10                  9                9            JavaScript        566      12736.0              16.0
+                        ohcnetwork/care_fe     2024-10                 9                 10                9            TypeScript        444       8016.0             249.0
+                         owid/owid-grapher     2024-11                10                  9                9            TypeScript       1435      19607.0              46.0
+                     pockethost/pockethost     2024-11                10                  9                9            JavaScript       1202       1554.0              21.0
+                            refly-ai/refly     2024-11                 9                  9                9            TypeScript       3249       4227.0               7.0
+reliverse/cli-ai-app-site-anything-builder     2024-11                10                  9                9            TypeScript        113        135.0               1.0
+                    warmachine028/memories     2024-10                 9                 10                9            JavaScript         53       1247.0              29.0
+                           MultiQC/MultiQC     2024-12                11                  8                8            JavaScript       1282       6744.0             234.0
+                     RiverTwilight/Geekits     2024-11                10                  8                8            TypeScript        325        828.0              10.0
+                               Shopify/cli     2024-09                 8                 11                8            TypeScript        487      16985.0             228.0
+                  deeeed/expo-audio-stream     2024-12                 8                  8                8            TypeScript         85        499.0               4.0
+                        elie222/inbox-zero     2024-09                 8                 11                8            TypeScript       3749       4122.0              20.0
+              imrishit98/rp-nextjs-starter     2024-09                 8                 10                8            JavaScript         10        396.0               3.0
+                     jhonsfran1165/unprice     2024-09                 8                 11                8            TypeScript         29        876.0               4.0
+                            kern/filepizza     2024-12                11                  8                8            TypeScript       8139        343.0              23.0
+                           konecty/Konecty     2024-12                11                  8                8            JavaScript         19        897.0              14.0
+                melissamcewen/CurlsBotSite     2024-12                11                  8                8            TypeScript         18        441.0               1.0
+           rohenaz/allaboard-bitchat-nitro     2024-12                11                  8                8            TypeScript         10        153.0               2.0
+                        shakee93/rapidload     2024-09                 8                 11                8            TypeScript         20       6793.0               4.0
+                              synatic/noql     2024-09                 8                  9                8            JavaScript         50        752.0               9.0
+                      transloadit/node-sdk     2024-12                11                  8                8            TypeScript         63        713.0              18.0
+                           twentyhq/twenty     2024-12                11                  8                8            TypeScript      27364       6109.0             420.0
+                          unmonk/chainlink     2024-09                 8                 10                8            TypeScript         13        333.0               1.0
+                        Bistutu/FluentRead     2025-01                12                  7                7            TypeScript       2307        368.0               4.0
+                Comfy-Org/ComfyUI_frontend     2025-01                12                  7                7            TypeScript        959       2237.0              59.0

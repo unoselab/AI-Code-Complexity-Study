@@ -1,0 +1,79 @@
+repo_name,event_month,panel_first_month,panel_latest_month,panel_month_count,min_relative_month,max_relative_month,pre_panel_months,event_months,post_panel_months,balanced_window,repo_primary_language,repo_stars,repo_commits,repo_contributors,repo_size,repo_languages
+GorvGoyl/Personal-Site-Gourav.io,2024-11,2024-01,2025-08,20,-10,9,10,1,9,9,TypeScript,129,581.0,7.0,28100.0,TypeScript: 215169; SCSS: 13112; JavaScript: 9679
+balancer/pool-creator,2024-10,2024-01,2025-08,20,-9,10,9,1,10,9,TypeScript,11,632.0,49.0,5233.0,TypeScript: 531363; JavaScript: 4791; CSS: 731; Makefile: 203; Shell: 68
+different-ai/note-companion,2024-10,2024-01,2025-08,20,-9,10,9,1,10,9,TypeScript,601,1940.0,12.0,159052.0,TypeScript: 1425869; JavaScript: 17500; CSS: 11431; Dockerfile: 568
+haqq-network/frontend,2024-11,2024-01,2025-08,20,-10,9,10,1,9,9,TypeScript,44,3225.0,11.0,281694.0,TypeScript: 3562260; JavaScript: 9888; CSS: 6252; HTML: 1044
+konturio/disaster-ninja-fe,2024-10,2024-01,2025-08,20,-9,10,9,1,10,9,TypeScript,22,1880.0,26.0,618439.0,TypeScript: 1749780; JavaScript: 384924; CSS: 94724; Go: 2693; HTML: 2395; Dockerfile: 240; Shell: 150
+ohcnetwork/care_fe,2024-10,2024-01,2025-08,20,-9,10,9,1,10,9,TypeScript,444,8016.0,249.0,49683.0,TypeScript: 2590059; JavaScript: 9299; CSS: 5868; HTML: 3568; Dockerfile: 560
+owid/owid-grapher,2024-11,2024-01,2025-08,20,-10,9,10,1,9,9,TypeScript,1435,19607.0,46.0,140680.0,TypeScript: 6777589; SCSS: 436698; JavaScript: 68762; Shell: 27471; Makefile: 14661; HTML: 11823; Python: 11385; Handlebars: 1097; Dockerfile: 346
+refly-ai/refly,2024-11,2024-02,2025-08,19,-9,9,9,1,9,9,TypeScript,3249,4227.0,7.0,45832.0,TypeScript: 4722991; SCSS: 156685; CSS: 45831; JavaScript: 7689; HTML: 4115; Dockerfile: 2041; Shell: 1688; Handlebars: 1673
+reliverse/cli-ai-app-site-anything-builder,2024-11,2024-01,2025-08,20,-10,9,10,1,9,9,TypeScript,113,135.0,1.0,18468.0,TypeScript: 786163; JavaScript: 3663
+RiverTwilight/Geekits,2024-11,2024-01,2025-07,19,-10,8,10,1,8,8,TypeScript,325,828.0,10.0,56294.0,TypeScript: 558380; JavaScript: 45729; Swift: 3031; CSS: 2043; Dockerfile: 1695; Shell: 1513; Java: 1299; Ruby: 1142
+Shopify/cli,2024-09,2024-01,2025-08,20,-8,11,8,1,11,8,TypeScript,487,16985.0,228.0,145407.0,TypeScript: 4758137; JavaScript: 99351; CSS: 80179; Liquid: 63138; SCSS: 11307; Shell: 7169; Gherkin: 2247; HTML: 1529; Batchfile: 68; Common Lisp: 66
+deeeed/expo-audio-stream,2024-12,2024-04,2025-08,17,-8,8,8,1,8,8,TypeScript,85,499.0,4.0,381170.0,TypeScript: 2000039; Kotlin: 714419; C++: 657550; Swift: 290773; JavaScript: 113245; Shell: 64784; Objective-C++: 53373; Objective-C: 49580; Ruby: 18812; HTML: 8144; C: 7151; CMake: 5939; CSS: 1545
+elie222/inbox-zero,2024-09,2024-01,2025-08,20,-8,11,8,1,11,8,TypeScript,3749,4122.0,20.0,22085.0,TypeScript: 2073498; MDX: 153823; JavaScript: 17679; CSS: 2622; PLpgSQL: 658; Shell: 137
+jhonsfran1165/unprice,2024-09,2024-01,2025-08,20,-8,11,8,1,11,8,TypeScript,29,876.0,4.0,9492.0,TypeScript: 2108625; CSS: 12364; JavaScript: 10831; MDX: 9430; Shell: 7725; PLpgSQL: 3045; Handlebars: 686; Makefile: 139
+kern/filepizza,2024-12,2024-01,2025-08,20,-11,8,11,1,8,8,TypeScript,8139,343.0,23.0,8130.0,TypeScript: 226334; JavaScript: 5762; HTML: 5616; Dockerfile: 766; CSS: 192; Shell: 178
+melissamcewen/CurlsBotSite,2024-12,2024-01,2025-08,20,-11,8,11,1,8,8,TypeScript,18,441.0,1.0,34460.0,TypeScript: 479940; MDX: 129535; JavaScript: 4845; CSS: 1631; HTML: 53
+rohenaz/allaboard-bitchat-nitro,2024-12,2024-01,2025-08,20,-11,8,11,1,8,8,TypeScript,10,153.0,2.0,2591.0,TypeScript: 204209; JavaScript: 56421; Shell: 4396; CSS: 534; Less: 533; Dockerfile: 490; HTML: 415
+shakee93/rapidload,2024-09,2024-01,2025-08,20,-8,11,8,1,11,8,TypeScript,20,6793.0,4.0,200961.0,TypeScript: 1035350; PHP: 647423; Vue: 365923; JavaScript: 244855; CSS: 91926; HTML: 17865; Shell: 135
+transloadit/node-sdk,2024-12,2024-01,2025-08,20,-11,8,11,1,8,8,TypeScript,63,713.0,18.0,2975.0,TypeScript: 452462; JavaScript: 2233
+twentyhq/twenty,2024-12,2024-01,2025-08,20,-11,8,11,1,8,8,TypeScript,27364,6109.0,420.0,256266.0,TypeScript: 18370331; MDX: 231767; JavaScript: 38322; HCL: 19327; Shell: 11981; CSS: 6922; Dockerfile: 6436; HTML: 5299; Makefile: 1665
+unmonk/chainlink,2024-09,2024-01,2025-07,19,-8,10,8,1,10,8,TypeScript,13,333.0,1.0,15980.0,TypeScript: 1144325; JavaScript: 122023; CSS: 8809
+Bistutu/FluentRead,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,2307,368.0,4.0,18126.0,TypeScript: 99927; JavaScript: 88022; Vue: 28480; CSS: 9257; HTML: 372
+Comfy-Org/ComfyUI_frontend,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,959,2237.0,59.0,140584.0,TypeScript: 1834483; Vue: 519916; JavaScript: 31533; CSS: 22133; HTML: 475; Python: 456
+L-Blondy/up-fetch,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,784,860.0,3.0,1208.0,TypeScript: 97137
+Vrooli/Vrooli,2024-08,2024-01,2025-04,16,-7,8,7,1,8,7,TypeScript,35,2408.0,4.0,223029.0,TypeScript: 19179614; Shell: 153689; Rust: 136389; JavaScript: 129732; Makefile: 113631; HTML: 59845; PLpgSQL: 11927; CSS: 9640; Dockerfile: 5328; HCL: 210
+a-polishchuk/mastering-react,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,10,249.0,1.0,7893.0,TypeScript: 356274; CSS: 17846; HTML: 871; JavaScript: 771; Shell: 128
+adidahiya/raga,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,27,569.0,2.0,28666.0,TypeScript: 234937; SCSS: 15583; JavaScript: 8970; HTML: 211; Shell: 121
+badass-courses/course-builder,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,441,1939.0,11.0,64234.0,TypeScript: 5572789; CSS: 230471; JavaScript: 79337; MDX: 14990; Handlebars: 3600; Shell: 3096; Astro: 3046
+frostime/sy-f-misc,2025-01,2024-03,2025-08,18,-10,7,10,1,7,7,TypeScript,11,651.0,1.0,1662.0,TypeScript: 758574; CSS: 93499; SCSS: 35454; JavaScript: 19805; PowerShell: 876
+humanspeak/svelte-markdown,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,22,446.0,14.0,3271.0,TypeScript: 192468; Svelte: 55301; JavaScript: 4041; HTML: 362
+jpmorgan-payments/embedded-finance,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,16,2063.0,12.0,11727.0,TypeScript: 1590531; JavaScript: 41407; Shell: 6665; HTML: 1972; CSS: 1435
+piotrkulpinski/openalternative,2024-11,2024-02,2025-06,17,-9,7,9,1,7,7,TypeScript,4196,985.0,3.0,33160.0,TypeScript: 709444; CSS: 4769; JavaScript: 69
+script-kit/app,2024-08,2024-01,2025-08,20,-7,12,7,1,12,7,TypeScript,80,3183.0,5.0,34146.0,TypeScript: 1258832; CSS: 198551; JavaScript: 25925; Python: 13119; Shell: 2452; HTML: 1920
+supermemoryai/supermemory,2025-01,2024-02,2025-08,19,-11,7,11,1,7,7,TypeScript,8947,1021.0,43.0,66486.0,TypeScript: 956924; CSS: 86510; MDX: 13855; JavaScript: 4830; Dockerfile: 1152
+tegnike/aituber-kit,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,437,1011.0,15.0,149315.0,TypeScript: 504095; Python: 86513; JavaScript: 5441; CSS: 3670; Dockerfile: 677
+udecode/plate,2024-08,2024-01,2025-08,20,-7,12,7,1,12,7,TypeScript,13340,7954.0,211.0,171692.0,TypeScript: 5408899; MDX: 1188376; HTML: 415018; JavaScript: 62682; CSS: 60380; Shell: 4232
+yuiseki/TRIDENT,2024-12,2024-01,2025-07,19,-11,7,11,1,7,7,TypeScript,26,1497.0,4.0,6727.0,TypeScript: 409945; CSS: 13187; SCSS: 3138; JavaScript: 2440; Makefile: 631; Dockerfile: 301
+zzfn/zzf,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,TypeScript,63,1514.0,1.0,28871.0,TypeScript: 151775; SCSS: 13890; JavaScript: 5681; CSS: 1341; Dockerfile: 207
+0xfrankz/Kaas,2024-08,2024-02,2025-04,15,-6,8,6,1,8,6,TypeScript,69,492.0,1.0,13872.0,TypeScript: 417295; Rust: 260538; CSS: 5597; HTML: 312; JavaScript: 229
+AudiusProject/audius-protocol,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,577,15427.0,43.0,738514.0,TypeScript: 15119337; Python: 4322748; PLpgSQL: 3502854; JavaScript: 1994913; CSS: 620810; Rust: 555378; Solidity: 383422; Go: 235745; HTML: 183838; Shell: 121466; MDX: 101292; Mustache: 74071; Ruby: 18438; Lua: 15827; Dockerfile: 9402; Objective-C: 7094; GLSL: 5911; Objective-C++: 3563; Kotlin: 3318; Java: 1991; Makefile: 1620; jq: 1011; Swift: 221; C: 104
+Automattic/wp-calypso,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,12469,74301.0,354.0,911263.0,TypeScript: 20464282; JavaScript: 17159981; SCSS: 3965568; PHP: 55277; HTML: 49914; Shell: 16664; CSS: 8930; Dockerfile: 5160; Ruby: 3506; Handlebars: 2806; Makefile: 2671; EJS: 632; Pug: 568
+Comfy-Org/desktop,2025-02,2024-08,2025-08,13,-6,6,6,1,6,6,TypeScript,1330,846.0,11.0,25474.0,TypeScript: 372061; JavaScript: 27250; NSIS: 2225; Shell: 960
+JesusFilm/core,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,19,3502.0,30.0,350170.0,TypeScript: 9808017; HCL: 121647; JavaScript: 68300; Shell: 15366; MDX: 12291; Dockerfile: 8574; CSS: 2453; PLpgSQL: 2033; HTML: 450; Procfile: 327
+MathiasGruber/TheNinjaRPG,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,70,2425.0,12.0,174544.0,TypeScript: 3095348; JavaScript: 63843; Jupyter Notebook: 21764; Python: 10264; CSS: 7240; Makefile: 5825; Shell: 1388; Dockerfile: 377; HTML: 53
+Melvynx/next-zod-route,2025-02,2024-06,2025-08,15,-8,6,8,1,6,6,TypeScript,20,84.0,3.0,177.0,TypeScript: 47024; JavaScript: 495; Shell: 70
+PostHog/posthog-foss,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,345,22660.0,276.0,1418726.0,TypeScript: 20146133; Python: 20019214; Rust: 1867097; C++: 686533; JavaScript: 451915; SCSS: 324234; HTML: 144866; Shell: 88299; Go: 39846; MDX: 33574; ANTLR: 23533; Dockerfile: 17237; PLpgSQL: 9521; EJS: 4831; Smarty: 1517; CSS: 520; C: 285
+TutoriaLLM/TutoriaLLM,2025-02,2024-05,2025-08,16,-9,6,9,1,6,6,TypeScript,271,777.0,4.0,45121.0,TypeScript: 732007; MDX: 64787; CSS: 8590; Astro: 5489; JavaScript: 4358; Dockerfile: 1569; HTML: 546
+Urigo/accounter-fullstack,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,12,2033.0,9.0,16587.0,TypeScript: 4475598; PLpgSQL: 127214; JavaScript: 11786; CSS: 1189; HTML: 354
+afadil/wealthfolio,2024-11,2024-05,2025-08,16,-6,9,6,1,9,6,TypeScript,5046,395.0,15.0,10757.0,TypeScript: 665279; Rust: 288331; JavaScript: 7766; CSS: 3019; HTML: 360
+alexander-turner/TurnTrout.com,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,12,5332.0,138.0,512463.0,TypeScript: 847933; Python: 368277; SCSS: 77123; JavaScript: 13569; Shell: 11811; HTML: 274
+ba-archive/blue-archive,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,262,971.0,13.0,59307.0,TypeScript: 817330; Vue: 639664; JavaScript: 40789; SCSS: 34213; Python: 11740; HTML: 3940; CSS: 2475; Shell: 1350
+betagouv/france-chaleur-urbaine,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,13,4827.0,11.0,543450.0,TypeScript: 2465896; Shell: 64998; PLpgSQL: 28711; JavaScript: 28697; EJS: 18294; MDX: 9532; CSS: 2647; Dockerfile: 79; Procfile: 64; HTML: 54
+cjinhuo/blazwitcher,2025-02,2024-07,2025-08,14,-7,6,7,1,6,6,TypeScript,22,258.0,4.0,10813.0,TypeScript: 138383; CSS: 10804; JavaScript: 5927; HTML: 337
+darenmalfait/nerdfish.be,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,26,1546.0,6.0,248054.0,TypeScript: 465180; MDX: 182176; CSS: 1328; JavaScript: 763; Handlebars: 391
+darkroomengineering/satus,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,638,621.0,9.0,10159.0,TypeScript: 156154; JavaScript: 76946; CSS: 68210
+dxos/dxos,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,420,6268.0,38.0,564104.0,TypeScript: 18216599; JavaScript: 389935; Go: 64745; CSS: 36934; HTML: 17295; Rust: 16734; Kotlin: 15063; Shell: 13630; Smarty: 4048; Dockerfile: 2814; GLSL: 1894; Python: 1254; AppleScript: 787; Batchfile: 155
+efdevcon/monorepo,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,22,3280.0,10.0,3272203.0,TypeScript: 3121846; SCSS: 865671; MDX: 266373; JavaScript: 106957; GLSL: 25915; Python: 9394; HTML: 1834; CSS: 557; Shell: 116
+elbwalker/walkerOS,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,296,2008.0,9.0,23417.0,TypeScript: 742265; MDX: 261191; HTML: 78171; JavaScript: 13942; CSS: 3497
+fengkx/beancount-lsp,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,13,211.0,1.0,6637.0,TypeScript: 314855; JavaScript: 7496; Tree-sitter Query: 1393; Shell: 275
+gaetansenn/vue-api,2024-10,2024-01,2025-04,16,-9,6,9,1,6,6,TypeScript,18,88.0,1.0,2936.0,TypeScript: 64049; Vue: 16013; CSS: 2664; JavaScript: 1353; HTML: 337
+genesis-ai-dev/codex-editor,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,10,2210.0,12.0,33100.0,TypeScript: 5583127; CSS: 114583; JavaScript: 17756; HTML: 366
+geyserfund/geyser-app,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,52,7656.0,13.0,162443.0,TypeScript: 3157261; JavaScript: 17750; HTML: 2470; Dockerfile: 1998; Shell: 625; Makefile: 69
+helius-labs/helius-sdk,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,208,191.0,31.0,6793.0,TypeScript: 125784; HTML: 27172; CSS: 9523; JavaScript: 671
+helius-labs/kite,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,53,385.0,10.0,702.0,TypeScript: 107162
+highlight/highlight,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,8108,6997.0,77.0,614674.0,TypeScript: 11185582; Go: 2482127; JavaScript: 1284776; Python: 170420; Java: 159854; CSS: 138317; SCSS: 109363; Ruby: 70076; HTML: 55791; C#: 34247; Rust: 22144; Dockerfile: 14581; PHP: 9876; Shell: 9402; Elixir: 8279; Makefile: 3864; EJS: 3065; ANTLR: 1812; MDX: 1585; Less: 1415; Scheme: 353; ASP.NET: 92
+hudy9x/namviek,2024-12,2024-01,2025-06,18,-11,6,11,1,6,6,TypeScript,2165,409.0,6.0,8568.0,TypeScript: 1507083; CSS: 59971; JavaScript: 4868; Dockerfile: 3724; Shell: 2550
+jrmybtlr/usemods,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,217,976.0,8.0,7897.0,TypeScript: 137466; JavaScript: 3823; CSS: 2882
+kremalicious/blog,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,51,1980.0,5.0,728453.0,TypeScript: 133319; Astro: 53499; CSS: 48193; JavaScript: 2494; Shell: 1884
+latechforce/engine,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,16,2090.0,3.0,30008.0,TypeScript: 950059; CSS: 31446; JavaScript: 767
+maciej-trebacz/ff7-ultima,2025-01,2024-07,2025-08,14,-6,7,6,1,7,6,TypeScript,21,95.0,1.0,5039.0,TypeScript: 533482; Rust: 9364; CSS: 2819; JavaScript: 2133; HTML: 827; PowerShell: 101
+pnd280/complexity,2024-11,2024-05,2025-08,16,-6,9,6,1,9,6,TypeScript,674,784.0,1.0,8025.0,TypeScript: 1181013; CSS: 14530; JavaScript: 9395; HTML: 394
+radzionc/radzionkit,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,TypeScript,256,542.0,2.0,12545.0,TypeScript: 2979811; HCL: 14482; Shell: 11481; JavaScript: 4508
+stacksjs/rpx,2025-02,2024-03,2025-08,18,-11,6,11,1,6,6,TypeScript,20,208.0,3.0,2115.0,TypeScript: 64926
+stacksjs/tlsx,2025-02,2024-03,2025-08,18,-11,6,11,1,6,6,TypeScript,38,251.0,4.0,2181.0,TypeScript: 55184
+tact-lang/tact-template,2025-01,2024-01,2025-07,19,-12,6,12,1,6,6,TypeScript,81,80.0,14.0,711.0,TypeScript: 5505; Tact: 576
+towns-protocol/towns,2025-02,2024-05,2025-08,16,-9,6,9,1,6,6,TypeScript,34,1993.0,28.0,93045.0,TypeScript: 2606059; Go: 2327197; Solidity: 1710460; MDX: 248258; Shell: 89719; Python: 23875; JavaScript: 22448; HTML: 21292; Just: 19303; Makefile: 16479; HCL: 15654; Dockerfile: 9107; PLpgSQL: 6667; CSS: 3005
+xlnfinance/xln,2025-02,2024-07,2025-08,14,-7,6,7,1,6,6,TypeScript,87,86.0,3.0,1736.0,TypeScript: 390369; JavaScript: 53465; Solidity: 50174; HTML: 9239
+zkSoju/frame,2025-01,2024-01,2025-07,19,-12,6,12,1,6,6,TypeScript,24,74.0,2.0,8813.0,TypeScript: 12758; CSS: 1572; JavaScript: 730

@@ -1,0 +1,442 @@
+repo_name,repo_primary_language,repo_stars,repo_commits,repo_contributors,repo_size,repo_languages
+0xAquaWolf/portfolio,TypeScript,60,161.0,1.0,26580.0,TypeScript: 166959; MDX: 34361; CSS: 6714; JavaScript: 1102; Shell: 1017
+0xfrankz/Kaas,TypeScript,69,492.0,1.0,13872.0,TypeScript: 417295; Rust: 260538; CSS: 5597; HTML: 312; JavaScript: 229
+0xsend/sendapp,TypeScript,24,1670.0,15.0,21291.0,TypeScript: 2483838; PLpgSQL: 375083; Solidity: 250601; Python: 28836; JavaScript: 9763; Swift: 7170; Kotlin: 4635; Dockerfile: 4313; Starlark: 3134; Makefile: 2653; Ruby: 1459; CSS: 1405; Shell: 122
+AIDC-AI/ComfyUI-Copilot,TypeScript,1215,177.0,9.0,39404.0,TypeScript: 197223; CSS: 52174; Python: 13599; JavaScript: 6588; HTML: 381
+AdirD/nestjs-context-logger,TypeScript,32,57.0,2.0,183.0,TypeScript: 67238; JavaScript: 416
+AlbertoBasalo/ng-lab,TypeScript,28,345.0,1.0,6621.0,TypeScript: 104316; JavaScript: 1137; HTML: 629; CSS: 139
+Alezander9/WiiWork,TypeScript,10,50.0,1.0,1251.0,TypeScript: 149987; JavaScript: 7735; CSS: 3767; HTML: 355
+AnEntrypoint/apptoapp,JavaScript,18,628.0,2.0,700.0,JavaScript: 114461
+Ashref-dev/entretien-ai,TypeScript,43,292.0,3.0,9576.0,TypeScript: 716526; MDX: 68760; CSS: 4238; JavaScript: 3107; Dockerfile: 1584; Shell: 157
+AudiusProject/audius-protocol,TypeScript,577,15427.0,43.0,738514.0,TypeScript: 15119337; Python: 4322748; PLpgSQL: 3502854; JavaScript: 1994913; CSS: 620810; Rust: 555378; Solidity: 383422; Go: 235745; HTML: 183838; Shell: 121466; MDX: 101292; Mustache: 74071; Ruby: 18438; Lua: 15827; Dockerfile: 9402; Objective-C: 7094; GLSL: 5911; Objective-C++: 3563; Kotlin: 3318; Java: 1991; Makefile: 1620; jq: 1011; Swift: 221; C: 104
+Automattic/wp-calypso,TypeScript,12469,74301.0,354.0,911263.0,TypeScript: 20464282; JavaScript: 17159981; SCSS: 3965568; PHP: 55277; HTML: 49914; Shell: 16664; CSS: 8930; Dockerfile: 5160; Ruby: 3506; Handlebars: 2806; Makefile: 2671; EJS: 632; Pug: 568
+Bistutu/FluentRead,TypeScript,2307,368.0,4.0,18126.0,TypeScript: 99927; JavaScript: 88022; Vue: 28480; CSS: 9257; HTML: 372
+CodeGuide-dev/codeguide-starter-lite,TypeScript,318,12.0,1.0,221.0,TypeScript: 173279; CSS: 2611; JavaScript: 227
+Comfy-Org/ComfyUI_frontend,TypeScript,959,2237.0,59.0,140584.0,TypeScript: 1834483; Vue: 519916; JavaScript: 31533; CSS: 22133; HTML: 475; Python: 456
+Comfy-Org/desktop,TypeScript,1330,846.0,11.0,25474.0,TypeScript: 372061; JavaScript: 27250; NSIS: 2225; Shell: 960
+Comfy-Org/litegraph.js,TypeScript,151,1528.0,74.0,31753.0,TypeScript: 725115; CSS: 11670; JavaScript: 10486
+Coyenn/personal-site,TypeScript,12,92.0,1.0,81449.0,TypeScript: 112815; MDX: 18488; CSS: 5933; Nix: 1002; JavaScript: 135; Shell: 9
+Cunninger/grok-remain-count,JavaScript,18,20.0,3.0,99.0,JavaScript: 48024
+Dankovk/browser-use-node,TypeScript,48,56.0,1.0,4452.0,TypeScript: 140034; JavaScript: 16068
+Darlley/saas-admin,TypeScript,10,109.0,1.0,24643.0,TypeScript: 366074; CSS: 3461; JavaScript: 1447; Handlebars: 616
+David-Sola/AIGaming,JavaScript,64,6.0,1.0,27562.0,JavaScript: 47529; HTML: 742
+Dhravya/mcp-durable-object-client,TypeScript,52,4.0,1.0,226.0,TypeScript: 51236; CSS: 4512; HTML: 1258
+DiscourseGraphs/discourse-graph,TypeScript,11,745.0,5.0,30704.0,TypeScript: 837632; CSS: 8938; JavaScript: 1812; Handlebars: 192; Shell: 76
+DumbWareio/DumbDrop,JavaScript,271,89.0,8.0,357.0,JavaScript: 62225; HTML: 44823; CSS: 6870; Shell: 2372; Dockerfile: 1371
+DumbWareio/DumbPad,JavaScript,172,116.0,5.0,269.0,JavaScript: 100230; HTML: 22147; CSS: 14558; Dockerfile: 199
+Dwtexe/cursor-stats,TypeScript,57,51.0,4.0,16847.0,TypeScript: 92435; JavaScript: 629
+EugenEistrach/et-stack,TypeScript,16,207.0,2.0,2211.0,TypeScript: 406377; CSS: 13531; JavaScript: 7526; Dockerfile: 1191
+FradSer/qa-generator,TypeScript,51,34.0,1.0,327.0,TypeScript: 137511; JavaScript: 727; CSS: 59
+FurkanKayaDev/react-native-spotlight-guide,TypeScript,12,10.0,1.0,9339.0,TypeScript: 60567; JavaScript: 40467; Kotlin: 2467; Objective-C: 2315; Ruby: 1620; Objective-C++: 813
+GODrums/BetterFloat,TypeScript,55,757.0,9.0,8336.0,TypeScript: 651815; CSS: 19243; JavaScript: 2596; HTML: 444
+GPT-language/gpt-tutor-for-chrome,TypeScript,19,818.0,61.0,56045.0,TypeScript: 959738; JavaScript: 47866; Rust: 40835; HTML: 8295; AppleScript: 2397; Python: 2214; CSS: 1873; Makefile: 939; Shell: 196; PowerShell: 167
+Galaxies-dev/threads-clone-react-native,TypeScript,48,19.0,1.0,39890.0,TypeScript: 69631; Kotlin: 4439; JavaScript: 4235; Ruby: 3009; Objective-C++: 2723; Shell: 830; Objective-C: 327; Swift: 113; C: 103
+Galaxies-dev/todoist-clone-react-native,TypeScript,89,29.0,1.0,34155.0,TypeScript: 65717; Shell: 1078; JavaScript: 887
+GaloyMoney/lana-bank,TypeScript,17,1716.0,15.0,20653.0,TypeScript: 1840380; Rust: 1595252; Shell: 71041; Python: 30319; PLpgSQL: 18647; HCL: 12517; CSS: 4623; Makefile: 3884; JavaScript: 3287; Dockerfile: 2892; Nix: 2245; Starlark: 2117; Jsonnet: 818
+GeekyWizKid/writing-helper,TypeScript,328,21.0,2.0,2334.0,TypeScript: 157889; CSS: 1885; JavaScript: 1625
+GorvGoyl/Personal-Site-Gourav.io,TypeScript,129,581.0,7.0,28100.0,TypeScript: 215169; SCSS: 13112; JavaScript: 9679
+GramSearch/telegram-search,TypeScript,245,157.0,6.0,1811.0,TypeScript: 355312; Vue: 183355; CSS: 1840; HTML: 965; JavaScript: 478; Shell: 70
+HaasStefan/eslint-plugin-enforce-angular-signal-call,TypeScript,11,27.0,1.0,64.0,TypeScript: 13692; JavaScript: 544
+Helicone/helicone,TypeScript,3504,3589.0,68.0,383548.0,TypeScript: 11664547; MDX: 986785; Python: 111100; PLpgSQL: 24639; Shell: 24071; HCL: 23799; CSS: 9810; JavaScript: 8314
+IamLiuLv/compoder,TypeScript,91,98.0,5.0,44487.0,TypeScript: 736681; JavaScript: 645355; Vue: 13181; CSS: 10579; SCSS: 1624; HTML: 667
+Illyism/saasbooks,TypeScript,35,17.0,1.0,278.0,TypeScript: 218915; CSS: 4353; JavaScript: 712
+JaleelB/readium-x,TypeScript,45,268.0,2.0,3108.0,TypeScript: 481407; Dockerfile: 3803; JavaScript: 2713; CSS: 2415
+JesusFilm/core,TypeScript,19,3502.0,30.0,350170.0,TypeScript: 9808017; HCL: 121647; JavaScript: 68300; Shell: 15366; MDX: 12291; Dockerfile: 8574; CSS: 2453; PLpgSQL: 2033; HTML: 450; Procfile: 327
+Julian-AT/synth-ui,TypeScript,16,185.0,1.0,89731.0,TypeScript: 323451; CSS: 6351; JavaScript: 298
+KRISACHAN/ying-web,TypeScript,24,206.0,1.0,4904.0,TypeScript: 458065; JavaScript: 178383; HTML: 80004; CSS: 4661; Less: 3446; Shell: 1184; Dockerfile: 544
+KaizeNodeLabs/SafeSwap,TypeScript,21,176.0,72.0,2269.0,TypeScript: 399357; CSS: 3117; Shell: 542; JavaScript: 436
+Kiranism/next-resume-ai,TypeScript,19,194.0,8.0,1741.0,TypeScript: 421559; JavaScript: 3788; CSS: 3232
+L-Blondy/up-fetch,TypeScript,784,860.0,3.0,1208.0,TypeScript: 97137
+LIT-Protocol/agent-wallet,TypeScript,48,607.0,8.0,5329.0,TypeScript: 548558; Solidity: 289615; JavaScript: 70990; CSS: 8560; Makefile: 5373
+LIT-Protocol/developer-guides-code,JavaScript,16,545.0,7.0,24079.0,JavaScript: 2787300; TypeScript: 444944; CSS: 19850; HTML: 9954; Shell: 610
+LastBotInc/nextjs-supabase-ai-webapp,TypeScript,13,5.0,1.0,4122.0,TypeScript: 1141914; PLpgSQL: 31824; JavaScript: 14680; Shell: 2091; CSS: 1819
+LegendApp/legend-photos,TypeScript,56,241.0,1.0,10184.0,TypeScript: 182107; Swift: 42060; Objective-C: 18501; Objective-C++: 6898; JavaScript: 1512; Ruby: 1113; CSS: 119
+LubomirGeorgiev/cloudflare-workers-nextjs-saas-template,TypeScript,259,125.0,2.0,727.0,TypeScript: 358085; JavaScript: 3145; CSS: 2802
+Lunaris-Project/HyprLuna,JavaScript,32,45.0,1.0,25557.0,JavaScript: 1626172; SCSS: 107356; Shell: 53062; CSS: 33265; Python: 9798; DTrace: 223
+Ly-GGboy/AI-Library,JavaScript,42,42.0,1.0,500213.0,JavaScript: 1983912; HTML: 595331; Vue: 263038; Python: 199838; TypeScript: 32784; CSS: 11997; Shell: 2876; SCSS: 2616; PowerShell: 673
+MaggieAppleton/lodestone,TypeScript,63,33.0,1.0,756.0,TypeScript: 226331; CSS: 2748; JavaScript: 1206; HTML: 342
+Malte2036/thw-tools,TypeScript,10,862.0,3.0,26691.0,TypeScript: 286046; Svelte: 251570; JavaScript: 27041; HTML: 12022; Dockerfile: 4769; Shell: 989; CSS: 592
+MathiasGruber/TheNinjaRPG,TypeScript,70,2425.0,12.0,174544.0,TypeScript: 3095348; JavaScript: 63843; Jupyter Notebook: 21764; Python: 10264; CSS: 7240; Makefile: 5825; Shell: 1388; Dockerfile: 377; HTML: 53
+MayGo/tockler,TypeScript,956,1629.0,7.0,74589.0,TypeScript: 607351; JavaScript: 11294; HTML: 487
+Melvynx/next-zod-route,TypeScript,20,84.0,3.0,177.0,TypeScript: 47024; JavaScript: 495; Shell: 70
+MultiQC/MultiQC,JavaScript,1282,6744.0,234.0,43580.0,JavaScript: 8812338; Python: 3438280; HTML: 69569; CSS: 27846; Dockerfile: 2040; Nix: 1509
+OneKeyHQ/app-monorepo,TypeScript,1880,2824.0,27.0,341014.0,TypeScript: 13180806; JavaScript: 490600; Java: 42999; Objective-C: 8112; HTML: 5945; Ruby: 5765; EJS: 5609; CSS: 4314; Objective-C++: 2886; Shell: 545; Swift: 113; C: 103
+OpenAgentsInc/openagents,TypeScript,208,1885.0,7.0,28219.0,TypeScript: 817943; JavaScript: 14070; CSS: 7267; HTML: 647
+Openpanel-dev/openpanel,TypeScript,3986,948.0,12.0,29835.0,TypeScript: 2266414; MDX: 138965; JavaScript: 12554; Dockerfile: 11402; Shell: 10822; CSS: 8801; HTML: 1401
+PostHog/posthog-foss,TypeScript,345,22660.0,276.0,1418726.0,TypeScript: 20146133; Python: 20019214; Rust: 1867097; C++: 686533; JavaScript: 451915; SCSS: 324234; HTML: 144866; Shell: 88299; Go: 39846; MDX: 33574; ANTLR: 23533; Dockerfile: 17237; PLpgSQL: 9521; EJS: 4831; Smarty: 1517; CSS: 520; C: 285
+PySpur-Dev/pyspur,TypeScript,4116,3215.0,14.0,86914.0,TypeScript: 1285840; Python: 1008750; JavaScript: 26589; CSS: 10911; Shell: 9125; HTML: 1760; SCSS: 1541; Mako: 635; Dockerfile: 611
+QuantGeekDev/mcp-framework,TypeScript,459,147.0,5.0,419.0,TypeScript: 131389; JavaScript: 5163
+R44VC0RP/r2d2,TypeScript,17,42.0,1.0,1493.0,TypeScript: 154004; JavaScript: 1015; CSS: 861
+RayFernando1337/vibestamps,TypeScript,20,42.0,1.0,348.0,TypeScript: 68889; CSS: 5111; JavaScript: 474
+RiverTwilight/Geekits,TypeScript,325,828.0,10.0,56294.0,TypeScript: 558380; JavaScript: 45729; Swift: 3031; CSS: 2043; Dockerfile: 1695; Shell: 1513; Java: 1299; Ruby: 1142
+Schroedinger-Hat/schroedinger-hat-website,TypeScript,38,659.0,20.0,149262.0,TypeScript: 386423; JavaScript: 5010; Shell: 2100; CSS: 1652
+ShieldBattery/ShieldBattery,TypeScript,161,3988.0,19.0,258154.0,TypeScript: 3035900; Rust: 842966; JavaScript: 367882; HTML: 67204; CSS: 21676; Dockerfile: 5677; Shell: 5008; Batchfile: 4919; HLSL: 2763; Pug: 2227
+Shopify/cli,TypeScript,487,16985.0,228.0,145407.0,TypeScript: 4758137; JavaScript: 99351; CSS: 80179; Liquid: 63138; SCSS: 11307; Shell: 7169; Gherkin: 2247; HTML: 1529; Batchfile: 68; Common Lisp: 66
+Shpigford/society-fail,JavaScript,37,95.0,3.0,298.0,JavaScript: 158744; CSS: 47543; HTML: 8622
+ShunL12324/comfy-portal,TypeScript,10,76.0,1.0,36382.0,TypeScript: 630480; JavaScript: 12290; Shell: 5852; CSS: 59
+StackOneHQ/crossroads,TypeScript,58,27.0,1.0,337.0,TypeScript: 114602; CSS: 9652; HTML: 1898
+SunHuawei/SourceDetector,TypeScript,563,3.0,1.0,459.0,TypeScript: 116206; HTML: 861; JavaScript: 734
+Suntory-Y-Water/honox-url-app,TypeScript,11,7.0,1.0,51.0,TypeScript: 13087; CSS: 40
+Swiftgum/swiftgum,TypeScript,11,227.0,2.0,3541.0,TypeScript: 252807; PLpgSQL: 29542; CSS: 1891; Dockerfile: 1151; Shell: 407; JavaScript: 131
+T1nker-1220/memories-with-lessons-mcp-server,JavaScript,34,10.0,3.0,99.0,JavaScript: 42323; Dockerfile: 557
+ThatGuySam/doesitarm,JavaScript,3782,2916.0,105.0,10554.0,JavaScript: 374878; Vue: 124595; Astro: 77964; TypeScript: 13417; CSS: 8313; Shell: 580; HTML: 164
+The-Pocket/PocketFlow-Typescript,TypeScript,10,146.0,4.0,1904.0,TypeScript: 134670; JavaScript: 117
+ThinkInAIXYZ/deepchat,TypeScript,1279,589.0,13.0,10885.0,TypeScript: 914761; JavaScript: 525723; Vue: 437645; CSS: 1533; Shell: 1020; HTML: 728
+Tmeister/wppb-generator,JavaScript,85,89.0,3.0,3401.0,JavaScript: 206616; MDX: 24550; CSS: 4875
+TutoriaLLM/TutoriaLLM,TypeScript,271,777.0,4.0,45121.0,TypeScript: 732007; MDX: 64787; CSS: 8590; Astro: 5489; JavaScript: 4358; Dockerfile: 1569; HTML: 546
+Urigo/accounter-fullstack,TypeScript,12,2033.0,9.0,16587.0,TypeScript: 4475598; PLpgSQL: 127214; JavaScript: 11786; CSS: 1189; HTML: 354
+Vagabonds-Labs/cofiblocks,TypeScript,16,121.0,29.0,10000.0,TypeScript: 576983; Cairo: 68605; MDX: 12898; JavaScript: 11471; Shell: 2442; CSS: 1169; Handlebars: 192
+VladSez/easy-invoice-pdf,TypeScript,23,44.0,1.0,2006.0,TypeScript: 487458; JavaScript: 4223; CSS: 235
+Vrooli/Vrooli,TypeScript,35,2408.0,4.0,223029.0,TypeScript: 19179614; Shell: 153689; Rust: 136389; JavaScript: 129732; Makefile: 113631; HTML: 59845; PLpgSQL: 11927; CSS: 9640; Dockerfile: 5328; HCL: 210
+a-polishchuk/mastering-react,TypeScript,10,249.0,1.0,7893.0,TypeScript: 356274; CSS: 17846; HTML: 871; JavaScript: 771; Shell: 128
+ably/ably-chat-js,TypeScript,12,1029.0,9.0,7037.0,TypeScript: 769564; JavaScript: 9399
+acoyfellow/fleet-pattern,TypeScript,45,9.0,1.0,99.0,TypeScript: 9909; JavaScript: 3628; CSS: 2144
+adidahiya/raga,TypeScript,27,569.0,2.0,28666.0,TypeScript: 234937; SCSS: 15583; JavaScript: 8970; HTML: 211; Shell: 121
+afadil/wealthfolio,TypeScript,5046,395.0,15.0,10757.0,TypeScript: 665279; Rust: 288331; JavaScript: 7766; CSS: 3019; HTML: 360
+ahmedkhaleel2004/gitdiagram,TypeScript,4599,150.0,3.0,620.0,TypeScript: 89466; Python: 57824; Shell: 3709; JavaScript: 3679; CSS: 1657; Dockerfile: 650
+ai-hero-dev/ai-hero,TypeScript,680,230.0,3.0,6658.0,TypeScript: 28077; JavaScript: 845; CSS: 309
+airas-network/airas-agent,TypeScript,21,49.0,1.0,2210.0,TypeScript: 93453; JavaScript: 2502; CSS: 1876
+alanhe421/alfred-workflows,JavaScript,686,1397.0,6.0,571806.0,JavaScript: 100254; HTML: 30402; Shell: 18235; Vue: 12209; CSS: 4286; TypeScript: 3642; Python: 2549; Swift: 1862; Nu: 258; Lua: 197
+alchaincyf/cursor-rules-huasheng,TypeScript,79,8.0,1.0,129.0,TypeScript: 20422; JavaScript: 1790
+alexander-turner/TurnTrout.com,TypeScript,12,5332.0,138.0,512463.0,TypeScript: 847933; Python: 368277; SCSS: 77123; JavaScript: 13569; Shell: 11811; HTML: 274
+angular-courses-lab/angular-debug-quest,TypeScript,33,62.0,1.0,1581.0,TypeScript: 33674; HTML: 30713; JavaScript: 7082; CSS: 618; Shell: 58
+ansh/deeperseeker-app,TypeScript,136,8.0,1.0,774.0,TypeScript: 46234; JavaScript: 226
+ant-design/ant-design,TypeScript,94114,29298.0,376.0,219388.0,TypeScript: 6221786; JavaScript: 26708; CSS: 4063; Shell: 3337; HTML: 3223
+antiwork/helper,TypeScript,139,129.0,10.0,4801.0,TypeScript: 1908525; MDX: 46830; Rust: 24483; CSS: 21947; JavaScript: 20244; Shell: 7635; HTML: 2150; Makefile: 467; Dockerfile: 417
+antiwork/iffy,TypeScript,224,80.0,8.0,6546.0,TypeScript: 657371; MDX: 18994; CSS: 2218; JavaScript: 691
+arcanis/terminosaurus,TypeScript,149,28.0,2.0,1368.0,TypeScript: 200660; JavaScript: 184
+ba-archive/blue-archive,TypeScript,262,971.0,13.0,59307.0,TypeScript: 817330; Vue: 639664; JavaScript: 40789; SCSS: 34213; Python: 11740; HTML: 3940; CSS: 2475; Shell: 1350
+badass-courses/course-builder,TypeScript,441,1939.0,11.0,64234.0,TypeScript: 5572789; CSS: 230471; JavaScript: 79337; MDX: 14990; Handlebars: 3600; Shell: 3096; Astro: 3046
+balancer/pool-creator,TypeScript,11,632.0,49.0,5233.0,TypeScript: 531363; JavaScript: 4791; CSS: 731; Makefile: 203; Shell: 68
+betagouv/france-chaleur-urbaine,TypeScript,13,4827.0,11.0,543450.0,TypeScript: 2465896; Shell: 64998; PLpgSQL: 28711; JavaScript: 28697; EJS: 18294; MDX: 9532; CSS: 2647; Dockerfile: 79; Procfile: 64; HTML: 54
+bitcashorg/smartsale,TypeScript,17,885.0,7.0,155726.0,TypeScript: 2702886; Solidity: 51433; JavaScript: 25083; CSS: 15281; PLpgSQL: 8018; Shell: 2676; Dockerfile: 1340; HTML: 367
+braebo/nutab,TypeScript,11,403.0,2.0,3446.0,TypeScript: 245179; Svelte: 231276; JavaScript: 13315; SCSS: 7969; HTML: 1868; Sass: 229
+brandon-schabel/octoprompt,TypeScript,12,210.0,1.0,2776.0,TypeScript: 1164882; CSS: 3455; JavaScript: 2540; HTML: 702
+browserbase/playbook,TypeScript,60,111.0,2.0,9066.0,TypeScript: 7945
+browserbase/stagehand,TypeScript,9223,391.0,19.0,38444.0,TypeScript: 652326; HTML: 2063; JavaScript: 387
+buster-so/buster,TypeScript,220,696.0,4.0,57907.0,TypeScript: 2472973; Rust: 2160350; HCL: 14857; PLpgSQL: 13859; SCSS: 11873; HTML: 10198; Jupyter Notebook: 7511; Dockerfile: 3744; JavaScript: 2628; Shell: 1419; Elixir: 1068; Makefile: 709; Python: 680
+c15t/c15t,TypeScript,60,186.0,5.0,6531.0,TypeScript: 1405180; MDX: 163010; CSS: 61614; PLpgSQL: 9018; Astro: 5840; JavaScript: 3363; HTML: 379
+cbingb666/115master,TypeScript,434,228.0,2.0,6670.0,TypeScript: 212282; Vue: 146733; CSS: 1583; JavaScript: 287
+ccbikai/DNS.Surf,TypeScript,350,87.0,1.0,615.0,TypeScript: 51449; JavaScript: 25426; MDX: 6595; CSS: 1485
+ccbikai/github-stars,JavaScript,22,31.0,2.0,7267.0,JavaScript: 2192
+ccbikai/hacker-news,TypeScript,1557,28.0,2.0,264.0,TypeScript: 35266; CSS: 1866; JavaScript: 971
+cgranier/tabSidian,JavaScript,45,41.0,2.0,169.0,JavaScript: 4676; HTML: 2773; CSS: 1211
+christophebe/julius-gpt,TypeScript,54,185.0,3.0,1847.0,TypeScript: 54142; JavaScript: 1358; Batchfile: 33
+cjinhuo/blazwitcher,TypeScript,22,258.0,4.0,10813.0,TypeScript: 138383; CSS: 10804; JavaScript: 5927; HTML: 337
+clchinkc/stockchat,TypeScript,127,6.0,1.0,10523.0,TypeScript: 59491; Python: 39031; CSS: 2206; Dockerfile: 1784; JavaScript: 1682; HTML: 366
+cloudflare/agents,TypeScript,1288,191.0,12.0,2176.0,TypeScript: 127099; CSS: 18495; HTML: 555
+cloudflare/agents-starter,TypeScript,498,91.0,9.0,580.0,TypeScript: 68834; CSS: 8529; HTML: 1289
+collinschaafsma/startstack,TypeScript,11,145.0,1.0,365.0,TypeScript: 272304; CSS: 4620; JavaScript: 934
+comet-ml/opik-mcp,TypeScript,16,34.0,3.0,303.0,TypeScript: 199033; HTML: 8687; JavaScript: 3908; Makefile: 1616; Dockerfile: 507
+constROD/template-hono-prisma-kysely,TypeScript,40,201.0,2.0,1659.0,TypeScript: 92022; Dockerfile: 1613; Shell: 149; JavaScript: 67
+convergence-ai/webgames,TypeScript,45,114.0,3.0,349.0,TypeScript: 377118; Python: 11850; HTML: 1162; JavaScript: 984; CSS: 665; Rust: 334
+ctxs-ai/ctxs.ai,TypeScript,19,262.0,2.0,883.0,TypeScript: 110851; Astro: 55911; Clojure: 7446; CSS: 4878; JavaScript: 3166; Dockerfile: 1347
+cuongtl1992/mcp-dbs,TypeScript,14,13.0,1.0,347.0,TypeScript: 106654; JavaScript: 1710
+cyberk-lab/nestjs-boilerplate,TypeScript,13,20.0,2.0,532.0,TypeScript: 108179; JavaScript: 8263; Ruby: 363
+darenmalfait/nerdfish.be,TypeScript,26,1546.0,6.0,248054.0,TypeScript: 465180; MDX: 182176; CSS: 1328; JavaScript: 763; Handlebars: 391
+darkroomengineering/satus,TypeScript,638,621.0,9.0,10159.0,TypeScript: 156154; JavaScript: 76946; CSS: 68210
+daydreamsai/daydreams,TypeScript,389,779.0,20.0,56890.0,TypeScript: 402820; Shell: 7234; JavaScript: 4142; CSS: 3018; HTML: 2090
+daytimedrinkingclub/shipstation,JavaScript,84,420.0,10.0,26216.0,JavaScript: 672153; HTML: 26616; PLpgSQL: 14904; CSS: 5815; Procfile: 14
+deeeed/expo-audio-stream,TypeScript,85,499.0,4.0,381170.0,TypeScript: 2000039; Kotlin: 714419; C++: 657550; Swift: 290773; JavaScript: 113245; Shell: 64784; Objective-C++: 53373; Objective-C: 49580; Ruby: 18812; HTML: 8144; C: 7151; CMake: 5939; CSS: 1545
+devagrawal09/tanstack-router-strello,TypeScript,12,6.0,1.0,84.0,TypeScript: 38794; CSS: 4964; HTML: 615; JavaScript: 502
+different-ai/hypr-v0,TypeScript,66,285.0,2.0,92257.0,TypeScript: 1502891; Python: 49178; CSS: 47567; JavaScript: 25321
+different-ai/note-companion,TypeScript,601,1940.0,12.0,159052.0,TypeScript: 1425869; JavaScript: 17500; CSS: 11431; Dockerfile: 568
+ditto-assistant/ditto-app,TypeScript,28,848.0,4.0,43631.0,TypeScript: 313073; JavaScript: 292168; CSS: 176911; Python: 26209; HTML: 5486; Just: 1195
+dogokit/dogokit-akita,JavaScript,24,48.0,1.0,307.0,JavaScript: 2264; Makefile: 190; TypeScript: 37
+dotabod/frontend,TypeScript,26,1685.0,9.0,344355.0,TypeScript: 1212922; JavaScript: 44202; PowerShell: 18885; Shell: 17132; CSS: 15297
+dotneet/aica,TypeScript,10,288.0,1.0,492.0,TypeScript: 312872; JavaScript: 768
+dotnetfactory/fluid-calendar,TypeScript,472,88.0,4.0,1398.0,TypeScript: 1198232; JavaScript: 7837; CSS: 7828; Shell: 5815; Dockerfile: 2581
+dougwithseismic/cursor-tools,TypeScript,26,64.0,2.0,778.0,TypeScript: 139568; JavaScript: 11101; CSS: 1971; HTML: 446; Handlebars: 192
+drivly/ai,TypeScript,10,920.0,8.0,26983.0,TypeScript: 2164883; MDX: 338190; JavaScript: 21641; CSS: 2328; Shell: 186
+dxos/dxos,TypeScript,420,6268.0,38.0,564104.0,TypeScript: 18216599; JavaScript: 389935; Go: 64745; CSS: 36934; HTML: 17295; Rust: 16734; Kotlin: 15063; Shell: 13630; Smarty: 4048; Dockerfile: 2814; GLSL: 1894; Python: 1254; AppleScript: 787; Batchfile: 155
+eastlondoner/cursor-tools,TypeScript,3478,192.0,5.0,7406.0,TypeScript: 603284; HTML: 15753; JavaScript: 7475; Dockerfile: 735; Shell: 276
+efdevcon/monorepo,TypeScript,22,3280.0,10.0,3272203.0,TypeScript: 3121846; SCSS: 865671; MDX: 266373; JavaScript: 106957; GLSL: 25915; Python: 9394; HTML: 1834; CSS: 557; Shell: 116
+elbwalker/walkerOS,TypeScript,296,2008.0,9.0,23417.0,TypeScript: 742265; MDX: 261191; HTML: 78171; JavaScript: 13942; CSS: 3497
+elie222/inbox-zero,TypeScript,3749,4122.0,20.0,22085.0,TypeScript: 2073498; MDX: 153823; JavaScript: 17679; CSS: 2622; PLpgSQL: 658; Shell: 137
+ephemeraHQ/converse-app,TypeScript,58,4567.0,15.0,33636.0,TypeScript: 1931125; JavaScript: 19119; Shell: 1842; Ruby: 121
+ephemeraHQ/xmtp-agent-examples,JavaScript,16,276.0,4.0,13671.0,JavaScript: 3635; TypeScript: 2978; Shell: 411; Dockerfile: 333
+epicweb-dev/epic-stack,TypeScript,5271,981.0,160.0,14495.0,TypeScript: 403056; JavaScript: 12567; Dockerfile: 2932; CSS: 1765
+eser/deno-next-showcase,TypeScript,26,5.0,2.0,54.0,TypeScript: 22089; CSS: 1352; Dockerfile: 1248; JavaScript: 439
+exa-labs/company-researcher,TypeScript,1140,80.0,1.0,1009.0,TypeScript: 135507; CSS: 2458; JavaScript: 379
+exa-labs/exa-deepseek-chat,TypeScript,676,41.0,2.0,857.0,TypeScript: 25269; CSS: 2458; JavaScript: 411
+eyaltoledano/claude-task-master,JavaScript,607,91.0,2.0,1330.0,JavaScript: 449217
+f/awesome-chatgpt-prompts,JavaScript,122280,682.0,124.0,1338.0,JavaScript: 56993; CSS: 38027; HTML: 19372; Shell: 294; Ruby: 87
+f3liiix/nav-site,TypeScript,104,70.0,1.0,940.0,TypeScript: 275152; Shell: 4893; JavaScript: 2254; CSS: 1617
+farfarawaylabs/bernstein_ai_framework,TypeScript,10,15.0,1.0,249.0,TypeScript: 185158; PLpgSQL: 1026
+fatwang2/gitpush,TypeScript,53,8.0,1.0,100.0,TypeScript: 30868; HTML: 298; JavaScript: 262; CSS: 59
+fatwang2/search1api-mcp,TypeScript,105,32.0,1.0,110.0,TypeScript: 26890; JavaScript: 1174
+federicofanini/gymbrah.com,TypeScript,82,282.0,1.0,31805.0,TypeScript: 469240; MDX: 6517; CSS: 3376; JavaScript: 602
+fengkx/beancount-lsp,TypeScript,13,211.0,1.0,6637.0,TypeScript: 314855; JavaScript: 7496; Tree-sitter Query: 1393; Shell: 275
+focu-app/focu,TypeScript,81,1453.0,2.0,137578.0,TypeScript: 614321; MDX: 22768; Rust: 12572; CSS: 2771; JavaScript: 924
+formml/formml,TypeScript,47,574.0,1.0,4501.0,TypeScript: 529872; JavaScript: 283
+fredericbarthelet/linkedin-mcp-server,TypeScript,18,9.0,1.0,55.0,TypeScript: 16901
+friuns2/appforge,JavaScript,83,3.0,1.0,170.0,JavaScript: 143861; HTML: 53582
+frostime/sy-f-misc,TypeScript,11,651.0,1.0,1662.0,TypeScript: 758574; CSS: 93499; SCSS: 35454; JavaScript: 19805; PowerShell: 876
+gaetansenn/vue-api,TypeScript,18,88.0,1.0,2936.0,TypeScript: 64049; Vue: 16013; CSS: 2664; JavaScript: 1353; HTML: 337
+genesis-ai-dev/codex-editor,TypeScript,10,2210.0,12.0,33100.0,TypeScript: 5583127; CSS: 114583; JavaScript: 17756; HTML: 366
+gensx-inc/gensx,TypeScript,408,368.0,5.0,16064.0,TypeScript: 516852; MDX: 143166; JavaScript: 25250; CSS: 4827; Shell: 287
+gerred/mcpmc,TypeScript,18,16.0,1.0,331.0,TypeScript: 102312; JavaScript: 1791
+getgrinta/grinta,TypeScript,13,260.0,2.0,37181.0,TypeScript: 278410; Svelte: 87525; Rust: 38616; Astro: 26131; MDX: 13573; CSS: 9588; JavaScript: 4968; HTML: 440
+geyserfund/geyser-app,TypeScript,52,7656.0,13.0,162443.0,TypeScript: 3157261; JavaScript: 17750; HTML: 2470; Dockerfile: 1998; Shell: 625; Makefile: 69
+gjsify/ts-for-gir,TypeScript,260,1549.0,18.0,198482.0,TypeScript: 723207; JavaScript: 7416; Shell: 1425
+gruntwork-io/docs,JavaScript,27,1259.0,32.0,89245.0,JavaScript: 94727; TypeScript: 60263; CSS: 30464; Shell: 7969; Dockerfile: 447
+h7ml/ai-markdown-translator,TypeScript,16,111.0,4.0,50849.0,TypeScript: 44460; JavaScript: 6468; Shell: 2345
+ham2k/app-polo,JavaScript,48,1210.0,11.0,154473.0,JavaScript: 1278437; Kotlin: 2743; Ruby: 1500; Swift: 1477; Objective-C: 236
+haqq-network/frontend,TypeScript,44,3225.0,11.0,281694.0,TypeScript: 3562260; JavaScript: 9888; CSS: 6252; HTML: 1044
+harrisonwang/url-shortener,TypeScript,33,21.0,1.0,1066.0,TypeScript: 19910; Dockerfile: 935; CSS: 560; JavaScript: 366
+hashintel/hash,TypeScript,1162,9309.0,48.0,349340.0,TypeScript: 9255685; Rust: 5253097; MDX: 1441317; HCL: 189345; JavaScript: 78366; SCSS: 34807; Shell: 25065; Dockerfile: 21788; CSS: 12492; Just: 6869; HTML: 5323; Handlebars: 3490; PLpgSQL: 2401; Python: 337; Jsonnet: 103
+helius-labs/helius-sdk,TypeScript,208,191.0,31.0,6793.0,TypeScript: 125784; HTML: 27172; CSS: 9523; JavaScript: 671
+helius-labs/kite,TypeScript,53,385.0,10.0,702.0,TypeScript: 107162
+hellokaton/namesage,TypeScript,37,14.0,2.0,991.0,TypeScript: 89620; CSS: 1252; JavaScript: 135
+henryhawke/mcp-titan,TypeScript,44,41.0,2.0,4758.0,TypeScript: 164808; Dockerfile: 928; JavaScript: 466
+heyverse/hey,TypeScript,28424,146.0,1.0,54369.0,TypeScript: 2236647; Shell: 4826; CSS: 3484; JavaScript: 3430; HTML: 8
+highlight/highlight,TypeScript,8108,6997.0,77.0,614674.0,TypeScript: 11185582; Go: 2482127; JavaScript: 1284776; Python: 170420; Java: 159854; CSS: 138317; SCSS: 109363; Ruby: 70076; HTML: 55791; C#: 34247; Rust: 22144; Dockerfile: 14581; PHP: 9876; Shell: 9402; Elixir: 8279; Makefile: 3864; EJS: 3065; ANTLR: 1812; MDX: 1585; Less: 1415; Scheme: 353; ASP.NET: 92
+hijohnnylin/neuronpedia,TypeScript,11,87.0,3.0,8928.0,TypeScript: 2273449; Python: 999902; Jupyter Notebook: 138483; MDX: 15774; JavaScript: 12524; CSS: 10615; Makefile: 9406; Dockerfile: 4175; Shell: 3831; HTML: 181
+him0/ai-rule-forge,JavaScript,11,9.0,1.0,19.0,JavaScript: 8414
+hooray/fantastic-startkit,TypeScript,171,257.0,1.0,7667.0,TypeScript: 14562; JavaScript: 5134; Vue: 2575; SCSS: 1073; Handlebars: 620; HTML: 299; CSS: 19
+howoii/SmartBookmark,JavaScript,78,14.0,1.0,5292.0,JavaScript: 547724; CSS: 181281; HTML: 104436; Python: 1432; Shell: 874
+hudy9x/namviek,TypeScript,2165,409.0,6.0,8568.0,TypeScript: 1507083; CSS: 59971; JavaScript: 4868; Dockerfile: 3724; Shell: 2550
+humanspeak/svelte-markdown,TypeScript,22,446.0,14.0,3271.0,TypeScript: 192468; Svelte: 55301; JavaScript: 4041; HTML: 362
+hyusap/deconstructor,TypeScript,232,26.0,1.0,298.0,TypeScript: 55154; CSS: 1878; JavaScript: 731
+i-am-alice/3rd-devs,TypeScript,190,57.0,1.0,32858.0,TypeScript: 1416682; JavaScript: 35850; HTML: 8875
+icantcodefyi/cattype,TypeScript,28,28.0,4.0,1135.0,TypeScript: 290779; CSS: 4739; JavaScript: 528
+iceener/ai,TypeScript,131,2.0,1.0,197.0,TypeScript: 441932
+ilyaizen/streak-calendar,TypeScript,94,481.0,1.0,4058.0,TypeScript: 324085; JavaScript: 5265; CSS: 3227
+imbhargav5/rooks,TypeScript,3248,3082.0,71.0,20123.0,TypeScript: 491238; MDX: 141931; JavaScript: 21145; Shell: 827; CSS: 717
+imhonglu/new-wheels,TypeScript,12,279.0,2.0,3337.0,TypeScript: 729521; JavaScript: 3099
+imrishit98/rp-nextjs-starter,JavaScript,10,396.0,3.0,1860.0,JavaScript: 17913; SCSS: 1684
+infinite-table/infinite-react,JavaScript,81,1849.0,6.0,93616.0,JavaScript: 3987868; TypeScript: 2588579; CSS: 32654; HTML: 1428; MDX: 50
+instructa/viber3d,TypeScript,437,64.0,3.0,3001.0,TypeScript: 64538; JavaScript: 1525; HTML: 708; CSS: 372
+isboyjc/isle-editor,JavaScript,132,164.0,2.0,577.0,JavaScript: 214110; SCSS: 25454; Vue: 12808; HTML: 328
+jackfriks/expo-app-boilerplate,TypeScript,371,5.0,1.0,774.0,TypeScript: 50519; Kotlin: 4596; JavaScript: 3608; Objective-C++: 2723; Ruby: 2626; Objective-C: 327; Swift: 113; C: 103
+jhonsfran1165/unprice,TypeScript,29,876.0,4.0,9492.0,TypeScript: 2108625; CSS: 12364; JavaScript: 10831; MDX: 9430; Shell: 7725; PLpgSQL: 3045; Handlebars: 686; Makefile: 139
+joelhooks/logseq-mcp-tools,TypeScript,11,2.0,1.0,35.0,TypeScript: 51062
+johanguse/next-saas-template,TypeScript,18,266.0,1.0,11487.0,TypeScript: 812150; MDX: 148414; JavaScript: 10370; CSS: 5530; Shell: 157
+johnneerdael/multiplatform-cursor-mcp,TypeScript,53,3.0,1.0,23997.0,TypeScript: 117159; JavaScript: 107660; Shell: 6414; PowerShell: 2196
+jonathanbertholet/promptmanager,JavaScript,12,35.0,2.0,468.0,JavaScript: 87935; HTML: 18542; CSS: 5248
+jparkerweb/llm-distillery,JavaScript,10,33.0,1.0,250.0,JavaScript: 20778
+jparkerweb/pixel-banner,JavaScript,112,448.0,2.0,116806.0,JavaScript: 609290; CSS: 29111
+jparkerweb/semantic-chunking,JavaScript,79,125.0,1.0,9239.0,JavaScript: 58216; CSS: 17510; HTML: 14543; Batchfile: 144
+jpmorgan-payments/embedded-finance,TypeScript,16,2063.0,12.0,11727.0,TypeScript: 1590531; JavaScript: 41407; Shell: 6665; HTML: 1972; CSS: 1435
+jrmybtlr/usemods,TypeScript,217,976.0,8.0,7897.0,TypeScript: 137466; JavaScript: 3823; CSS: 2882
+kazuph/mcp-screenshot,JavaScript,11,13.0,2.0,62.0,JavaScript: 8203
+kelvin6365/rocksdev.tools,TypeScript,32,159.0,2.0,1864.0,TypeScript: 643299; CSS: 2423; JavaScript: 2224; Dockerfile: 1257
+kendevco/spaces,TypeScript,14,20.0,1.0,6671.0,TypeScript: 830630; JavaScript: 13831; Dockerfile: 2443; CSS: 1962; SCSS: 768
+kern/filepizza,TypeScript,8139,343.0,23.0,8130.0,TypeScript: 226334; JavaScript: 5762; HTML: 5616; Dockerfile: 766; CSS: 192; Shell: 178
+kindfi-org/kindfi,TypeScript,14,205.0,62.0,9313.0,TypeScript: 1260602; JavaScript: 1087233; Rust: 59117; CSS: 12497; PLpgSQL: 10927; Shell: 1285
+kingbootoshi/cypher,TypeScript,11,29.0,2.0,228.0,TypeScript: 242798; JavaScript: 15090; HTML: 11068
+kingbootoshi/cypher-swarm,TypeScript,26,57.0,2.0,1091.0,TypeScript: 335325; Dockerfile: 876
+kingbootoshi/feather,TypeScript,27,54.0,1.0,137.0,TypeScript: 68094; JavaScript: 22673; HTML: 14440
+kirill-markin/chatgpt-telegram-bot-telegraf,TypeScript,22,341.0,5.0,571.0,TypeScript: 102333; JavaScript: 4307; Dockerfile: 498
+kirill-markin/chrome-auto-image-blocker,JavaScript,78,34.0,3.0,4714.0,JavaScript: 4647; Shell: 1000
+kivS/lite-queen,JavaScript,18,70.0,1.0,20202.0,JavaScript: 226257; TypeScript: 52734; MDX: 17544; CSS: 8925; Ruby: 7122; Shell: 5354; Dockerfile: 3610
+kleneway/forq-cli,TypeScript,16,49.0,1.0,1037.0,TypeScript: 153348; JavaScript: 16272; Shell: 608
+kokonut-labs/kokonutui,TypeScript,694,241.0,7.0,2023.0,TypeScript: 939568; MDX: 22324; CSS: 5361; JavaScript: 1322
+koljapluemer/learn-worldmap,TypeScript,43,57.0,1.0,3527.0,TypeScript: 44701; Vue: 44421; HTML: 727; CSS: 41
+konecty/Konecty,JavaScript,19,897.0,14.0,5757.0,JavaScript: 312305; TypeScript: 305126; Handlebars: 20162; HTML: 10909; Shell: 1553; Dockerfile: 575; Less: 87
+konturio/disaster-ninja-fe,TypeScript,22,1880.0,26.0,618439.0,TypeScript: 1749780; JavaScript: 384924; CSS: 94724; Go: 2693; HTML: 2395; Dockerfile: 240; Shell: 150
+kremalicious/blog,TypeScript,51,1980.0,5.0,728453.0,TypeScript: 133319; Astro: 53499; CSS: 48193; JavaScript: 2494; Shell: 1884
+ks0318-p/Cursor-Project-Rules,TypeScript,27,15.0,1.0,103.0,TypeScript: 4005
+kturung/Langgraph-Multi-Agent-HITL-Form,TypeScript,21,11.0,1.0,108.0,TypeScript: 175976; CSS: 4846; Python: 3911; JavaScript: 2580
+labnol/react-tailwind,JavaScript,51,33.0,1.0,3426.0,JavaScript: 5347; CSS: 798; HTML: 407
+langfuse/langfuse,TypeScript,9896,3898.0,66.0,19972.0,TypeScript: 5399230; JavaScript: 40316; Shell: 10642; Dockerfile: 8148; CSS: 4297; PLpgSQL: 3965
+langfuse/mcp-server-langfuse,TypeScript,37,9.0,1.0,122.0,TypeScript: 6582
+latechforce/engine,TypeScript,16,2090.0,3.0,30008.0,TypeScript: 950059; CSS: 31446; JavaScript: 767
+latitude-dev/latitude-llm,TypeScript,1867,1497.0,16.0,21043.0,TypeScript: 5091685; Python: 236272; JavaScript: 20544; Dockerfile: 11609; CSS: 6544; PLpgSQL: 3547; Shell: 1539
+leaperone/MultiPost-Extension,TypeScript,1118,134.0,4.0,1296.0,TypeScript: 367285; JavaScript: 1798; CSS: 153; Makefile: 120
+leemonade/leemons,JavaScript,242,6853.0,18.0,93880.0,JavaScript: 12085117; MDX: 40393; HTML: 31336; TypeScript: 31291; Shell: 13804; CSS: 13029; Mermaid: 8537; Dockerfile: 1342
+liam-hq/liam,TypeScript,1080,3163.0,21.0,64530.0,TypeScript: 625907; CSS: 84879; MDX: 76532; JavaScript: 20383; Ruby: 7830; PLpgSQL: 2460; Shell: 1925; Handlebars: 1403; HTML: 417
+lightdash/lightdash,TypeScript,4571,9971.0,125.0,153457.0,TypeScript: 12244212; HTML: 1049156; JavaScript: 42856; Shell: 23154; CSS: 3209; MDX: 1088
+linshenkx/prompt-optimizer,TypeScript,2582,235.0,4.0,3254.0,TypeScript: 197891; Vue: 157347; CSS: 42983; JavaScript: 29886; Shell: 1279; PowerShell: 856; HTML: 832; Dockerfile: 579
+loglayer/loglayer,TypeScript,278,281.0,2.0,7522.0,TypeScript: 480616; JavaScript: 964
+lonestone/rolebase.io,TypeScript,19,1102.0,5.0,14948.0,TypeScript: 4960531; HTML: 40971; CSS: 28573; JavaScript: 3193; Dockerfile: 442
+lucasromerodb/impuestito-extension,JavaScript,42,116.0,2.0,2446.0,JavaScript: 108284; CSS: 15456; HTML: 1466
+maciej-trebacz/ff7-ultima,TypeScript,21,95.0,1.0,5039.0,TypeScript: 533482; Rust: 9364; CSS: 2819; JavaScript: 2133; HTML: 827; PowerShell: 101
+madarco/ragrabbit,TypeScript,54,44.0,1.0,7175.0,TypeScript: 488405; JavaScript: 15536; Shell: 6552; MDX: 4985; CSS: 2242; Handlebars: 192
+magebitcom/magento-toolbox,TypeScript,13,164.0,3.0,1240.0,TypeScript: 230170; Handlebars: 56833; PHP: 17181; JavaScript: 6048; HTML: 353; CSS: 338
+makerkit/react-native-expo-turbo-saas-kit,TypeScript,51,31.0,2.0,1939.0,TypeScript: 177075; PLpgSQL: 8262; JavaScript: 5176; CSS: 1498
+mangosqueezy/mangosqueezy,TypeScript,166,214.0,1.0,63309.0,TypeScript: 559294; CSS: 3054; JavaScript: 410
+manifoldmarkets/manifold,TypeScript,434,15757.0,112.0,135133.0,TypeScript: 6167201; HTML: 524727; JavaScript: 69104; PLpgSQL: 68137; Shell: 21795; Python: 16137; Kotlin: 9007; CSS: 7567; Ruby: 5622; Objective-C++: 5446; Handlebars: 3068; SCSS: 2321; Dockerfile: 2250; Makefile: 694; Objective-C: 654; Swift: 226; C: 206
+mantou132/gem,TypeScript,19,953.0,2.0,6628.0,TypeScript: 1338919; Rust: 58434; JavaScript: 31292; HTML: 2151; Scheme: 1228
+marianfoo/ui5-lib-diff,JavaScript,11,144.0,1.0,68181.0,JavaScript: 33885; TypeScript: 32988; HTML: 4474; CSS: 1002
+mazeincoding/Mazeway,TypeScript,23,642.0,1.0,1348.0,TypeScript: 668605; CSS: 2291; JavaScript: 135
+mckaywrigley/level-3-agent-code,TypeScript,14,1.0,1.0,373.0,TypeScript: 207660; CSS: 2367; JavaScript: 1357; Shell: 107
+mckaywrigley/level-4-agent-code,TypeScript,54,2.0,1.0,422.0,TypeScript: 248100; CSS: 2367; JavaScript: 1357; Shell: 107
+mckaywrigley/mckays-app-template,TypeScript,1401,33.0,1.0,509.0,TypeScript: 224451; CSS: 2367; JavaScript: 1357; Shell: 107
+mckaywrigley/o1-pro-template-system,TypeScript,118,7.0,1.0,334.0,TypeScript: 208326; CSS: 2340; JavaScript: 1260; Shell: 107
+mckaywrigley/o1-xml-parser,TypeScript,463,8.0,1.0,151.0,TypeScript: 9064; CSS: 1779; JavaScript: 227
+mckaywrigley/takeoff-perplexity-clone-final,TypeScript,14,1.0,1.0,170.0,TypeScript: 183322; CSS: 1656; JavaScript: 1099; Shell: 107
+mckaywrigley/takeoff-perplexity-clone-mckay,TypeScript,13,4.0,1.0,167.0,TypeScript: 172395; CSS: 1656; JavaScript: 1099; Shell: 107
+mediar-ai/screenpipe,TypeScript,12877,3908.0,71.0,327161.0,TypeScript: 5394652; Rust: 1364857; MDX: 79167; Swift: 56814; CSS: 41482; Python: 30225; JavaScript: 26253; Shell: 12936; HTML: 8821; PowerShell: 3959; Dockerfile: 1391
+medusajs/examples,TypeScript,73,99.0,3.0,5225.0,TypeScript: 1298667; JavaScript: 18254; CSS: 3141
+melissamcewen/CurlsBotSite,TypeScript,18,441.0,1.0,34460.0,TypeScript: 479940; MDX: 129535; JavaScript: 4845; CSS: 1631; HTML: 53
+metaskills/experts,JavaScript,1039,109.0,2.0,3865.0,JavaScript: 45880; Shell: 367; Dockerfile: 22
+metriport/metriport,JavaScript,566,12736.0,16.0,518957.0,JavaScript: 6819147; TypeScript: 4063057; Handlebars: 1457428; Python: 24847; Shell: 23614; HTML: 18586; Java: 15973; Dockerfile: 2133; CSS: 930; ANTLR: 910
+milaboratory/platforma,TypeScript,14,4093.0,14.0,20254.0,TypeScript: 4330917; Vue: 688843; SCSS: 154593; JavaScript: 101977; Shell: 34935; HTML: 12000; CSS: 8861; Emacs Lisp: 3862; R: 2082; Dockerfile: 859; Batchfile: 305; Python: 104
+module-federation/core,TypeScript,1831,3015.0,148.0,232664.0,TypeScript: 3052047; MDX: 660267; JavaScript: 337456; CSS: 44367; Handlebars: 37777; SCSS: 15287; Shell: 7709; Python: 7559; HTML: 6566; Vue: 3274
+motiondivision/motion-vue,TypeScript,1657,428.0,10.0,1729.0,TypeScript: 213811; Vue: 86843; JavaScript: 2793; CSS: 1750; HTML: 369
+movibe/memory-bank-mcp,TypeScript,16,47.0,3.0,482.0,TypeScript: 208963; JavaScript: 9242
+mrabdussalam/zakat-calculator,TypeScript,16,43.0,3.0,3055.0,TypeScript: 1468320; CSS: 3388; JavaScript: 2374
+mslavov/shelly-forge,TypeScript,10,10.0,1.0,82.0,TypeScript: 23393; JavaScript: 1386
+mzxrai/mcp-openai,JavaScript,33,8.0,1.0,55.0,JavaScript: 4995
+namesakefyi/namesake,TypeScript,24,273.0,10.0,15694.0,TypeScript: 618037; CSS: 16807; JavaScript: 3954; HTML: 570; Shell: 509
+nauvalazhar/gollama,TypeScript,30,17.0,1.0,945.0,TypeScript: 132006; CSS: 6479; JavaScript: 2631
+netresearch/timetracker,JavaScript,22,463.0,9.0,53393.0,JavaScript: 45516891; CSS: 4526697; HTML: 712978; SCSS: 654430; PHP: 554360; Twig: 8565; Ruby: 5174; Dockerfile: 3028; Shell: 1011
+ngxpert/input-otp,TypeScript,33,55.0,3.0,5803.0,TypeScript: 58638; HTML: 13981; CSS: 5148; JavaScript: 1656; SCSS: 1005
+noelrohi/www,TypeScript,45,321.0,2.0,1565.0,TypeScript: 48150; MDX: 13500; CSS: 4639; JavaScript: 475
+nuotsu/sanitypress,TypeScript,282,981.0,8.0,5405.0,TypeScript: 204894; CSS: 8366; JavaScript: 117
+oaknational/oak-ai-lesson-assistant,TypeScript,19,694.0,16.0,9435.0,TypeScript: 2461937; JavaScript: 60540; Shell: 8181; CSS: 2926; PLpgSQL: 880; Python: 563; Dockerfile: 407
+obytes/react-native-template-obytes,TypeScript,3053,668.0,31.0,36840.0,TypeScript: 125143; JavaScript: 20919; Kotlin: 4582; Objective-C++: 2723; Ruby: 2617; Shell: 429; Objective-C: 327; Swift: 113; C: 103; CSS: 59
+ohcnetwork/care_fe,TypeScript,444,8016.0,249.0,49683.0,TypeScript: 2590059; JavaScript: 9299; CSS: 5868; HTML: 3568; Dockerfile: 560
+ojasskapre/nextjs-starter-template,TypeScript,35,47.0,1.0,832.0,TypeScript: 110995; Python: 11400; Dockerfile: 1214; JavaScript: 227; CSS: 61
+olyaiy/resume-lm,TypeScript,37,628.0,2.0,46676.0,TypeScript: 1141031; PLpgSQL: 7469; CSS: 5372; Shell: 1079; JavaScript: 528
+omnisat/lasereyes-mono,TypeScript,18,1498.0,9.0,5010.0,TypeScript: 1280744; CSS: 13841; JavaScript: 8332; HTML: 2806; Python: 2327; Just: 313
+one-ie/one,TypeScript,58,472.0,3.0,70024.0,TypeScript: 526846; Astro: 276042; MDX: 46150; CSS: 26078; JavaScript: 4516; Solidity: 3237; HTML: 2882
+open-fractal/flur,JavaScript,38,212.0,2.0,2618.0,JavaScript: 958186; TypeScript: 483906; MDX: 13439; CSS: 4539
+openintegrations/openint,TypeScript,172,726.0,8.0,18491.0,TypeScript: 1322928; PLpgSQL: 72046; Shell: 18169; JavaScript: 14204; CSS: 10717
+opentoolsteam/cli,TypeScript,43,62.0,4.0,168.0,TypeScript: 53728; JavaScript: 311; Batchfile: 117
+orionjs/orionjs,TypeScript,44,2000.0,16.0,10028.0,TypeScript: 630500; MDX: 46198; JavaScript: 2769
+osbytes/crypt.fyi,TypeScript,94,361.0,3.0,2271.0,TypeScript: 317148; JavaScript: 11120; HTML: 3253; Shell: 2771; CSS: 2137; Dockerfile: 432
+owengretzinger/gitreadme,TypeScript,30,143.0,1.0,9814.0,TypeScript: 228232; Python: 7942; JavaScript: 5588; CSS: 2640; Shell: 2084; Dockerfile: 636
+owid/owid-grapher,TypeScript,1435,19607.0,46.0,140680.0,TypeScript: 6777589; SCSS: 436698; JavaScript: 68762; Shell: 27471; Makefile: 14661; HTML: 11823; Python: 11385; Handlebars: 1097; Dockerfile: 346
+pAIrprogio/oai,TypeScript,27,38.0,1.0,214.0,TypeScript: 59606; Shell: 301
+panoratech/Panora,TypeScript,989,2214.0,21.0,109641.0,TypeScript: 4427074; JavaScript: 34063; Shell: 13062; CSS: 8380; Dockerfile: 5330; Slim: 1337; PLpgSQL: 690; Handlebars: 615; HTML: 366
+paulboguta/alternativeoss,TypeScript,22,65.0,1.0,1596.0,TypeScript: 410397; JavaScript: 10226; CSS: 4049; PLpgSQL: 2545
+piotrkulpinski/openalternative,TypeScript,4196,985.0,3.0,33160.0,TypeScript: 709444; CSS: 4769; JavaScript: 69
+pnd280/complexity,TypeScript,674,784.0,1.0,8025.0,TypeScript: 1181013; CSS: 14530; JavaScript: 9395; HTML: 394
+pnizer/wweb-mcp,TypeScript,12,12.0,2.0,425.0,TypeScript: 124461; JavaScript: 3680; Dockerfile: 910
+pockethost/pockethost,JavaScript,1202,1554.0,21.0,114824.0,JavaScript: 306869; TypeScript: 241039; Svelte: 125203; Shell: 2005; CSS: 534; HTML: 383; Dockerfile: 193
+pollinations/pollinations,JavaScript,1422,5418.0,20.0,379673.0,JavaScript: 1091501; Python: 688767; Shell: 74266; TypeScript: 57664; HTML: 6204; Dockerfile: 2285; CSS: 2188
+privatefolio/privatefolio,TypeScript,12,362.0,2.0,19837.0,TypeScript: 1164333; Shell: 4241; CSS: 3213; JavaScript: 2916; HTML: 1027
+project-89/argOS,TypeScript,30,89.0,2.0,2097.0,TypeScript: 525131; CSS: 1422; JavaScript: 660; HTML: 300
+promptfoo/promptfoo,TypeScript,6016,4042.0,154.0,331801.0,TypeScript: 5143298; CSS: 104789; JavaScript: 30482; Go: 7483; Python: 5782; Smarty: 1802; HTML: 1784; Shell: 1648; Dockerfile: 1607
+przeprogramowani/ai-rules-builder,TypeScript,76,83.0,9.0,1085.0,TypeScript: 177680; JavaScript: 4808; Astro: 2697; CSS: 1115
+q1226189767/FlyAdmin,TypeScript,31,11.0,1.0,456.0,TypeScript: 310740; CSS: 4454; Shell: 2241; JavaScript: 1313; HTML: 1061; Dockerfile: 531
+qpd-v/mcp-DEEPwebresearch,TypeScript,46,53.0,3.0,350.0,TypeScript: 113988; JavaScript: 65651
+quantalogic/qllm,TypeScript,33,445.0,4.0,2586.0,TypeScript: 1082057; JavaScript: 16309; Dockerfile: 605; Python: 524
+radzionc/guitar,TypeScript,28,107.0,1.0,5075.0,TypeScript: 782580; Shell: 9933; HCL: 3509; JavaScript: 3413
+radzionc/radzionkit,TypeScript,256,542.0,2.0,12545.0,TypeScript: 2979811; HCL: 14482; Shell: 11481; JavaScript: 4508
+recallnet/js-recall,TypeScript,12,130.0,6.0,2134.0,TypeScript: 516848; JavaScript: 11784; CSS: 1757; Shell: 1563; Nix: 563
+refly-ai/refly,TypeScript,3249,4227.0,7.0,45832.0,TypeScript: 4722991; SCSS: 156685; CSS: 45831; JavaScript: 7689; HTML: 4115; Dockerfile: 2041; Shell: 1688; Handlebars: 1673
+rejot-dev/rejot,TypeScript,19,135.0,2.0,1150.0,TypeScript: 1151668; JavaScript: 4820; CSS: 2391; Dockerfile: 1052; Shell: 738; HTML: 354
+reliverse/cli-ai-app-site-anything-builder,TypeScript,113,135.0,1.0,18468.0,TypeScript: 786163; JavaScript: 3663
+rember/rember-mcp,TypeScript,17,49.0,1.0,6433.0,TypeScript: 34072; JavaScript: 5847
+renocrypt/lumina-research-renocrypt,TypeScript,11,25.0,1.0,123.0,TypeScript: 57692; JavaScript: 3808; CSS: 2033; HTML: 400
+richardadonnell/Upwork-Job-Scraper,JavaScript,16,491.0,3.0,5353.0,JavaScript: 964445; HTML: 48562; CSS: 15293
+rivet-gg/actor-core,TypeScript,528,265.0,8.0,27823.0,TypeScript: 368291; Rust: 46244; JavaScript: 4352; Shell: 185
+rohenaz/allaboard-bitchat-nitro,TypeScript,10,153.0,2.0,2591.0,TypeScript: 204209; JavaScript: 56421; Shell: 4396; CSS: 534; Less: 533; Dockerfile: 490; HTML: 415
+rohenaz/bmap,JavaScript,20,217.0,2.0,63021.0,JavaScript: 1142164; TypeScript: 112035; HTML: 10795
+ryokun6/ryos,TypeScript,110,871.0,2.0,36322.0,TypeScript: 1199512; JavaScript: 25072; CSS: 8266; HTML: 1947
+sadmann7/diceui,TypeScript,250,874.0,3.0,2906.0,TypeScript: 489323
+sadmann7/shadcn-table,TypeScript,4574,1110.0,26.0,3040.0,TypeScript: 307186; CSS: 4961; JavaScript: 1485
+saleor/saleor-app-template,TypeScript,68,260.0,15.0,3008.0,TypeScript: 23060; Dockerfile: 434; CSS: 112; JavaScript: 88
+sam-goodwin/alchemy,TypeScript,101,127.0,2.0,67626.0,TypeScript: 363162
+scalar/scalar,TypeScript,9581,4171.0,112.0,162188.0,TypeScript: 2461580; Vue: 882068; C#: 106023; CSS: 103403; JavaScript: 24427; Go: 22241; HTML: 17855; Python: 17494; Dockerfile: 10969; Shell: 3693; MDX: 3602
+scoful/pocker,JavaScript,21,126.0,1.0,609.0,JavaScript: 224238; CSS: 1274
+script-kit/app,TypeScript,80,3183.0,5.0,34146.0,TypeScript: 1258832; CSS: 198551; JavaScript: 25925; Python: 13119; Shell: 2452; HTML: 1920
+searchfe/hoth,TypeScript,13,417.0,5.0,2230.0,TypeScript: 124764; JavaScript: 23890; Vue: 3420; Shell: 3199; HTML: 740; Smarty: 108; EJS: 86
+serge-0v/next-js-sanity-starter,TypeScript,80,137.0,3.0,4515.0,TypeScript: 255119; CSS: 5338; JavaScript: 453
+settlemint/sdk,TypeScript,13,1325.0,8.0,10939.0,TypeScript: 802221; JavaScript: 10004
+shadowoff09/pathfinder,TypeScript,145,55.0,2.0,1220.0,TypeScript: 75830; CSS: 1964; JavaScript: 528
+shakee93/rapidload,TypeScript,20,6793.0,4.0,200961.0,TypeScript: 1035350; PHP: 647423; Vue: 365923; JavaScript: 244855; CSS: 91926; HTML: 17865; Shell: 135
+shnai0/stripe-mrr,TypeScript,25,65.0,2.0,479.0,TypeScript: 42177; CSS: 2992; JavaScript: 203
+sidejot/sidejot,TypeScript,29,70.0,1.0,1187.0,TypeScript: 115756; CSS: 3922; Dockerfile: 1846; JavaScript: 318
+silvonli/Summa,TypeScript,62,199.0,6.0,1466.0,TypeScript: 70001; CSS: 31033; JavaScript: 9883; HTML: 1839
+siriwatknp/jun-mvp-starter,TypeScript,61,15.0,1.0,301.0,TypeScript: 51393; CSS: 4377; JavaScript: 474
+social-embed/social-embed,TypeScript,13,1127.0,1.0,9058.0,TypeScript: 121316; MDX: 46103; HTML: 5831; Astro: 3994; JavaScript: 2741; CSS: 1614
+sopt-makers/makers-design-system,TypeScript,27,450.0,16.0,4154.0,TypeScript: 398467; CSS: 4164; JavaScript: 3496; MDX: 2929; Handlebars: 430; HTML: 366; Shell: 248
+ssdeanx/deep-research-mcp-server,TypeScript,19,13.0,1.0,373.0,TypeScript: 88413; JavaScript: 525; Dockerfile: 141
+sshh12/spark-stack,JavaScript,189,324.0,2.0,1611.0,JavaScript: 211907; Python: 186141; CSS: 2272; Dockerfile: 1624; Mako: 635
+stacksjs/dtsx,TypeScript,113,351.0,3.0,1906.0,TypeScript: 244774
+stacksjs/rpx,TypeScript,20,208.0,3.0,2115.0,TypeScript: 64926
+stacksjs/tlsx,TypeScript,38,251.0,4.0,2181.0,TypeScript: 55184
+stacksjs/ts-collect,TypeScript,20,187.0,3.0,2318.0,TypeScript: 429022
+stacksjs/ts-spreadsheets,TypeScript,76,64.0,3.0,1402.0,TypeScript: 28066
+stacksjs/vite-plugin-local,TypeScript,29,98.0,3.0,1381.0,TypeScript: 14893
+stakefish/eth2-batch-deposit,JavaScript,17,19.0,3.0,289.0,JavaScript: 29455; Solidity: 17692
+stevesarmiento/solana-starter,TypeScript,18,42.0,2.0,1053.0,TypeScript: 322975; CSS: 3375; MDX: 612; JavaScript: 605
+storybookjs/storybook,TypeScript,86254,67620.0,372.0,963301.0,TypeScript: 7798051; JavaScript: 2513079; Svelte: 125957; MDX: 87137; Vue: 35552; HTML: 23979; CSS: 19808; EJS: 6074; Pug: 3991; Handlebars: 1711; Shell: 1051; SCSS: 125
+sullyo/webapp-starter,TypeScript,784,66.0,2.0,489.0,TypeScript: 178354; CSS: 4737; JavaScript: 414
+superglue-ai/superglue,TypeScript,1630,467.0,10.0,1172.0,TypeScript: 668992; CSS: 2812; Shell: 2618; Dockerfile: 1683; JavaScript: 133
+supermemoryai/supermemory,TypeScript,8947,1021.0,43.0,66486.0,TypeScript: 956924; CSS: 86510; MDX: 13855; JavaScript: 4830; Dockerfile: 1152
+sushaantu/boxento,TypeScript,110,281.0,1.0,2694.0,TypeScript: 769520; CSS: 20322; Dockerfile: 2592; JavaScript: 2445; HTML: 1937
+synatic/noql,JavaScript,50,752.0,9.0,7706.0,JavaScript: 1033193; TypeScript: 12280; HTML: 776
+tact-lang/tact-template,TypeScript,81,80.0,14.0,711.0,TypeScript: 5505; Tact: 576
+taishikato/supavec,TypeScript,560,688.0,3.0,112074.0,TypeScript: 500108; PLpgSQL: 63520; MDX: 8452; CSS: 2657; JavaScript: 689
+teamreflex/cosmo-web,TypeScript,35,769.0,3.0,4404.0,TypeScript: 1024018; CSS: 6983; Dockerfile: 2497; Shell: 618; JavaScript: 72
+techblitzdev/TechBlitz,TypeScript,378,2626.0,4.0,12507.0,TypeScript: 2427792; MDX: 348480; CSS: 6964; JavaScript: 6593; PLpgSQL: 859
+tegnike/aituber-kit,TypeScript,437,1011.0,15.0,149315.0,TypeScript: 504095; Python: 86513; JavaScript: 5441; CSS: 3670; Dockerfile: 677
+thedaviddias/llms-txt-hub,TypeScript,128,203.0,20.0,38641.0,TypeScript: 473076; MDX: 107225; JavaScript: 23967; CSS: 4706; Handlebars: 189
+thelastbackspace/traceperf,TypeScript,90,25.0,1.0,278.0,TypeScript: 159349; HTML: 6112; JavaScript: 1106
+thorski1/LouMinouS,TypeScript,35,11.0,1.0,459.0,TypeScript: 137732; Dockerfile: 2294; JavaScript: 606
+thrashr888/terraform-mcp-server,TypeScript,28,52.0,1.0,421.0,TypeScript: 370242; JavaScript: 30063; Dockerfile: 520
+tinybirdco/logs-explorer-template,TypeScript,60,106.0,3.0,952.0,TypeScript: 156876; CSS: 4560; JavaScript: 528
+tkellogg/target-practice,TypeScript,11,48.0,1.0,1316.0,TypeScript: 258448; JavaScript: 631; HTML: 362; CSS: 181
+tkt-actions/add-issue-links,TypeScript,23,896.0,3.0,3079.0,TypeScript: 59195; JavaScript: 941
+towns-protocol/towns,TypeScript,34,1993.0,28.0,93045.0,TypeScript: 2606059; Go: 2327197; Solidity: 1710460; MDX: 248258; Shell: 89719; Python: 23875; JavaScript: 22448; HTML: 21292; Just: 19303; Makefile: 16479; HCL: 15654; Dockerfile: 9107; PLpgSQL: 6667; CSS: 3005
+transitive-bullshit/severance-wellness-memes,TypeScript,10,146.0,2.0,6031.0,TypeScript: 210774; CSS: 17912; JavaScript: 105
+transloadit/node-sdk,TypeScript,63,713.0,18.0,2975.0,TypeScript: 452462; JavaScript: 2233
+triggerdotdev/trigger.dev,TypeScript,10574,5987.0,102.0,113278.0,TypeScript: 6558746; JavaScript: 24162; PLpgSQL: 11589; Dockerfile: 9585; Shell: 9027; Python: 7457; CSS: 6789
+trycompai/comp,TypeScript,370,977.0,8.0,11856.0,TypeScript: 2295808; MDX: 67238; JavaScript: 34401; CSS: 16727; Shell: 915
+tryethernal/ethernal,JavaScript,220,2867.0,5.0,16629.0,JavaScript: 1802720; Vue: 659568; HTML: 5634; Dockerfile: 1855; SCSS: 1018; Shell: 323
+tunctn/express-next-turborepo-boilerplate,TypeScript,12,8.0,1.0,334.0,TypeScript: 152015; CSS: 14491; JavaScript: 1747
+turbostarter/extro,TypeScript,143,16.0,1.0,1230.0,TypeScript: 65695; CSS: 2622; HTML: 2099; JavaScript: 113
+twentyhq/twenty,TypeScript,27364,6109.0,420.0,256266.0,TypeScript: 18370331; MDX: 231767; JavaScript: 38322; HCL: 19327; Shell: 11981; CSS: 6922; Dockerfile: 6436; HTML: 5299; Makefile: 1665
+typefully/minimal-twitter,JavaScript,852,692.0,8.0,34821.0,JavaScript: 146254; CSS: 10743; Swift: 4735; HTML: 1093
+udecode/plate,TypeScript,13340,7954.0,211.0,171692.0,TypeScript: 5408899; MDX: 1188376; HTML: 415018; JavaScript: 62682; CSS: 60380; Shell: 4232
+umijs/tnf,TypeScript,83,240.0,12.0,881.0,TypeScript: 146415; JavaScript: 2730; Less: 23
+umussetu/marble-stack,TypeScript,20,4.0,1.0,4830.0,TypeScript: 289412; JavaScript: 4801; SCSS: 2482
+un/1up,TypeScript,51,60.0,2.0,3840.0,TypeScript: 229189; JavaScript: 23064; Ruby: 2611; CSS: 1997; Swift: 1442; Handlebars: 1003; C: 102
+undb-io/undb,TypeScript,2511,6956.0,10.0,62079.0,TypeScript: 2081161; Svelte: 1145301; Handlebars: 44609; CSS: 4582; JavaScript: 3578; ANTLR: 2790; HTML: 1898; Dockerfile: 1326; Rust: 782
+unmonk/chainlink,TypeScript,13,333.0,1.0,15980.0,TypeScript: 1144325; JavaScript: 122023; CSS: 8809
+unsend-dev/unsend,TypeScript,935,241.0,17.0,6341.0,TypeScript: 730651; MDX: 26994; JavaScript: 9178; CSS: 8196; Dockerfile: 3517; Shell: 997
+vadxq/nextjs-ai-starter,TypeScript,11,27.0,1.0,160.0,TypeScript: 38874; CSS: 5014; JavaScript: 1476; Shell: 519
+veloplanner/map-matrix,TypeScript,171,79.0,2.0,8460.0,TypeScript: 66460; JavaScript: 1051; HTML: 339; CSS: 135
+vpavlenko/web-2024-template,TypeScript,81,204.0,1.0,666.0,TypeScript: 4986; JavaScript: 734; HTML: 479; CSS: 321
+vulhub/vulhub-org,TypeScript,29,76.0,3.0,18137.0,TypeScript: 244277; MDX: 19652; JavaScript: 7393; CSS: 2428
+wakeyi-git/obsidian-card-navigator-plugin,TypeScript,19,333.0,1.0,11432.0,TypeScript: 482210; CSS: 23201; JavaScript: 1605
+waqarkalim/holiday-optimizer,TypeScript,82,277.0,1.0,976.0,TypeScript: 545258; JavaScript: 5559; CSS: 2216; Shell: 308
+wardbox/roke,TypeScript,20,27.0,2.0,630.0,TypeScript: 201390; JavaScript: 4858; CSS: 2640
+warmachine028/memories,JavaScript,53,1247.0,29.0,51850.0,JavaScript: 157135; TypeScript: 31944; HTML: 2597; CSS: 1957; Mermaid: 1433
+wasp-lang/cursor-template,TypeScript,23,11.0,1.0,129.0,TypeScript: 18282; JavaScript: 312; CSS: 58
+waynesutton/promptstack,TypeScript,27,120.0,2.0,12224.0,TypeScript: 150653; JavaScript: 5646; HTML: 3565; CSS: 1939
+webdevcody/survive-the-night-game,TypeScript,123,364.0,7.0,2006.0,TypeScript: 486254; JavaScript: 15350; Dockerfile: 1779; CSS: 1705
+webdevcody/tanstack-course-platform,TypeScript,32,104.0,2.0,919.0,TypeScript: 327472; JavaScript: 4663; CSS: 2882; Shell: 1056; Dockerfile: 419
+wesleyel/cloudmark,TypeScript,33,66.0,1.0,1177.0,TypeScript: 153452; CSS: 10372; JavaScript: 528; Dockerfile: 517; Shell: 358
+wham/kaja,TypeScript,11,98.0,2.0,1008.0,TypeScript: 90049; Go: 36918; Shell: 4322; HTML: 1081; Dockerfile: 812
+wosherco/bashbuddy,TypeScript,25,169.0,3.0,1597.0,TypeScript: 187088; Svelte: 137527; JavaScript: 10759; CSS: 7954; Dockerfile: 3635; PowerShell: 3211; MDX: 2418; mdsvex: 2145; HTML: 1928; Shell: 1701; Handlebars: 1029
+xingBaGan/atujii,TypeScript,22,211.0,2.0,3691.0,TypeScript: 414457; Python: 25127; JavaScript: 16232; Shell: 5444; Batchfile: 2116; CSS: 2071; HTML: 293
+xlnfinance/xln,TypeScript,87,86.0,3.0,1736.0,TypeScript: 390369; JavaScript: 53465; Solidity: 50174; HTML: 9239
+yamadashy/repomix,TypeScript,13952,1007.0,39.0,3361.0,TypeScript: 560240; Vue: 48531; CSS: 5108; Dockerfile: 1976; JavaScript: 1529
+yavuzyalcintas/cursornew,TypeScript,150,3.0,2.0,644.0,TypeScript: 286044; CSS: 3652; JavaScript: 227
+yayxs/ai-coding,TypeScript,13,52.0,1.0,282.0,TypeScript: 56393; CSS: 1990; JavaScript: 528
+yctimlin/mcp_excalidraw,JavaScript,20,3.0,2.0,9.0,JavaScript: 21299; Dockerfile: 116
+yuiseki/TRIDENT,TypeScript,26,1497.0,4.0,6727.0,TypeScript: 409945; CSS: 13187; SCSS: 3138; JavaScript: 2440; Makefile: 631; Dockerfile: 301
+zkSoju/frame,TypeScript,24,74.0,2.0,8813.0,TypeScript: 12758; CSS: 1572; JavaScript: 730
+zueai/cloudflare-api-mcp,TypeScript,16,24.0,1.0,112.0,TypeScript: 49461
+zueai/create-mcp,TypeScript,27,51.0,1.0,63.0,TypeScript: 10349
+zueai/mcp-manager,TypeScript,151,76.0,2.0,1016.0,TypeScript: 59238; JavaScript: 842; CSS: 731; HTML: 649
+zzfn/zzf,TypeScript,63,1514.0,1.0,28871.0,TypeScript: 151775; SCSS: 13890; JavaScript: 5681; CSS: 1341; Dockerfile: 207
+CopilotKit/open-multi-agent-canvas,TypeScript,198,36.0,2.0,14194.0,TypeScript: 78953; CSS: 2484; JavaScript: 528
+DA0-DA0/dao-dao-ui,TypeScript,32,2989.0,30.0,48422.0,TypeScript: 21936745; JavaScript: 70427; CSS: 20184; Dockerfile: 1367
+IndieYe/sqlwise,TypeScript,31,7.0,1.0,195.0,TypeScript: 301402; Python: 165000; Mustache: 7079; JavaScript: 1606; Shell: 1481; CSS: 495; HTML: 359; Dockerfile: 318
+Just-Understanding-Data-Ltd/ai-coding-with-cursor,TypeScript,36,44.0,1.0,5273.0,TypeScript: 1422231; SQL: 53980; Python: 31671; PLpgSQL: 27047; CSS: 18203; JavaScript: 8717; Shell: 5082; HTML: 4670; Jupyter Notebook: 3424; Dockerfile: 1406
+andrewhopper/dotai,JavaScript,11,36.0,2.0,109.0,JavaScript: 8767
+autonomys/astral,TypeScript,13,4249.0,22.0,187635.0,TypeScript: 2931760; PLpgSQL: 150751; EJS: 2947; JavaScript: 1473; Dockerfile: 1239; CSS: 184
+ballerine-io/ballerine,TypeScript,2158,2274.0,44.0,122342.0,TypeScript: 6872665; MDX: 165104; Rust: 134552; Svelte: 111234; JavaScript: 74502; CSS: 27769; PLpgSQL: 21472; HTML: 17606; Shell: 10735; Astro: 6112; Dockerfile: 3389; HCL: 1547; Makefile: 484; SCSS: 451; Jinja: 240
+daangn/seed-design,TypeScript,669,1930.0,20.0,2426277.0,TypeScript: 2406131; JavaScript: 404558; CSS: 398070
+dalenguyen/dalenguyen.github.io,TypeScript,27,402.0,3.0,67432.0,TypeScript: 233853; HTML: 33785; SCSS: 10399; JavaScript: 7737; CSS: 1615; Shell: 1259; MDX: 100
+dustland/agentok,TypeScript,289,671.0,3.0,72004.0,TypeScript: 458852; Python: 115163; PLpgSQL: 22853; CSS: 20724; Jinja: 18512; Dockerfile: 3092; JavaScript: 1721; Shell: 521
+ghostlexly/ultimate-typescript-starter-kit,TypeScript,16,156.0,1.0,2323.0,TypeScript: 112155; JavaScript: 6763; Dockerfile: 2439; EJS: 452; CSS: 404
+gly-hub/dandelion-admin,TypeScript,22,2.0,0.0,1039.0,TypeScript: 99105; Go: 89648; CSS: 7575; Shell: 1156; JavaScript: 734; HTML: 366; Makefile: 173
+hackclub/print-legion,TypeScript,13,110.0,2.0,2049.0,TypeScript: 331498; Python: 26977; CSS: 4506; JavaScript: 609
+haydenbleasel/next-forge,TypeScript,5647,1297.0,48.0,19284.0,TypeScript: 464650; MDX: 28847; CSS: 8844; JavaScript: 1632; HTML: 573; Handlebars: 470
+mayneyao/eidos,TypeScript,2472,907.0,6.0,15468.0,TypeScript: 2691668; JavaScript: 32728; CSS: 21514; HTML: 9426; Dockerfile: 827; Python: 85
+notional-finance/notional-monorepo,TypeScript,13,2145.0,8.0,71814.0,TypeScript: 15841500; Shell: 9485; JavaScript: 9326; HTML: 1960; CSS: 340; Dockerfile: 209
+novuhq/novu,TypeScript,36653,19542.0,363.0,214574.0,TypeScript: 15274105; JavaScript: 359246; Python: 216296; HTML: 48589; CSS: 40330; Handlebars: 18479; Shell: 16823; Dockerfile: 16302; MDX: 11302; Vue: 9082; EJS: 2409
+openshiporg/openfront,JavaScript,34,185.0,1.0,6411.0,JavaScript: 5494806; CSS: 9147
+paramountric/digitaltwincityviewer,TypeScript,13,1129.0,2.0,235191.0,TypeScript: 2230251; Go: 1255355; PLpgSQL: 334623; JavaScript: 160960; MDX: 83233; Smarty: 78944; CSS: 22744; Python: 20515; Dockerfile: 12849; Shell: 10330; Elixir: 3083; Ruby: 2270; Starlark: 2136
+stolinski/drop-in,TypeScript,287,99.0,2.0,1461.0,TypeScript: 53068; Svelte: 41680; JavaScript: 15080; CSS: 10077; HTML: 2901; MDX: 1136
+timothywarner/ai900,JavaScript,43,39.0,1.0,1097.0,JavaScript: 159883; CSS: 116624; HTML: 110072; SCSS: 57651; Python: 22332; Shell: 6670; PowerShell: 4724; Handlebars: 1407; Jupyter Notebook: 1
+tweneboah/youtube-tutorials-projects,JavaScript,77,54.0,1.0,111268.0,JavaScript: 86917012; TypeScript: 158982; HTML: 87044; CSS: 79639; EJS: 8338
+yenche123/liubai,TypeScript,778,4131.0,2.0,149404.0,TypeScript: 2516466; Vue: 598812; CSS: 28355; JavaScript: 8320; HTML: 3017; SCSS: 1939
