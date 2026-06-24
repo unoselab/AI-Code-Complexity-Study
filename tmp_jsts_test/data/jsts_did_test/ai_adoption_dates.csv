@@ -7,3 +7,389 @@ Alezander9/WiiWork,cursor,dc246fb5230b5dd4a91aee557334964c83c574c5,2025-02-15,20
 AnEntrypoint/apptoapp,cursor,30a8534a7db925b61e1c86142bcb64b997c0c5c7,2025-02-13,2025-02,.cursor/rules,cursor_related_path,high,xml version
 Ashref-dev/entretien-ai,cursor,615c2424d11691ab291153c168ae4304040744e8,2024-12-01,2024-12,.cursorrules,cursor_related_path,high,Added a new component to test
 AudiusProject/audius-protocol,cursor,7fdeaddd7fcffff822dd65fcfac5099885f51673,2025-02-26,2025-02,.cursor/rules/challenges.mdc,cursor_related_path,high,Add cursor project rule for challenges (#11474)
+Automattic/wp-calypso,cursor,216730ce63b01c7bdc5cf706e0e1fabde0a4fc2c,2025-02-07,2025-02,.cursor/rules/a4a-custom-rules.mdc,cursor_related_path,high,A4A: create custom cursor rules (#99247)
+Bistutu/FluentRead,cursor,7f094296c99e9bf31645bb4deba885ed46e456a6,2025-01-18,2025-01,.cursorrules,cursor_related_path,high,refactor: update service labels and model name handling in option.ts and template.ts
+CodeGuide-dev/codeguide-starter-lite,cursor,c0a5203473dacd56e3f1b995ca232e5b6a7b0860,2025-02-02,2025-02,.cursorignore,cursor_related_path,high,chore: cursorignore and codeiumignore
+Comfy-Org/ComfyUI_frontend,cursor,1f266e826e1f2a45228ef74ca09e878be4b83e23,2025-01-20,2025-01,.cursorrules,cursor_related_path,high,Fix .cursorrules typo (#2298)
+Comfy-Org/desktop,cursor,547f95874f8e2503877d8b8861d98527f60eecf4,2025-02-07,2025-02,.cursor/rules/vitest.mdc,cursor_related_path,high,[Test] Add cursor rules for vitest test generation (#852)
+Comfy-Org/litegraph.js,cursor,c1f9745e54d2abb8c5dcd258800757666e655455,2025-03-16,2025-03,.cursor/rules/unit-test.mdc,cursor_related_path,high,Add cursor rule for unit tests (#795)
+Coyenn/personal-site,cursor,ad709af637e83383bb58b408bb01f8b11e9427c0,2025-03-08,2025-03,.cursor/rules/absolute-import-paths.mdc;.cursor/rules/framer-motion-best-practices.mdc;.cursor/rules/typescript-best-practices.mdc;.cursor/rules/zustand-best-practices.mdc,cursor_related_path,high,Add cursor rules and improve image
+Cunninger/grok-remain-count,cursor,3fc794afd3ce11701dd798c3dbf8716084f487c5,2025-02-24,2025-02,.cursor/rules/cloudflare-worker-rules.mdc,cursor_related_path,high,Optimize SSO list display and add specific rules
+Dankovk/browser-use-node,cursor,9688951544f3bda5bcdc13f48c225a024235e045,2024-12-28,2024-12,.cursorignore;.cursorrules,cursor_related_path,high,align with py
+Darlley/saas-admin,cursor,453eb9248d1b1cd94143d99aab6e5f45c2816755,2024-10-16,2024-10,.cursorignore,cursor_related_path,high,feat: verificação e envio de email
+David-Sola/AIGaming,cursor,8d2438016324ecae14418a35aaf17ca8845b368d,2025-03-09,2025-03,.cursorrules,cursor_related_path,high,Adding game-dev plan
+Dhravya/mcp-durable-object-client,cursor,95fa13df28eadbc5a0a57d424e5e1707ba81e807,2025-03-05,2025-03,.cursor/rules/cloudflare.mdc,cursor_related_path,high,init
+DiscourseGraphs/discourse-graph,cursor,264900efdaaa877877d8392efce6a97902b2a113,2025-03-22,2025-03,.cursor/rules/api.mdc;.cursor/rules/main.mdc;.cursor/rules/obsidian.mdc;.cursor/rules/roam.mdc;.cursor/rules/website.mdc,cursor_related_path,high,Cursor AI rules (#107)
+DumbWareio/DumbDrop,cursor,22f79f830b4d55d5f789c4b5f8c3fe84e1e20e25,2025-02-16,2025-02,.cursorrules,cursor_related_path,high,feat: Complete Application Infrastructure and Security Overhaul (#28)
+DumbWareio/DumbPad,cursor,52fb437d75a47495453e2f804efaabf29f1cd81a,2025-02-21,2025-02,.cursorrules,cursor_related_path,high,Create .cursorrules
+Dwtexe/cursor-stats,cursor,2e01bf157ec2218acd10f1e036e121879bed73a1,2025-02-06,2025-02,.cursorignore,cursor_related_path,high,"Release v1.0.5-beta.15 - SQL.js migration, notifications, and optimizations"
+EugenEistrach/et-stack,cursor,a161ee8497a9011f47190cbf40af1aca69ac8a94,2024-10-02,2024-10,.cursorrules,cursor_related_path,high,user settings
+FradSer/qa-generator,cursor,95f1bd1ace8807cbf67c67583311bb99bdb65b39,2025-02-19,2025-02,.cursorrules,cursor_related_path,high,feat: initialize project structure for qa generation tool
+FurkanKayaDev/react-native-spotlight-guide,cursor,c22e51671d6296445d61f67f28ff977b72df95b7,2025-02-12,2025-02,.cursorrules,cursor_related_path,high,Initial commit
+GODrums/BetterFloat,cursor,718313166124734b759aa9b57adaae7575af226b,2025-03-10,2025-03,.cursorrules,cursor_related_path,high,Add .cursorrules
+GPT-language/gpt-tutor-for-chrome,cursor,f94f15d896144e19669d9292a827e51df3693a2b,2024-12-10,2024-12,.cursorrules,cursor_related_path,high,add cursorrules
+Galaxies-dev/threads-clone-react-native,cursor,3f84140f5f0c08c260dfa6676ee0f89954d9c6bc,2024-09-18,2024-09,.cursorrules,cursor_related_path,high,WIP tabs.
+Galaxies-dev/todoist-clone-react-native,cursor,c744bcc7b5211eb4fb162e0bc46e9b4a0bd49447,2024-11-11,2024-11,.cursorrules,cursor_related_path,high,Form sheet working.
+GeekyWizKid/writing-helper,cursor,a3cbd8aea1119cce83fc9cd8b0deae0ebb133987,2025-03-02,2025-03,.cursor/rules/next.mdc,cursor_related_path,high,init
+GorvGoyl/Personal-Site-Gourav.io,cursor,7c8fb6842011786c86835af07f55bacd0b45dc31,2024-11-30,2024-11,.cursorrules,cursor_related_path,high,add devtools
+GramSearch/telegram-search,cursor,032cbb4765b91e2f411fc10489cc6ed09bfca3df,2025-03-18,2025-03,.cursorrules,cursor_related_path,high,feat: embeddings model support (#86)
+HaasStefan/eslint-plugin-enforce-angular-signal-call,cursor,9422a26ccde16ebd700ab26dbbb5b7f07262c901,2024-10-06,2024-10,.cursorrules,cursor_related_path,high,chore(cursor): add cursor rules
+Helicone/helicone,cursor,b723bf1e68fda8970a20de730ba2537c610f2079,2025-03-03,2025-03,.cursor/rules/helicone-style-guidelines.mdc,cursor_related_path,high,Add typography system and theme-aware styling (#3368)
+IamLiuLv/compoder,cursor,871d25acbe9e0b298f16e828f475bebf17a85edb,2025-03-08,2025-03,.cursor/rules/generate:biz-component.mdc;.cursor/rules/generate:page-integration.mdc;.cursor/rules/generate:services.mdc;.cursor/rules/generate:sql-api.mdc;.cursor/rules/refactor:bizcomponent.mdc,cursor_related_path,high,"feat: artifacts antd-renderer, material-ui-renderer, shadcn-ui-renderer"
+Illyism/saasbooks,cursor,2f1a0d9a6827bd1dc211fbe55a024c3844834188,2025-03-03,2025-03,.cursorrules,cursor_related_path,high,"Implement authentication system with Prisma, server-side sessions, and user flows"
+JaleelB/readium-x,cursor,d94818abbe66b753a30c8d31f4c433c074cb0aeb,2024-08-25,2024-08,.cursorrules,cursor_related_path,high,misc: cursor ai instructions
+JesusFilm/core,cursor,06bea328725bd4a803d161fbde4b91e233f4cb5b,2025-02-07,2025-02,.cursorrules,cursor_related_path,high,feat: cursorroles (#5144)
+Julian-AT/synth-ui,cursor,313722a676a885d3511e87481e5d96903e318359,2024-10-13,2024-10,.cursorrules,cursor_related_path,high,initial commit
+KRISACHAN/ying-web,cursor,36e4c997b3fe2704a9131f3b8fe82f5d85fbd8b4,2024-12-04,2024-12,.cursorrules,cursor_related_path,high,feat: clean up RFC templates and add cursor role configuration
+KaizeNodeLabs/SafeSwap,cursor,6723ca13e9f1a6edc37fb4f65d8ec0c2995d1a3c,2024-11-01,2024-11,frontend/.cursorrules,cursor_related_path,high,"feat: add next.js, shadcn, biome and ai features and configurations"
+Kiranism/next-resume-ai,cursor,ac4c78dd9723ec0438e098f9a8bd39c21a6fc325,2025-02-05,2025-02,.cursorrules,cursor_related_path,high,feat: jstack and clerk
+L-Blondy/up-fetch,cursor,78587522f435fc8302289968621dcf78220349a9,2025-01-28,2025-01,.cursorrules,cursor_related_path,high,Standard Schema (#11)
+LIT-Protocol/agent-wallet,cursor,56a8f45a2c8f5f40626a38fc05e8dc7607f824ef,2024-12-22,2024-12,.cursorignore,cursor_related_path,high,Checkpoint: agent-cli refactors
+LastBotInc/nextjs-supabase-ai-webapp,cursor,0725f49b0c9cfc00339e378ed527547ae4e73bc1,2025-02-18,2025-02,.cursor/rules/add-data-model.mdc;.cursor/rules/admin-api-protection.mdc;.cursor/rules/implement-frontend-page.mdc;.cursor/rules/implement-nextjs-api.mdc;.cursor/rules/implement-unit-tests.mdc;.cursorrules,cursor_related_path,high,Initial commit: Clean start
+LegendApp/legend-photos,cursor,e8f99bcee1a58de21fae533ba442ad4a05d55313,2025-03-14,2025-03,.cursor/rules/biome.mdc;.cursor/rules/package-manager.mdc,cursor_related_path,high,Add biome and format all files
+LubomirGeorgiev/cloudflare-workers-nextjs-saas-template,cursor,2c4376672e05cb0e417f5873db0d8cb546a597bf,2025-01-09,2025-01,.cursorrules,cursor_related_path,high,feat: Add drizzle and D1
+Lunaris-Project/HyprLuna,cursor,3be2eef147cd84e0dc0387e72f589a1e022e08ac,2025-03-26,2025-03,.config/.cursor/extensions/hyprluna.hyprluna-matugen-theme-1.0.0/.vsixmanifest;.config/.cursor/extensions/hyprluna.hyprluna-matugen-theme-1.0.0/icon.png;.config/.cursor/extensions/hyprluna.hyprluna-matugen-theme-1.0.0/package.json;.config/.cursor/extensions/hyprluna.hyprluna-matugen-theme-1.0.0/readme.md;.config/.cursor/extensions/hyprluna.hyprluna-matugen-theme-1.0.0/themes/hyprluna.json,cursor_related_path,high,added vscode & cursor extension for matugen support
+Ly-GGboy/AI-Library,cursor,77a1fcbce4668d84e3491af0bf31c11aa3dd6704,2025-01-05,2025-01,.cursorrules,cursor_related_path,high,Remove scraper.py from git tracking
+MaggieAppleton/lodestone,cursor,b9576e86cb7c31b838cb3fb6ebc137951f9e6678,2025-02-21,2025-02,.cursorrules,cursor_related_path,high,holy shit fixed the highlights problem
+Malte2036/thw-tools,cursor,0b6cbeae132e47db7c277a5da9d6ff0bceae7bc3,2025-02-28,2025-02,apps/backend/.cursor/rules/migrate-from-mongodb-to-postgressql.mdc;apps/backend/.cursor/rules/nestjs-basic.mdc,cursor_related_path,high,🚀 Add migration script for transferring data from MongoDB to PostgreSQL
+MathiasGruber/TheNinjaRPG,cursor,9e20fdfd9eae6c07452546fd1ed2282f64c00cb1,2025-02-27,2025-02,.cursorrules,cursor_related_path,high,:sparkles: Email reminder system
+MayGo/tockler,cursor,5dc6cefc0aace00f10110a39fac46a7934cd0554,2025-03-15,2025-03,.cursorrules,cursor_related_path,high,3.24.1
+Melvynx/next-zod-route,cursor,e17c34ae551ceaa5c2f6058cc60e7345e3d4c0c9,2025-02-27,2025-02,.cursor/rules/00-agent.mdc,cursor_related_path,high,feat: Enhance route handler with form data and response handling
+MultiQC/MultiQC,cursor,e9159bfb051d3371569de367a654fc5aebc5a772,2024-12-15,2024-12,.cursorrules,cursor_related_path,high,Add .cursorrules
+OneKeyHQ/app-monorepo,cursor,a1817d5c2e66edb42798dc79aff3b7d36db0a500,2025-03-10,2025-03,.cursor/rules/clean-unused-import.mdc,cursor_related_path,high,chore: Clean up unused imports across multiple components (#6843)
+OpenAgentsInc/openagents,cursor,29363e0393139bd4d0fc70daeaa6ee24aa2c72db,2025-03-22,2025-03,.cursor/rules/cloudflare.mdc,cursor_related_path,high,Misc setup (#755)
+Openpanel-dev/openpanel,cursor,a022cb4831cc1c029e5f9ab224c119b47aac01f8,2024-11-13,2024-11,apps/public/content/articles/.cursorrules,cursor_related_path,high,"feature(public,docs): new public website and docs"
+PostHog/posthog-foss,cursor,7f51a1d7e52de21d6d2282a63a72176c24177f96,2025-02-25,2025-02,.cursor/rules/django-python.mdc;.cursor/rules/react-typescript.mdc;.cursor/rules/rust.mdc;.cursorrules,cursor_related_path,high,"chore(dev): cursor rules for react+typescript, django+python, rust (#29116)"
+PySpur-Dev/pyspur,cursor,ef6b5490a26341c79aa5e6c439e71b00ed5bcfd9,2025-03-20,2025-03,.cursor/rules/frontend-api-calls.mdc,cursor_related_path,high,fix: issues with app tokens
+QuantGeekDev/mcp-framework,cursor,36bbc88d731f6aa2629ad85da3ab69e77508b74f,2025-03-28,2025-03,.cursor/rules/mcp-framework.mdc,cursor_related_path,high,feat: remove vibe coder contingency
+R44VC0RP/r2d2,cursor,36489307ad5093ed63be80ca7250fc2646619289,2025-03-16,2025-03,.cursorrules,cursor_related_path,high,buckets view
+RayFernando1337/vibestamps,cursor,faca114979c0fbbbeffa3eb8b17d0f67d4e60f4a,2025-03-27,2025-03,.cursor/rules/project.mdc;.cursor/rules/vercel-ai-sdk.mdc,cursor_related_path,high,Add cursor rules and update README
+RiverTwilight/Geekits,cursor,5c76b4b3c8c62430368279c0e6e224362f08c9f5,2024-11-06,2024-11,src/components/.cursorrules,cursor_related_path,high,feat: add cursor rules
+Schroedinger-Hat/schroedinger-hat-website,cursor,978f278ac80643303bf362fcebc49dc1ace69789,2025-01-10,2025-01,.cursorrules,cursor_related_path,high,2025 (#147)
+ShieldBattery/ShieldBattery,cursor,1946beef8e5ed2273cf92cbe95aa46a4cb8b1d80,2025-03-14,2025-03,.cursorrules,cursor_related_path,high,"Migrate snackbars to motion, add LLM instruction files (try to keep these in sync)."
+Shopify/cli,cursor,f72a671ed1609535cdd3c74f6a88a3698a2862da,2024-09-27,2024-09,.cursorrules,cursor_related_path,high,Add a cursorrules for CLI work
+Shpigford/society-fail,cursor,c317580a437101fbc277523d1dde0c0d619725b6,2024-08-28,2024-08,.cursorrules,cursor_related_path,high,Create .cursorrules
+ShunL12324/comfy-portal,cursor,d70ccc057e98156c6a2f989d3fbfff15d80ccc03,2025-01-22,2025-01,.cursorrules,cursor_related_path,high,test
+StackOneHQ/crossroads,cursor,df0acdaeb2bb4a533fdb293423698dec6ccc3eff,2025-02-28,2025-02,.cursor/rules/cloudflare-dev-platform.mdc;.cursor/rules/cursor-rules-location.mdc,cursor_related_path,high,feat: cursor rules
+SunHuawei/SourceDetector,cursor,8412ed8f4d44696844058dd1f47a9595447f7370,2025-02-03,2025-02,.cursorrules,cursor_related_path,high,a
+Suntory-Y-Water/honox-url-app,cursor,4ace915a9cb54b416515b04c5747ee9faab29c94,2025-02-28,2025-02,.cursor/rules/my-rules.mdc;.cursorignore,cursor_related_path,high,first commit
+Swiftgum/swiftgum,cursor,e79166510cd286941ab2ce014640e7f468d835ce,2025-02-19,2025-02,.cursor/rules/logic.mdc;.cursor/rules/studio.mdc,cursor_related_path,high,docs: add documentation for KnowledgeX system and studio frontend rules
+T1nker-1220/memories-with-lessons-mcp-server,cursor,c6f31ae9124da64e7b28fb6de7172d61f28be33e,2025-02-13,2025-02,.cursorrules,cursor_related_path,high,Follow these steps for each interaction:
+ThatGuySam/doesitarm,cursor,754f6b3920f0d8c1a9b97b0010bdf40633cb99be,2024-12-27,2024-12,.cursorrules,cursor_related_path,high,add: cursor rules
+The-Pocket/PocketFlow-Typescript,cursor,ac46414861646efbd7b82cccefd55e4f236eafa4,2025-03-30,2025-03,.cursorrules,cursor_related_path,high,Update and rename .cursorrule to .cursorrules
+ThinkInAIXYZ/deepchat,cursor,74ad4ecea448679f351825b52e1438cbb8a79c62,2025-02-19,2025-02,.cursor/rules/vue-shadcn.mdc,cursor_related_path,high,first commit
+Tmeister/wppb-generator,cursor,86cd218a870a71e5a2cb08bc2e49fbcedcefa5e6,2024-09-03,2024-09,.cursorrules,cursor_related_path,high,chore: Plugin Additions chart was added
+TutoriaLLM/TutoriaLLM,cursor,e916030a3c3ebaf24f4c9303f79298d42c6b1d42,2025-02-17,2025-02,.cursorrules,cursor_related_path,high,Release v2.0 (#128)
+Urigo/accounter-fullstack,cursor,76a85a24f10a3e5589294df6c4508158cfc5c91a,2025-02-16,2025-02,.cursor/rules/components.mdc;.cursor/rules/graphql.mdc,cursor_related_path,high,Add cursor project rules (#1710)
+Vagabonds-Labs/cofiblocks,cursor,ed5cdd414eb5fa812eb9d00f99cef466c3119c4b,2024-08-26,2024-08,.cursorrules,cursor_related_path,high,feat: add ai prompts
+VladSez/easy-invoice-pdf,cursor,b0a87e5650627e79d50ebc07e4cf86490b184170,2025-02-17,2025-02,.cursor/rules/shared.mdc,cursor_related_path,high,chore: update project license from MIT to GNU Affero General Public License (AGPLv3) + add .cursor/rules (#44)
+Vrooli/Vrooli,cursor,16906bf8e73a21a1af2e70ed6825210e39ae7a8a,2024-08-24,2024-08,.cursorignore,cursor_related_path,high,Create .cursorignore
+a-polishchuk/mastering-react,cursor,3a28fe66240bbb25ff2c2f495fd09018dec5d80b,2025-01-03,2025-01,.cursorrules,cursor_related_path,high,+ useActionState example
+ably/ably-chat-js,cursor,a62eb97373b59baea09b82c5e32cc1af38c87d49,2025-03-03,2025-03,.cursor/rules/feature-specification.mdc;.cursor/rules/file-conventions.mdc;.cursor/rules/integration-testing.mdc;.cursor/rules/react-conventions.mdc;.cursor/rules/testing.mdc;.cursor/rules/typescript-conventions.mdc;.cursor/rules/unit-testing.mdc,cursor_related_path,high,dev: create cursor and copilot guidance
+acoyfellow/fleet-pattern,cursor,e4de7f588b9f76bd638d46dd57f6db385986570d,2025-02-07,2025-02,.cursorrules,cursor_related_path,high,Initial commit
+adidahiya/raga,cursor,51d004002e266e846e285079282eac8de47464dd,2025-01-13,2025-01,.cursorrules,cursor_related_path,high,add .cursorrules
+afadil/wealthfolio,cursor,90e6999ce45ade678e74d100debed6f06f264f99,2024-11-09,2024-11,.cursorrules,cursor_related_path,high,cursor rules
+ahmedkhaleel2004/gitdiagram,cursor,ae7d8a60f607087fec2aafa0ddab9860bc815e07,2025-03-06,2025-03,.cursor/rules/summary.mdc,cursor_related_path,high,"fix #33: move to o3-mini, add cursor rules, fix window error"
+ai-hero-dev/ai-hero,cursor,e8ad0af782ecdc00b1d349b1c39cb03a53d10c1e,2025-03-25,2025-03,.cursor/rules/writing-style.mdc,cursor_related_path,high,Added section 8
+airas-network/airas-agent,cursor,e379ff2c88fe103c7017dc682fe07da231ef9532,2025-01-20,2025-01,.cursorrules,cursor_related_path,high,Initial commit
+alanhe421/alfred-workflows,cursor,00a28ac2eb2306b47ae7da8b44fc2ddfdab1133e,2025-03-13,2025-03,.cursor/rules/commit.mdc,cursor_related_path,high,feat: Update VSCode - Open Project.alfredworkflow
+alchaincyf/cursor-rules-huasheng,cursor,600ac4cdff8c01c3c68b7864f947f37c1147c254,2025-01-03,2025-01,.cursorrules;rules/App开发-Android/.cursorrules;rules/App开发-iOS/.cursorrules;rules/Chrome插件/.cursorrules;rules/微信小程序/.cursorrules;rules/本地- python/.cursorrules;rules/网站-HTML/.cursorrules;rules/网站-Nextjs/.cursorrules;rules/网站-React/.cursorrules;rules/网站-Vue/.cursorrules;rules/通用/.cursorrules,cursor_related_path,high,Initial commit: Cursor Rules VSCode Extension
+alexander-turner/TurnTrout.com,cursor,c1a66d7d8060232fdf1a11ce9a334f19fbfb4776,2025-11-29,2025-11,.cursorrules,cursor_related_path,high,fix: cleaned up conftest
+angular-courses-lab/angular-debug-quest,cursor,22ffd9811c91efea1f731f969ea2b2577e5cdd60,2025-02-13,2025-02,.cursor/rules/angular.mdc,cursor_related_path,high,chore: bootstrap cursor rules
+ansh/deeperseeker-app,cursor,94c2d826425a426fc58a1d25da1a4e54aeaeace5,2025-01-27,2025-01,.cursorrules,cursor_related_path,high,README and .curosorrules
+ant-design/ant-design,cursor,a88eac45c951860ff4c82364a2804cfd3bc3c953,2025-03-10,2025-03,.cursorrules,cursor_related_path,high,chore: add .cursorrules (#53108)
+arcanis/terminosaurus,cursor,f8277c622e0d927d01901c49fb263d363de845b1,2025-01-15,2025-01,.cursorrules,cursor_related_path,high,Adds an Ollama example
+ba-archive/blue-archive,cursor,750dbb0cfdca0aa0e817b78f8c9c17b93856c314,2025-02-26,2025-02,.cursor/rules/code-guidelines.mdc;.cursor/rules/vue-components.mdc,cursor_related_path,high,chore: add cursor rules
+balancer/pool-creator,cursor,38f4cc5ab8039d81929e9be178226c58e7cf2ba1,2024-10-04,2024-10,.cursorrules,cursor_related_path,high,Select pool typeUI
+betagouv/france-chaleur-urbaine,cursor,e40844a5dcdb4a370a0afed4679eebd5f53c9ee6,2025-02-12,2025-02,.cursorrules,cursor_related_path,high,Modif texte sur la fcihe réseau
+bitcashorg/smartsale,cursor,05dcb03745e5ed377378b97fefdb0aa633b1c3d8,2024-07-20,2024-07,.cursorrules,cursor_related_path,high,release: new landing page (#269)
+braebo/nutab,cursor,7a6eddb7bb400b9775b174356df72a1135c6c40d,2024-11-01,2024-11,.cursorignore,cursor_related_path,high,wip: svelte 5
+browserbase/playbook,cursor,174627f485276587461af7b1d797537839fab726,2024-12-27,2024-12,stagehand-quickstart/.cursorrules,cursor_related_path,high,cursorrules
+browserbase/stagehand,cursor,dc8b6b3bd6a119438801a0fe90afd4a9bcb7f269,2025-03-31,2025-03,.cursorrules,cursor_related_path,high,final touches for v2 (#622)
+c15t/c15t,cursor,01024f3ea4b93879ea7f307bbf7f39ce828e173b,2025-01-21,2025-01,.cursorrules,cursor_related_path,high,🏗️ WIP: Consent Management System Implementation
+cbingb666/115master,cursor,47dc3ff1b45ac52d347b45faadb03f94f3fb3177,2025-02-17,2025-02,.cursorrules,cursor_related_path,high,feat: Refactor player and upgrade to immersive player page
+ccbikai/DNS.Surf,cursor,90998d434a00059f12bad5ff32009d220c468f88,2024-09-24,2024-09,.cursorrules,cursor_related_path,high,feat: add coding standards and best practices for project
+ccbikai/github-stars,cursor,0fabdcfe161e5a6e4504d9a0651ffad168df163c,2024-12-01,2024-12,.cursorignore,cursor_related_path,high,feat: init
+ccbikai/hacker-news,cursor,308847133be63f93c52c06601293aa5729b78049,2025-02-14,2025-02,.cursorrules,cursor_related_path,high,feat: init
+cgranier/tabSidian,cursor,5c7000ca44ad916996792c9136da18827e9e1cdc,2024-10-29,2024-10,.cursorrules,cursor_related_path,high,Add .gitignore file
+cjinhuo/blazwitcher,cursor,ffdd036bdac4749cb850195f407518ecec6701ba,2025-02-13,2025-02,.cursor/rules/rules.mdc,cursor_related_path,high,feat: add global rules for TypeScript files
+clchinkc/stockchat,cursor,15cc767d80e5e6a01c810403180edcef92ba9763,2025-02-01,2025-02,.cursorignore,cursor_related_path,high,Refactor frontend architecture and add comprehensive UI components
+cloudflare/agents,cursor,ebcbf52642ed987bb18ae3c5464c6d20c88f832c,2025-02-27,2025-02,.cursor/rules/cloudflare.mdc,cursor_related_path,high,Create cloudflare.mdc
+cloudflare/agents-starter,cursor,72778ce35b984ba88e8710ccef7cb5e4ab63525a,2025-02-27,2025-02,.cursor/rules/cloudflare.mdc,cursor_related_path,high,add the cloudflare cursor rule
+collinschaafsma/startstack,cursor,ef083777e06ba60754b927b9250e6bb198953181,2024-09-02,2024-09,.cursorrules,cursor_related_path,high,initial import
+comet-ml/opik-mcp,cursor,764f7d2de7587d421645407d6e9a4996646c6b64,2025-03-06,2025-03,.cursor/test.txt,cursor_related_path,high,prompts tools
+constROD/template-hono-prisma-kysely,cursor,f70f1c932f57621f3a383479aba7973d26ca7827,2025-03-02,2025-03,.cursor/rules/data-access-layer.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/service-layer.mdc,cursor_related_path,high,feat: add cursor project rules
+convergence-ai/webgames,cursor,eaefffd5d484e6f5e369d28168eb8b37ad593195,2025-01-20,2025-01,.cursorrules,cursor_related_path,high,add loads more
+ctxs-ai/ctxs.ai,cursor,e2f14a787423c54d7010e15f97bc2a1d2dd30580,2025-03-04,2025-03,.cursor/rules/agent.mdc;.cursor/rules/astro-site.mdc,cursor_related_path,high,add cursor rules prompt
+cuongtl1992/mcp-dbs,cursor,c62475613c1bcebb72e575abc73fc6c2b1e3c93a,2025-03-17,2025-03,.cursor/config.json;.cursor/rules/database-implementations.mdc;.cursor/rules/esm-imports.mdc;.cursor/rules/project-overview.mdc,cursor_related_path,high,first commit
+cyberk-lab/nestjs-boilerplate,cursor,2b0b47a9219fac57dd8b3fd16846b6173e7eaf51,2025-01-15,2025-01,.cursorrules,cursor_related_path,high,chore: small fixes
+darenmalfait/nerdfish.be,cursor,0d6815965f389aeed9302d85ede63b1623a7105d,2025-02-17,2025-02,.cursorrules,cursor_related_path,high,chore(shared): add cursorrules
+darkroomengineering/satus,cursor,e9d660f1ff363f2834e25dd587bf33410640a18f,2025-02-11,2025-02,.cursorrules,cursor_related_path,high,add .cursorrules
+daydreamsai/daydreams,cursor,1df856407039aa449b4a95b1e4ec61f72d352781,2025-03-05,2025-03,.cursor/rules/docs.mdc,cursor_related_path,high,add docs
+daytimedrinkingclub/shipstation,cursor,3a7faf2103e263dbb076b22aa679c2583703a544,2024-06-29,2024-06,.cursorignore,cursor_related_path,high,add cursor ignore
+deeeed/expo-audio-stream,cursor,63f4e8ca227f72e83d5c8a9209d1b25fe820c081,2024-12-10,2024-12,.cursorrules,cursor_related_path,high,feat(playground): integrate whisper.rn native speech recognition (#51)
+devagrawal09/tanstack-router-strello,cursor,ef1984e94392573e0774e4697e3f7814e7f75b26,2025-02-22,2025-02,.cursorrules,cursor_related_path,high,init
+different-ai/hypr-v0,cursor,e8ea01537e5d773478d95ea4fbaf8a4bb11d1be1,2024-11-05,2024-11,.cursorrules,cursor_related_path,high,initial commit
+different-ai/note-companion,cursor,a17e0d0b910c6eb89bb95fdeb68aaca022763200,2024-10-15,2024-10,.cursorrules,cursor_related_path,high,move settings to react + add tailwind
+dogokit/dogokit-akita,cursor,0e2e8974d9d535bc9dba925de1234667586915a7,2024-09-03,2024-09,.cursorignore;.cursorrules,cursor_related_path,high,docs: restructure with adjusted configs
+dotabod/frontend,cursor,bcd6e54b36ac82d3352312a75ba6f444581d7169,2025-03-15,2025-03,.cursor/rules/CURSOR_RULES_README.md;.cursor/rules/cursor-rules.json,cursor_related_path,high,docs: Add Vitest best practices and update configuration for improved testing
+dotneet/aica,cursor,52e7ec2514f6ce5f2e3c5439e39eb4d726f141a6,2025-02-20,2025-02,.cursor/rules/test.mdc,cursor_related_path,high,feat: agent
+dotnetfactory/fluid-calendar,cursor,f2f67374ab88c0bfbbaa36bb463daad37408ab5b,2025-02-17,2025-02,.cursor/rules/app-rule.mdc;.cursor/rules/main-rule.mdc,cursor_related_path,high,initial commit
+dougwithseismic/cursor-tools,cursor,6de371fe6feaf54616af53d69b4e86026e664735,2025-01-21,2025-01,.cursorrules,cursor_related_path,high,fix(ui): implement proper scrolling behavior in workspace components
+drivly/ai,cursor,43f187d9ccac359d88fb4befccba2410bf3929da,2025-03-30,2025-03,.cursor/rules/code-style.mdc;.cursor/rules/deployment-patterns.mdc;.cursor/rules/mdx-capabilities.mdc;.cursor/rules/project-overview.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/sdk-implementation.mdc;.cursor/rules/tech-requirements.mdc,cursor_related_path,high,Add project rules for Cursor in .cursor/rules folder
+dxos/dxos,cursor,ea3458d00962e0c594eeb0138c7e8a0cac4eb043,2025-02-26,2025-02,.cursor/prompts.ts;.cursor/rules/typescript.json,cursor_related_path,high,feat: Chat UX (#8599)
+eastlondoner/cursor-tools,cursor,2697b01de7f57dd4d520a28fa92a423769b7d5ef,2025-01-13,2025-01,.cursorrules,cursor_related_path,high,Initial commit: Basic project setup with README and LICENSE
+efdevcon/monorepo,cursor,d62d5fa3bf4299895d3c24f3a34c275baa8e6322,2024-09-03,2024-09,devcon-api/.cursorrules,cursor_related_path,high,cursor rules
+elbwalker/walkerOS,cursor,91d221b2fc2420f930e9142190f1d59e7215e89f,2025-02-14,2025-02,.cursor/rules/01-core.rule;.cursor/rules/02-packages.rule;.cursor/rules/03-priorities.rule;.cursor/rules/04-standards.rule,cursor_related_path,high,help me please
+elie222/inbox-zero,cursor,e06dd782c2fd76024bc9d124498ffb4ec672a415,2024-09-16,2024-09,.cursorrules,cursor_related_path,high,Add a cursor rules file
+ephemeraHQ/converse-app,cursor,0fc1b568c7222f7d83b7440c7802789d687076f5,2025-01-06,2025-01,.cursorrules,cursor_related_path,high,Many chat fixes (#1468)
+ephemeraHQ/xmtp-agent-examples,cursor,325729370cd209b5e190f3648753b7888ca81853,2025-01-17,2025-01,.cursorrules,cursor_related_path,high,deploy
+epicweb-dev/epic-stack,cursor,4917bdbca19cd2a7728e4a8633a551780db7a36c,2025-03-21,2025-03,.cursor/rules/avoid-use-effect.mdc,cursor_related_path,high,ad first cursor rule
+eser/deno-next-showcase,cursor,ec130395b2a526c96ec0a4bc71ebade949ebdac0,2024-09-28,2024-09,.cursorrules,cursor_related_path,high,Initial commit
+exa-labs/company-researcher,cursor,bc4c15fdb80a5671125cfd2cf074ac0490c0cecd,2024-12-22,2024-12,.cursorrules,cursor_related_path,high,fixed ui issues with linkedin + recent tweets + added cursor rules
+exa-labs/exa-deepseek-chat,cursor,32fcb81eaee7d8ed232cc30badb1a8d377a5a6c0,2025-01-28,2025-01,.cursorrules,cursor_related_path,high,added styling + fonts + colors
+eyaltoledano/claude-task-master,cursor,07648a141733888253f29361028455d88ff86ff7,2025-03-04,2025-03,.cursor/rules/dev_workflow.mdc,cursor_related_path,high,initial version
+f/awesome-chatgpt-prompts,cursor,e87f1b54dfdf9594237f04d8daf8d0748da34791,2025-01-05,2025-01,.cursorrules,cursor_related_path,high,fix ui
+farfarawaylabs/bernstein_ai_framework,cursor,62649f7b4696e4f221250274b090c4d1fae18f72,2025-02-07,2025-02,.cursorrules,cursor_related_path,high,initial framework working
+fatwang2/gitpush,cursor,3778bfe407befc15a8d0b307ce5a97e9715e7d08,2025-03-06,2025-03,.cursor/rules/workflows.mdc,cursor_related_path,high,add the demo website of GitPush
+fatwang2/search1api-mcp,cursor,032267979ae95a4344e010534fc7caab6e13a6f7,2025-03-18,2025-03,.cursor/rules/mcp-rule.mdc,cursor_related_path,high,"v0.1.5: Added new search parameters (include_sites, exclude_sites, time_range) and new search services (arxiv, wechat, bilibili, imdb)"
+federicofanini/gymbrah.com,cursor,994feeda4245ab8600d228d52f433eca0686af8f,2025-01-04,2025-01,.cursorrules,cursor_related_path,high,license + readme
+fengkx/beancount-lsp,cursor,44d2b3676f342d557c301f69f724fde2d31a8e2d,2025-02-26,2025-02,.cursor/rules/package-manager.mdc,cursor_related_path,high,feat: enhance LSP completions with pinyin and additional symbol indexing
+focu-app/focu,cursor,aa1a6b2578a9d3966f8b55a04b1db5b4282a7db2,2024-09-13,2024-09,.cursorrules,cursor_related_path,high,(chore) convert to shadcn
+formml/formml,cursor,90e6457b860251d68fc83244536e2d41c0748c2c,2024-10-24,2024-10,.cursorrules,cursor_related_path,high,docs: add cursor rules
+fredericbarthelet/linkedin-mcp-server,cursor,c8ad527e2b79f1322d2ce88343a1083d4c9a8d95,2025-03-14,2025-03,.cursorignore,cursor_related_path,high,Create stdio Linkedin MCP server with single tool user-info
+friuns2/appforge,cursor,2f90e221cb1a50bdbd02acb6883918a93709d102,2024-08-12,2024-08,.cursorignore;.cursorrules,cursor_related_path,high,init
+frostime/sy-f-misc,cursor,dea3cc6bce28c0938194411dd4bed61ddcd7af44,2025-01-29,2025-01,.cursorrules,cursor_related_path,high,🎨 misc
+gaetansenn/vue-api,cursor,621108aea006a776212d843674b3a31ab838f955,2024-10-10,2024-10,.cursorignore,cursor_related_path,high,fix: add tests and fix some issues
+genesis-ai-dev/codex-editor,cursor,3b53281a2439a8d820dd2fdcc414348c8ce6b9f0,2025-02-01,2025-02,.cursor/rules/import-transaction.mdc;.cursor/rules/types.mdc,cursor_related_path,high,Add documentation for import transactions and type handling in Codex
+gensx-inc/gensx,cursor,20cce636aeb6431a45c782c84f92969f6fba16d5,2025-03-06,2025-03,packages/gensx/src/templates/projects/typescript/.cursor/gensx-ai-sdk.mdc;packages/gensx/src/templates/projects/typescript/.cursor/gensx-anthropic.mdc;packages/gensx/src/templates/projects/typescript/.cursor/gensx-mcp.mdc;packages/gensx/src/templates/projects/typescript/.cursor/gensx-openai.mdc;packages/gensx/src/templates/projects/typescript/.cursor/gensx.mdc,cursor_related_path,high,feat: Add cursor project rules to template (#438)
+gerred/mcpmc,cursor,88573f5f558d02c15e768e2d09887b183bf8f0f6,2024-12-22,2024-12,.cursorrules,cursor_related_path,high,feat: initial implementation of MCP-compliant Minecraft bot
+geyserfund/geyser-app,cursor,2a92418e23a70dbd31e100bfe7a680709035310f,2025-02-18,2025-02,.cursor/rules/contribution.mdc,cursor_related_path,high,feat: start adding rules for cursor to create and help with creating components
+gjsify/ts-for-gir,cursor,7b1e2b31df06f59046899d4b2d476187afad95aa,2025-03-21,2025-03,.cursor/rules/gjs-examples.mdc,cursor_related_path,high,Examples: Switch to better GObject.registerClass syntax and improved documentation
+gruntwork-io/docs,cursor,507c75b998063a0204233a9026f23219d52bfb08,2025-03-03,2025-03,.cursor/rules/gitlab-background.mdc;.cursor/rules/tone.mdc,cursor_related_path,high,Pipelines GitLab Support Docs (#2393)
+h7ml/ai-markdown-translator,cursor,f5a75e8a572af4f816e67fee00f03e38ad638eb9,2025-03-24,2025-03,.cursorrules,cursor_related_path,high,Feat: Apply locale for cli help
+ham2k/app-polo,cursor,e9a01fb5be2b8863e26fc70a05f08ecfb51d6d2a,2025-03-03,2025-03,.cursor/rules/base.mdc;.cursor/rules/cursor-rules.mdc;.cursor/rules/javascript-imports.mdc;.cursor/rules/javascript-style.mdc;.cursor/rules/license-preamble.mdc;.cursor/rules/react-project.mdc;.cursorignore,cursor_related_path,high,Cursor files
+haqq-network/frontend,cursor,74278e0fd238ded09d6148f1fcc350bffea3dafa,2024-11-06,2024-11,.cursorrules,cursor_related_path,high,chore: add comprehensive development guidelines and standards to `.cursorrules` (#989)
+harrisonwang/url-shortener,cursor,66561b2ec4a32bf0c780af88c2c7682f21d6cc6b,2024-09-09,2024-09,.cursorrules,cursor_related_path,high,🎉 init: Initial commit
+hashintel/hash,cursor,5e653a79428e8f6e57dc2bb574a1d066bfa21494,2025-03-06,2025-03,.cursor/rules/git-commit-conventions.mdc;.cursor/rules/rust-coding-style.mdc;.cursor/rules/rust-documentation.mdc;.cursor/rules/rust-error-handling.mdc;.cursor/rules/rust-testing-strategy.mdc;.cursor/rules/rust-tracing-practices.mdc;.cursor/rules/update-rules.mdc,cursor_related_path,high,H-4174: Add Rust project coding guidelines and best practices to be consumed by Cursor AI (#6628)
+helius-labs/helius-sdk,cursor,c6f5717e82089979f47945010cd9a16360dc5227,2025-02-14,2025-02,.cursor/rules,cursor_related_path,high,Add Cursor Rules (#172)
+helius-labs/kite,cursor,31160093c77fabc55a43001e9d6ae99e36bef930,2025-02-05,2025-02,.cursorrules,cursor_related_path,high,Add a .cursorrules
+hellokaton/namesage,cursor,2f86fd81060ea3f033e5fe5f4cc76f93bcb06742,2025-02-10,2025-02,.cursorrules,cursor_related_path,high,:sparkles: first commit
+henryhawke/mcp-titan,cursor,8c99a6615242be988b531a2d5a5cd4e962618e1f,2025-02-20,2025-02,.cursor/rules/memory.mdc,cursor_related_path,high,Update project configuration and dependencies for version 1.2.0
+heyverse/hey,cursor,7a81240cc2f5c687e712ef8437e3535f6c5444ab,2025-03-17,2025-03,.cursorrules,cursor_related_path,high,squash: Reset history to a single commit
+highlight/highlight,cursor,90563ab9d6ae530348f11dfea91777467560399a,2025-02-06,2025-02,.cursor/rules,cursor_related_path,high,Add blog tag pages to sitemap (#9885)
+hijohnnylin/neuronpedia,cursor,ab1e24c1d6324f52a08419aa8479dd47bac52ca3,2025-03-01,2025-03,.cursor/rules;apps/webapp/.cursor/rules,cursor_related_path,high,init
+him0/ai-rule-forge,cursor,15504fdd4ef63cbdde3135228b6c05e72e100567,2025-03-15,2025-03,.cursorrules,cursor_related_path,high,Initial Commit
+hooray/fantastic-startkit,cursor,c8ee28c4a848c94440af97acef18bca278ac1883,2025-03-26,2025-03,.cursor/extensions.json;.cursor/settings.json,cursor_related_path,high,增加 cursor 配置
+howoii/SmartBookmark,cursor,a8a8864eccfd9ef7b63acd245d0248a7c1ff2543,2025-01-09,2025-01,.cursorrules,cursor_related_path,high,Smart Bookmark v1.1.3
+hudy9x/namviek,cursor,868731e607487c7e12f22de3b3d0bb73e5b08185,2024-12-22,2024-12,.cursorrules,cursor_related_path,high,chore: add .cursorrules for better ai output
+humanspeak/svelte-markdown,cursor,1afcbf5c47a5f97b24944615e71fe076750c5042,2025-01-01,2025-01,.cursorrules,cursor_related_path,high,A bit more cleanup
+hyusap/deconstructor,cursor,22185da85392c44576d0a513dc0f3a71715757d1,2025-02-24,2025-02,.cursor/rules/package-runtime.mdc,cursor_related_path,high,Add disclaimer and install html-to-image package
+i-am-alice/3rd-devs,cursor,dfe5ed109a9792d9e25052022ffff9f893c24e56,2024-09-14,2024-09,.cursorignore,cursor_related_path,high,Week #1
+icantcodefyi/cattype,cursor,413a940dfe7d8eca9b2ca5992dd6a19930b3a6e8,2025-02-15,2025-02,.cursor/rules/rule.mdc,cursor_related_path,high,Initial commit
+iceener/ai,cursor,d9d551cb3449bbe9d853012c2e936df3de01ab91,2024-12-05,2024-12,.cursorignore;.cursorrules,cursor_related_path,high,AGI is here.
+ilyaizen/streak-calendar,cursor,d09781aeab2d121c6fe7cf21e0f66bfedac28af4,2025-01-01,2025-01,.cursorrules,cursor_related_path,high,style: improve header and footer styling
+imbhargav5/rooks,cursor,43ea675420ff7035b8fb95df418c2273c1648db7,2025-03-24,2025-03,.cursor/rules/react-hook-yolo.mdc,cursor_related_path,high,chore: update configuration and add new rules for hooks
+imhonglu/new-wheels,cursor,3b27e4ab18ae21f00dbe63d9a831b9bf78de9811,2025-01-07,2025-01,.cursorrules,cursor_related_path,high,feat: prototype code
+imrishit98/rp-nextjs-starter,cursor,a34326cc485998be5110b3d08ce466083f1f3ead,2024-09-14,2024-09,.cursorrules,cursor_related_path,high,Add cursor rules/config
+infinite-table/infinite-react,cursor,d7dc8a941429180057c10563d3f3c18421f8a063,2024-08-27,2024-08,.cursorignore,cursor_related_path,high,add docs on disabled rows
+instructa/viber3d,cursor,212018f20f9a396626d23738155d5a28daec337e,2025-03-01,2025-03,packages/viber3d/.cursor/rules/create-files.mdc;packages/viber3d/.cursor/rules/global.mdc;packages/viber3d/.cursor/rules/lock-files.mdc;packages/viber3d/.cursorignore,cursor_related_path,high,first push
+isboyjc/isle-editor,cursor,9941c5327469187d0501e89f94b45defb4bba043,2024-12-29,2024-12,.cursorignore;.cursorrules,cursor_related_path,high,chore: 🔨 add cursor config
+jackfriks/expo-app-boilerplate,cursor,df54542767cb9f83f3c30c91732f5305211d7fff,2025-02-20,2025-02,.cursorrules,cursor_related_path,high,onboarding fix
+jhonsfran1165/unprice,cursor,ce8d190711cec37833abf1433de93195073d9c1e,2024-09-02,2024-09,.cursorrules,cursor_related_path,high,chore: start implementation of total prices
+joelhooks/logseq-mcp-tools,cursor,2b07aa0fa3d2da544cf9e69bba943c8303c03ae0,2025-03-12,2025-03,.cursor/rules/logseq.mdc;.cursor/rules/modelcontextprotocol.mdc,cursor_related_path,high,hey
+johanguse/next-saas-template,cursor,479bbd47f453a6be599e09d8c6b35c52b26d0a43,2025-01-01,2025-01,.cursorrules,cursor_related_path,high,feat: add cursorrule
+johnneerdael/multiplatform-cursor-mcp,cursor,5c4c7c1d63b47ffc1c5cdb8a0ad529a7bcd7a994,2025-01-28,2025-01,.cursorrules,cursor_related_path,high,first commit
+jonathanbertholet/promptmanager,cursor,b11a0eaf947fad344adec6a891432d2a945b5b2d,2025-03-02,2025-03,.cursorrules,cursor_related_path,high,feat: major refactor and redesign overhaul
+jparkerweb/llm-distillery,cursor,6e26373118b0a1f5c5bec17d850bd382d917fdcd,2024-09-08,2024-09,.cursorignore,cursor_related_path,high,add ignore file
+jparkerweb/pixel-banner,cursor,30f00daa369a826304ddfd89d7648cfbb59777c5,2024-09-20,2024-09,.cursorrules,cursor_related_path,high,dot files
+jparkerweb/semantic-chunking,cursor,357c6f9e2dd2fd8751a2917f2c01a1bfdf600082,2024-09-08,2024-09,.cursorignore,cursor_related_path,high,update ignore files
+jpmorgan-payments/embedded-finance,cursor,5cb33f127ba7ed5daf36f2d3c8f3ee5e0981d7e4,2025-01-09,2025-01,.cursorrules,cursor_related_path,high,Add initial drafts of .cursorrules and copilot-instructions config files
+jrmybtlr/usemods,cursor,f8736357607a3ff11d2dc64b5837a512d3e888d3,2025-02-25,2025-02,.cursorrules,cursor_related_path,high,feat: enhance formatCombinedDates function to support long and short formats
+kazuph/mcp-screenshot,cursor,4c173a21eab9dc5644a55a27d26fb2ec0705020f,2024-12-24,2024-12,.cursorrules,cursor_related_path,high,✨ feat: OCR APIとの連携機能を追加
+kelvin6365/rocksdev.tools,cursor,732751f836953f7cf365386596268f8b14123e71,2025-01-11,2025-01,.cursorrules,cursor_related_path,high,add .cursorrules
+kendevco/spaces,cursor,538702c9580e50b197e4244b3290031c10d2b797,2025-01-28,2025-01,.cursorrules,cursor_related_path,high,feat: initial release v1.0.0
+kern/filepizza,cursor,e402c807c4df7098e82e33c25188fd4e6b3e6fdb,2024-12-28,2024-12,.cursorrules,cursor_related_path,high,FilePizza v2 🍕 (#134)
+kindfi-org/kindfi,cursor,cddd8073a06975a090a5ea965a1b69a32d2338fc,2025-01-22,2025-01,.cursorrules,cursor_related_path,high,feat: include cursorrules
+kingbootoshi/cypher,cursor,42e261b643e260e3f1ffb14c0f08832d68660587,2024-12-11,2024-12,.cursorignore,cursor_related_path,high,first init
+kingbootoshi/cypher-swarm,cursor,043a2f9164123d2c44842549eacb5bede2c7a4fe,2024-11-24,2024-11,.cursorignore;.cursorrules,cursor_related_path,high,"First commit, agent system + terminal & twitter functionality complete"
+kingbootoshi/feather,cursor,f581d8da3977259e6f8804c140222747d5e0f9d0,2024-12-29,2024-12,.cursorrules,cursor_related_path,high,caw caw
+kirill-markin/chatgpt-telegram-bot-telegraf,cursor,b741339b8a66131a6ebc810c81fd9ef4b61c7945,2025-02-19,2025-02,.cursorrules,cursor_related_path,high,feat: Add .cursorrules file
+kirill-markin/chrome-auto-image-blocker,cursor,6eb8bcb4b75b280c6f09a3b0cf9aa76fb27fc016,2025-03-06,2025-03,.cursorrules,cursor_related_path,high,add cursorrules
+kivS/lite-queen,cursor,ccab0ff32481981b58f6d38b0a7244037d9585cf,2024-10-10,2024-10,.cursorrules,cursor_related_path,high,🚀
+kleneway/forq-cli,cursor,3eed261ad587038e574915f0f5d81a9a111a7ca7,2025-03-03,2025-03,.cursorrules,cursor_related_path,high,Implement CLI interface and REPL functionality
+kokonut-labs/kokonutui,cursor,3dc59bf2ec094ca38e5751e1afc67dca5da7b6af,2024-11-06,2024-11,.cursorrules,cursor_related_path,high,features/btn + texts
+koljapluemer/learn-worldmap,cursor,f99c62657f9cbf518848aa1d3d8d5a8a224c44a7,2025-03-15,2025-03,.cursorrules,cursor_related_path,high,Initial commit
+konturio/disaster-ninja-fe,cursor,5626bad4f69fcd06ccaa07e996fff460f12f4963,2024-10-16,2024-10,.cursorignore,cursor_related_path,high,fixes (#857)
+kremalicious/blog,cursor,82945edb53207500bf4f17a66978390a659818b2,2025-02-13,2025-02,.cursor/rules/astro.mdc;.cursor/rules/project.mdc,cursor_related_path,high,add ai instructions
+ks0318-p/Cursor-Project-Rules,cursor,3c58dff8970bd6e8f3ca0d1abcf9bc188ef6655d,2025-03-01,2025-03,.cursor/rules/api.mdc;.cursor/rules/chaosmap.mdc;.cursor/rules/frontend.mdc;.cursor/rules/general.mdc;.cursor/rules/prisma.mdc;.cursor/rules/supabase.mdc,cursor_related_path,high,Update README with project rules header
+kturung/Langgraph-Multi-Agent-HITL-Form,cursor,65de1419d34ce37516b97e21e4fe15e69241ca5e,2025-02-26,2025-02,.cursor/rules/folder-check.mdc,cursor_related_path,high,Refactor frontend tools and update dependencies
+labnol/react-tailwind,cursor,dbc04d02c5f2de1955844a169881bd51481cbd66,2024-09-05,2024-09,.cursorrules,cursor_related_path,high,Migrated from Create React App to Vite
+langfuse/langfuse,cursor,f0c37c8309d1d3f228cfe81ed06b7ba2bb5b5e7f,2025-03-09,2025-03,.cursor/rules/authorization-and-rbac.mdc;.cursor/rules/entitlements.mdc;.cursor/rules/frontend-features.mdc;.cursor/rules/public-api.mdc,cursor_related_path,high,chore: add initial cursor rules (#5926)
+langfuse/mcp-server-langfuse,cursor,50080df2f4ced9c0c101388cd9c17d5d0a1550df,2025-02-15,2025-02,.cursor/rules/mcp-llms-full.mdc,cursor_related_path,high,chore: add mcp-llms-full as cursor rule
+latechforce/engine,cursor,668cfeaff1db903c893a9ed3ce391c745456f912,2025-02-26,2025-02,.cursor/new-integration-action.md;.cursor/new-integration.md,cursor_related_path,high,chore(Cursor): add notepads
+latitude-dev/latitude-llm,cursor,9094fb52c357fe7cce9d47438358a9c2c3e0f4de,2024-09-27,2024-09,.cursorignore,cursor_related_path,high,feature: synthetic datasets (#295)
+leaperone/MultiPost-Extension,cursor,3940ebb00d3ddc4bbc11c688a433fe8d0705528b,2024-11-12,2024-11,.cursorignore;.cursorrules,cursor_related_path,high,init: mutlipost
+leemonade/leemons,cursor,81550dcdbbcea38449e6278861d5f684ab065b26,2024-11-18,2024-11,.cursorrules,cursor_related_path,high,feat: modifications for virtual tutor
+liam-hq/liam,cursor,a785463f829eea75466bf844986e139320fa135d,2025-01-27,2025-01,.cursorrules,cursor_related_path,high,🔧 Add Cursor AI development rules configuration file
+lightdash/lightdash,cursor,dac5be2db1b73738e56366fdd7d61205ad1406d3,2025-03-17,2025-03,.cursor/rules/backend.mdc;.cursor/rules/frontend.mdc,cursor_related_path,high,chore: add cursor rules for FE and BE (#14103)
+linshenkx/prompt-optimizer,cursor,0d3c2ba5012d3e9fc5258092d768d66b44aef26e,2025-01-17,2025-01,.cursorrules,cursor_related_path,high,init
+loglayer/loglayer,cursor,e97c430a811b4587163481a1f1cce347993fce81,2025-03-16,2025-03,.cursor/rules/project-structure.mdc;.cursor/rules/testing.mdc;.cursor/rules/writing-documentation.mdc,cursor_related_path,high,docs: add async context tracking (#178)
+lonestone/rolebase.io,cursor,90e172e388e0b85e0ab57d82b90cebf6d39c8c57,2025-03-23,2025-03,.cursor/mcp.json;.cursor/rules/typescript.mdc;.cursor/rules/webapp.mdc,cursor_related_path,high,"Add API keys, graphql proxy and API documentation"
+lucasromerodb/impuestito-extension,cursor,e75248ecbef1d3f4baecbe147d3436ee2952bbfa,2024-12-30,2024-12,.cursorrules,cursor_related_path,high,chore: improve extension and simplify
+maciej-trebacz/ff7-ultima,cursor,0fedaf556565e23ff9b44fa33f03fcd0a3bb5481,2025-01-19,2025-01,.cursorignore;.cursorrules,cursor_related_path,high,"Version 1.1.4, party bug fixes"
+madarco/ragrabbit,cursor,1793d6ef15ce8fd274fca7d54643a4312cd8c581,2025-01-22,2025-01,.cursorrules,cursor_related_path,high,first commit
+magebitcom/magento-toolbox,cursor,6bae36dbcd7e7684b506a4906a1bd04f5e1b8e92,2025-03-14,2025-03,.cursor/rules/commands.mdc,cursor_related_path,high,feat: jump to module command; added basic cursorrule for command generation
+makerkit/react-native-expo-turbo-saas-kit,cursor,787c3b7a06f563cbd924a88c790d2673398bc9ba,2025-01-18,2025-01,.cursorrules,cursor_related_path,high,"Added Cursor rules; Added account management forms (update email, update pwd)"
+mangosqueezy/mangosqueezy,cursor,82c138afb37e1216c18e2231eab0ddcc771f9a6f,2025-02-14,2025-02,.cursor/rules/fullstack.mdc,cursor_related_path,high,refactor(campaign): add campaign page
+manifoldmarkets/manifold,cursor,2b93dec5603c23080f65356daa69121c4cb9c6a7,2025-07-23,2025-07,.cursor/rules/general-knowledge.mdc,cursor_related_path,high,Show last active time on top right of post-card
+mantou132/gem,cursor,08daca7d4f5baddc0bbe8fb6c3da05bdc06aeb1e,2025-02-26,2025-02,.cursor/rules/gem-rule.mdc;.cursor/rules/typescript-rule.mdc,cursor_related_path,high,[duoyun-ui] Add sankey chart
+marianfoo/ui5-lib-diff,cursor,72ea791489f53f8ebe1f193abf36c6a5effe066d,2025-02-20,2025-02,.cursorignore,cursor_related_path,high,feat: add commit link to update text
+mckaywrigley/level-3-agent-code,cursor,9d3c1e203ed4a201467dd6e3521047e304d7fdf9,2025-02-06,2025-02,.cursorrules,cursor_related_path,high,MakePublic
+mckaywrigley/level-4-agent-code,cursor,136a825829bd44e6f43ae9a4d30069fe677819b1,2025-02-07,2025-02,.cursorrules,cursor_related_path,high,MakePublic
+mckaywrigley/mckays-app-template,cursor,251413e6dced8f33fc1cc309d51d3e4099835ee5,2024-09-01,2024-09,.cursorrules,cursor_related_path,high,make public
+mckaywrigley/o1-pro-template-system,cursor,3e501ab830ee14be22ac19ddc2811f985be44952,2025-02-16,2025-02,.cursor/rules/auth.mdc;.cursor/rules/backend.mdc;.cursor/rules/env.mdc;.cursor/rules/frontend.mdc;.cursor/rules/general.mdc;.cursor/rules/payments.mdc;.cursor/rules/storage.mdc;.cursor/rules/types.mdc;.cursorrules,cursor_related_path,high,MakePublic
+mckaywrigley/o1-xml-parser,cursor,31c71e6d1820eab65828d016f5f73db1d3d7f1cb,2024-12-08,2024-12,.cursorrules,cursor_related_path,high,Initial public release
+mckaywrigley/takeoff-perplexity-clone-final,cursor,02d2c5888c4f3b187ed5cf46dfe90a2e21d5d36e,2024-10-10,2024-10,.cursorrules,cursor_related_path,high,make public
+mckaywrigley/takeoff-perplexity-clone-mckay,cursor,f8d3d80aecfaedc47bcee76f998880a580e5949f,2024-10-10,2024-10,.cursorrules,cursor_related_path,high,make public
+mediar-ai/screenpipe,cursor,b0d71476a55bae8ac122f4c2d419abba719a1dca,2024-10-16,2024-10,.cursorrules,cursor_related_path,high,add .cursorrules
+medusajs/examples,cursor,0b2e54a03f35ab9e3382a42a8525e2aa5ac39226,2025-03-19,2025-03,.cursorrules,cursor_related_path,high,feat: added product reviews (#38)
+melissamcewen/CurlsBotSite,cursor,c5077339905b6555e0edda160fe73c58268a2767,2024-12-18,2024-12,.cursorrules,cursor_related_path,high,updating
+metaskills/experts,cursor,97ddedf4c3b1529df073d0ef745b46ebfab19d7e,2024-09-06,2024-09,.cursorrules,cursor_related_path,high,Handle tool hallucination using helpful outputs. Add cursor rules.
+metriport/metriport,cursor,3b1e2ed243e5f1503da81f51e7361ef62ecfed1e,2024-10-31,2024-10,.cursorignore;.cursorrules,cursor_related_path,high,build: add settings for Cursor
+milaboratory/platforma,cursor,3f42921c77eea850fa143ab070f91d2565b0f4a6,2025-03-01,2025-03,.cursor/rules/tengo-language.mdc,cursor_related_path,high,feat: Add getFutureFieldWithDefault function for dynamic field resolution
+module-federation/core,cursor,2e52e516a8e4b6b22b96347f04aa4b3011396838,2024-05-09,2024-05,.cursorignore,cursor_related_path,high,feat(sdk): auto public path support for json remote (#2463)
+motiondivision/motion-vue,cursor,3a9bde57b9aac173c184bdeaf995e0e40289d4b5,2024-11-14,2024-11,.cursorrules,cursor_related_path,high,chore: init commit
+movibe/memory-bank-mcp,cursor,75afb2cad335709bc01cca3fcaf91a4e66346341,2025-03-07,2025-03,.cursor/mcp.json,cursor_related_path,high,docs: Update repository URLs and English translation
+mrabdussalam/zakat-calculator,cursor,52c0c98fdf8d59718c9a4a45f338e3be155e2ea3,2025-02-21,2025-02,.cursorrules,cursor_related_path,high,Initial commit: Add Zakat calculator with validation system
+mslavov/shelly-forge,cursor,9962c9864e93bdbd26bff37871a576823b5c59a4,2025-03-30,2025-03,.cursor/rules/checkpoint-commits.mdc;.cursor/rules/create-rules.mdc;templates/default/.cursor/rules/checkpoint-commits.mdc;templates/default/.cursor/rules/create-rules.mdc;templates/default/.cursor/rules/shelly-scripting.mdc,cursor_related_path,high,Update package version to 0.1.3 and enhance Shelly API type definitions
+mzxrai/mcp-openai,cursor,2b9b76c9455bdeabcb3ba997e4f99001f8cdce90,2024-12-06,2024-12,.cursorrules,cursor_related_path,high,chore: Initial repository setup with OpenAI MCP server implementation
+namesakefyi/namesake,cursor,ac184fc8943d2fef54f11400f736a0e0815a1e6a,2026-03-24,2026-03,.cursor/settings.json,cursor_related_path,high,Add MA court order form for minors (#421)
+nauvalazhar/gollama,cursor,6cbe9174d2ab398a3718cd2786e576c09576a405,2025-01-28,2025-01,.cursorrules,cursor_related_path,high,mockup
+netresearch/timetracker,cursor,897aaae1eb337b2216d565f31e1416a605c24d03,2025-03-30,2025-03,.cursor/rules/php.mdc;.cursor/rules/rules.mdc,cursor_related_path,high,chore(ai): add some development rules
+ngxpert/input-otp,cursor,0b90a18ce1eed4b9ce96e057f88df8dfe0ad24e5,2025-02-11,2025-02,.cursor/rules,cursor_related_path,high,feat: library and demo setup
+noelrohi/www,cursor,492a770d34865cd4731ad25061bc6857af527c9a,2025-03-25,2025-03,.cursor/rules/linter-errors.mdc;.cursor/rules/performance.mdc;.cursor/rules/typescript.mdc,cursor_related_path,high,"chore: add linter error handling, performance, and TypeScript guidelines"
+oaknational/oak-ai-lesson-assistant,cursor,e6b1cbcd530daf061c10026a646861b041c32d17,2025-03-25,2025-03,.cursorrules,cursor_related_path,high,feat: .cursorrules and CLAUDE.md (#593)
+obytes/react-native-template-obytes,cursor,8b518f1b60cb00efa00b2ee3ec2422ec8ddc333c,2025-02-18,2025-02,.cursorrules,cursor_related_path,high,feat: add cursor rules + few prompts
+ohcnetwork/care_fe,cursor,45a39301cc938d042f1c568940a9a697abf52140,2024-10-16,2024-10,.cursorrules,cursor_related_path,high,WIP: Care Plugin Support (#8660)
+ojasskapre/nextjs-starter-template,cursor,6fc196043c059de0751bc2daac3ba6de10873059,2024-08-17,2024-08,.cursorrules,cursor_related_path,high,init next.js project setup
+olyaiy/resume-lm,cursor,a572c0943f13c0c164a57169f87844c8364eeb3d,2024-12-23,2024-12,.cursorrules,cursor_related_path,high,restart project
+omnisat/lasereyes-mono,cursor,6e36cbdf31a8b5d233a72e5e85baf68b38af66b1,2025-03-21,2025-03,.cursor/rules/lasereyes-core.mdc;.cursor/rules/lasereyes-docs.mdc;.cursor/rules/lasereyes-react.mdc,cursor_related_path,high,add docs
+open-fractal/flur,cursor,63dafacc12064c64128510fceccd53448a12b809,2024-10-05,2024-10,.cursorrules,cursor_related_path,high,saving point
+opentoolsteam/cli,cursor,159b315fcd40ba5ec8b80f3badcaf89c62f13768,2025-03-12,2025-03,.cursor/rules/derived-cursor-rules.mdc;.cursorignore,cursor_related_path,high,specstory stuff
+orionjs/orionjs,cursor,78d04e54acb9246dbb31e70d76ab3feef9143735,2025-03-08,2025-03,.cursor/rules/orionjs.mdc,cursor_related_path,high,cursor rule
+osbytes/crypt.fyi,cursor,73617a30c87933b4b1b11bb7ace016ac1ebcab76,2024-12-29,2024-12,.cursorrules,cursor_related_path,high,add .cursorrules file
+owengretzinger/gitreadme,cursor,6c9e09ccfd19544bc8690b60a81cb719b99c5289,2025-02-28,2025-02,.cursor/rules/shadcn.mdc,cursor_related_path,high,add about section
+owid/owid-grapher,cursor,d80ee437899ad3c0889fb29cd7fdcf1e9582eefb,2024-11-06,2024-11,.cursorignore,cursor_related_path,high,Add .cursorignore
+pAIrprogio/oai,cursor,39e7faf05b96de4fdf823488977c9eebb836dc4e,2024-04-08,2024-04,.cursorignore,cursor_related_path,high,switch to bun
+panoratech/Panora,cursor,d059687e5cc3af2d0caffaefa3903f00a428a9d7,2024-11-16,2024-11,.cursorrules,cursor_related_path,high,Create .cursorrules
+pnd280/complexity,cursor,b4faf204594ab63d06e52a13ef32e924cfee4b14,2024-10-15,2024-10,.cursorignore,cursor_related_path,high,initial commit
+pnizer/wweb-mcp,cursor,e02723d21fd3ec53e20b7b62cc8fbb20b1c45111,2025-03-12,2025-03,.cursor/rules/project-rules.mdc,cursor_related_path,high,Project initial commit
+pockethost/pockethost,cursor,601377037b9ae8a57cd6d51bd16ee4cf5f5ee4ef,2024-11-21,2024-11,.cursorrules,cursor_related_path,high,enh: add cursor rules
+pollinations/pollinations,cursor,850d26c038daa94afbb6b5d45f80db0d68851e4b,2024-09-28,2024-09,app/.cursorrules,cursor_related_path,high,759 handle json mode for openai compatible endpoint on textpollinationsai (#760)
+privatefolio/privatefolio,cursor,9b41e134553f014c5c6e433475cc969f490dfeef,2025-03-19,2025-03,.cursorignore;.cursorrules,cursor_related_path,high,Bootstramp v2 from private repo
+project-89/argOS,cursor,00e9da2fa1d7ed928171aaa2450e03003d7f81e6,2025-02-15,2025-02,.cursorrules,cursor_related_path,high,Massive refactor to remove experience system and references.  More direct chain of thought.
+promptfoo/promptfoo,cursor,ccbbe467273bf1b49e6bf37064fe9a699754982f,2025-03-09,2025-03,.cursor/rules/examples.mdc;.cursor/rules/jest.mdc;.cursor/rules/python.mdc,cursor_related_path,high,chore: add cursor AI rules for development workflow (#3326)
+przeprogramowani/ai-rules-builder,cursor,67a225de3d56a47db78f938d03e663f8f2a017f4,2025-03-21,2025-03,.cursorrules,cursor_related_path,high,chore: create .cursorrules (#9)
+q1226189767/FlyAdmin,cursor,82a2622afc93d121d3458e9911bce527599e71e3,2025-02-19,2025-02,.cursorrules,cursor_related_path,high,feat: cursorrules
+qpd-v/mcp-DEEPwebresearch,cursor,7b664e507bf2f4a3a24238f71b00e131aca2aff4,2024-12-05,2024-12,.cursorrules,cursor_related_path,high,feat: Add robust error handling and enhance stability
+quantalogic/qllm,cursor,fe7f909ebf196054259dad9a7217f95d0169cc7f,2024-09-03,2024-09,.cursorrules,cursor_related_path,high,feat(cursorrules): add new cursorrules file (#51)
+radzionc/guitar,cursor,6a98e2688a5b30e26a71af6d3d36c5a553f14462,2025-03-17,2025-03,.cursor/rules/assert.mdc;.cursor/rules/attempt-over-try-catch.mdc;.cursor/rules/cusor-rules.mdc;.cursor/rules/functions.mdc;.cursor/rules/package-manager.mdc;.cursor/rules/pattern-matching.mdc;.cursor/rules/reuse-lib.mdc;.cursor/rules/type-definitions.mdc;.cursor/rules/use-fetch.mdc,cursor_related_path,high,Update dependencies and refactor various components for improved performance and maintainability
+radzionc/radzionkit,cursor,c0f2438d7bdd007b8151d9241031897d9e207fa5,2025-02-09,2025-02,.cursor/rules/general.mdc,cursor_related_path,high,"Add new SVG icons for Asterisk, Bitcoin, and Chart Candlestick"
+recallnet/js-recall,cursor,0005c84cd061810b86b9e29a33d163fbb5fb1fdb,2025-03-26,2025-03,.cursor/rules/agent-context.mdc;.cursor/rules/coding-patterns.mdc;.cursor/rules/development-guidelines.mdc;.cursor/rules/quality-requirements.mdc;.cursor/rules/repository-structure.mdc;.cursorrules,cursor_related_path,high,Enhance Repository for Agent-Based Development (#136)
+refly-ai/refly,cursor,ff3536506c2f23650c3df69e239ae050029f4108,2024-11-17,2024-11,.cursorrules,cursor_related_path,high,chore: add custom cursor rules
+rejot-dev/rejot,cursor,1931ea5e1591c56a343cfad803554d000f856906,2025-02-16,2025-02,.cursor/rules/controller-app.mdc;.cursor/rules/cursor-rules-location.mdc;.cursor/rules/monorepo.mdc;.cursor/rules/single-page-application.mdc,cursor_related_path,high,Initial commit
+reliverse/cli-ai-app-site-anything-builder,cursor,45efe6a4bc996826a0d79431df1b092fb9a8999a,2024-11-30,2024-11,.cursorignore;.cursorrules,cursor_related_path,high,console→relinka and implement basic auth
+rember/rember-mcp,cursor,57988f106314a3701c6f3ad47a0dc5c9367b3476,2025-02-28,2025-02,.cursor/rules/general.mdc;.cursor/rules/libraries.mdc;.cursor/rules/rember.mdc,cursor_related_path,high,add cursor rules and mcp docs
+renocrypt/lumina-research-renocrypt,cursor,63187dfacb7e3ac2ce9088ff87cf8909d27b10bd,2024-10-15,2024-10,.cursorignore,cursor_related_path,high,update info
+richardadonnell/Upwork-Job-Scraper,cursor,abbfdbcdfc388c01dc483db34cff93699db2b3aa,2024-09-12,2024-09,upwork-job-scraper/.cursorignore,cursor_related_path,high,fixed job scraping
+rohenaz/allaboard-bitchat-nitro,cursor,d802f5f7832f2d1ba2210aeeb7ab74eb5df0b8d5,2024-12-18,2024-12,.cursorrules,cursor_related_path,high,ts
+rohenaz/bmap,cursor,76fcaf55d7256110549a4305cc1173f0bb827486,2024-12-20,2024-12,.cursorrules,cursor_related_path,high,migrating to bun test
+ryokun6/ryos,cursor,3dea10887bbf596e0fd35b4ec7a5a23a751e14aa,2025-01-27,2025-01,.cursorrules,cursor_related_path,high,I apolog
+sadmann7/diceui,cursor,2a8e704b1cae689b203fb4f621369a3aa88c83bb,2024-11-24,2024-11,.cursorrules,cursor_related_path,high,chore: update
+sadmann7/shadcn-table,cursor,5c7bdcab5b8bd5c9c1b8b1048ec88a83eb4d4232,2025-03-07,2025-03,.cursorrules,cursor_related_path,high,feat: tailwindcss v4 (#918)
+saleor/saleor-app-template,cursor,51e8272cf4a7c92a8b3f082bef7cfa2a4fcd4a67,2025-03-11,2025-03,.cursor/rules/integrating-with-saleor-api.mdc,cursor_related_path,high,feat: add AI rules (#276)
+sam-goodwin/alchemy,cursor,f8ff8dbdfac011cc8d8a9ba27c715761ee4a71f4,2025-01-19,2025-01,.cursorrules,cursor_related_path,high,feat: implement SQS Queue and record a demo
+scalar/scalar,cursor,62a72764023cc81adc1e0eb521e33a895cbfe3e7,2025-03-13,2025-03,.cursor/rules/tests.mdc;.cursor/rules/typescript.mdc;.cursor/rules/vue-components.mdc,cursor_related_path,high,chore: Cursor rules (#5096)
+scoful/pocker,cursor,756749fb4002a6ae0b05fddcf825c26b5fa36a3c,2025-02-12,2025-02,.cursorignore,cursor_related_path,high,登陆逻辑
+script-kit/app,cursor,f9423365b91832fec6aebbca1bc401f6c4fd41d1,2024-08-08,2024-08,.cursorrules,cursor_related_path,high,fix(quit): handle pty end errors. Update splash icon
+searchfe/hoth,cursor,491839670e163a96e9c50d02e41575ad280d5dd2,2025-02-21,2025-02,.cursorignore,cursor_related_path,high,feat: yarn to pnpm
+serge-0v/next-js-sanity-starter,cursor,1e8ec70c21cc981c8c9fb18d51a8e58ad8d75ebe,2025-03-17,2025-03,.cursor/rules/sanity-schemaui.mdc,cursor_related_path,high,"feat: cursor rules, update packages"
+settlemint/sdk,cursor,2cd9d62c212f60ea9a751fdbb62fc91e6a08b171,2024-08-06,2024-08,.cursorrules,cursor_related_path,high,feat: sdk cli to connect to the BTP instance and codegen
+shadowoff09/pathfinder,cursor,d026c9444520670893f21859963014019ba9be8f,2025-02-16,2025-02,.cursor/rules/cursor-rules.mdc,cursor_related_path,high,Enhance map functionality and UI with new features and improvements
+shakee93/rapidload,cursor,fdc7df66b8ed1c1b0e991199bb374655a93e2ac9,2024-09-10,2024-09,.cursorrules,cursor_related_path,high,feat: add loading spinner to perf score component
+shnai0/stripe-mrr,cursor,8e0b7bdc9066a2f9670fb017ddfaebefe0c4addc,2024-08-27,2024-08,.cursorignore,cursor_related_path,high,stripe two dashboards
+sidejot/sidejot,cursor,d44e25404bc23bdd9751607e41e4a30f31dbbfed,2024-11-07,2024-11,.cursorrules,cursor_related_path,high,init
+silvonli/Summa,cursor,26b393bac09b192a7cb7995f81e31f0f54e993fc,2024-11-25,2024-11,.cursorrules,cursor_related_path,high,Change SummaInsights component
+siriwatknp/jun-mvp-starter,cursor,0c5c840521f98d41b50ad0dea4f23e2adeababbb,2025-03-12,2025-03,.cursor/rules/overall-rules.mdc;.cursor/rules/react.mdc,cursor_related_path,high,init project
+social-embed/social-embed,cursor,92677cb59259ae85ab37a31f2ca92e2f958f9ebd,2025-03-02,2025-03,.cursor/rules/dev-loop.mdc;.cursor/rules/git-commits.mdc;.cursor/rules/no-index-exports.mdc,cursor_related_path,high,config(docs[ai-rules]): Add project-specific AI assistant rules (#40)
+sopt-makers/makers-design-system,cursor,6063e587a6157111061ffc890fa07ee4c599cc84,2025-03-23,2025-03,.cursor/rules/rules.mdc,cursor_related_path,high,docs: cursor rule + vscode task 세팅 (#247)
+ssdeanx/deep-research-mcp-server,cursor,44687ebeb5daeae5c0f7e85a5d2fc098c13f4d76,2025-02-20,2025-02,.cursorrules,cursor_related_path,high,Fix Gemini response text extraction method
+sshh12/spark-stack,cursor,b8a98dd616340bfc3fdab725b2b1116bebcf9b0d,2024-11-09,2024-11,.cursorrules,cursor_related_path,high,tweaks
+stacksjs/dtsx,cursor,c9c4611a44cd1c51cd52c2458ef4895bf7bcf245,2025-02-19,2025-02,.cursor/rules/code-style.mdc;.cursor/rules/documentation.mdc;.cursor/rules/error-handling.mdc;.cursor/rules/key-conventions.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/readme.mdc;.cursor/rules/syntax-formatting.mdc;.cursor/rules/testing.mdc;.cursor/rules/typescript.mdc,cursor_related_path,high,chore: add stacks docs and cursor rules
+stacksjs/rpx,cursor,6b62c252cbac60c981cc3099fb24291e3486631d,2025-02-20,2025-02,.cursor/rules/code-style.mdc;.cursor/rules/documentation.mdc;.cursor/rules/error-handling.mdc;.cursor/rules/key-conventions.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/readme.mdc;.cursor/rules/syntax-formatting.mdc;.cursor/rules/testing.mdc;.cursor/rules/typescript.mdc,cursor_related_path,high,chore: add stacksjs/docs and cursor rules
+stacksjs/tlsx,cursor,19593a0c07e6cea212c6f12482ac470bee0f2656,2025-02-20,2025-02,.cursor/rules/code-style.mdc;.cursor/rules/documentation.mdc;.cursor/rules/error-handling.mdc;.cursor/rules/key-conventions.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/readme.mdc;.cursor/rules/syntax-formatting.mdc;.cursor/rules/testing.mdc;.cursor/rules/typescript.mdc,cursor_related_path,high,chore: minor updates
+stacksjs/ts-collect,cursor,c0fca1f51a02c09b6308693992855fbbfc120011,2025-02-20,2025-02,.cursor/rules/code-style.mdc;.cursor/rules/documentation.mdc;.cursor/rules/error-handling.mdc;.cursor/rules/key-conventions.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/readme.mdc;.cursor/rules/syntax-formatting.mdc;.cursor/rules/testing.mdc;.cursor/rules/typescript.mdc,cursor_related_path,high,chore: add cursor rules
+stacksjs/ts-spreadsheets,cursor,f05e52515291c2ceb87e44432900fc4458ffd2d2,2025-02-20,2025-02,.cursor/rules/code-style.mdc;.cursor/rules/documentation.mdc;.cursor/rules/error-handling.mdc;.cursor/rules/key-conventions.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/readme.mdc;.cursor/rules/syntax-formatting.mdc;.cursor/rules/testing.mdc;.cursor/rules/typescript.mdc,cursor_related_path,high,chore: add stacksjs/docs and cursor rules
+stacksjs/vite-plugin-local,cursor,b0b52fcd24a0ba099c66e068d29cf3fe3a132b81,2025-02-20,2025-02,.cursor/rules/code-style.mdc;.cursor/rules/documentation.mdc;.cursor/rules/error-handling.mdc;.cursor/rules/key-conventions.mdc;.cursor/rules/project-structure.mdc;.cursor/rules/readme.mdc;.cursor/rules/syntax-formatting.mdc;.cursor/rules/testing.mdc;.cursor/rules/typescript.mdc,cursor_related_path,high,chore: add stacksjs/docs and cursor rules
+stakefish/eth2-batch-deposit,cursor,0710f404f5ee89c8cfee5b539b33cb5b728ae9a5,2025-03-25,2025-03,.cursor/rules/implementation-plan.mdc,cursor_related_path,high,feat: convert project to use latest libraries and solutions
+stevesarmiento/solana-starter,cursor,00979f9dfd7350ad325f51dcc26b71e082ffa88e,2024-11-10,2024-11,.cursorrules,cursor_related_path,high,convert to shadcn
+storybookjs/storybook,cursor,b3feea60ea61d498ba2ec5923cdca6327d21161b,2025-03-24,2025-03,.cursor/rules/spy-mocking.mdc,cursor_related_path,high,Add spy mocking rules for Vitest tests
+sullyo/webapp-starter,cursor,aa74e097ac9653e2d9897f4092b8fe673b527585,2025-02-19,2025-02,.cursor/rules/api.mdc;.cursor/rules/web.mdc,cursor_related_path,high,cursor rules
+superglue-ai/superglue,cursor,166d582d16658f2a934f97feca1d1ba51a783d08,2025-02-24,2025-02,.cursor/rules/next-js.mdc,cursor_related_path,high,cursor rules
+supermemoryai/supermemory,cursor,47904011de646b92b1f3774f9a30bcfa118c5dc4,2025-01-20,2025-01,.cursorrules,cursor_related_path,high,Supermemory v2 Release 🚀
+sushaantu/boxento,cursor,e05b79c2c1b385b6218f296179418f8d5b79213b,2025-03-06,2025-03,.cursor/rules/component-patterns.mdc;.cursor/rules/package-management.mdc;.cursor/rules/styling-conventions.mdc;.cursor/rules/typescript-standards.mdc,cursor_related_path,high,Enhance TypeScript type safety and remove unused imports
+synatic/noql,cursor,024f5d73e87a605c7b4f579fdfc9f46f8eccc744,2024-09-11,2024-09,.cursorrules,cursor_related_path,high,Squashed commit of the following:
+tact-lang/tact-template,cursor,6de0bb1918077f3366977d14f3b0554b7ea82fb6,2025-01-16,2025-01,.cursorrules,cursor_related_path,high,feat: add promt files for Cursor and Windsurf (#42)
+taishikato/supavec,cursor,df1128c7d4f1c4d5f871fde1995f0cd870416336,2025-02-24,2025-02,.cursor/mcp-sample.json,cursor_related_path,high,Add Cursor MCP configuration and update .gitignore
+teamreflex/cosmo-web,cursor,40dac8c853fd6351b6d76dfeae42a017e2e0d5d2,2025-02-27,2025-02,.cursor/rules/database.mdc;.cursor/rules/frontend.mdc,cursor_related_path,high,setup cursor rules
+techblitzdev/TechBlitz,cursor,8401e98a8e117d4ffd1efe50053695e593b94393,2024-12-19,2024-12,.cursorrules,cursor_related_path,high,fix(marketing): mobile menu changes (responsive issues)
+tegnike/aituber-kit,cursor,b05d0ab86e4b133867370fdc40215d7696079cc8,2025-01-23,2025-01,.cursorrules,cursor_related_path,high,保持するメッセージ数を指定できるようにする
+thedaviddias/llms-txt-hub,cursor,001a864c4c45949561183544e4e44607807f0e7a,2025-02-20,2025-02,.cursor/rules/design-system.mdc;.cursor/rules/functions.mdc;.cursor/rules/git.mdc;.cursor/rules/jsdoc-comments.mdc;.cursor/rules/nextjs.mdc;.cursor/rules/rules.mdc;.cursor/rules/shared.mdc;.cursor/rules/website.mdc;.cursorrules,cursor_related_path,high,chore: first commit
+thelastbackspace/traceperf,cursor,4d88b245d1797fd5be3f79d8854505bb4b101464,2025-03-15,2025-03,.cursor/rules/custom-rule.mdc,cursor_related_path,high,"Add browser support, CI/CD workflow, and basic tests"
+thorski1/LouMinouS,cursor,17b21776891038c753d96116dcaa89a2535adb01,2024-12-05,2024-12,.cursorrules,cursor_related_path,high,feat: initial commit
+thrashr888/terraform-mcp-server,cursor,e60838bb354abc8189f92e0efcef2791c83052b8,2025-02-27,2025-02,.cursorrules,cursor_related_path,high,Release v0.9.3: Fixed mock implementation and TypeScript types
+tinybirdco/logs-explorer-template,cursor,9a2c3e60b51a4ebeeb2d88a51ebdddbffc3a8c25,2025-02-04,2025-02,tinybird/.cursorrules,cursor_related_path,high,add tinybird
+tkellogg/target-practice,cursor,4e2b4729c3f13012e5e70eeb39f8d9d130acc21d,2025-01-09,2025-01,.cursorrules,cursor_related_path,high,Initial Commit
+tkt-actions/add-issue-links,cursor,22fbb5f66556e9b5f236b50f3e55342f94afd5a0,2025-03-30,2025-03,.cursor/rules/general-rule.mdc;.cursor/rules/investigation-rule.mdc,cursor_related_path,high,chore: cursor rules
+towns-protocol/towns,cursor,fe85f37373e2fb17c85ca1bf5fdfdb7f3e40b182,2025-01-12,2025-01,core/.cursorrules,cursor_related_path,high,Add initial .cursorrules file to define project structure and guidelines (#2027)
+transitive-bullshit/severance-wellness-memes,cursor,34bf4d7b7acc28410fe218438575c249b0ae79d1,2025-03-01,2025-03,.cursor/rules/general.mdc,cursor_related_path,high,👎
+transloadit/node-sdk,cursor,e272d0b5bde11daacc62576bf9e60fe8c3b1fd54,2024-12-09,2024-12,.cursorrules,cursor_related_path,high,Sync alphalib
+triggerdotdev/trigger.dev,cursor,70ff5de7b9730fcda1cbd7f33d0df80aca510e76,2025-03-10,2025-03,.cursor/rules/executing-commands.mdc;.cursor/rules/repo.mdc;.cursor/rules/webapp.mdc;.cursorignore,cursor_related_path,high,WIP
+trycompai/comp,cursor,6d09ffa2952a9be89f6046f9cf01c0dda93d8c1a,2025-01-15,2025-01,.cursorrules,cursor_related_path,high,feat: moved github repo
+tryethernal/ethernal,cursor,3ce6f1977c6969a3a4c9eda0a61be090c43f82bb,2025-03-09,2025-03,.cursorrules,cursor_related_path,high,cursor rules
+tunctn/express-next-turborepo-boilerplate,cursor,bd185306d01a1147b32885cbae65c0308f7ed8ad,2025-03-02,2025-03,.cursor/rules/nextjs.mdc,cursor_related_path,high,bump everything
+turbostarter/extro,cursor,7b75c89243a02a894e733dfb795cecfa89385d30,2024-11-02,2024-11,.cursorrules,cursor_related_path,high,chore: cursor rules
+twentyhq/twenty,cursor,09cdfaa25416511614365515be40d2daf2bd4f67,2024-12-31,2024-12,.cursorrules,cursor_related_path,high,Add cursor rules (#9268)
+typefully/minimal-twitter,cursor,9e6cd94020428d0794e82e7b371ab8fc1d07db2d,2025-01-30,2025-01,.cursor/rules/features.mdc,cursor_related_path,high,Add custom Cursor rules
+udecode/plate,cursor,bc811930c2e618bb30f8c209a5e840bd39e2d6d0,2024-08-27,2024-08,.cursorrules,cursor_related_path,high,✨
+umijs/tnf,cursor,81cd57acb2de2d61cea764b9ad0790b6668c3746,2024-12-03,2024-12,.cursorrules,cursor_related_path,high,chore: add .cursorrules and test cases
+umussetu/marble-stack,cursor,9cc5af94eb67a901c08c2cacbfb54a37210f7455,2025-03-04,2025-03,.cursorrules,cursor_related_path,high,added cursorrules
+un/1up,cursor,073cacc213981f5f4351172a17e7466931f0dda0,2025-03-18,2025-03,.cursor/rules/1up-cursor-rules.mdc,cursor_related_path,high,add cursor rules
+undb-io/undb,cursor,ba183e7ef07de4b5f8592d69adbeff843a3c3680,2025-03-07,2025-03,.cursor/mcp.json,cursor_related_path,high,chore: add cursor mcp.json
+unmonk/chainlink,cursor,2e13ee5bbec7a7fec4057dde752dcb4fb5662ab2,2024-09-18,2024-09,.cursorrules,cursor_related_path,high,"stats, leaderboards, profile updates"
+unsend-dev/unsend,cursor,403ad8b93e041f8d413f21046fc1d167f165f0d5,2025-03-22,2025-03,.cursorrules,cursor_related_path,high,add stripe (#121)
+vadxq/nextjs-ai-starter,cursor,8f8a6641b9c207bf3e4132a6dc2f8300df8658d0,2025-03-07,2025-03,.cursorrules,cursor_related_path,high,feat: fix type error
+veloplanner/map-matrix,cursor,cbe467d26be639bbf89d106d7e7a516588e2be19,2024-11-18,2024-11,.cursorrules,cursor_related_path,high,Create CustomSourcesDialog [AI done good job]
+vpavlenko/web-2024-template,cursor,19bca8bc91f90afb6db82a82b0c2e8d70cc1468f,2024-10-03,2024-10,.cursorrules,cursor_related_path,high,add .cursorrules
+vulhub/vulhub-org,cursor,de06bf17d8cd7385cffa7a27fddcaa548357d25f,2025-03-12,2025-03,.cursor/rules/main.mdc,cursor_related_path,high,Add package-lock.json and update package.json with new dependencies
+waqarkalim/holiday-optimizer,cursor,dcc8643e5840c2a2ef39888579f465fc7e80b857,2025-02-28,2025-02,.cursor/rules/frontend-testing.mdc;.cursor/rules/main.mdc,cursor_related_path,high,Add comprehensive frontend testing best practices documentation
+wardbox/roke,cursor,128ca70ae123331b0a10a4b048d6a43cffceab1a,2024-11-14,2024-11,.cursorrules,cursor_related_path,high,Init (#1)
+warmachine028/memories,cursor,a0456194f9739a3ea146f322a1f2554f72da689e,2024-10-14,2024-10,.cursorrules,cursor_related_path,high,feat: cursorrules file
+wasp-lang/cursor-template,cursor,444895bf9446f808a0cacffe847cd8e55e9cae8d,2024-12-04,2024-12,.cursorrules,cursor_related_path,high,add template
+waynesutton/promptstack,cursor,2df9e20ee4fafaf4edbb70ae6155f508a8976f0e,2025-01-29,2025-01,.cursor/rules/.cursorrules,cursor_related_path,high,initial commit
+webdevcody/survive-the-night-game,cursor,86613d91e55ad10c876e9a4fd939453ca95e5788,2025-01-25,2025-01,.cursorrules,cursor_related_path,high,adding client side culling to improve FPS on slower machines
+webdevcody/tanstack-course-platform,cursor,6ca1037664a3656e3dfaebebaa24e32e2c380302,2025-03-21,2025-03,.cursor/rules/my-code-rules.md,cursor_related_path,high,vibe coding bruh
+wesleyel/cloudmark,cursor,c25f23d85fb7339098aae6d4938ddce7eec658ff,2025-02-25,2025-02,.cursorrules,cursor_related_path,high,Add Framer Motion and enhance homepage with animated design
+wham/kaja,cursor,1a02d694ff6af8cd486a3e4a5dffcd3268492be7,2025-03-06,2025-03,.cursor/rules/general.mdc,cursor_related_path,high,Ability to run multiple projects (#84)
+wosherco/bashbuddy,cursor,4908210c9baabd1e6f79ba3a85457be5eb64ffd8,2025-03-03,2025-03,.cursorrules,cursor_related_path,high,Initial Commit
+xingBaGan/atujii,cursor,aac33ab9f1a4cc55172ab959fab286069f638fda,2025-01-13,2025-01,.cursor,cursor_related_path,high,- Modified Vite configuration to set a consistent base path.
+xlnfinance/xln,cursor,44d115d5478dcaa54fae90b7fb36eabde63f9e8a,2025-02-18,2025-02,.cursorignore,cursor_related_path,high,Fixed server tests and merkle root handling in runSelfTest
+yamadashy/repomix,cursor,389ed95c22a5f10ae29366c5a496c8739cacee6c,2025-03-17,2025-03,.cursorrules,cursor_related_path,high,chore: Add .cursorrules
+yavuzyalcintas/cursornew,cursor,e1cd795fbc5c7b9b4ec441236af2ac39e4ffca2e,2025-01-17,2025-01,.cursorrules,cursor_related_path,high,Initial commit
+yayxs/ai-coding,cursor,140912324e7142dbc891e020e844dd2510af37f4,2025-01-14,2025-01,.cursorrules,cursor_related_path,high,feat: 优化项目结构和UI组件
+yctimlin/mcp_excalidraw,cursor,c0ac378695a122576ae67e021a8e91d68f207bbb,2025-03-17,2025-03,.cursor/mcp.json.example,cursor_related_path,high,"Add .excalidraw to .gitignore, enhance README.md with Cursor integration instructions, and add mcp.json.example for configuration"
+yuiseki/TRIDENT,cursor,0420346f907cc11aa734c127dd7e93788596bfdf,2024-12-06,2024-12,.cursorignore,cursor_related_path,high,chore: add .cursorignore to exclude JSON files from indexing
+zkSoju/frame,cursor,9df674fea006647759bb0810e640bbbd7d820bde,2025-01-19,2025-01,.cursorrules,cursor_related_path,high,Upgrade frame to support cursorrules and dynamic + other frameworks
+zueai/mcp-manager,cursor,6bb86be934843d21002e5916dcd21305a1571ed3,2024-12-08,2024-12,.cursorrules,cursor_related_path,high,first commit
+zzfn/zzf,cursor,604093328a9e10fdbc269dcc06a679084d8f779d,2025-01-24,2025-01,.cursorrules,cursor_related_path,high,chore: remove cursorrules file and update dependencies

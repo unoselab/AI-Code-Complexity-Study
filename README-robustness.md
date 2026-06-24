@@ -199,3 +199,63 @@ So the immediate action is:
 ```bash
 MAX_CLONES=0 bash run7c-clone-ai-adoption-repo.sh
 ```
+
+---
+---
+---
+---
+---
+---
+---
+
+# June 24
+
+```
+run7a-count-repo.sh
+  Step 1. Count and prepare the JS/TS treatment candidate pool.
+  Output: original_paper_treatment_jsts_repos.csv
+
+run7b-detect-ai-adoption-repo.sh
+  Step 2. Core engine script.
+  It can detect/filter candidates and perform clone/check logic.
+  In this pipeline, it is usually called by wrapper scripts, not manually.
+
+run7c1-clone-ai-adoption-repo.sh
+  Step 3. Clone the JS/TS treatment candidate repositories.
+  Input: original_paper_treatment_jsts_repos.csv
+  Output: jsts_treatment_clone_status.csv
+
+run7c2-create-clone-usable-repos.sh
+  Step 4. Create a usable cloned repo list and attach event metadata.
+  Input: jsts_treatment_clone_status.csv + panel_event_monthly.csv
+  Output: jsts_treatment_clone_usable_repos_with_event.csv
+
+run7c3-split-valid-event-repos.sh
+  Step 5. Split usable repos into valid-event and missing-event files.
+  Input: jsts_treatment_clone_usable_repos_with_event.csv
+  Output:
+    jsts_treatment_clone_usable_repos_with_event_valid.csv
+    jsts_treatment_clone_usable_missing_event_month.csv
+
+run7d-analyze-ai-adoption-repo.sh
+  Step 6. Analyze git history for valid cloned treatment repos.
+  Input should now be:
+    jsts_treatment_clone_usable_repos_with_event_valid.csv
+```
+
+```
+run7c1 = clone
+run7c2 = attach event metadata
+run7c3 = split valid vs missing event metadata
+```
+
+```
+run7d1-analyze-ai-adoption-repo.sh
+  Step 0. Decide which repo input file to use
+  Step 0b. Validate the repo input file
+  Step 1. Run git-history analysis
+  Step 2. Compare event_month vs git-detected adoption_month
+  Step 3. Print generated output files
+```
+
+
