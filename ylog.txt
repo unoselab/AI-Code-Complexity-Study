@@ -1,167 +1,62 @@
-Panel file: data_baseline_backup/panel_event_monthly.csv
-Repos file: data_baseline_backup/repos.csv
-panel rows: 22096
-repos rows: 8621
+File: tmp_jsts_test/data/jsts_did_test/adoption_month_check.csv
+Rows: 398
 
-dataset_source counts:
-dataset_source
-control      12203
-treatment     9893
+Match status counts:
+match_status
+matched                   381
+mismatched                 13
+missing_adoption_month      4
 
-unique treatment repos from panel: 858
-repos after metadata join: 858
-missing primary language: 24
+Event/adoption month matched: 381
+Detected adoption month: 394
+Missing adoption month: 4
 
-Primary language counts among treatment repos:
-repo_primary_language
-TypeScript          379
-Python              128
-JavaScript           62
-Go                   36
-(missing)            24
-Rust                 24
-PHP                  23
-Vue                  16
-HTML                 16
-C#                   13
-Jupyter Notebook     13
-Dart                 12
-Swift                11
-C++                  11
-Shell                11
-Ruby                 10
-Elixir                8
-Svelte                7
-CSS                   7
-MDX                   6
-Astro                 5
-Java                  5
-C                     4
-Solidity              4
-Lua                   4
-Kotlin                3
-OCaml                 2
-HCL                   1
-Liquid                1
-Mathematica           1
+Month difference counts:
+month_difference
+-7.0       1
+-5.0       1
+-4.0       1
+-3.0       1
+-1.0       7
+ 0.0     381
+ 9.0       1
+ 14.0      1
+ NaN       4
 
-Selected languages: TypeScript, JavaScript
-Group name: JavaScript_TypeScript
-JavaScript_TypeScript treatment repos: 441
-Unique repos: 441
+Language counts by match status:
+match_status           matched  mismatched  missing_adoption_month
+repo_primary_language                                             
+JavaScript                  53           3                       0
+TypeScript                 328          10                       4
+8488 tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
+66440 tmp_jsts_test/data/jsts_did_test/ts_contributors_monthly.csv
+3959 tmp_jsts_test/data/jsts_did_test/cursor_commits.csv
+395 tmp_jsts_test/data/jsts_did_test/ai_adoption_dates.csv
+399 tmp_jsts_test/data/jsts_did_test/adoption_month_check.csv
+Missing adoption-month repos: 4
 
-Saved language subset: tmp_jsts_test/data/original_paper_treatment_jsts_repos.csv
+                     repo_name repo_primary_language event_month adoption_month           match_status                                                                                                            target_dir
+            nuotsu/sanitypress            TypeScript     2025-03            NaN missing_adoption_month             /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/nuotsu_sanitypress
+                    one-ie/one            TypeScript     2025-02            NaN missing_adoption_month                     /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/one-ie_one
+piotrkulpinski/openalternative            TypeScript     2024-11            NaN missing_adoption_month /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/piotrkulpinski_openalternative
+           rivet-gg/actor-core            TypeScript     2025-03            NaN missing_adoption_month            /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/rivet-gg_actor-core
 
-Top 30 JavaScript_TypeScript repos:
-                                 repo_name repo_primary_language repo_stars repo_commits repo_contributors repo_size
-                      0xAquaWolf/portfolio            TypeScript         60        161.0               1.0   26580.0
-                             0xfrankz/Kaas            TypeScript         69        492.0               1.0   13872.0
-                            0xsend/sendapp            TypeScript         24       1670.0              15.0   21291.0
-                   AIDC-AI/ComfyUI-Copilot            TypeScript       1215        177.0               9.0   39404.0
-               AdirD/nestjs-context-logger            TypeScript         32         57.0               2.0     183.0
-                      AlbertoBasalo/ng-lab            TypeScript         28        345.0               1.0    6621.0
-                        Alezander9/WiiWork            TypeScript         10         50.0               1.0    1251.0
-                     AnEntrypoint/apptoapp            JavaScript         18        628.0               2.0     700.0
-                   Ashref-dev/entretien-ai            TypeScript         43        292.0               3.0    9576.0
-             AudiusProject/audius-protocol            TypeScript        577      15427.0              43.0  738514.0
-                     Automattic/wp-calypso            TypeScript      12469      74301.0             354.0  911263.0
-                        Bistutu/FluentRead            TypeScript       2307        368.0               4.0   18126.0
-      CodeGuide-dev/codeguide-starter-lite            TypeScript        318         12.0               1.0     221.0
-                Comfy-Org/ComfyUI_frontend            TypeScript        959       2237.0              59.0  140584.0
-                         Comfy-Org/desktop            TypeScript       1330        846.0              11.0   25474.0
-                    Comfy-Org/litegraph.js            TypeScript        151       1528.0              74.0   31753.0
-                      Coyenn/personal-site            TypeScript         12         92.0               1.0   81449.0
-               Cunninger/grok-remain-count            JavaScript         18         20.0               3.0      99.0
-                  Dankovk/browser-use-node            TypeScript         48         56.0               1.0    4452.0
-                        Darlley/saas-admin            TypeScript         10        109.0               1.0   24643.0
-                       David-Sola/AIGaming            JavaScript         64          6.0               1.0   27562.0
-         Dhravya/mcp-durable-object-client            TypeScript         52          4.0               1.0     226.0
-           DiscourseGraphs/discourse-graph            TypeScript         11        745.0               5.0   30704.0
-                       DumbWareio/DumbDrop            JavaScript        271         89.0               8.0     357.0
-                        DumbWareio/DumbPad            JavaScript        172        116.0               5.0     269.0
-                       Dwtexe/cursor-stats            TypeScript         57         51.0               4.0   16847.0
-                    EugenEistrach/et-stack            TypeScript         16        207.0               2.0    2211.0
-                      FradSer/qa-generator            TypeScript         51         34.0               1.0     327.0
-FurkanKayaDev/react-native-spotlight-guide            TypeScript         12         10.0               1.0    9339.0
-                       GODrums/BetterFloat            TypeScript         55        757.0               9.0    8336.0
+Saved: tmp_jsts_test/data/jsts_did_test/missing_adoption_month_repos.csv
+Mismatched repos: 13
 
-============================================================
-Event-window coverage among selected language-group repos
-============================================================
-Duplicated repo-month rows collapsed: 51
-All JavaScript_TypeScript treatment repos with window summary: 418
-Unique repos: 418
+                         repo_name repo_primary_language event_month adoption_month  month_difference confidence                                                                                                 evidence_paths
+               Malte2036/thw-tools            TypeScript     2025-03        2025-02              -1.0       high apps/backend/.cursor/rules/migrate-from-mongodb-to-postgressql.mdc;apps/backend/.cursor/rules/nestjs-basic.mdc
+           Openpanel-dev/openpanel            TypeScript     2025-03        2024-11              -4.0       high                                                                      apps/public/content/articles/.cursorrules
+    alexander-turner/TurnTrout.com            TypeScript     2025-02        2025-11               9.0       high                                                                                                   .cursorrules
+                 efdevcon/monorepo            TypeScript     2025-02        2024-09              -5.0       high                                                                                        devcon-api/.cursorrules
+           eser/deno-next-showcase            TypeScript     2024-10        2024-09              -1.0       high                                                                                                   .cursorrules
+                     mantou132/gem            TypeScript     2025-03        2025-02              -1.0       high                                                   .cursor/rules/gem-rule.mdc;.cursor/rules/typescript-rule.mdc
+               metriport/metriport            JavaScript     2024-11        2024-10              -1.0       high                                                                                     .cursorignore;.cursorrules
+              namesakefyi/namesake            TypeScript     2025-01        2026-03              14.0       high                                                                                          .cursor/settings.json
+          owengretzinger/gitreadme            TypeScript     2025-03        2025-02              -1.0       high                                                                                       .cursor/rules/shadcn.mdc
+                 pnd280/complexity            TypeScript     2024-11        2024-10              -1.0       high                                                                                                  .cursorignore
+         pollinations/pollinations            JavaScript     2025-04        2024-09              -7.0       high                                                                                               app/.cursorrules
+richardadonnell/Upwork-Job-Scraper            JavaScript     2024-12        2024-09              -3.0       high                                                                               upwork-job-scraper/.cursorignore
+              towns-protocol/towns            TypeScript     2025-02        2025-01              -1.0       high                                                                                              core/.cursorrules
 
-Primary language counts in window-summary subset:
-repo_primary_language
-TypeScript    360
-JavaScript     58
-
-balanced_window counts:
-balanced_window
-0    172
-1     43
-2     11
-3     27
-4     23
-5     50
-6     43
-7     21
-8     16
-9     12
-
-balanced_window >= 3: 192
-balanced_window >= 4: 165
-balanced_window >= 5: 142
-balanced_window >= 6: 92
-balanced_window >= 7: 49
-balanced_window >= 8: 28
-balanced_window >= 9: 12
-
-Good-window JavaScript_TypeScript repos, balanced_window >= 6: 92
-Unique good-window repos: 92
-
-Event month counts for balanced_window >= 6:
-event_month
-2024-08     5
-2024-09     9
-2024-10     6
-2024-11    11
-2024-12    12
-2025-01    16
-2025-02    33
-
-Saved good-window subset: tmp_jsts_test/data/original_paper_treatment_jsts_repos_bw6.csv
-
-Top 30 good-window JavaScript_TypeScript repos:
-                                 repo_name event_month  pre_panel_months  post_panel_months  balanced_window repo_primary_language repo_stars repo_commits repo_contributors
-          GorvGoyl/Personal-Site-Gourav.io     2024-11                10                  9                9            TypeScript        129        581.0               7.0
-                     balancer/pool-creator     2024-10                 9                 10                9            TypeScript         11        632.0              49.0
-               different-ai/note-companion     2024-10                 9                 10                9            TypeScript        601       1940.0              12.0
-                     haqq-network/frontend     2024-11                10                  9                9            TypeScript         44       3225.0              11.0
-                konturio/disaster-ninja-fe     2024-10                 9                 10                9            TypeScript         22       1880.0              26.0
-                       metriport/metriport     2024-11                10                  9                9            JavaScript        566      12736.0              16.0
-                        ohcnetwork/care_fe     2024-10                 9                 10                9            TypeScript        444       8016.0             249.0
-                         owid/owid-grapher     2024-11                10                  9                9            TypeScript       1435      19607.0              46.0
-                     pockethost/pockethost     2024-11                10                  9                9            JavaScript       1202       1554.0              21.0
-                            refly-ai/refly     2024-11                 9                  9                9            TypeScript       3249       4227.0               7.0
-reliverse/cli-ai-app-site-anything-builder     2024-11                10                  9                9            TypeScript        113        135.0               1.0
-                    warmachine028/memories     2024-10                 9                 10                9            JavaScript         53       1247.0              29.0
-                           MultiQC/MultiQC     2024-12                11                  8                8            JavaScript       1282       6744.0             234.0
-                     RiverTwilight/Geekits     2024-11                10                  8                8            TypeScript        325        828.0              10.0
-                               Shopify/cli     2024-09                 8                 11                8            TypeScript        487      16985.0             228.0
-                  deeeed/expo-audio-stream     2024-12                 8                  8                8            TypeScript         85        499.0               4.0
-                        elie222/inbox-zero     2024-09                 8                 11                8            TypeScript       3749       4122.0              20.0
-              imrishit98/rp-nextjs-starter     2024-09                 8                 10                8            JavaScript         10        396.0               3.0
-                     jhonsfran1165/unprice     2024-09                 8                 11                8            TypeScript         29        876.0               4.0
-                            kern/filepizza     2024-12                11                  8                8            TypeScript       8139        343.0              23.0
-                           konecty/Konecty     2024-12                11                  8                8            JavaScript         19        897.0              14.0
-                melissamcewen/CurlsBotSite     2024-12                11                  8                8            TypeScript         18        441.0               1.0
-           rohenaz/allaboard-bitchat-nitro     2024-12                11                  8                8            TypeScript         10        153.0               2.0
-                        shakee93/rapidload     2024-09                 8                 11                8            TypeScript         20       6793.0               4.0
-                              synatic/noql     2024-09                 8                  9                8            JavaScript         50        752.0               9.0
-                      transloadit/node-sdk     2024-12                11                  8                8            TypeScript         63        713.0              18.0
-                           twentyhq/twenty     2024-12                11                  8                8            TypeScript      27364       6109.0             420.0
-                          unmonk/chainlink     2024-09                 8                 10                8            TypeScript         13        333.0               1.0
-                        Bistutu/FluentRead     2025-01                12                  7                7            TypeScript       2307        368.0               4.0
-                Comfy-Org/ComfyUI_frontend     2025-01                12                  7                7            TypeScript        959       2237.0              59.0
+Saved: tmp_jsts_test/data/jsts_did_test/mismatched_adoption_month_repos.csv
