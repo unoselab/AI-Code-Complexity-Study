@@ -1,0 +1,11 @@
+repo_name,status,target_dir,note
+0xAquaWolf/portfolio,failed,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xAquaWolf_portfolio,Cloning into '/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xAquaWolf_portfolio'... remote: Repository not found. fatal: repository 'https://github.com/0xAquaWolf/portfolio.git/' not found
+0xfrankz/Kaas,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xfrankz_Kaas,already_has_git_dir
+0xsend/sendapp,failed,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xsend_sendapp,Cloning into '/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xsend_sendapp'... remote: Repository not found. fatal: repository 'https://github.com/0xsend/sendapp.git/' not found
+AIDC-AI/ComfyUI-Copilot,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AIDC-AI_ComfyUI-Copilot,already_has_git_dir
+AdirD/nestjs-context-logger,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AdirD_nestjs-context-logger,already_has_git_dir
+AlbertoBasalo/ng-lab,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AlbertoBasalo_ng-lab,already_has_git_dir
+Alezander9/WiiWork,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Alezander9_WiiWork,already_has_git_dir
+AnEntrypoint/apptoapp,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AnEntrypoint_apptoapp,already_has_git_dir
+Ashref-dev/entretien-ai,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Ashref-dev_entretien-ai,already_has_git_dir
+AudiusProject/audius-protocol,skipped_existing,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AudiusProject_audius-protocol,already_has_git_dir

@@ -1,0 +1,9 @@
+repo_name,adoption_tool,adoption_commit,adoption_date,adoption_month,evidence_paths,evidence_type,confidence,message
+0xfrankz/Kaas,cursor,96418ef0c037125cf7562be15a9a2a78ab6e53e9,2024-08-28,2024-08,.cursorignore,cursor_related_path,high,chore: added .cursorignore
+AIDC-AI/ComfyUI-Copilot,cursor,b050a0226210a38f0a91c8ce9acf00d3bd2d1271,2025-01-19,2025-01,.cursorignore,cursor_related_path,high,initial commit
+AdirD/nestjs-context-logger,cursor,f7c9b2b08d371bdd7db4c6fcac436188cfa61795,2025-03-04,2025-03,.cursor/rules/create-pr.mdc,cursor_related_path,high,docs: add cursor rules and pr template
+AlbertoBasalo/ng-lab,cursor,3087f2be1d29bef6016e87dde51b1253d3a6b1d5,2024-10-15,2024-10,.cursorrules,cursor_related_path,high,feat: update docs 1 and 2 up to v18
+Alezander9/WiiWork,cursor,dc246fb5230b5dd4a91aee557334964c83c574c5,2025-02-15,2025-02,.cursor/rules/claude-cursor-rules.mdc,cursor_related_path,high,feat: create llm factory for api calls and chat completions
+AnEntrypoint/apptoapp,cursor,30a8534a7db925b61e1c86142bcb64b997c0c5c7,2025-02-13,2025-02,.cursor/rules,cursor_related_path,high,xml version
+Ashref-dev/entretien-ai,cursor,615c2424d11691ab291153c168ae4304040744e8,2024-12-01,2024-12,.cursorrules,cursor_related_path,high,Added a new component to test
+AudiusProject/audius-protocol,cursor,7fdeaddd7fcffff822dd65fcfac5099885f51673,2025-02-26,2025-02,.cursor/rules/challenges.mdc,cursor_related_path,high,Add cursor project rule for challenges (#11474)

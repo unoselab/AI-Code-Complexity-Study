@@ -1,0 +1,11 @@
+repo_name,status,target_dir,note
+0xAquaWolf/portfolio,failed,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xAquaWolf_portfolio,Cloning into '/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xAquaWolf_portfolio'... remote: Repository not found. fatal: repository 'https://github.com/0xAquaWolf/portfolio.git/' not found
+0xfrankz/Kaas,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xfrankz_Kaas,ok
+0xsend/sendapp,failed,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xsend_sendapp,Cloning into '/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xsend_sendapp'... remote: Repository not found. fatal: repository 'https://github.com/0xsend/sendapp.git/' not found
+AIDC-AI/ComfyUI-Copilot,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AIDC-AI_ComfyUI-Copilot,ok
+AdirD/nestjs-context-logger,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AdirD_nestjs-context-logger,ok
+AlbertoBasalo/ng-lab,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AlbertoBasalo_ng-lab,ok
+Alezander9/WiiWork,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Alezander9_WiiWork,ok
+AnEntrypoint/apptoapp,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AnEntrypoint_apptoapp,ok
+Ashref-dev/entretien-ai,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Ashref-dev_entretien-ai,ok
+AudiusProject/audius-protocol,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/AudiusProject_audius-protocol,ok
