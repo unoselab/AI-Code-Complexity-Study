@@ -1,0 +1,11 @@
+repo_name,status,target_dir,note
+3loop/loop-decoder,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/3loop_loop-decoder,ok
+59de44955ebd/twitter-to-bsky,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/59de44955ebd_twitter-to-bsky,ok
+9d8dev/pay,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/9d8dev_pay,ok
+AUBGTheHUB/monolith,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/AUBGTheHUB_monolith,ok
+Abstract-Foundation/create-abstract-app-template,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/Abstract-Foundation_create-abstract-app-template,ok
+Adamant-im/developers,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/Adamant-im_developers,ok
+Adarshjain3011/Imaginify,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/Adarshjain3011_Imaginify,ok
+AdguardTeam/FiltersDownloader,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/AdguardTeam_FiltersDownloader,ok
+AdrenaFoundation/frontend,failed,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/AdrenaFoundation_frontend,Cloning into '/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/AdrenaFoundation_frontend'... remote: Repository not found. fatal: repository 'https://github.com/AdrenaFoundation/frontend.git/' not found
+AgentCoord/AgentCoord,cloned,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/AgentCoord_AgentCoord,ok

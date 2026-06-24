@@ -1,0 +1,356 @@
+#!/usr/bin/env python3
+"""
+Extract matched control repositories for the JS/TS treatment sample.
+
+This script does not rerun BigQuery or matching.
+It uses an existing original matching file and extracts matched controls
+corresponding to the current JS/TS treatment sample.
+
+Inputs:
+  --treatment-sample-file
+    Current JS/TS treatment sample, e.g.
+    tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
+
+  --matching-file
+    Existing original matching file, e.g.
+    data_baseline_backup/matching.csv
+
+Outputs:
+  --pair-output-file
+    Long treatment-control pair file.
+
+  --control-clone-file
+    Unique control repo clone list with repo_name column.
+
+  --missing-match-file
+    Treatment repos missing matching rows.
+
+  --summary-file
+    One-row-per-metric extraction summary.
+"""
+
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+import pandas as pd
+
+
+CONTROL_COLUMNS = ["matched_control_1", "matched_control_2", "matched_control_3"]
+
+TREATMENT_METADATA_COLUMNS = [
+    "repo_primary_language",
+    "event_month",
+    "adoption_month",
+    "match_status",
+    "month_difference",
+    "target_dir",
+]
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Extract matched controls for JS/TS treatment repositories."
+    )
+
+    parser.add_argument(
+        "--treatment-sample-file",
+        type=Path,
+        required=True,
+        help="CSV file containing the current JS/TS treatment sample.",
+    )
+    parser.add_argument(
+        "--matching-file",
+        type=Path,
+        required=True,
+        help="Original matching CSV containing matched_control_1/2/3 columns.",
+    )
+    parser.add_argument(
+        "--pair-output-file",
+        type=Path,
+        required=True,
+        help="Output CSV for long treatment-control matched pairs.",
+    )
+    parser.add_argument(
+        "--control-clone-file",
+        type=Path,
+        required=True,
+        help="Output CSV for unique control repositories to clone.",
+    )
+    parser.add_argument(
+        "--missing-match-file",
+        type=Path,
+        required=True,
+        help="Output CSV for treatment repos without matching rows.",
+    )
+    parser.add_argument(
+        "--summary-file",
+        type=Path,
+        required=True,
+        help="Output CSV containing extraction summary metrics.",
+    )
+    parser.add_argument(
+        "--top-print",
+        type=int,
+        default=30,
+        help="Number of pair rows to print for quick inspection.",
+    )
+
+    return parser.parse_args()
+
+
+def require_file(path: Path, label: str) -> None:
+    if not path.exists():
+        raise SystemExit(f"ERROR: {label} not found: {path}")
+
+
+def require_columns(df: pd.DataFrame, required: set[str], label: str) -> None:
+    missing = required - set(df.columns)
+    if missing:
+        raise SystemExit(
+            f"ERROR: {label} missing columns: {sorted(missing)}. "
+            f"Available columns: {list(df.columns)}"
+        )
+
+
+def normalize_repo_series(series: pd.Series) -> pd.Series:
+    return series.astype(str).str.strip()
+
+
+def load_inputs(treatment_path: Path, matching_path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    require_file(treatment_path, "treatment sample file")
+    require_file(matching_path, "matching file")
+
+    treat = pd.read_csv(treatment_path)
+    match = pd.read_csv(matching_path)
+
+    require_columns(treat, {"repo_name"}, "treatment sample")
+    require_columns(
+        match,
+        {"repo_name", *CONTROL_COLUMNS},
+        "matching file",
+    )
+
+    treat = treat.copy()
+    match = match.copy()
+
+    treat["repo_name"] = normalize_repo_series(treat["repo_name"])
+    match["repo_name"] = normalize_repo_series(match["repo_name"])
+
+    treat = treat[treat["repo_name"].ne("")]
+    match = match[match["repo_name"].ne("")]
+
+    treat = treat.drop_duplicates("repo_name", keep="first").copy()
+
+    return treat, match
+
+
+def subset_matching_rows(treat: pd.DataFrame, match: pd.DataFrame) -> pd.DataFrame:
+    treatment_repos = set(treat["repo_name"])
+
+    match_subset = match[match["repo_name"].isin(treatment_repos)].copy()
+
+    # If the matching file contains both treatment and control rows,
+    # keep treatment rows as the rows carrying matched_control_1/2/3.
+    if "group" in match_subset.columns:
+        treatment_like = match_subset[
+            match_subset["group"].astype(str).str.lower().eq("treatment")
+        ].copy()
+        if not treatment_like.empty:
+            match_subset = treatment_like
+
+    match_subset = match_subset.drop_duplicates("repo_name", keep="first").copy()
+
+    return match_subset
+
+
+def build_pairs(treat: pd.DataFrame, match_subset: pd.DataFrame) -> pd.DataFrame:
+    treat_lookup = treat.set_index("repo_name", drop=False)
+    pairs: list[dict] = []
+
+    for _, row in match_subset.iterrows():
+        treatment_repo = str(row["repo_name"]).strip()
+        if not treatment_repo:
+            continue
+
+        for rank, col in enumerate(CONTROL_COLUMNS, start=1):
+            control_repo = row.get(col)
+
+            if pd.isna(control_repo):
+                continue
+
+            control_repo = str(control_repo).strip()
+            if not control_repo:
+                continue
+
+            rec = {
+                "treatment_repo": treatment_repo,
+                "control_repo": control_repo,
+                "control_rank": rank,
+                "matched_period": row.get("matched_period"),
+                "matching_propensity_score": row.get("propensity_score"),
+            }
+
+            if treatment_repo in treat_lookup.index:
+                trow = treat_lookup.loc[treatment_repo]
+                for meta_col in TREATMENT_METADATA_COLUMNS:
+                    if meta_col in trow.index:
+                        rec[meta_col] = trow[meta_col]
+
+            pairs.append(rec)
+
+    pairs_df = pd.DataFrame(pairs)
+
+    if pairs_df.empty:
+        raise SystemExit("ERROR: no matched control pairs were extracted.")
+
+    return pairs_df
+
+
+def build_control_clone_list(pairs_df: pd.DataFrame) -> pd.DataFrame:
+    controls_df = (
+        pairs_df[["control_repo"]]
+        .drop_duplicates()
+        .rename(columns={"control_repo": "repo_name"})
+        .sort_values("repo_name")
+        .reset_index(drop=True)
+    )
+
+    return controls_df
+
+
+def save_outputs(
+    pairs_df: pd.DataFrame,
+    controls_df: pd.DataFrame,
+    missing_treatments: pd.DataFrame,
+    summary_df: pd.DataFrame,
+    pair_output_path: Path,
+    control_clone_path: Path,
+    missing_match_path: Path,
+    summary_path: Path,
+) -> None:
+    for path in [pair_output_path, control_clone_path, missing_match_path, summary_path]:
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+    pairs_df.to_csv(pair_output_path, index=False)
+    controls_df.to_csv(control_clone_path, index=False)
+    missing_treatments.to_csv(missing_match_path, index=False)
+    summary_df.to_csv(summary_path, index=False)
+
+
+def print_report(
+    treat: pd.DataFrame,
+    match_subset: pd.DataFrame,
+    missing_treatments: pd.DataFrame,
+    pairs_df: pd.DataFrame,
+    controls_df: pd.DataFrame,
+    leakage_df: pd.DataFrame,
+    pair_output_path: Path,
+    control_clone_path: Path,
+    missing_match_path: Path,
+    summary_path: Path,
+    top_print: int,
+) -> None:
+    print("Treatment sample rows:", len(treat))
+    print("Matching rows for treatment sample:", len(match_subset))
+    print("Treatments missing matching row:", len(missing_treatments))
+    print("Matched pair rows:", len(pairs_df))
+    print("Unique control repos:", controls_df["repo_name"].nunique())
+    print("Treatment-control leakage rows:", len(leakage_df))
+    print()
+
+    if "repo_primary_language" in pairs_df.columns:
+        print("Pair rows by treatment language:")
+        print(pairs_df["repo_primary_language"].fillna("(missing)").value_counts().to_string())
+        print()
+
+    print("Saved pair output:", pair_output_path)
+    print("Saved control clone list:", control_clone_path)
+    print("Saved missing match file:", missing_match_path)
+    print("Saved summary file:", summary_path)
+    print()
+
+    print(f"Top {top_print} matched pairs:")
+    print(pairs_df.head(top_print).to_string(index=False))
+
+    if not missing_treatments.empty:
+        print()
+        print("Missing treatment matches:")
+        cols = ["repo_name", "repo_primary_language", "event_month", "match_status"]
+        cols = [c for c in cols if c in missing_treatments.columns]
+        print(missing_treatments[cols].to_string(index=False))
+
+    if not leakage_df.empty:
+        print()
+        print("ERROR: treatment-control leakage detected.")
+        print(leakage_df.to_string(index=False))
+
+
+def main() -> None:
+    args = parse_args()
+
+    treatment_path = args.treatment_sample_file
+    matching_path = args.matching_file
+
+    pair_output_path = args.pair_output_file
+    control_clone_path = args.control_clone_file
+    missing_match_path = args.missing_match_file
+    summary_path = args.summary_file
+
+    treat, match = load_inputs(treatment_path, matching_path)
+
+    treatment_repos = set(treat["repo_name"])
+
+    match_subset = subset_matching_rows(treat, match)
+    matched_treatments = set(match_subset["repo_name"])
+
+    missing_treatments = treat[~treat["repo_name"].isin(matched_treatments)].copy()
+
+    pairs_df = build_pairs(treat, match_subset)
+    controls_df = build_control_clone_list(pairs_df)
+
+    leakage_df = controls_df[controls_df["repo_name"].isin(treatment_repos)].copy()
+
+    summary_df = pd.DataFrame(
+        [
+            {"metric": "treatment_sample_rows", "value": len(treat)},
+            {"metric": "matching_rows_for_treatment_sample", "value": len(match_subset)},
+            {"metric": "treatments_missing_matching_row", "value": len(missing_treatments)},
+            {"metric": "matched_pair_rows", "value": len(pairs_df)},
+            {"metric": "unique_control_repos", "value": controls_df["repo_name"].nunique()},
+            {"metric": "treatment_control_leakage_rows", "value": len(leakage_df)},
+        ]
+    )
+
+    save_outputs(
+        pairs_df=pairs_df,
+        controls_df=controls_df,
+        missing_treatments=missing_treatments,
+        summary_df=summary_df,
+        pair_output_path=pair_output_path,
+        control_clone_path=control_clone_path,
+        missing_match_path=missing_match_path,
+        summary_path=summary_path,
+    )
+
+    print_report(
+        treat=treat,
+        match_subset=match_subset,
+        missing_treatments=missing_treatments,
+        pairs_df=pairs_df,
+        controls_df=controls_df,
+        leakage_df=leakage_df,
+        pair_output_path=pair_output_path,
+        control_clone_path=control_clone_path,
+        missing_match_path=missing_match_path,
+        summary_path=summary_path,
+        top_print=args.top_print,
+    )
+
+    if not leakage_df.empty:
+        raise SystemExit(2)
+
+
+if __name__ == "__main__":
+    main()
