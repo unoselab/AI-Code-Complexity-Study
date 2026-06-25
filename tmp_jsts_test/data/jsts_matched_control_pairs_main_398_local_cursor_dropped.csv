@@ -1,0 +1,4 @@
+treatment_repo,control_repo,control_rank,matched_period,matching_propensity_score,repo_primary_language,event_month,adoption_month,match_status,month_difference,target_dir,overlap_current_treatment_sample,overlap_full_adopter_population
+KaizeNodeLabs/SafeSwap,reddit/devvit,3,202410,0.0168959797303928,TypeScript,2024-11,2024-11,matched,0.0,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/KaizeNodeLabs_SafeSwap,False,False
+webdevcody/survive-the-night-game,3loop/loop-decoder,3,202412,0.0428161148905294,TypeScript,2025-01,2025-01,matched,0.0,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/webdevcody_survive-the-night-game,False,False
+yayxs/ai-coding,jherr/start-trpc,2,202502,0.0750919806677857,TypeScript,2025-01,2025-01,matched,0.0,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/yayxs_ai-coding,False,False

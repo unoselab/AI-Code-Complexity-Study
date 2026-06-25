@@ -1,0 +1,13 @@
+metric,value
+clean_control_repos_before_clone_filter,467
+clone_status_rows,467
+clone_status_unique_repos,467
+extra_clone_status_repos_not_in_control_list,0
+usable_control_repos,453
+failed_or_missing_control_repos,14
+matched_pair_rows_before_clone_filter,1129
+usable_matched_pair_rows,1106
+dropped_pair_rows_due_to_failed_or_missing_clone,23
+treatment_repos_before_clone_filter,384
+treatment_repos_with_usable_controls,384
+treatment_repos_lost_all_controls,0

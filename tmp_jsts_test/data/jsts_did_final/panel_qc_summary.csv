@@ -1,0 +1,5 @@
+panel,path,exists,rows,repos,treated_repos,control_repos,min_time,max_time,treated_rows,control_rows,post_rows,control_rows_without_provenance
+main_unbalanced,tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv,True,6281,773,380,393,2024-01,2025-08,3410,2871,1821,0
+main_window_completed,tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv,True,12270,827,380,447,2024-01,2025-08,5028,7242,3007,0
+strict_1to3_unbalanced,tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv,True,5518,691,337,354,2024-01,2025-08,2945,2573,1601,0
+strict_1to3_window_completed,tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv,True,10986,741,337,404,2024-01,2025-08,4418,6568,2680,0

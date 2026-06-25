@@ -1,179 +1,239 @@
-1. check result below.
-2. should we clone 467?
-3. why do we have overlap b/w control and treatment although we used data of original paper work study?
+1. check below.
 
-run8a: extract matched JS/TS control repositories
-Timestamp: 20260624-164206
-Treatment sample: tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
-Matching file: data_baseline_backup/matching.csv
-Output dir: tmp_jsts_test/data
+============================================================
+run8e: build final matched JS/TS DiD event panel
+Timestamp:              20260625-011951
+Python script:          proc_scripts/prepare_panel_event_v2.py
+Treatment metadata:     tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
+Pairs file:             tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean.csv
+Treatment time series:  tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
+Control time series:    tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
+Output file:            tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
+Balanced output file:   tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+Log file:               logs/run8e_build_jsts_matched_panel_20260625-011951.log
+============================================================
 
-Treatment sample rows: 398
-Full adopter population size: 830
-Matching rows for treatment sample: 384
-Treatments missing matching row: 14
-Raw matched pair rows: 1152
-Clean matched pair rows: 1129
-Removed overlap pair rows: 23
-Raw unique control repos: 480
-Clean unique control repos: 467
-Removed overlap unique control repos: 13
-Treatment repos with clean pairs: 384
+** Checking input schemas
+------------------------------------------------------------
+treatment_meta: tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
+  columns: ['repo_name', 'repo_primary_language', 'repo_stars', 'repo_commits', 'repo_contributors', 'repo_size', 'repo_languages', 'status', 'target_dir', 'note', 'event_month', 'panel_first_month', 'panel_latest_month', 'panel_month_count', 'min_relative_month', 'max_relative_month', 'pre_panel_months', 'event_months', 'post_panel_months', 'balanced_window', 'adoption_month', 'adoption_date', 'adoption_commit', 'confidence', 'evidence_paths', 'event_month_clean', 'adoption_month_clean', 'month_difference', 'event_month_match', 'match_status']
 
-Overlap unique control repos:
-                                 repo_name  overlap_current_treatment_sample  overlap_full_adopter_population
-                  AmandaloveYang/ClearPage                             False                             True
-                          Codehagen/Badget                             False                             True
-SquirrelCorporation/SquirrelServersManager                             False                             True
-                          abiteman/DumbKan                             False                             True
-                       aldrin-labs/opensvm                             False                             True
-                         extendui/extendui                             False                             True
-                          gravity-ui/graph                             False                             True
-              janus-idp/backstage-showcase                             False                             True
-                             maxentr/skyjo                             False                             True
-                        mendix/web-widgets                             False                             True
-                       moinulmoin/chadnext                             False                             True
-                          thesysdev/crayon                             False                             True
-                           yuiseki/TRIDENT                              True                             True
+pairs: tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean.csv
+  columns: ['treatment_repo', 'control_repo', 'control_rank', 'matched_period', 'matching_propensity_score', 'repo_primary_language', 'event_month', 'adoption_month', 'match_status', 'month_difference', 'target_dir', 'overlap_current_treatment_sample', 'overlap_full_adopter_population']
 
-Control-count distribution after overlap removal:
-num_unique_controls
-2     23
-3    361
+treatment_ts: tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
+  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
 
-Saved CLEAN pair output: tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv
-Saved CLEAN control clone list: tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv
-Saved missing match file: tmp_jsts_test/data/jsts_treatment_missing_matching_main_398.csv
-Saved overlap pair file: tmp_jsts_test/data/jsts_matched_control_pairs_main_398_overlap_pairs.csv
-Saved overlap repo file: tmp_jsts_test/data/jsts_control_repos_to_clone_main_398_overlap_repos.csv
-Saved raw pair output: tmp_jsts_test/data/jsts_matched_control_pairs_main_398_raw.csv
-Saved raw control clone list: tmp_jsts_test/data/jsts_control_repos_to_clone_main_398_raw.csv
-Saved coverage file: tmp_jsts_test/data/jsts_matched_control_pairs_main_398_coverage.csv
-Saved summary file: tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv
+control_ts: tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
+  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
 
-Top 30 CLEAN matched pairs:
-                         treatment_repo                               control_repo  control_rank  matched_period  matching_propensity_score repo_primary_language event_month adoption_month match_status  month_difference                                                                                                                     target_dir  overlap_current_treatment_sample  overlap_full_adopter_population
-                          0xfrankz/Kaas      hipstersmoothie/react-window-splitter             1          202407                   0.006694            TypeScript     2024-08        2024-08      matched               0.0                           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xfrankz_Kaas                             False                            False
-                          0xfrankz/Kaas                AnshSinghal/DHARA.github.io             3          202407                   0.006694            TypeScript     2024-08        2024-08      matched               0.0                           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/0xfrankz_Kaas                             False                            False
-                      JaleelB/readium-x                    D-Sketon/mouse-firework             1          202407                   0.006350            TypeScript     2024-08        2024-08      matched               0.0                       /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/JaleelB_readium-x                             False                            False
-                      JaleelB/readium-x                         mpaiva/wcag-tokens             2          202407                   0.006350            TypeScript     2024-08        2024-08      matched               0.0                       /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/JaleelB_readium-x                             False                            False
-                      JaleelB/readium-x            woowacourse-teams/2023-celuveat             3          202407                   0.006350            TypeScript     2024-08        2024-08      matched               0.0                       /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/JaleelB_readium-x                             False                            False
-              Vagabonds-Labs/cofiblocks                           TherkuTech/tturl             1          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0               /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Vagabonds-Labs_cofiblocks                             False                            False
-              Vagabonds-Labs/cofiblocks Dannyisadog/nextjs-authentication-template             2          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0               /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Vagabonds-Labs_cofiblocks                             False                            False
-              Vagabonds-Labs/cofiblocks      hipstersmoothie/react-window-splitter             3          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0               /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Vagabonds-Labs_cofiblocks                             False                            False
-                          Vrooli/Vrooli           tim-hub/nestjs-hexagonal-example             1          202407                   0.002531            TypeScript     2024-08        2024-08      matched               0.0                           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Vrooli_Vrooli                             False                            False
-                          Vrooli/Vrooli                        CanCLID/to-jyutping             2          202407                   0.002531            TypeScript     2024-08        2024-08      matched               0.0                           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Vrooli_Vrooli                             False                            False
-                          Vrooli/Vrooli   iamchathu/changeset-conventional-commits             3          202407                   0.002531            TypeScript     2024-08        2024-08      matched               0.0                           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Vrooli_Vrooli                             False                            False
-          infinite-table/infinite-react                    workout-lol/workout-lol             1          202407                   0.003175            JavaScript     2024-08        2024-08      matched               0.0           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/infinite-table_infinite-react                             False                            False
-          infinite-table/infinite-react                  dekguh/Leaflet.MoveMarker             2          202407                   0.003175            JavaScript     2024-08        2024-08      matched               0.0           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/infinite-table_infinite-react                             False                            False
-          infinite-table/infinite-react                     hqm012/HM-vue3-echarts             3          202407                   0.003175            JavaScript     2024-08        2024-08      matched               0.0           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/infinite-table_infinite-react                             False                            False
-     ojasskapre/nextjs-starter-template                           TherkuTech/tturl             1          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0      /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/ojasskapre_nextjs-starter-template                             False                            False
-     ojasskapre/nextjs-starter-template Dannyisadog/nextjs-authentication-template             2          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0      /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/ojasskapre_nextjs-starter-template                             False                            False
-     ojasskapre/nextjs-starter-template      hipstersmoothie/react-window-splitter             3          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0      /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/ojasskapre_nextjs-starter-template                             False                            False
-                         script-kit/app                           TherkuTech/tturl             1          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                          /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/script-kit_app                             False                            False
-                         script-kit/app Dannyisadog/nextjs-authentication-template             2          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                          /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/script-kit_app                             False                            False
-                         script-kit/app      hipstersmoothie/react-window-splitter             3          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                          /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/script-kit_app                             False                            False
-                         settlemint/sdk                           TherkuTech/tturl             1          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                          /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/settlemint_sdk                             False                            False
-                         settlemint/sdk Dannyisadog/nextjs-authentication-template             2          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                          /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/settlemint_sdk                             False                            False
-                         settlemint/sdk      hipstersmoothie/react-window-splitter             3          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                          /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/settlemint_sdk                             False                            False
-                      shnai0/stripe-mrr                           TherkuTech/tturl             1          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                       /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/shnai0_stripe-mrr                             False                            False
-                      shnai0/stripe-mrr Dannyisadog/nextjs-authentication-template             2          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                       /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/shnai0_stripe-mrr                             False                            False
-                      shnai0/stripe-mrr      hipstersmoothie/react-window-splitter             3          202407                   0.006692            TypeScript     2024-08        2024-08      matched               0.0                       /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/shnai0_stripe-mrr                             False                            False
-Galaxies-dev/threads-clone-react-native       kotaindah55/extended-markdown-syntax             1          202408                   0.019923            TypeScript     2024-09        2024-09      matched               0.0 /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Galaxies-dev_threads-clone-react-native                             False                            False
-Galaxies-dev/threads-clone-react-native                   diffusionstudio/examples             2          202408                   0.019923            TypeScript     2024-09        2024-09      matched               0.0 /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Galaxies-dev_threads-clone-react-native                             False                            False
-Galaxies-dev/threads-clone-react-native                     mwangimuringi/viatupoa             3          202408                   0.019923            TypeScript     2024-09        2024-09      matched               0.0 /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Galaxies-dev_threads-clone-react-native                             False                            False
-                            Shopify/cli                       andreisergiu98/baeta             1          202408                   0.387641            TypeScript     2024-09        2024-09      matched               0.0                             /home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_repo_dataset/Shopify_cli                             False                            False
+Schema check passed.
 
-run8a finished with exit code: 0
-Log file: logs/run8a_extract_jsts_control_repos_20260624-164206.log
-Pair output file: tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv
-Control clone file: tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv
-Missing match file: tmp_jsts_test/data/jsts_treatment_missing_matching_main_398.csv
-Summary file: tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv
+** Running panel builder
+------------------------------------------------------------
+python proc_scripts/prepare_panel_event_v2.py --treatment-meta tmp_jsts_test/data/jsts_treatment_sample_main_398.csv --pairs tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean.csv --treatment-ts tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv --control-ts tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv --output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv --balanced-output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+
+2026-06-25 01:19:51,786 [INFO] Loaded 398 treatment repos with event_month
+2026-06-25 01:19:51,791 [INFO] Filtered treatment metadata to treatments present in selected pair file: 398 -> 384
+2026-06-25 01:19:51,814 [INFO] Filtered control time series to controls present in selected pair file: rows 7896 -> 7896, repos 450 -> 450
+2026-06-25 01:19:51,845 [INFO] === Building UNBALANCED panel ===
+2026-06-25 01:19:53,876 [WARNING] Treated repo AIDC-AI/ComfyUI-Copilot has empty/zero pre-adoption window
+...
+
+2026-06-25 01:19:53,951 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
+2026-06-25 01:19:53,959 [INFO] Control repos with post-window Cursor evidence kept as diagnostics: ['aidenybai/bippy', 'get-convex/convex-evals', 'nrwl/nx-console', 'rudderlabs/rudder-transformer', 'sst/sst', 'xavimondev/hubdev.tools']
+2026-06-25 01:19:53,965 [INFO] Date filter [2024-01-01..2025-08-31]: 15916 -> 6281 rows
+2026-06-25 01:19:53,983 [INFO] Saved unbalanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
+2026-06-25 01:19:53,983 [INFO] [UNBALANCED] Rows: 6281 | treated repos: 380 | control repos: 393
+
+=== UNBALANCED panel summary ===
+dataset_source  repos  rows  post_rows
+       control    393  2871          0
+     treatment    380  3410       1821
+2026-06-25 01:19:53,986 [INFO] === Building BALANCED panel (window completion) ===
+2026-06-25 01:19:54,458 [INFO] Window completion [2024-01..2025-08]: 8487 -> 5289 rows (394 repos)
+2026-06-25 01:19:54,989 [INFO] Window completion [2024-01..2025-08]: 7896 -> 7242 rows (447 repos)
+2026-06-25 01:19:55,361 [WARNING] No time series for treatment repo alexander-turner/TurnTrout.com; skipping
+...
+2026-06-25 01:19:56,552 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
+2026-06-25 01:19:56,568 [INFO] Date filter [2024-01-01..2025-08-31]: 12270 -> 12270 rows
+2026-06-25 01:19:56,606 [INFO] Saved balanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+2026-06-25 01:19:56,606 [INFO] [BALANCED] Rows: 12270 | treated repos: 380 | control repos: 447
+
+=== BALANCED panel summary ===
+dataset_source  repos  rows  post_rows
+       control    447  7242          0
+     treatment    380  5028       3007
+
+** Output summary
+------------------------------------------------------------
+unbalanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
+  rows: 6281
+  repos: 773
+  treated repos: 380
+  control repos: 393
+  dataset_source counts:
+dataset_source
+treatment    3410
+control      2871
+
+balanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+  rows: 12270
+  repos: 827
+  treated repos: 380
+  control repos: 447
+  dataset_source counts:
+dataset_source
+control      7242
+treatment    5028
 
 
+============================================================
+run8e completed successfully.
+Log file: logs/run8e_build_jsts_matched_panel_20260625-011951.log
+Output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
+Balanced output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+============================================================
+============================================================
+run8e: build final matched JS/TS DiD event panel
+Timestamp:              20260625-012041
+Python script:          proc_scripts/prepare_panel_event_v2.py
+Treatment metadata:     tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
+Pairs file:             tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv
+Treatment time series:  tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
+Control time series:    tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
+Output file:            tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
+Balanced output file:   tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+Log file:               logs/run8e_build_jsts_matched_panel_20260625-012041.log
+============================================================
 
-python - <<'PY'
-import pandas as pd
-from pathlib import Path
+** Checking input schemas
+------------------------------------------------------------
+treatment_meta: tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
+  columns: ['repo_name', 'repo_primary_language', 'repo_stars', 'repo_commits', 'repo_contributors', 'repo_size', 'repo_languages', 'status', 'target_dir', 'note', 'event_month', 'panel_first_month', 'panel_latest_month', 'panel_month_count', 'min_relative_month', 'max_relative_month', 'pre_panel_months', 'event_months', 'post_panel_months', 'balanced_window', 'adoption_month', 'adoption_date', 'adoption_commit', 'confidence', 'evidence_paths', 'event_month_clean', 'adoption_month_clean', 'month_difference', 'event_month_match', 'match_status']
 
-treatment_path = Path("tmp_jsts_test/data/jsts_treatment_sample_main_398.csv")
-control_path = Path("tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv")
-overlap_path = Path("tmp_jsts_test/data/jsts_control_repos_to_clone_main_398_overlap_repos.csv")
-summary_path = Path("tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv")
-panel_path = Path("data_baseline_backup/panel_event_monthly.csv")
+pairs: tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv
+  columns: ['treatment_repo', 'control_repo', 'control_rank', 'matched_period', 'matching_propensity_score', 'repo_primary_language', 'event_month', 'adoption_month', 'match_status', 'month_difference', 'target_dir', 'overlap_current_treatment_sample', 'overlap_full_adopter_population']
 
-treat = pd.read_csv(treatment_path)
-control = pd.read_csv(control_path)
-summary = pd.read_csv(summary_path)
+treatment_ts: tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
+  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
 
-treatment_repos = set(treat["repo_name"].astype(str).str.strip())
-control_repos = set(control["repo_name"].astype(str).str.strip())
+control_ts: tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
+  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
 
-panel = pd.read_csv(panel_path, usecols=["repo_name", "is_treatment"])
-full_adopters = set(
-    panel.loc[panel["is_treatment"].eq(1), "repo_name"]
-    .astype(str)
-    .str.strip()
-)
+Schema check passed.
 
-subset_overlap = sorted(control_repos & treatment_repos)
-full_overlap = sorted(control_repos & full_adopters)
+** Running panel builder
+------------------------------------------------------------
+python proc_scripts/prepare_panel_event_v2.py --treatment-meta tmp_jsts_test/data/jsts_treatment_sample_main_398.csv --pairs tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv --treatment-ts tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv --control-ts tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv --output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv --balanced-output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
 
-print("Clean control repos:", len(control_repos))
-print("Subset overlap after cleaning:", len(subset_overlap))
-print("Full adopter overlap after cleaning:", len(full_overlap))
+2026-06-25 01:20:41,700 [INFO] Loaded 398 treatment repos with event_month
+2026-06-25 01:20:41,704 [INFO] Filtered treatment metadata to treatments present in selected pair file: 398 -> 339
+2026-06-25 01:20:41,728 [INFO] Filtered control time series to controls present in selected pair file: rows 7896 -> 7329, repos 450 -> 407
+2026-06-25 01:20:41,757 [INFO] === Building UNBALANCED panel ===
+2026-06-25 01:20:43,576 [WARNING] Treated repo AIDC-AI/ComfyUI-Copilot has empty/zero pre-adoption window
 
-if subset_overlap:
-    print("Subset overlap:", subset_overlap)
+...
+2026-06-25 01:20:43,641 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
+2026-06-25 01:20:43,648 [INFO] Control repos with post-window Cursor evidence kept as diagnostics: ['aidenybai/bippy', 'get-convex/convex-evals', 'nrwl/nx-console', 'rudderlabs/rudder-transformer', 'xavimondev/hubdev.tools']
+2026-06-25 01:20:43,653 [INFO] Date filter [2024-01-01..2025-08-31]: 14462 -> 5518 rows
+2026-06-25 01:20:43,669 [INFO] Saved unbalanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
+2026-06-25 01:20:43,669 [INFO] [UNBALANCED] Rows: 5518 | treated repos: 337 | control repos: 354
 
-if full_overlap:
-    print("Full adopter overlap:", full_overlap)
+=== UNBALANCED panel summary ===
+dataset_source  repos  rows  post_rows
+       control    354  2573          0
+     treatment    337  2945       1601
+2026-06-25 01:20:43,672 [INFO] === Building BALANCED panel (window completion) ===
+2026-06-25 01:20:44,139 [INFO] Window completion [2024-01..2025-08]: 8487 -> 5289 rows (394 repos)
+2026-06-25 01:20:44,616 [INFO] Window completion [2024-01..2025-08]: 7329 -> 6568 rows (404 repos)
+2026-06-25 01:20:44,930 [WARNING] No time series for treatment repo alexander-turner/TurnTrout.com; skipping
 
-print()
-print("Summary:")
-print(summary.to_string(index=False))
+...
+2026-06-25 01:20:45,994 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
+2026-06-25 01:20:46,008 [INFO] Date filter [2024-01-01..2025-08-31]: 10986 -> 10986 rows
+2026-06-25 01:20:46,044 [INFO] Saved balanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+2026-06-25 01:20:46,046 [INFO] [BALANCED] Rows: 10986 | treated repos: 337 | control repos: 404
 
-print()
-print("Overlap repo file exists:", overlap_path.exists())
-if overlap_path.exists():
-    print(pd.read_csv(overlap_path).to_string(index=False))
-PY
+=== BALANCED panel summary ===
+dataset_source  repos  rows  post_rows
+       control    404  6568          0
+     treatment    337  4418       2680
 
-Clean control repos: 467
-Subset overlap after cleaning: 0
-Full adopter overlap after cleaning: 0
+** Output summary
+------------------------------------------------------------
+unbalanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
+  rows: 5518
+  repos: 691
+  treated repos: 337
+  control repos: 354
+  dataset_source counts:
+dataset_source
+treatment    2945
+control      2573
 
-Summary:
-                                        metric  value
-                         treatment_sample_rows    398
-                  full_adopter_population_rows    830
-            matching_rows_for_treatment_sample    384
-               treatments_missing_matching_row     14
-                         raw_matched_pair_rows   1152
-                       clean_matched_pair_rows   1129
-                     removed_overlap_pair_rows     23
-                      raw_unique_control_repos    480
-                    clean_unique_control_repos    467
-          removed_overlap_unique_control_repos     13
-current_treatment_overlap_unique_control_repos      1
-     full_adopter_overlap_unique_control_repos     13
-              treatment_repos_with_clean_pairs    384
-        treatment_repos_missing_after_cleaning     14
+balanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+  rows: 10986
+  repos: 741
+  treated repos: 337
+  control repos: 404
+  dataset_source counts:
+dataset_source
+control      6568
+treatment    4418
 
-Overlap repo file exists: True
-                                 repo_name  overlap_current_treatment_sample  overlap_full_adopter_population
-                  AmandaloveYang/ClearPage                             False                             True
-                          Codehagen/Badget                             False                             True
-SquirrelCorporation/SquirrelServersManager                             False                             True
-                          abiteman/DumbKan                             False                             True
-                       aldrin-labs/opensvm                             False                             True
-                         extendui/extendui                             False                             True
-                          gravity-ui/graph                             False                             True
-              janus-idp/backstage-showcase                             False                             True
-                             maxentr/skyjo                             False                             True
-                        mendix/web-widgets                             False                             True
-                       moinulmoin/chadnext                             False                             True
-                          thesysdev/crayon                             False                             True
-                           yuiseki/TRIDENT                              True                             True
-(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 
+
+============================================================
+run8e completed successfully.
+Log file: logs/run8e_build_jsts_matched_panel_20260625-012041.log
+Output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
+Balanced output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+============================================================
+
+tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
+rows: 6281
+repos: 773
+treated repos: 380
+control repos: 393
+time range: 2024-01 to 2025-08
+dataset_source:
+dataset_source
+treatment    3410
+control      2871
+control rows without provenance: 0
+
+tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+rows: 12270
+repos: 827
+treated repos: 380
+control repos: 447
+time range: 2024-01 to 2025-08
+dataset_source:
+dataset_source
+control      7242
+treatment    5028
+control rows without provenance: 0
+
+tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
+rows: 5518
+repos: 691
+treated repos: 337
+control repos: 354
+time range: 2024-01 to 2025-08
+dataset_source:
+dataset_source
+treatment    2945
+control      2573
+control rows without provenance: 0
+
+tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+rows: 10986
+repos: 741
+treated repos: 337
+control repos: 404
+time range: 2024-01 to 2025-08
+dataset_source:
+dataset_source
+control      6568
+treatment    4418
+control rows without provenance: 0

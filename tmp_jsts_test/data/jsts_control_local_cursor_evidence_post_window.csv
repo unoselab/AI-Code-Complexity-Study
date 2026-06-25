@@ -1,0 +1,7 @@
+repo_name,adoption_tool,adoption_commit,adoption_date,adoption_month,evidence_paths,evidence_type,confidence,message,cursor_evidence_in_analysis_window
+aidenybai/bippy,cursor,4cca52c0518ea41ad59373dd18488d4fd3dedc96,2025-10-31,2025-10,.cursor/rules/codebase-guidelines.mdc,cursor_related_path,high,more cleanup,False
+get-convex/convex-evals,cursor,88731e7067fd4ccf4abaa5a0dfc53df2f6aec30d,2026-02-05,2026-02,.cursor/skills/debug-eval-run/SKILL.md,cursor_related_path,high,add debug action and agent skill for investigating eval failures,False
+nrwl/nx-console,cursor,5581d361bfceef6266bf68847b8fa444715fe121,2026-01-30,2026-01,.cursor/agents/ci-watcher.md;.cursor/commands/monitor-ci.md;.cursor/skills/monitor-ci/SKILL.md;.cursor/skills/nx-generate/SKILL.md;.cursor/skills/nx-plugins/SKILL.md;.cursor/skills/nx-run-tasks/SKILL.md;.cursor/skills/nx-workspace/SKILL.md,cursor_related_path,high,chore(repo): add latest ai agent config files (#2996),False
+rudderlabs/rudder-transformer,cursor,893da92a4f99efef5475a51038c84a94308c0d47,2025-09-23,2025-09,.cursor/rules/pr-review-comments.mdc,cursor_related_path,high,feat: onboard google developer token (#4613),False
+sst/sst,cursor,0345d4f5bebb53973d72a3892c9eea5c532e108c,2026-01-06,2026-01,examples/aws-tanstack-start/.cursorrules,cursor_related_path,high,[Docs] Update TanStack Start docs to reflect current required steps (#6246),False
+xavimondev/hubdev.tools,cursor,85148b5059662599bb601d4ccf479aac12896dce,2026-01-22,2026-01,.cursor/skills/vercel-react-best-practices,cursor_related_path,high,add skills,False

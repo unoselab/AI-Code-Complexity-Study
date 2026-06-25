@@ -161,34 +161,13 @@ def load_ts(path: Path, source: str) -> pd.DataFrame:
 
 
 def build_provenance(pairs_path: Path) -> pd.DataFrame:
-    """
-    One row per control repo with the treatments/ranks/periods it was matched to.
-
-    The recovered matching artifacts may use slightly different column names.
-    In particular, run8 final-clean pairs use control_rank, while older
-    prepare_panel_event_v2 code expected match_rank. Normalize that here.
-    """
+    """One row per control repo with the treatments/ranks/periods it was matched to."""
     pairs = pd.read_csv(pairs_path)
-
-    required = {"treatment_repo", "control_repo"}
-    missing_required = required - set(pairs.columns)
-    if missing_required:
-        raise SystemExit(
-            f"{pairs_path} missing required columns: {sorted(missing_required)}"
-        )
-
+    needed = {"treatment_repo", "control_repo", "match_rank", "matched_period"}
+    if not needed.issubset(pairs.columns):
+        logging.warning("pairs file missing some of %s; provenance will be partial", needed)
     pairs = pairs.dropna(subset=["control_repo"]).copy()
-    pairs["treatment_repo"] = pairs["treatment_repo"].astype(str).str.strip()
     pairs["control_repo"] = pairs["control_repo"].astype(str).str.strip()
-
-    if "match_rank" not in pairs.columns:
-        if "control_rank" in pairs.columns:
-            pairs["match_rank"] = pairs["control_rank"]
-        else:
-            pairs["match_rank"] = pd.NA
-
-    if "matched_period" not in pairs.columns:
-        pairs["matched_period"] = pd.NA
 
     def join_unique(values: pd.Series) -> str:
         return "; ".join(sorted({str(v) for v in values.dropna()}))
@@ -205,6 +184,7 @@ def build_provenance(pairs_path: Path) -> pd.DataFrame:
     )
     prov["matched_as_control"] = 1
     return prov
+
 
 def make_lead_lag(time_to_event: pd.Series) -> pd.DataFrame:
     """lead_1..5 / lag_0..5 exact; lead_6 / lag_6 cumulative (matches original)."""
@@ -256,47 +236,22 @@ def build_control_panel(control_ts: pd.DataFrame, provenance: pd.DataFrame) -> p
     panel["ever_treated"] = 0
     panel["is_treatment"] = 0
     panel["is_treatment_dynamic"] = panel["cursor"].astype(int)
-
     for lead in range(1, MONTH_LEAD_AND_LAG + 1):
         panel[f"lead_{lead}"] = 0
     for lag in range(0, MONTH_LEAD_AND_LAG + 1):
         panel[f"lag_{lag}"] = 0
 
     panel = panel.merge(provenance, on="repo_name", how="left")
-    panel["matched_as_control"] = (
-        pd.to_numeric(panel["matched_as_control"], errors="coerce")
-        .fillna(0)
-        .astype(int)
-    )
+    panel["matched_as_control"] = pd.to_numeric(panel["matched_as_control"], errors="coerce").fillna(0).astype(int)
 
-    analysis_end_month = pd.to_datetime(END_DATE).strftime("%Y-%m")
-    in_window_leaked = panel.loc[
-        (panel["cursor"] == True) & (panel["month"].astype(str) <= analysis_end_month),
-        "repo_name",
-    ].unique()
-
-    post_window_cursor = panel.loc[
-        (panel["cursor"] == True) & (panel["month"].astype(str) > analysis_end_month),
-        "repo_name",
-    ].unique()
-
-    if len(in_window_leaked):
-        logging.warning(
-            "Control repos with in-window Cursor evidence (should be removed before DiD): %s",
-            list(in_window_leaked),
-        )
-
-    if len(post_window_cursor):
-        logging.info(
-            "Control repos with post-window Cursor evidence kept as diagnostics: %s",
-            list(post_window_cursor),
-        )
-
+    leaked = panel.loc[panel["cursor"] == True, "repo_name"].unique()  # noqa: E712
+    if len(leaked):
+        logging.warning("Control repos with cursor evidence (NOT never-treated): %s", list(leaked))
     no_prov = panel.loc[panel["matched_as_control"] == 0, "repo_name"].unique()
     if len(no_prov):
         logging.warning("Control repos without PSM provenance: %s", list(no_prov))
-
     return panel
+
 
 def filter_by_date(panel: pd.DataFrame) -> pd.DataFrame:
     dt = pd.to_datetime(panel["month"] + "-01")
@@ -377,67 +332,8 @@ def main() -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     meta = load_treatment_meta(treatment_meta)
-
-    pairs_for_meta = pd.read_csv(pairs_path)
-    required_pair_cols = {"treatment_repo", "control_repo"}
-    missing_pair_cols = required_pair_cols - set(pairs_for_meta.columns)
-    if missing_pair_cols:
-        raise SystemExit(
-            f"{pairs_path} missing required columns: {sorted(missing_pair_cols)}"
-        )
-
-    pairs_for_meta["treatment_repo"] = (
-        pairs_for_meta["treatment_repo"].dropna().astype(str).str.strip()
-    )
-    pairs_for_meta["control_repo"] = (
-        pairs_for_meta["control_repo"].dropna().astype(str).str.strip()
-    )
-
-    paired_treatments = set(pairs_for_meta["treatment_repo"].dropna())
-    paired_controls = set(pairs_for_meta["control_repo"].dropna())
-
-    before_meta = len(meta)
-    meta = meta[meta["repo_name"].isin(paired_treatments)].copy()
-    logging.info(
-        "Filtered treatment metadata to treatments present in selected pair file: %d -> %d",
-        before_meta,
-        len(meta),
-    )
-
     treat_ts = load_ts(treatment_ts_path, "treatment")
     control_ts = load_ts(control_ts_path, "control")
-
-    treatment_ts_repos = set(treat_ts["repo_name"].dropna().astype(str).str.strip())
-    control_ts_repos = set(control_ts["repo_name"].dropna().astype(str).str.strip())
-
-    missing_treatment_ts = sorted(paired_treatments - treatment_ts_repos)
-    missing_control_ts = sorted(paired_controls - control_ts_repos)
-
-    if missing_treatment_ts:
-        logging.warning(
-            "Treatment repos in selected pairs but missing treatment time series (%d): %s",
-            len(missing_treatment_ts),
-            missing_treatment_ts,
-        )
-
-    if missing_control_ts:
-        logging.warning(
-            "Control repos in selected pairs but missing control time series (%d): %s",
-            len(missing_control_ts),
-            missing_control_ts,
-        )
-
-    before_control_rows = len(control_ts)
-    before_control_repos = control_ts["repo_name"].nunique()
-    control_ts = control_ts[control_ts["repo_name"].isin(paired_controls)].copy()
-    logging.info(
-        "Filtered control time series to controls present in selected pair file: rows %d -> %d, repos %d -> %d",
-        before_control_rows,
-        len(control_ts),
-        before_control_repos,
-        control_ts["repo_name"].nunique(),
-    )
-
     provenance = build_provenance(pairs_path)
 
     # --- Unbalanced panel (existing behavior: months with commits only) ---

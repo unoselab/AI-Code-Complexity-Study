@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ============================================================
+# run8d2: Filter controls with local Cursor evidence
+# ============================================================
+# This wrapper removes control repositories with local Cursor
+# evidence inside the analysis window and recomputes matched
+# pair coverage.
+# ============================================================
+
+LOG_DIR="${LOG_DIR:-logs}"
+RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/run8d2_filter_local_cursor_controls_${RUN_TS}.log}"
+
+PY_SCRIPT="${PY_SCRIPT:-proc_scripts/filter_controls_by_local_cursor_evidence.py}"
+
+ANALYSIS_END="${ANALYSIS_END:-2025-08}"
+
+CONTROL_FILE="${CONTROL_FILE:-tmp_jsts_test/data/jsts_control_clone_usable_repos_main_398.csv}"
+PAIR_FILE="${PAIR_FILE:-tmp_jsts_test/data/jsts_matched_control_pairs_main_398_clone_usable.csv}"
+ADOPTION_FILE="${ADOPTION_FILE:-tmp_jsts_test/data/jsts_did_control/ai_adoption_dates.csv}"
+
+CONTROL_TS_REPOS_FILE="${CONTROL_TS_REPOS_FILE:-tmp_jsts_test/data/jsts_did_control/ts_repos_monthly.csv}"
+CONTROL_TS_CONTRIBUTORS_FILE="${CONTROL_TS_CONTRIBUTORS_FILE:-tmp_jsts_test/data/jsts_did_control/ts_contributors_monthly.csv}"
+
+OUTPUT_DIR="${OUTPUT_DIR:-tmp_jsts_test/data}"
+CONTROL_OUTPUT_DIR="${CONTROL_OUTPUT_DIR:-tmp_jsts_test/data/jsts_did_control}"
+
+IN_WINDOW_EVIDENCE_FILE="${IN_WINDOW_EVIDENCE_FILE:-${OUTPUT_DIR}/jsts_control_local_cursor_evidence_in_window.csv}"
+POST_WINDOW_EVIDENCE_FILE="${POST_WINDOW_EVIDENCE_FILE:-${OUTPUT_DIR}/jsts_control_local_cursor_evidence_post_window.csv}"
+
+FINAL_CONTROL_FILE="${FINAL_CONTROL_FILE:-${OUTPUT_DIR}/jsts_control_clone_usable_repos_main_398_final_clean.csv}"
+FINAL_PAIR_FILE="${FINAL_PAIR_FILE:-${OUTPUT_DIR}/jsts_matched_control_pairs_main_398_final_clean.csv}"
+DROPPED_PAIR_FILE="${DROPPED_PAIR_FILE:-${OUTPUT_DIR}/jsts_matched_control_pairs_main_398_local_cursor_dropped.csv}"
+COVERAGE_FILE="${COVERAGE_FILE:-${OUTPUT_DIR}/jsts_control_pair_coverage_main_398_final_clean.csv}"
+ZERO_CONTROL_TREATMENT_FILE="${ZERO_CONTROL_TREATMENT_FILE:-${OUTPUT_DIR}/jsts_treatment_repos_lost_all_controls_main_398_final_clean.csv}"
+SUMMARY_FILE="${SUMMARY_FILE:-${OUTPUT_DIR}/jsts_control_local_cursor_filter_summary_main_398.csv}"
+
+FINAL_CONTROL_TS_REPOS_FILE="${FINAL_CONTROL_TS_REPOS_FILE:-${CONTROL_OUTPUT_DIR}/ts_repos_monthly_final_clean.csv}"
+FINAL_CONTROL_TS_CONTRIBUTORS_FILE="${FINAL_CONTROL_TS_CONTRIBUTORS_FILE:-${CONTROL_OUTPUT_DIR}/ts_contributors_monthly_final_clean.csv}"
+
+FAIL_IF_ZERO_CONTROL="${FAIL_IF_ZERO_CONTROL:-true}"
+
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CONTROL_OUTPUT_DIR}"
+
+echo "============================================================" | tee "${LOG_FILE}"
+echo "run8d2: filter controls with local Cursor evidence" | tee -a "${LOG_FILE}"
+echo "Timestamp:                         ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Python script:                     ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
+echo "Analysis end:                      ${ANALYSIS_END}" | tee -a "${LOG_FILE}"
+echo "Control file:                      ${CONTROL_FILE}" | tee -a "${LOG_FILE}"
+echo "Pair file:                         ${PAIR_FILE}" | tee -a "${LOG_FILE}"
+echo "Adoption file:                     ${ADOPTION_FILE}" | tee -a "${LOG_FILE}"
+echo "Control repo time-series file:     ${CONTROL_TS_REPOS_FILE}" | tee -a "${LOG_FILE}"
+echo "Control contributor time-series:   ${CONTROL_TS_CONTRIBUTORS_FILE}" | tee -a "${LOG_FILE}"
+echo "Final control file:                ${FINAL_CONTROL_FILE}" | tee -a "${LOG_FILE}"
+echo "Final pair file:                   ${FINAL_PAIR_FILE}" | tee -a "${LOG_FILE}"
+echo "Final coverage file:               ${COVERAGE_FILE}" | tee -a "${LOG_FILE}"
+echo "Final control repo time-series:    ${FINAL_CONTROL_TS_REPOS_FILE}" | tee -a "${LOG_FILE}"
+echo "Final control contributor series:  ${FINAL_CONTROL_TS_CONTRIBUTORS_FILE}" | tee -a "${LOG_FILE}"
+echo "Fail if zero control:              ${FAIL_IF_ZERO_CONTROL}" | tee -a "${LOG_FILE}"
+echo "============================================================" | tee -a "${LOG_FILE}"
+echo | tee -a "${LOG_FILE}"
+
+if [[ ! -f "${PY_SCRIPT}" ]]; then
+  echo "ERROR: Python script not found: ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -f "${CONTROL_FILE}" ]]; then
+  echo "ERROR: control file not found: ${CONTROL_FILE}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -f "${PAIR_FILE}" ]]; then
+  echo "ERROR: pair file not found: ${PAIR_FILE}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -f "${ADOPTION_FILE}" ]]; then
+  echo "ERROR: adoption file not found: ${ADOPTION_FILE}" | tee -a "${LOG_FILE}"
+  echo "Run run8d-analyze-control-repos.sh first." | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+CMD=(
+  python "${PY_SCRIPT}"
+  --analysis-end "${ANALYSIS_END}"
+  --control-file "${CONTROL_FILE}"
+  --pair-file "${PAIR_FILE}"
+  --adoption-file "${ADOPTION_FILE}"
+  --control-ts-repos-file "${CONTROL_TS_REPOS_FILE}"
+  --control-ts-contributors-file "${CONTROL_TS_CONTRIBUTORS_FILE}"
+  --in-window-evidence-file "${IN_WINDOW_EVIDENCE_FILE}"
+  --post-window-evidence-file "${POST_WINDOW_EVIDENCE_FILE}"
+  --final-control-file "${FINAL_CONTROL_FILE}"
+  --final-pair-file "${FINAL_PAIR_FILE}"
+  --dropped-pair-file "${DROPPED_PAIR_FILE}"
+  --coverage-file "${COVERAGE_FILE}"
+  --zero-control-treatment-file "${ZERO_CONTROL_TREATMENT_FILE}"
+  --summary-file "${SUMMARY_FILE}"
+  --final-control-ts-repos-file "${FINAL_CONTROL_TS_REPOS_FILE}"
+  --final-control-ts-contributors-file "${FINAL_CONTROL_TS_CONTRIBUTORS_FILE}"
+)
+
+if [[ "${FAIL_IF_ZERO_CONTROL}" == "true" ]]; then
+  CMD+=(--fail-if-zero-control)
+fi
+
+echo "** Running local Cursor evidence filter" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+echo "${CMD[*]}" | tee -a "${LOG_FILE}"
+echo | tee -a "${LOG_FILE}"
+
+"${CMD[@]}" 2>&1 | tee -a "${LOG_FILE}"
+
+echo | tee -a "${LOG_FILE}"
+echo "============================================================" | tee -a "${LOG_FILE}"
+echo "run8d2 completed successfully." | tee -a "${LOG_FILE}"
+echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
+echo "Final control file: ${FINAL_CONTROL_FILE}" | tee -a "${LOG_FILE}"
+echo "Final pair file: ${FINAL_PAIR_FILE}" | tee -a "${LOG_FILE}"
+echo "Final coverage file: ${COVERAGE_FILE}" | tee -a "${LOG_FILE}"
+echo "Summary file: ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
+echo "============================================================" | tee -a "${LOG_FILE}"
