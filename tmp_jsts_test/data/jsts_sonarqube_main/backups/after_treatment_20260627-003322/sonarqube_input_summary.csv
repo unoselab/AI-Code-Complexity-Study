@@ -1,0 +1,3 @@
+dataset_source,file,rows,repos,min_month,max_month,missing_latest_commit,duplicate_repo_month_rows
+treatment,tmp_jsts_test/data/jsts_sonarqube_main/treatment/data/ts_repos_monthly.csv,5028,380,2024-01,2025-08,0,0
+control,tmp_jsts_test/data/jsts_sonarqube_main/control/data/ts_repos_monthly.csv,7242,447,2024-01,2025-08,0,0
