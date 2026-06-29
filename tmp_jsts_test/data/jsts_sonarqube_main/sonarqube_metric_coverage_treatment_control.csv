@@ -1,0 +1,17 @@
+dataset,metric,non_null,missing,total,coverage_pct
+treatment,ncloc,4957,71,5028,98.59
+treatment,bugs,4973,55,5028,98.91
+treatment,vulnerabilities,4973,55,5028,98.91
+treatment,code_smells,4973,55,5028,98.91
+treatment,duplicated_lines_density,4957,71,5028,98.59
+treatment,comment_lines_density,4957,71,5028,98.59
+treatment,cognitive_complexity,4951,77,5028,98.47
+treatment,technical_debt,4973,55,5028,98.91
+control,ncloc,7187,55,7242,99.24
+control,bugs,7222,20,7242,99.72
+control,vulnerabilities,7222,20,7242,99.72
+control,code_smells,7222,20,7242,99.72
+control,duplicated_lines_density,7187,55,7242,99.24
+control,comment_lines_density,7187,55,7242,99.24
+control,cognitive_complexity,7187,55,7242,99.24
+control,technical_debt,7222,20,7242,99.72

@@ -1,0 +1,9 @@
+dataset,metric,non_null,missing,total,coverage_pct
+control,ncloc,7187,55,7242,99.24
+control,bugs,7222,20,7242,99.72
+control,vulnerabilities,7222,20,7242,99.72
+control,code_smells,7222,20,7242,99.72
+control,duplicated_lines_density,7187,55,7242,99.24
+control,comment_lines_density,7187,55,7242,99.24
+control,cognitive_complexity,7187,55,7242,99.24
+control,technical_debt,7222,20,7242,99.72

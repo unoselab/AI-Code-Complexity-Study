@@ -1,0 +1,9 @@
+metric,non_null,total,coverage_pct
+ncloc,4957,5028,98.59
+bugs,4973,5028,98.91
+vulnerabilities,4973,5028,98.91
+code_smells,4973,5028,98.91
+duplicated_lines_density,4957,5028,98.59
+comment_lines_density,4957,5028,98.59
+cognitive_complexity,4951,5028,98.47
+technical_debt,4973,5028,98.91
