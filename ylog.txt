@@ -1,239 +1,609 @@
-1. check below.
-
 ============================================================
-run8e: build final matched JS/TS DiD event panel
-Timestamp:              20260625-011951
-Python script:          proc_scripts/prepare_panel_event_v2.py
-Treatment metadata:     tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
-Pairs file:             tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean.csv
-Treatment time series:  tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
-Control time series:    tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
-Output file:            tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
-Balanced output file:   tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
-Log file:               logs/run8e_build_jsts_matched_panel_20260625-011951.log
+run9e: prepare quality DiD input for JS/TS panels
+Started:          Mon Jun 29 03:15:28 PM CDT 2026
+Python script:    proc_scripts/prepare_quality_did_input_v2.py
+DID dir:          tmp_jsts_test/data/jsts_did_final
+Manifest:         tmp_jsts_test/data/jsts_did_final/quality_did_input_manifest_20260629-151528.csv
+Combined QC long: tmp_jsts_test/data/jsts_did_final/quality_did_input_qc_all_long.csv
+Combined QC wide: tmp_jsts_test/data/jsts_did_final/quality_did_input_qc_all_wide.csv
+Log file:         logs/run9e_prepare_quality_did_input_20260629-151528.log
 ============================================================
 
-** Checking input schemas
+
+============================================================
+Preparing panel: main_balanced
+Input:           tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube.csv
+Output:          tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input.csv
+Complete output: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
+QC output:       tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_qc.csv
+Missing output:  tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+============================================================
+2026-06-29 15:15:28,456 [INFO] Loading merged panel: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube.csv
+2026-06-29 15:15:28,502 [INFO] Input rows: 12270
+2026-06-29 15:15:28,502 [INFO] Input repos: 827
+2026-06-29 15:15:28,503 [INFO] Input months: 2024-01 to 2025-08
+2026-06-29 15:15:28,996 [INFO] Saved full quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input.csv
+2026-06-29 15:15:28,996 [INFO] Saved missing core quality rows: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+2026-06-29 15:15:28,996 [INFO] Saved complete-case quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
+2026-06-29 15:15:28,996 [INFO] Saved QC: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_qc.csv
+
+QC summary:
+                                     check                                                                                                                            value
+                               panel_label                                                                                                                    main_balanced
+                                input_rows                                                                                                                            12270
+                               output_rows                                                                                                                            12270
+        row_count_preserved_in_full_output                                                                                                                                1
+                                     repos                                                                                                                              827
+                                  min_time                                                                                                                          2024-01
+                                  max_time                                                                                                                          2025-08
+                            treatment_rows                                                                                                                             5028
+                              control_rows                                                                                                                             7242
+                           treatment_repos                                                                                                                              380
+                             control_repos                                                                                                                              447
+           duplicate_repo_time_source_rows                                                                                                                                0
+              analysis_ready_did_base_rows                                                                                                                            12270
+          analysis_ready_core_quality_rows                                                                                                                            12138
+           analysis_ready_quality_did_rows                                                                                                                            12138
+                 missing_core_quality_rows                                                                                                                              132
+        treatment_time_to_event_nonmissing                                                                                                                             5028
+          control_time_to_event_nonmissing                                                                                                                                0
+                            post_event_sum                                                                                                                             3007
+                    control_post_event_sum                                                                                                                                0
+                  treatment_post_event_sum                                                                                                                             3007
+           sonarqube_latest_commit_missing                                                                                                                                0
+      sonarqube_any_raw_metric_missing_sum                                                                                                                              132
+     sonarqube_all_raw_metrics_missing_sum                                                                                                                               75
+                  sonarqube_ncloc_zero_sum                                                                                                                               23
+     sonarqube_static_warnings_missing_sum                                                                                                                               75
+   sonarqube_duplicate_density_missing_sum                                                                                                                              126
+sonarqube_cognitive_complexity_missing_sum                                                                                                                              132
+   sonarqube_quality_outcomes_complete_sum                                                                                                                            12138
+       static_analysis_warnings_nonmissing                                                                                                                            12195
+          static_analysis_warnings_missing                                                                                                                               75
+       static_analysis_warnings_zero_count                                                                                                                              240
+             static_analysis_warnings_mean                                                                                                                       773.959656
+           static_analysis_warnings_median                                                                                                                             90.0
+         duplicate_line_density_nonmissing                                                                                                                            12144
+            duplicate_line_density_missing                                                                                                                              126
+         duplicate_line_density_zero_count                                                                                                                             3895
+               duplicate_line_density_mean                                                                                                                         7.367095
+             duplicate_line_density_median                                                                                                                              2.9
+                code_complexity_nonmissing                                                                                                                            12138
+                   code_complexity_missing                                                                                                                              132
+                code_complexity_zero_count                                                                                                                              161
+                      code_complexity_mean                                                                                                                      2417.344126
+                    code_complexity_median                                                                                                                            276.0
+              warnings_per_kloc_nonmissing                                                                                                                            12121
+                 warnings_per_kloc_missing                                                                                                                              149
+              warnings_per_kloc_zero_count                                                                                                                              166
+                    warnings_per_kloc_mean                                                                                                                        29.555305
+                  warnings_per_kloc_median                                                                                                                        20.361991
+            complexity_per_kloc_nonmissing                                                                                                                            12115
+               complexity_per_kloc_missing                                                                                                                              155
+            complexity_per_kloc_zero_count                                                                                                                              138
+                  complexity_per_kloc_mean                                                                                                                        84.326049
+                complexity_per_kloc_median                                                                                                                        58.757903
+           code_smells_per_kloc_nonmissing                                                                                                                            12121
+              code_smells_per_kloc_missing                                                                                                                              149
+           code_smells_per_kloc_zero_count                                                                                                                              193
+                 code_smells_per_kloc_mean                                                                                                                        28.115471
+               code_smells_per_kloc_median                                                                                                                        18.779343
+                 technical_debt_nonmissing                                                                                                                            12195
+                    technical_debt_missing                                                                                                                               75
+                 technical_debt_zero_count                                                                                                                              273
+                       technical_debt_mean                                                                                                                      4181.198688
+                     technical_debt_median                                                                                                                            487.0
+                          ncloc_nonmissing                                                                                                                            12144
+                             ncloc_missing                                                                                                                              126
+                          ncloc_zero_count                                                                                                                               23
+                                ncloc_mean                                                                                                                     29657.347908
+                              ncloc_median                                                                                                                           4396.0
+       duplicated_lines_density_nonmissing                                                                                                                            12144
+          duplicated_lines_density_missing                                                                                                                              126
+       duplicated_lines_density_zero_count                                                                                                                             3895
+             duplicated_lines_density_mean                                                                                                                         7.367095
+           duplicated_lines_density_median                                                                                                                              2.9
+          comment_lines_density_nonmissing                                                                                                                            12144
+             comment_lines_density_missing                                                                                                                              126
+          comment_lines_density_zero_count                                                                                                                              328
+                comment_lines_density_mean                                                                                                                         6.993297
+              comment_lines_density_median                                                                                                                              4.8
+           cognitive_complexity_nonmissing                                                                                                                            12138
+              cognitive_complexity_missing                                                                                                                              132
+           cognitive_complexity_zero_count                                                                                                                              161
+                 cognitive_complexity_mean                                                                                                                      2417.344126
+               cognitive_complexity_median                                                                                                                            276.0
+                           bugs_nonmissing                                                                                                                            12195
+                              bugs_missing                                                                                                                               75
+                           bugs_zero_count                                                                                                                             3737
+                                 bugs_mean                                                                                                                        36.078475
+                               bugs_median                                                                                                                              3.0
+                vulnerabilities_nonmissing                                                                                                                            12195
+                   vulnerabilities_missing                                                                                                                               75
+                vulnerabilities_zero_count                                                                                                                             7563
+                      vulnerabilities_mean                                                                                                                         3.908815
+                    vulnerabilities_median                                                                                                                              0.0
+                    code_smells_nonmissing                                                                                                                            12195
+                       code_smells_missing                                                                                                                               75
+                    code_smells_zero_count                                                                                                                              267
+                          code_smells_mean                                                                                                                       733.972366
+                        code_smells_median                                                                                                                             87.0
+   log_static_analysis_warnings_nonmissing                                                                                                                            12195
+       log_static_analysis_warnings_finite                                                                                                                            12195
+            log_code_complexity_nonmissing                                                                                                                            12138
+                log_code_complexity_finite                                                                                                                            12138
+             log_technical_debt_nonmissing                                                                                                                            12195
+                 log_technical_debt_finite                                                                                                                            12195
+                      log_ncloc_nonmissing                                                                                                                            12144
+                          log_ncloc_finite                                                                                                                            12144
+                       log_bugs_nonmissing                                                                                                                            12195
+                           log_bugs_finite                                                                                                                            12195
+            log_vulnerabilities_nonmissing                                                                                                                            12195
+                log_vulnerabilities_finite                                                                                                                            12195
+                log_code_smells_nonmissing                                                                                                                            12195
+                    log_code_smells_finite                                                                                                                            12195
+          log_warnings_per_kloc_nonmissing                                                                                                                            12121
+              log_warnings_per_kloc_finite                                                                                                                            12121
+        log_complexity_per_kloc_nonmissing                                                                                                                            12115
+            log_complexity_per_kloc_finite                                                                                                                            12115
+       log_code_smells_per_kloc_nonmissing                                                                                                                            12121
+           log_code_smells_per_kloc_finite                                                                                                                            12121
+                      complete_output_path tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
+                      complete_output_rows                                                                                                                            12138
+                     complete_output_repos                                                                                                                              822
+
+============================================================
+Preparing panel: main_unbalanced
+Input:           tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube.csv
+Output:          tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input.csv
+Complete output: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
+QC output:       tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_qc.csv
+Missing output:  tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_missing_core_quality.csv
+============================================================
+2026-06-29 15:15:29,245 [INFO] Loading merged panel: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube.csv
+2026-06-29 15:15:29,265 [INFO] Input rows: 6281
+2026-06-29 15:15:29,265 [INFO] Input repos: 773
+2026-06-29 15:15:29,266 [INFO] Input months: 2024-01 to 2025-08
+2026-06-29 15:15:29,480 [INFO] Saved full quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input.csv
+2026-06-29 15:15:29,480 [INFO] Saved missing core quality rows: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_missing_core_quality.csv
+2026-06-29 15:15:29,480 [INFO] Saved complete-case quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
+2026-06-29 15:15:29,480 [INFO] Saved QC: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_qc.csv
+
+QC summary:
+                                     check                                                                                                                   value
+                               panel_label                                                                                                         main_unbalanced
+                                input_rows                                                                                                                    6281
+                               output_rows                                                                                                                    6281
+        row_count_preserved_in_full_output                                                                                                                       1
+                                     repos                                                                                                                     773
+                                  min_time                                                                                                                 2024-01
+                                  max_time                                                                                                                 2025-08
+                            treatment_rows                                                                                                                    3410
+                              control_rows                                                                                                                    2871
+                           treatment_repos                                                                                                                     380
+                             control_repos                                                                                                                     393
+           duplicate_repo_time_source_rows                                                                                                                       0
+              analysis_ready_did_base_rows                                                                                                                    6281
+          analysis_ready_core_quality_rows                                                                                                                    6184
+           analysis_ready_quality_did_rows                                                                                                                    6184
+                 missing_core_quality_rows                                                                                                                      97
+        treatment_time_to_event_nonmissing                                                                                                                    3410
+          control_time_to_event_nonmissing                                                                                                                       0
+                            post_event_sum                                                                                                                    1821
+                    control_post_event_sum                                                                                                                       0
+                  treatment_post_event_sum                                                                                                                    1821
+           sonarqube_latest_commit_missing                                                                                                                       0
+      sonarqube_any_raw_metric_missing_sum                                                                                                                      97
+     sonarqube_all_raw_metrics_missing_sum                                                                                                                      63
+                  sonarqube_ncloc_zero_sum                                                                                                                       4
+     sonarqube_static_warnings_missing_sum                                                                                                                      63
+   sonarqube_duplicate_density_missing_sum                                                                                                                      95
+sonarqube_cognitive_complexity_missing_sum                                                                                                                      97
+   sonarqube_quality_outcomes_complete_sum                                                                                                                    6184
+       static_analysis_warnings_nonmissing                                                                                                                    6218
+          static_analysis_warnings_missing                                                                                                                      63
+       static_analysis_warnings_zero_count                                                                                                                      95
+             static_analysis_warnings_mean                                                                                                             1034.239949
+           static_analysis_warnings_median                                                                                                                   187.0
+         duplicate_line_density_nonmissing                                                                                                                    6186
+            duplicate_line_density_missing                                                                                                                      95
+         duplicate_line_density_zero_count                                                                                                                    1307
+               duplicate_line_density_mean                                                                                                                7.994342
+             duplicate_line_density_median                                                                                                                     4.2
+                code_complexity_nonmissing                                                                                                                    6184
+                   code_complexity_missing                                                                                                                      97
+                code_complexity_zero_count                                                                                                                      57
+                      code_complexity_mean                                                                                                             3462.324062
+                    code_complexity_median                                                                                                                   607.0
+              warnings_per_kloc_nonmissing                                                                                                                    6182
+                 warnings_per_kloc_missing                                                                                                                      99
+              warnings_per_kloc_zero_count                                                                                                                      59
+                    warnings_per_kloc_mean                                                                                                               25.570302
+                  warnings_per_kloc_median                                                                                                               18.033573
+            complexity_per_kloc_nonmissing                                                                                                                    6180
+               complexity_per_kloc_missing                                                                                                                     101
+            complexity_per_kloc_zero_count                                                                                                                      53
+                  complexity_per_kloc_mean                                                                                                               81.182359
+                complexity_per_kloc_median                                                                                                               60.004045
+           code_smells_per_kloc_nonmissing                                                                                                                    6182
+              code_smells_per_kloc_missing                                                                                                                      99
+           code_smells_per_kloc_zero_count                                                                                                                      66
+                 code_smells_per_kloc_mean                                                                                                               24.404968
+               code_smells_per_kloc_median                                                                                                               17.076323
+                 technical_debt_nonmissing                                                                                                                    6218
+                    technical_debt_missing                                                                                                                      63
+                 technical_debt_zero_count                                                                                                                     105
+                       technical_debt_mean                                                                                                             5595.827276
+                     technical_debt_median                                                                                                                   951.0
+                          ncloc_nonmissing                                                                                                                    6186
+                             ncloc_missing                                                                                                                      95
+                          ncloc_zero_count                                                                                                                       4
+                                ncloc_mean                                                                                                            47946.834465
+                              ncloc_median                                                                                                                 10135.0
+       duplicated_lines_density_nonmissing                                                                                                                    6186
+          duplicated_lines_density_missing                                                                                                                      95
+       duplicated_lines_density_zero_count                                                                                                                    1307
+             duplicated_lines_density_mean                                                                                                                7.994342
+           duplicated_lines_density_median                                                                                                                     4.2
+          comment_lines_density_nonmissing                                                                                                                    6186
+             comment_lines_density_missing                                                                                                                      95
+          comment_lines_density_zero_count                                                                                                                      84
+                comment_lines_density_mean                                                                                                                7.194811
+              comment_lines_density_median                                                                                                                     5.4
+           cognitive_complexity_nonmissing                                                                                                                    6184
+              cognitive_complexity_missing                                                                                                                      97
+           cognitive_complexity_zero_count                                                                                                                      57
+                 cognitive_complexity_mean                                                                                                             3462.324062
+               cognitive_complexity_median                                                                                                                   607.0
+                           bugs_nonmissing                                                                                                                    6218
+                              bugs_missing                                                                                                                      63
+                           bugs_zero_count                                                                                                                    1332
+                                 bugs_mean                                                                                                               42.530878
+                               bugs_median                                                                                                                     5.0
+                vulnerabilities_nonmissing                                                                                                                    6218
+                   vulnerabilities_missing                                                                                                                      63
+                vulnerabilities_zero_count                                                                                                                    3392
+                      vulnerabilities_mean                                                                                                                3.860566
+                    vulnerabilities_median                                                                                                                     0.0
+                    code_smells_nonmissing                                                                                                                    6218
+                       code_smells_missing                                                                                                                      63
+                    code_smells_zero_count                                                                                                                     102
+                          code_smells_mean                                                                                                              987.848504
+                        code_smells_median                                                                                                                   176.0
+   log_static_analysis_warnings_nonmissing                                                                                                                    6218
+       log_static_analysis_warnings_finite                                                                                                                    6218
+            log_code_complexity_nonmissing                                                                                                                    6184
+                log_code_complexity_finite                                                                                                                    6184
+             log_technical_debt_nonmissing                                                                                                                    6218
+                 log_technical_debt_finite                                                                                                                    6218
+                      log_ncloc_nonmissing                                                                                                                    6186
+                          log_ncloc_finite                                                                                                                    6186
+                       log_bugs_nonmissing                                                                                                                    6218
+                           log_bugs_finite                                                                                                                    6218
+            log_vulnerabilities_nonmissing                                                                                                                    6218
+                log_vulnerabilities_finite                                                                                                                    6218
+                log_code_smells_nonmissing                                                                                                                    6218
+                    log_code_smells_finite                                                                                                                    6218
+          log_warnings_per_kloc_nonmissing                                                                                                                    6182
+              log_warnings_per_kloc_finite                                                                                                                    6182
+        log_complexity_per_kloc_nonmissing                                                                                                                    6180
+            log_complexity_per_kloc_finite                                                                                                                    6180
+       log_code_smells_per_kloc_nonmissing                                                                                                                    6182
+           log_code_smells_per_kloc_finite                                                                                                                    6182
+                      complete_output_path tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
+                      complete_output_rows                                                                                                                    6184
+                     complete_output_repos                                                                                                                     768
+
+============================================================
+Preparing panel: strict_1to3_balanced
+Input:           tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube.csv
+Output:          tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input.csv
+Complete output: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
+QC output:       tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_qc.csv
+Missing output:  tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+============================================================
+2026-06-29 15:15:29,735 [INFO] Loading merged panel: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube.csv
+2026-06-29 15:15:29,768 [INFO] Input rows: 10986
+2026-06-29 15:15:29,769 [INFO] Input repos: 741
+2026-06-29 15:15:29,769 [INFO] Input months: 2024-01 to 2025-08
+2026-06-29 15:15:30,129 [INFO] Saved full quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input.csv
+2026-06-29 15:15:30,129 [INFO] Saved missing core quality rows: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+2026-06-29 15:15:30,129 [INFO] Saved complete-case quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
+2026-06-29 15:15:30,129 [INFO] Saved QC: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_qc.csv
+
+QC summary:
+                                     check                                                                                                                                      value
+                               panel_label                                                                                                                       strict_1to3_balanced
+                                input_rows                                                                                                                                      10986
+                               output_rows                                                                                                                                      10986
+        row_count_preserved_in_full_output                                                                                                                                          1
+                                     repos                                                                                                                                        741
+                                  min_time                                                                                                                                    2024-01
+                                  max_time                                                                                                                                    2025-08
+                            treatment_rows                                                                                                                                       4418
+                              control_rows                                                                                                                                       6568
+                           treatment_repos                                                                                                                                        337
+                             control_repos                                                                                                                                        404
+           duplicate_repo_time_source_rows                                                                                                                                          0
+              analysis_ready_did_base_rows                                                                                                                                      10986
+          analysis_ready_core_quality_rows                                                                                                                                      10862
+           analysis_ready_quality_did_rows                                                                                                                                      10862
+                 missing_core_quality_rows                                                                                                                                        124
+        treatment_time_to_event_nonmissing                                                                                                                                       4418
+          control_time_to_event_nonmissing                                                                                                                                          0
+                            post_event_sum                                                                                                                                       2680
+                    control_post_event_sum                                                                                                                                          0
+                  treatment_post_event_sum                                                                                                                                       2680
+           sonarqube_latest_commit_missing                                                                                                                                          0
+      sonarqube_any_raw_metric_missing_sum                                                                                                                                        124
+     sonarqube_all_raw_metrics_missing_sum                                                                                                                                         75
+                  sonarqube_ncloc_zero_sum                                                                                                                                          3
+     sonarqube_static_warnings_missing_sum                                                                                                                                         75
+   sonarqube_duplicate_density_missing_sum                                                                                                                                        118
+sonarqube_cognitive_complexity_missing_sum                                                                                                                                        124
+   sonarqube_quality_outcomes_complete_sum                                                                                                                                      10862
+       static_analysis_warnings_nonmissing                                                                                                                                      10911
+          static_analysis_warnings_missing                                                                                                                                         75
+       static_analysis_warnings_zero_count                                                                                                                                        185
+             static_analysis_warnings_mean                                                                                                                                 809.769774
+           static_analysis_warnings_median                                                                                                                                       91.0
+         duplicate_line_density_nonmissing                                                                                                                                      10868
+            duplicate_line_density_missing                                                                                                                                        118
+         duplicate_line_density_zero_count                                                                                                                                       3498
+               duplicate_line_density_mean                                                                                                                                   7.275616
+             duplicate_line_density_median                                                                                                                                        2.8
+                code_complexity_nonmissing                                                                                                                                      10862
+                   code_complexity_missing                                                                                                                                        124
+                code_complexity_zero_count                                                                                                                                        138
+                      code_complexity_mean                                                                                                                                2515.380317
+                    code_complexity_median                                                                                                                                      276.0
+              warnings_per_kloc_nonmissing                                                                                                                                      10865
+                 warnings_per_kloc_missing                                                                                                                                        121
+              warnings_per_kloc_zero_count                                                                                                                                        139
+                    warnings_per_kloc_mean                                                                                                                                  29.977729
+                  warnings_per_kloc_median                                                                                                                                  20.477816
+            complexity_per_kloc_nonmissing                                                                                                                                      10859
+               complexity_per_kloc_missing                                                                                                                                        127
+            complexity_per_kloc_zero_count                                                                                                                                        135
+                  complexity_per_kloc_mean                                                                                                                                  84.833905
+                complexity_per_kloc_median                                                                                                                                  58.487874
+           code_smells_per_kloc_nonmissing                                                                                                                                      10865
+              code_smells_per_kloc_missing                                                                                                                                        121
+           code_smells_per_kloc_zero_count                                                                                                                                        166
+                 code_smells_per_kloc_mean                                                                                                                                   28.56382
+               code_smells_per_kloc_median                                                                                                                                  19.075036
+                 technical_debt_nonmissing                                                                                                                                      10911
+                    technical_debt_missing                                                                                                                                         75
+                 technical_debt_zero_count                                                                                                                                        218
+                       technical_debt_mean                                                                                                                                4354.066355
+                     technical_debt_median                                                                                                                                      498.0
+                          ncloc_nonmissing                                                                                                                                      10868
+                             ncloc_missing                                                                                                                                        118
+                          ncloc_zero_count                                                                                                                                          3
+                                ncloc_mean                                                                                                                               30496.057784
+                              ncloc_median                                                                                                                                     4435.5
+       duplicated_lines_density_nonmissing                                                                                                                                      10868
+          duplicated_lines_density_missing                                                                                                                                        118
+       duplicated_lines_density_zero_count                                                                                                                                       3498
+             duplicated_lines_density_mean                                                                                                                                   7.275616
+           duplicated_lines_density_median                                                                                                                                        2.8
+          comment_lines_density_nonmissing                                                                                                                                      10868
+             comment_lines_density_missing                                                                                                                                        118
+          comment_lines_density_zero_count                                                                                                                                        306
+                comment_lines_density_mean                                                                                                                                   6.806395
+              comment_lines_density_median                                                                                                                                        4.8
+           cognitive_complexity_nonmissing                                                                                                                                      10862
+              cognitive_complexity_missing                                                                                                                                        124
+           cognitive_complexity_zero_count                                                                                                                                        138
+                 cognitive_complexity_mean                                                                                                                                2515.380317
+               cognitive_complexity_median                                                                                                                                      276.0
+                           bugs_nonmissing                                                                                                                                      10911
+                              bugs_missing                                                                                                                                         75
+                           bugs_zero_count                                                                                                                                       3422
+                                 bugs_mean                                                                                                                                  38.221978
+                               bugs_median                                                                                                                                        3.0
+                vulnerabilities_nonmissing                                                                                                                                      10911
+                   vulnerabilities_missing                                                                                                                                         75
+                vulnerabilities_zero_count                                                                                                                                       6701
+                      vulnerabilities_mean                                                                                                                                   4.082119
+                    vulnerabilities_median                                                                                                                                        0.0
+                    code_smells_nonmissing                                                                                                                                      10911
+                       code_smells_missing                                                                                                                                         75
+                    code_smells_zero_count                                                                                                                                        212
+                          code_smells_mean                                                                                                                                 767.465677
+                        code_smells_median                                                                                                                                       88.0
+   log_static_analysis_warnings_nonmissing                                                                                                                                      10911
+       log_static_analysis_warnings_finite                                                                                                                                      10911
+            log_code_complexity_nonmissing                                                                                                                                      10862
+                log_code_complexity_finite                                                                                                                                      10862
+             log_technical_debt_nonmissing                                                                                                                                      10911
+                 log_technical_debt_finite                                                                                                                                      10911
+                      log_ncloc_nonmissing                                                                                                                                      10868
+                          log_ncloc_finite                                                                                                                                      10868
+                       log_bugs_nonmissing                                                                                                                                      10911
+                           log_bugs_finite                                                                                                                                      10911
+            log_vulnerabilities_nonmissing                                                                                                                                      10911
+                log_vulnerabilities_finite                                                                                                                                      10911
+                log_code_smells_nonmissing                                                                                                                                      10911
+                    log_code_smells_finite                                                                                                                                      10911
+          log_warnings_per_kloc_nonmissing                                                                                                                                      10865
+              log_warnings_per_kloc_finite                                                                                                                                      10865
+        log_complexity_per_kloc_nonmissing                                                                                                                                      10859
+            log_complexity_per_kloc_finite                                                                                                                                      10859
+       log_code_smells_per_kloc_nonmissing                                                                                                                                      10865
+           log_code_smells_per_kloc_finite                                                                                                                                      10865
+                      complete_output_path tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
+                      complete_output_rows                                                                                                                                      10862
+                     complete_output_repos                                                                                                                                        736
+
+============================================================
+Preparing panel: strict_1to3_unbalanced
+Input:           tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube.csv
+Output:          tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input.csv
+Complete output: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
+QC output:       tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_qc.csv
+Missing output:  tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_missing_core_quality.csv
+============================================================
+2026-06-29 15:15:30,380 [INFO] Loading merged panel: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube.csv
+2026-06-29 15:15:30,397 [INFO] Input rows: 5518
+2026-06-29 15:15:30,398 [INFO] Input repos: 691
+2026-06-29 15:15:30,398 [INFO] Input months: 2024-01 to 2025-08
+2026-06-29 15:15:30,589 [INFO] Saved full quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input.csv
+2026-06-29 15:15:30,589 [INFO] Saved missing core quality rows: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_missing_core_quality.csv
+2026-06-29 15:15:30,589 [INFO] Saved complete-case quality DiD input: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
+2026-06-29 15:15:30,589 [INFO] Saved QC: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_qc.csv
+
+QC summary:
+                                     check                                                                                                                             value
+                               panel_label                                                                                                            strict_1to3_unbalanced
+                                input_rows                                                                                                                              5518
+                               output_rows                                                                                                                              5518
+        row_count_preserved_in_full_output                                                                                                                                 1
+                                     repos                                                                                                                               691
+                                  min_time                                                                                                                           2024-01
+                                  max_time                                                                                                                           2025-08
+                            treatment_rows                                                                                                                              2945
+                              control_rows                                                                                                                              2573
+                           treatment_repos                                                                                                                               337
+                             control_repos                                                                                                                               354
+           duplicate_repo_time_source_rows                                                                                                                                 0
+              analysis_ready_did_base_rows                                                                                                                              5518
+          analysis_ready_core_quality_rows                                                                                                                              5425
+           analysis_ready_quality_did_rows                                                                                                                              5425
+                 missing_core_quality_rows                                                                                                                                93
+        treatment_time_to_event_nonmissing                                                                                                                              2945
+          control_time_to_event_nonmissing                                                                                                                                 0
+                            post_event_sum                                                                                                                              1601
+                    control_post_event_sum                                                                                                                                 0
+                  treatment_post_event_sum                                                                                                                              1601
+           sonarqube_latest_commit_missing                                                                                                                                 0
+      sonarqube_any_raw_metric_missing_sum                                                                                                                                93
+     sonarqube_all_raw_metrics_missing_sum                                                                                                                                63
+                  sonarqube_ncloc_zero_sum                                                                                                                                 3
+     sonarqube_static_warnings_missing_sum                                                                                                                                63
+   sonarqube_duplicate_density_missing_sum                                                                                                                                91
+sonarqube_cognitive_complexity_missing_sum                                                                                                                                93
+   sonarqube_quality_outcomes_complete_sum                                                                                                                              5425
+       static_analysis_warnings_nonmissing                                                                                                                              5455
+          static_analysis_warnings_missing                                                                                                                                63
+       static_analysis_warnings_zero_count                                                                                                                                73
+             static_analysis_warnings_mean                                                                                                                       1081.945371
+           static_analysis_warnings_median                                                                                                                             188.0
+         duplicate_line_density_nonmissing                                                                                                                              5427
+            duplicate_line_density_missing                                                                                                                                91
+         duplicate_line_density_zero_count                                                                                                                              1164
+               duplicate_line_density_mean                                                                                                                          8.005233
+             duplicate_line_density_median                                                                                                                               4.2
+                code_complexity_nonmissing                                                                                                                              5425
+                   code_complexity_missing                                                                                                                                93
+                code_complexity_zero_count                                                                                                                                53
+                      code_complexity_mean                                                                                                                       3625.884793
+                    code_complexity_median                                                                                                                             607.0
+              warnings_per_kloc_nonmissing                                                                                                                              5424
+                 warnings_per_kloc_missing                                                                                                                                94
+              warnings_per_kloc_zero_count                                                                                                                                42
+                    warnings_per_kloc_mean                                                                                                                         25.967058
+                  warnings_per_kloc_median                                                                                                                         18.072295
+            complexity_per_kloc_nonmissing                                                                                                                              5422
+               complexity_per_kloc_missing                                                                                                                                96
+            complexity_per_kloc_zero_count                                                                                                                                50
+                  complexity_per_kloc_mean                                                                                                                         81.979571
+                complexity_per_kloc_median                                                                                                                         60.004045
+           code_smells_per_kloc_nonmissing                                                                                                                              5424
+              code_smells_per_kloc_missing                                                                                                                                94
+           code_smells_per_kloc_zero_count                                                                                                                                49
+                 code_smells_per_kloc_mean                                                                                                                         24.807877
+               code_smells_per_kloc_median                                                                                                                         17.050132
+                 technical_debt_nonmissing                                                                                                                              5455
+                    technical_debt_missing                                                                                                                                63
+                 technical_debt_zero_count                                                                                                                                83
+                       technical_debt_mean                                                                                                                       5818.478277
+                     technical_debt_median                                                                                                                             945.0
+                          ncloc_nonmissing                                                                                                                              5427
+                             ncloc_missing                                                                                                                                91
+                          ncloc_zero_count                                                                                                                                 3
+                                ncloc_mean                                                                                                                      50097.623917
+                              ncloc_median                                                                                                                           10077.0
+       duplicated_lines_density_nonmissing                                                                                                                              5427
+          duplicated_lines_density_missing                                                                                                                                91
+       duplicated_lines_density_zero_count                                                                                                                              1164
+             duplicated_lines_density_mean                                                                                                                          8.005233
+           duplicated_lines_density_median                                                                                                                               4.2
+          comment_lines_density_nonmissing                                                                                                                              5427
+             comment_lines_density_missing                                                                                                                                91
+          comment_lines_density_zero_count                                                                                                                                72
+                comment_lines_density_mean                                                                                                                          7.103851
+              comment_lines_density_median                                                                                                                               5.4
+           cognitive_complexity_nonmissing                                                                                                                              5425
+              cognitive_complexity_missing                                                                                                                                93
+           cognitive_complexity_zero_count                                                                                                                                53
+                 cognitive_complexity_mean                                                                                                                       3625.884793
+               cognitive_complexity_median                                                                                                                             607.0
+                           bugs_nonmissing                                                                                                                              5455
+                              bugs_missing                                                                                                                                63
+                           bugs_zero_count                                                                                                                              1201
+                                 bugs_mean                                                                                                                         44.850229
+                               bugs_median                                                                                                                               5.0
+                vulnerabilities_nonmissing                                                                                                                              5455
+                   vulnerabilities_missing                                                                                                                                63
+                vulnerabilities_zero_count                                                                                                                              2915
+                      vulnerabilities_mean                                                                                                                          3.916224
+                    vulnerabilities_median                                                                                                                               0.0
+                    code_smells_nonmissing                                                                                                                              5455
+                       code_smells_missing                                                                                                                                63
+                    code_smells_zero_count                                                                                                                                80
+                          code_smells_mean                                                                                                                       1033.178918
+                        code_smells_median                                                                                                                             177.0
+   log_static_analysis_warnings_nonmissing                                                                                                                              5455
+       log_static_analysis_warnings_finite                                                                                                                              5455
+            log_code_complexity_nonmissing                                                                                                                              5425
+                log_code_complexity_finite                                                                                                                              5425
+             log_technical_debt_nonmissing                                                                                                                              5455
+                 log_technical_debt_finite                                                                                                                              5455
+                      log_ncloc_nonmissing                                                                                                                              5427
+                          log_ncloc_finite                                                                                                                              5427
+                       log_bugs_nonmissing                                                                                                                              5455
+                           log_bugs_finite                                                                                                                              5455
+            log_vulnerabilities_nonmissing                                                                                                                              5455
+                log_vulnerabilities_finite                                                                                                                              5455
+                log_code_smells_nonmissing                                                                                                                              5455
+                    log_code_smells_finite                                                                                                                              5455
+          log_warnings_per_kloc_nonmissing                                                                                                                              5424
+              log_warnings_per_kloc_finite                                                                                                                              5424
+        log_complexity_per_kloc_nonmissing                                                                                                                              5422
+            log_complexity_per_kloc_finite                                                                                                                              5422
+       log_code_smells_per_kloc_nonmissing                                                                                                                              5424
+           log_code_smells_per_kloc_finite                                                                                                                              5424
+                      complete_output_path tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
+                      complete_output_rows                                                                                                                              5425
+                     complete_output_repos                                                                                                                               686
+
+** Building combined run9e QC summaries
 ------------------------------------------------------------
-treatment_meta: tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
-  columns: ['repo_name', 'repo_primary_language', 'repo_stars', 'repo_commits', 'repo_contributors', 'repo_size', 'repo_languages', 'status', 'target_dir', 'note', 'event_month', 'panel_first_month', 'panel_latest_month', 'panel_month_count', 'min_relative_month', 'max_relative_month', 'pre_panel_months', 'event_months', 'post_panel_months', 'balanced_window', 'adoption_month', 'adoption_date', 'adoption_commit', 'confidence', 'evidence_paths', 'event_month_clean', 'adoption_month_clean', 'month_difference', 'event_month_match', 'match_status']
+Combined QC wide:
+                 panel input_rows output_rows row_count_preserved_in_full_output repos treatment_rows control_rows treatment_repos control_repos duplicate_repo_time_source_rows analysis_ready_did_base_rows analysis_ready_core_quality_rows analysis_ready_quality_did_rows missing_core_quality_rows complete_output_rows complete_output_repos sonarqube_latest_commit_missing sonarqube_all_raw_metrics_missing_sum sonarqube_ncloc_zero_sum static_analysis_warnings_nonmissing duplicate_line_density_nonmissing code_complexity_nonmissing warnings_per_kloc_nonmissing complexity_per_kloc_nonmissing code_smells_per_kloc_nonmissing
+         main_balanced      12270       12270                                  1   827           5028         7242             380           447                               0                        12270                            12138                           12138                       132                12138                   822                               0                                    75                       23                               12195                             12144                      12138                        12121                          12115                           12121
+       main_unbalanced       6281        6281                                  1   773           3410         2871             380           393                               0                         6281                             6184                            6184                        97                 6184                   768                               0                                    63                        4                                6218                              6186                       6184                         6182                           6180                            6182
+  strict_1to3_balanced      10986       10986                                  1   741           4418         6568             337           404                               0                        10986                            10862                           10862                       124                10862                   736                               0                                    75                        3                               10911                             10868                      10862                        10865                          10859                           10865
+strict_1to3_unbalanced       5518        5518                                  1   691           2945         2573             337           354                               0                         5518                             5425                            5425                        93                 5425                   686                               0                                    63                        3                                5455                              5427                       5425                         5424                           5422                            5424
 
-pairs: tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean.csv
-  columns: ['treatment_repo', 'control_repo', 'control_rank', 'matched_period', 'matching_propensity_score', 'repo_primary_language', 'event_month', 'adoption_month', 'match_status', 'month_difference', 'target_dir', 'overlap_current_treatment_sample', 'overlap_full_adopter_population']
-
-treatment_ts: tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
-  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
-
-control_ts: tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
-  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
-
-Schema check passed.
-
-** Running panel builder
-------------------------------------------------------------
-python proc_scripts/prepare_panel_event_v2.py --treatment-meta tmp_jsts_test/data/jsts_treatment_sample_main_398.csv --pairs tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean.csv --treatment-ts tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv --control-ts tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv --output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv --balanced-output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
-
-2026-06-25 01:19:51,786 [INFO] Loaded 398 treatment repos with event_month
-2026-06-25 01:19:51,791 [INFO] Filtered treatment metadata to treatments present in selected pair file: 398 -> 384
-2026-06-25 01:19:51,814 [INFO] Filtered control time series to controls present in selected pair file: rows 7896 -> 7896, repos 450 -> 450
-2026-06-25 01:19:51,845 [INFO] === Building UNBALANCED panel ===
-2026-06-25 01:19:53,876 [WARNING] Treated repo AIDC-AI/ComfyUI-Copilot has empty/zero pre-adoption window
-...
-
-2026-06-25 01:19:53,951 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
-2026-06-25 01:19:53,959 [INFO] Control repos with post-window Cursor evidence kept as diagnostics: ['aidenybai/bippy', 'get-convex/convex-evals', 'nrwl/nx-console', 'rudderlabs/rudder-transformer', 'sst/sst', 'xavimondev/hubdev.tools']
-2026-06-25 01:19:53,965 [INFO] Date filter [2024-01-01..2025-08-31]: 15916 -> 6281 rows
-2026-06-25 01:19:53,983 [INFO] Saved unbalanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
-2026-06-25 01:19:53,983 [INFO] [UNBALANCED] Rows: 6281 | treated repos: 380 | control repos: 393
-
-=== UNBALANCED panel summary ===
-dataset_source  repos  rows  post_rows
-       control    393  2871          0
-     treatment    380  3410       1821
-2026-06-25 01:19:53,986 [INFO] === Building BALANCED panel (window completion) ===
-2026-06-25 01:19:54,458 [INFO] Window completion [2024-01..2025-08]: 8487 -> 5289 rows (394 repos)
-2026-06-25 01:19:54,989 [INFO] Window completion [2024-01..2025-08]: 7896 -> 7242 rows (447 repos)
-2026-06-25 01:19:55,361 [WARNING] No time series for treatment repo alexander-turner/TurnTrout.com; skipping
-...
-2026-06-25 01:19:56,552 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
-2026-06-25 01:19:56,568 [INFO] Date filter [2024-01-01..2025-08-31]: 12270 -> 12270 rows
-2026-06-25 01:19:56,606 [INFO] Saved balanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
-2026-06-25 01:19:56,606 [INFO] [BALANCED] Rows: 12270 | treated repos: 380 | control repos: 447
-
-=== BALANCED panel summary ===
-dataset_source  repos  rows  post_rows
-       control    447  7242          0
-     treatment    380  5028       3007
-
-** Output summary
-------------------------------------------------------------
-unbalanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
-  rows: 6281
-  repos: 773
-  treated repos: 380
-  control repos: 393
-  dataset_source counts:
-dataset_source
-treatment    3410
-control      2871
-
-balanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
-  rows: 12270
-  repos: 827
-  treated repos: 380
-  control repos: 447
-  dataset_source counts:
-dataset_source
-control      7242
-treatment    5028
-
+Saved combined QC long: tmp_jsts_test/data/jsts_did_final/quality_did_input_qc_all_long.csv
+Saved combined QC wide: tmp_jsts_test/data/jsts_did_final/quality_did_input_qc_all_wide.csv
 
 ============================================================
-run8e completed successfully.
-Log file: logs/run8e_build_jsts_matched_panel_20260625-011951.log
-Output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
-Balanced output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+run9e completed successfully.
+Completed:        Mon Jun 29 03:15:30 PM CDT 2026
+Manifest:         tmp_jsts_test/data/jsts_did_final/quality_did_input_manifest_20260629-151528.csv
+Combined QC long: tmp_jsts_test/data/jsts_did_final/quality_did_input_qc_all_long.csv
+Combined QC wide: tmp_jsts_test/data/jsts_did_final/quality_did_input_qc_all_wide.csv
+Log file:         logs/run9e_prepare_quality_did_input_20260629-151528.log
 ============================================================
-============================================================
-run8e: build final matched JS/TS DiD event panel
-Timestamp:              20260625-012041
-Python script:          proc_scripts/prepare_panel_event_v2.py
-Treatment metadata:     tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
-Pairs file:             tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv
-Treatment time series:  tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
-Control time series:    tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
-Output file:            tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
-Balanced output file:   tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-Log file:               logs/run8e_build_jsts_matched_panel_20260625-012041.log
-============================================================
-
-** Checking input schemas
-------------------------------------------------------------
-treatment_meta: tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
-  columns: ['repo_name', 'repo_primary_language', 'repo_stars', 'repo_commits', 'repo_contributors', 'repo_size', 'repo_languages', 'status', 'target_dir', 'note', 'event_month', 'panel_first_month', 'panel_latest_month', 'panel_month_count', 'min_relative_month', 'max_relative_month', 'pre_panel_months', 'event_months', 'post_panel_months', 'balanced_window', 'adoption_month', 'adoption_date', 'adoption_commit', 'confidence', 'evidence_paths', 'event_month_clean', 'adoption_month_clean', 'month_difference', 'event_month_match', 'match_status']
-
-pairs: tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv
-  columns: ['treatment_repo', 'control_repo', 'control_rank', 'matched_period', 'matching_propensity_score', 'repo_primary_language', 'event_month', 'adoption_month', 'match_status', 'month_difference', 'target_dir', 'overlap_current_treatment_sample', 'overlap_full_adopter_population']
-
-treatment_ts: tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv
-  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
-
-control_ts: tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv
-  columns: ['repo_name', 'month', 'latest_commit', 'cursor', 'commits', 'lines_added', 'lines_removed', 'contributors']
-
-Schema check passed.
-
-** Running panel builder
-------------------------------------------------------------
-python proc_scripts/prepare_panel_event_v2.py --treatment-meta tmp_jsts_test/data/jsts_treatment_sample_main_398.csv --pairs tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv --treatment-ts tmp_jsts_test/data/jsts_did_test/ts_repos_monthly.csv --control-ts tmp_jsts_test/data/jsts_did_control/ts_repos_monthly_final_clean.csv --output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv --balanced-output tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-
-2026-06-25 01:20:41,700 [INFO] Loaded 398 treatment repos with event_month
-2026-06-25 01:20:41,704 [INFO] Filtered treatment metadata to treatments present in selected pair file: 398 -> 339
-2026-06-25 01:20:41,728 [INFO] Filtered control time series to controls present in selected pair file: rows 7896 -> 7329, repos 450 -> 407
-2026-06-25 01:20:41,757 [INFO] === Building UNBALANCED panel ===
-2026-06-25 01:20:43,576 [WARNING] Treated repo AIDC-AI/ComfyUI-Copilot has empty/zero pre-adoption window
-
-...
-2026-06-25 01:20:43,641 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
-2026-06-25 01:20:43,648 [INFO] Control repos with post-window Cursor evidence kept as diagnostics: ['aidenybai/bippy', 'get-convex/convex-evals', 'nrwl/nx-console', 'rudderlabs/rudder-transformer', 'xavimondev/hubdev.tools']
-2026-06-25 01:20:43,653 [INFO] Date filter [2024-01-01..2025-08-31]: 14462 -> 5518 rows
-2026-06-25 01:20:43,669 [INFO] Saved unbalanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
-2026-06-25 01:20:43,669 [INFO] [UNBALANCED] Rows: 5518 | treated repos: 337 | control repos: 354
-
-=== UNBALANCED panel summary ===
-dataset_source  repos  rows  post_rows
-       control    354  2573          0
-     treatment    337  2945       1601
-2026-06-25 01:20:43,672 [INFO] === Building BALANCED panel (window completion) ===
-2026-06-25 01:20:44,139 [INFO] Window completion [2024-01..2025-08]: 8487 -> 5289 rows (394 repos)
-2026-06-25 01:20:44,616 [INFO] Window completion [2024-01..2025-08]: 7329 -> 6568 rows (404 repos)
-2026-06-25 01:20:44,930 [WARNING] No time series for treatment repo alexander-turner/TurnTrout.com; skipping
-
-...
-2026-06-25 01:20:45,994 [WARNING] Treated repo zueai/mcp-manager has empty/zero pre-adoption window
-2026-06-25 01:20:46,008 [INFO] Date filter [2024-01-01..2025-08-31]: 10986 -> 10986 rows
-2026-06-25 01:20:46,044 [INFO] Saved balanced panel: /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-2026-06-25 01:20:46,046 [INFO] [BALANCED] Rows: 10986 | treated repos: 337 | control repos: 404
-
-=== BALANCED panel summary ===
-dataset_source  repos  rows  post_rows
-       control    404  6568          0
-     treatment    337  4418       2680
-
-** Output summary
-------------------------------------------------------------
-unbalanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
-  rows: 5518
-  repos: 691
-  treated repos: 337
-  control repos: 354
-  dataset_source counts:
-dataset_source
-treatment    2945
-control      2573
-
-balanced: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-  rows: 10986
-  repos: 741
-  treated repos: 337
-  control repos: 404
-  dataset_source counts:
-dataset_source
-control      6568
-treatment    4418
+Saved log to logs/run9e_prepare_quality_did_input_20260629-151528.log
 
 
-============================================================
-run8e completed successfully.
-Log file: logs/run8e_build_jsts_matched_panel_20260625-012041.log
-Output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
-Balanced output file: tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-============================================================
 
-tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
-rows: 6281
-repos: 773
-treated repos: 380
-control repos: 393
-time range: 2024-01 to 2025-08
-dataset_source:
-dataset_source
-treatment    3410
-control      2871
-control rows without provenance: 0
-
-tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
-rows: 12270
-repos: 827
-treated repos: 380
-control repos: 447
-time range: 2024-01 to 2025-08
-dataset_source:
-dataset_source
-control      7242
-treatment    5028
-control rows without provenance: 0
-
-tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
-rows: 5518
-repos: 691
-treated repos: 337
-control repos: 354
-time range: 2024-01 to 2025-08
-dataset_source:
-dataset_source
-treatment    2945
-control      2573
-control rows without provenance: 0
-
-tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-rows: 10986
-repos: 741
-treated repos: 337
-control repos: 404
-time range: 2024-01 to 2025-08
-dataset_source:
-dataset_source
-control      6568
-treatment    4418
-control rows without provenance: 0
+                 panel  input_rows  output_rows  row_count_preserved_in_full_output  duplicate_repo_time_source_rows  analysis_ready_quality_did_rows  missing_core_quality_rows  complete_output_rows  static_analysis_warnings_nonmissing  duplicate_line_density_nonmissing  code_complexity_nonmissing
+         main_balanced       12270        12270                                   1                                0                            12138                        132                 12138                                12195                              12144                       12138
+       main_unbalanced        6281         6281                                   1                                0                             6184                         97                  6184                                 6218                               6186                        6184
+  strict_1to3_balanced       10986        10986                                   1                                0                            10862                        124                 10862                                10911                              10868                       10862
+strict_1to3_unbalanced        5518         5518                                   1                                0                             5425                         93                  5425                                 5455                               5427                        5425
