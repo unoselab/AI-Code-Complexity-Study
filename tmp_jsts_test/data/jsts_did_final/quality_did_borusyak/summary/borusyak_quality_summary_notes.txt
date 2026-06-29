@@ -1,0 +1,21 @@
+Borusyak Quality DiD Summary
+================================
+
+Main panel: main_balanced
+
+Static effects are log-point estimates converted to percent changes:
+percent_change = (exp(estimate) - 1) * 100
+
+- Static analysis warnings: 5.0% [-3.8%, 14.5%], CI excludes zero: False
+- Duplicate line density: 3.9% [-9.7%, 19.6%], CI excludes zero: False
+- Code complexity: 17.3% [6.4%, 29.2%], CI excludes zero: True
+
+Robustness pattern:
+- Static analysis warnings: positive in 4/4 panels; CI excludes zero in 0/4 panels.
+- Duplicate line density: positive in 4/4 panels; CI excludes zero in 0/4 panels.
+- Code complexity: positive in 4/4 panels; CI excludes zero in 4/4 panels.
+
+Model errors: none recorded.
+
+Recommended interpretation:
+Code complexity is the most robust quality outcome: all panels show positive estimates with confidence intervals excluding zero.

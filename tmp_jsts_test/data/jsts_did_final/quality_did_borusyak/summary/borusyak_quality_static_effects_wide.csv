@@ -1,0 +1,5 @@
+panel,panel_label,Static analysis warnings,Duplicate line density,Code complexity
+main_balanced,Main balanced,"5.0% [-3.8%, 14.5%]","3.9% [-9.7%, 19.6%]","17.3%** [6.4%, 29.2%]"
+main_unbalanced,Main unbalanced,"4.0% [-4.9%, 13.6%]","0.2% [-12.2%, 14.3%]","10.7%* [0.2%, 22.3%]"
+strict_1to3_balanced,Strict 1:3 balanced,"7.5% [-1.9%, 17.9%]","2.3% [-12.1%, 19.2%]","21.8%*** [9.6%, 35.3%]"
+strict_1to3_unbalanced,Strict 1:3 unbalanced,"7.8% [-1.8%, 18.3%]","0.1% [-13.5%, 16.0%]","14.7%* [2.6%, 28.2%]"
