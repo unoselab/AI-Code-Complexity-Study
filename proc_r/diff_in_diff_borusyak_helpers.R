@@ -1,42 +1,45 @@
 # Helper functions for Borusyak DiD analyses.
 #
-# These helpers are shared by run9 quality DiD analyses.
-#
-# Reused logic:
-#   1. Static Borusyak did_imputation call.
-#   2. Dynamic Borusyak event-study did_imputation call.
-#   3. Static treatment-effect extraction.
-#   4. Dynamic event-study result extraction.
-#
-# Expected panel columns:
-#   - repo_name: numeric repository/unit id
-#   - time: numeric monthly time id, e.g., 202501
-#   - event: numeric treatment cohort month, e.g., 202501, or 0 for never-treated controls
+# Expected default panel columns:
+#   - repo_id: numeric repository/unit id
+#   - time_id: numeric monthly time id, e.g., year * 12 + month
+#   - event_id: numeric treatment cohort month id, or 0 for never-treated controls
 #
 # Main dependency:
 #   didimputation::did_imputation()
 
 
-run_borusyak_static <- function(data, outcome_var, first_stage_formula) {
+run_borusyak_static <- function(data,
+                                outcome_var,
+                                first_stage_formula,
+                                idname = "repo_id",
+                                tname = "time_id",
+                                gname = "event_id") {
   didimputation::did_imputation(
     data = data,
     yname = outcome_var,
-    gname = "event",
-    tname = "time",
-    idname = "repo_name",
+    gname = gname,
+    tname = tname,
+    idname = idname,
     first_stage = first_stage_formula
   )
 }
 
 
-run_borusyak_dynamic <- function(data, outcome_var, first_stage_formula,
-                                 horizon = -6:6, pretrends = -6:-2) {
+run_borusyak_dynamic <- function(data,
+                                 outcome_var,
+                                 first_stage_formula,
+                                 horizon = -6:6,
+                                 pretrends = -6:-2,
+                                 idname = "repo_id",
+                                 tname = "time_id",
+                                 gname = "event_id") {
   didimputation::did_imputation(
     data = data,
     yname = outcome_var,
-    gname = "event",
-    tname = "time",
-    idname = "repo_name",
+    gname = gname,
+    tname = tname,
+    idname = idname,
     first_stage = first_stage_formula,
     horizon = horizon,
     pretrends = pretrends
@@ -119,8 +122,30 @@ extract_static_result <- function(result, outcome) {
 }
 
 
-extract_dynamic_result <- function(result, outcome, outcome_label,
-                                   min_horizon = -6, max_horizon = 6) {
+extract_event_time_from_term <- function(term_vec) {
+  term_chr <- gsub("[\u2212\u2013\u2014]", "-", as.character(term_vec))
+  term_chr <- gsub("\\s+", "", term_chr)
+
+  out <- suppressWarnings(as.numeric(term_chr))
+
+  missing_idx <- is.na(out)
+  if (any(missing_idx)) {
+    extracted <- regmatches(
+      term_chr[missing_idx],
+      regexpr("-?[0-9]+$", term_chr[missing_idx])
+    )
+    out[missing_idx] <- suppressWarnings(as.numeric(extracted))
+  }
+
+  out
+}
+
+
+extract_dynamic_result <- function(result,
+                                   outcome,
+                                   outcome_label,
+                                   min_horizon = -6,
+                                   max_horizon = 6) {
   if (is.null(result)) {
     return(data.frame())
   }
@@ -131,8 +156,7 @@ extract_dynamic_result <- function(result, outcome, outcome_label,
     return(data.frame())
   }
 
-  term_chr <- gsub("[\u2212\u2013\u2014]", "-", as.character(result_df$term))
-  time_numeric <- suppressWarnings(as.numeric(term_chr))
+  time_numeric <- extract_event_time_from_term(result_df$term)
 
   valid <- !is.na(time_numeric) &
     time_numeric >= min_horizon &

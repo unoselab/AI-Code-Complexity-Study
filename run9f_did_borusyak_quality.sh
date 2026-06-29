@@ -79,14 +79,15 @@ PANELS=(
     echo "HTML:          ${HTML_FILE}"
     echo "============================================================"
 
-    PROJECT_ROOT="${PROJECT_ROOT}" \
-    PANEL_LABEL="${PANEL_LABEL}" \
-    PANEL_PATH="${INPUT_FILE}" \
-    OUT_DIR="${PANEL_OUT_DIR}" \
+    export PANEL_LABEL
+    export PANEL_PATH="${INPUT_FILE}"
+    export OUT_DIR="${PANEL_OUT_DIR}"
+    export RMD_FILE
+
     Rscript -e "rmarkdown::render(
-      '${RMD_FILE}',
-      output_dir = '${PANEL_OUT_DIR}',
-      output_file = 'borusyak_quality_${PANEL_LABEL}.html',
+      input = Sys.getenv('RMD_FILE'),
+      output_dir = Sys.getenv('OUT_DIR'),
+      output_file = paste0('borusyak_quality_', Sys.getenv('PANEL_LABEL'), '.html'),
       envir = new.env()
     )"
 
@@ -159,24 +160,26 @@ for _, row in manifest.iterrows():
     dynamic_error_path = Path(row["dynamic_errors"])
 
     if static_error_path.exists():
-      err = pd.read_csv(static_error_path)
-      if "panel" not in err.columns:
-          err.insert(0, "panel", panel)
-      err.insert(1, "model_type", "static")
-      error_frames.append(err)
+        err = pd.read_csv(static_error_path)
+        if "panel" not in err.columns:
+            err.insert(0, "panel", panel)
+        err.insert(1, "model_type", "static")
+        error_frames.append(err)
 
     if dynamic_error_path.exists():
-      err = pd.read_csv(dynamic_error_path)
-      if "panel" not in err.columns:
-          err.insert(0, "panel", panel)
-      err.insert(1, "model_type", "dynamic")
-      error_frames.append(err)
+        err = pd.read_csv(dynamic_error_path)
+        if "panel" not in err.columns:
+            err.insert(0, "panel", panel)
+        err.insert(1, "model_type", "dynamic")
+        error_frames.append(err)
 
 combined_static = pd.concat(static_frames, ignore_index=True) if static_frames else pd.DataFrame()
 combined_dynamic = pd.concat(dynamic_frames, ignore_index=True) if dynamic_frames else pd.DataFrame()
 combined_checks = pd.concat(checks_frames, ignore_index=True) if checks_frames else pd.DataFrame()
 combined_input_summary = pd.concat(summary_frames, ignore_index=True) if summary_frames else pd.DataFrame()
-combined_errors = pd.concat(error_frames, ignore_index=True) if error_frames else pd.DataFrame(columns=["panel", "model_type", "outcome", "error"])
+combined_errors = pd.concat(error_frames, ignore_index=True) if error_frames else pd.DataFrame(
+    columns=["panel", "model_type", "outcome", "error"]
+)
 
 combined_static_path.parent.mkdir(parents=True, exist_ok=True)
 
