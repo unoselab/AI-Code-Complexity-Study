@@ -1,0 +1,12 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_quality_v2.Rmd
+helper_file,proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,main_balanced
+panel_path,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
+out_dir,/home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_balanced
+outcomes,"log_static_analysis_warnings, log_duplicate_line_density, log_code_complexity"
+covariates,contributors_log + log_ncloc
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,YYYY-MM converted to month_id = year * 12 + month
+input_source,run9e complete-case quality DiD input
+interpretation_note,Use main panel as primary analysis and other panels as robustness checks

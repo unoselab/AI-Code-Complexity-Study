@@ -12,8 +12,22 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
 options(bitmapType = "cairo")
 
 project_root <- Sys.getenv("PROJECT_ROOT", unset = normalizePath(".", mustWork = TRUE))
-panel_path <- Sys.getenv("PANEL_PATH", unset = "")
-out_dir <- Sys.getenv("OUT_DIR", unset = "")
+project_root <- normalizePath(project_root, mustWork = TRUE)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || path_value == "") {
+    return("")
+  }
+
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(Sys.getenv("PANEL_PATH", unset = ""))
+out_dir <- resolve_project_path(Sys.getenv("OUT_DIR", unset = ""))
 panel_label <- Sys.getenv("PANEL_LABEL", unset = "panel")
 
 if (panel_path == "") {

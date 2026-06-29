@@ -1,0 +1,13 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,panel
+log_static_analysis_warnings,treat,0.0486485092775415,0.0443535398843387,-0.0382844288957624,0.135581447450845,,Borusyak static treatment effect,Static Analysis Warnings,main_balanced
+log_duplicate_line_density,treat,0.0386256840739803,0.0716125030539181,-0.101734821911699,0.17898619005966,,Borusyak static treatment effect,Duplicate Line Density,main_balanced
+log_code_complexity,treat,0.159332786056825,0.0494923409076567,0.0623277978778177,0.256337774235832,,Borusyak static treatment effect,Code Complexity,main_balanced
+log_static_analysis_warnings,treat,0.0389940241642992,0.0453694617718355,-0.0499301209084984,0.127918169237097,,Borusyak static treatment effect,Static Analysis Warnings,main_unbalanced
+log_duplicate_line_density,treat,0.0019285269807979,0.0674168030250356,-0.130208406948272,0.134065460909868,,Borusyak static treatment effect,Duplicate Line Density,main_unbalanced
+log_code_complexity,treat,0.102034404170013,0.0508109568218924,0.0024449287991041,0.201623879540922,,Borusyak static treatment effect,Code Complexity,main_unbalanced
+log_static_analysis_warnings,treat,0.0726102542253126,0.0467685514695858,-0.0190561066550755,0.164276615105701,,Borusyak static treatment effect,Static Analysis Warnings,strict_1to3_balanced
+log_duplicate_line_density,treat,0.0229884032155335,0.0776698600712931,-0.129244522524201,0.175221328955268,,Borusyak static treatment effect,Duplicate Line Density,strict_1to3_balanced
+log_code_complexity,treat,0.197141310614057,0.0537647482080831,0.0917624041262142,0.3025202171019,,Borusyak static treatment effect,Code Complexity,strict_1to3_balanced
+log_static_analysis_warnings,treat,0.0752337567598381,0.0475590086845938,-0.0179819002619657,0.168449413781642,,Borusyak static treatment effect,Static Analysis Warnings,strict_1to3_unbalanced
+log_duplicate_line_density,treat,0.0014766154173155,0.0747653413608184,-0.145063453649888,0.14801668448452,,Borusyak static treatment effect,Duplicate Line Density,strict_1to3_unbalanced
+log_code_complexity,treat,0.137114146544126,0.0566476350849773,0.0260847817775703,0.248143511310681,,Borusyak static treatment effect,Code Complexity,strict_1to3_unbalanced

@@ -1,0 +1,3 @@
+dataset_source,rows,repos,mean_log_static_warnings,mean_log_duplicate_line_density,mean_log_code_complexity,mean_log_ncloc
+treatment,4911,375,5.22007199390399,1.4844096210235,6.31336686861028,9.1571862316652
+control,7187,445,4.22051364415639,1.27597494417039,5.13642050111694,7.94876526446809

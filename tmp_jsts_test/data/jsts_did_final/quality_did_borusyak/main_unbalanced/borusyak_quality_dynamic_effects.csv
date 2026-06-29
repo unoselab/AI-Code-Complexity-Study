@@ -1,0 +1,37 @@
+outcome,outcome_label,time,estimate,conf_low,conf_high,std_error,p_value,significant,panel
+log_static_analysis_warnings,Static Analysis Warnings,-6,-0.00169460617646328,-0.0521843709531469,0.0487951586002204,0.0257600840697366,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,-5,0.0203003130927475,-0.0352637436140002,0.0758643697994951,0.0283490085238509,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,-4,-0.0257289705275368,-0.11076903916065,0.0593110981055763,0.0433877901189353,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,-3,-0.000642244590486146,-0.0681120968238128,0.0668276076428405,0.0344233939965952,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,-2,0.033549578939497,-0.0309355573426225,0.0980347152216165,0.0329005797357753,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,0,0.0238202099216619,-0.0492901003871022,0.096930520230426,0.0373011787289613,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,1,0.0589265809355611,-0.0308443309224299,0.148697492793552,0.0458014856418321,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,2,0.0756290976897497,-0.0184742731588772,0.169732468538377,0.0480119239023607,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,3,0.0484396232261944,-0.0514851014984473,0.148364347950836,0.0509820024105314,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,4,0.0148442760625849,-0.0846921429596377,0.114380695084807,0.050783887256236,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,5,0.0599720605461789,-0.0442517598568638,0.164195880949222,0.053175418572981,,FALSE,main_unbalanced
+log_static_analysis_warnings,Static Analysis Warnings,6,-0.0125828435091131,-0.126969071102197,0.101803384083971,0.0583603202005531,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,-6,-0.00476372895959769,-0.0897378305673319,0.0802103726481365,0.0433541334733338,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,-5,-0.0219995023680915,-0.112098292141242,0.0680992874050589,0.0459687702924237,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,-4,-0.126708662370644,-0.225977004037994,-0.0274403207032945,0.0506471130955867,,TRUE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,-3,-0.0358632701715627,-0.132709750687945,0.0609832103448194,0.0494114696512153,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,-2,0.0113240747655673,-0.0765285246878073,0.0991766742189419,0.0448227548231503,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,0,0.0276925459688805,-0.0889001841511332,0.144285276088894,0.0594860867959253,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,1,-0.00995904650083606,-0.139911661887637,0.119993568885965,0.066302354789184,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,2,-0.00249853161893633,-0.15061530388427,0.145618240646398,0.0755697817680276,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,3,-0.056222338138879,-0.218825565151937,0.106380888874179,0.0829608301087029,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,4,-0.0243084825930678,-0.192828115709543,0.144211150523407,0.0859794046512627,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,5,-0.019487551583859,-0.184241288191172,0.145266185023454,0.0840580288812821,,FALSE,main_unbalanced
+log_duplicate_line_density,Duplicate Line Density,6,-0.0475981935604511,-0.249325406419809,0.154129019298907,0.102922047377224,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,-6,-0.00680937896568848,-0.0490189096018557,0.0354001516704788,0.0215354748143711,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,-5,0.000908772883176465,-0.0406338670435608,0.0424514128099138,0.021195224452417,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,-4,-0.0193027074508215,-0.0903284131088265,0.0517229982071836,0.0362376049275536,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,-3,0.0134057465260409,-0.0344310227125012,0.061242515764583,0.0244065149176235,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,-2,0.0453884062341837,-0.00391684272942307,0.0946936551977905,0.0251557392671463,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,0,0.0950647521843965,0.0098741438573099,0.180255360511483,0.0434645960852483,,TRUE,main_unbalanced
+log_code_complexity,Code Complexity,1,0.095377667793419,-0.00583192228155786,0.196587257868396,0.0516375459566208,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,2,0.121219959055987,0.00448961823200375,0.23795029987997,0.0595562963387669,,TRUE,main_unbalanced
+log_code_complexity,Code Complexity,3,0.109085082570084,-0.010907983318304,0.229078148458472,0.0612209519838714,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,4,0.103135472869054,-0.0110138376330242,0.217284783371132,0.0582394441337133,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,5,0.0729459020956272,-0.0422667715352012,0.188158575726456,0.0587819763422594,,FALSE,main_unbalanced
+log_code_complexity,Code Complexity,6,0.13352352504692,0.00605413277138142,0.260992917322459,0.0650354042222136,,TRUE,main_unbalanced
