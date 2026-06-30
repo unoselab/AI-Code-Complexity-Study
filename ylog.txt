@@ -1,221 +1,198 @@
-============================================================
-run9f: Borusyak DiD for JS/TS SonarQube quality outcomes
-Started:                Mon Jun 29 03:47:02 PM CDT 2026
-PROJECT_ROOT:           /home/user1-system12/Documents/repro-test01/ai_code_complexity_study
-Rmd file:               proc_r/DiffInDiffBorusyak_quality_v2.Rmd
-DID dir:                tmp_jsts_test/data/jsts_did_final
-Output root:            tmp_jsts_test/data/jsts_did_final/quality_did_borusyak
-Manifest:               tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_manifest_20260629-154702.csv
-Combined static:        tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_static_effects_all.csv
-Combined dynamic:       tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_dynamic_effects_all.csv
-Combined checks:        tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_panel_checks_all.csv
-Combined input summary: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_input_summary_all.csv
-Combined errors:        tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_errors_all.csv
-Log file:               logs/run9f_did_borusyak_quality_20260629-154702.log
-============================================================
+./tmp_jsts_test/data/
+├── jsts_control_clone_failed_repos_main_398.csv
+├── jsts_control_clone_status_main_398_20260624-164811.csv
+├── jsts_control_clone_status_main_398_20260624-165336.csv
+├── jsts_control_clone_status_main_398.csv
+├── jsts_control_clone_usable_repos_main_398.csv
+├── jsts_control_clone_usable_repos_main_398_final_clean.csv
+├── jsts_control_clone_usable_summary_main_398.csv
+├── jsts_control_extract_summary_main_398.csv
+├── jsts_control_local_cursor_evidence_in_window.csv
+├── jsts_control_local_cursor_evidence_post_window.csv
+├── jsts_control_local_cursor_filter_summary_main_398.csv
+├── jsts_control_overlap_with_full_adopters.csv
+├── jsts_control_pair_coverage_main_398_clone_usable.csv
+├── jsts_control_pair_coverage_main_398_final_clean_1to3_only.csv
+├── jsts_control_pair_coverage_main_398_final_clean.csv
+├── jsts_control_repos_to_clone_main_398.csv
+├── jsts_control_repos_to_clone_main_398_overlap_repos.csv
+├── jsts_control_repos_to_clone_main_398_raw.csv
+├── jsts_did_control
+│   ├── ai_adoption_dates.csv
+│   ├── cursor_commits.csv
+│   ├── ts_contributors_monthly.csv
+│   ├── ts_contributors_monthly_final_clean.csv
+│   ├── ts_repos_monthly.csv
+│   └── ts_repos_monthly_final_clean.csv
+├── jsts_did_final
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_check_summary.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_missing_analysis_outcomes.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_qc.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_qc.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_check_summary.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_missing_analysis_outcomes.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_qc.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_missing_core_quality.csv
+│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_qc.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_check_summary.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_missing_analysis_outcomes.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_qc.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_qc.csv
+│   ├── panel_event_monthly_matched_final_clean.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_check_summary.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_missing_analysis_outcomes.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_qc.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_missing_core_quality.csv
+│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_qc.csv
+│   ├── panel_qc_summary.csv
+│   ├── quality_did_borusyak
+│   │   ├── borusyak_quality_dynamic_effects_all.csv
+│   │   ├── borusyak_quality_errors_all.csv
+│   │   ├── borusyak_quality_input_summary_all.csv
+│   │   ├── borusyak_quality_manifest_20260629-153637.csv
+│   │   ├── borusyak_quality_manifest_20260629-154254.csv
+│   │   ├── borusyak_quality_manifest_20260629-154645.csv
+│   │   ├── borusyak_quality_manifest_20260629-154702.csv
+│   │   ├── borusyak_quality_panel_checks_all.csv
+│   │   ├── borusyak_quality_static_effects_all.csv
+│   │   ├── main_balanced
+│   │   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   │   ├── borusyak_quality_input_summary.csv
+│   │   │   ├── borusyak_quality_main_balanced.html
+│   │   │   ├── borusyak_quality_metadata.csv
+│   │   │   ├── borusyak_quality_panel_checks.csv
+│   │   │   ├── borusyak_quality_static_effects.csv
+│   │   │   └── dynamic_effects_borusyak_quality.pdf
+│   │   ├── main_unbalanced
+│   │   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   │   ├── borusyak_quality_input_summary.csv
+│   │   │   ├── borusyak_quality_main_unbalanced.html
+│   │   │   ├── borusyak_quality_metadata.csv
+│   │   │   ├── borusyak_quality_panel_checks.csv
+│   │   │   ├── borusyak_quality_static_effects.csv
+│   │   │   └── dynamic_effects_borusyak_quality.pdf
+│   │   ├── strict_1to3_balanced
+│   │   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   │   ├── borusyak_quality_input_summary.csv
+│   │   │   ├── borusyak_quality_metadata.csv
+│   │   │   ├── borusyak_quality_panel_checks.csv
+│   │   │   ├── borusyak_quality_static_effects.csv
+│   │   │   ├── borusyak_quality_strict_1to3_balanced.html
+│   │   │   └── dynamic_effects_borusyak_quality.pdf
+│   │   ├── strict_1to3_unbalanced
+│   │   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   │   ├── borusyak_quality_input_summary.csv
+│   │   │   ├── borusyak_quality_metadata.csv
+│   │   │   ├── borusyak_quality_panel_checks.csv
+│   │   │   ├── borusyak_quality_static_effects.csv
+│   │   │   ├── borusyak_quality_strict_1to3_unbalanced.html
+│   │   │   └── dynamic_effects_borusyak_quality.pdf
+│   │   └── summary
+│   │       ├── borusyak_quality_dynamic_effects_percent.csv
+│   │       ├── borusyak_quality_dynamic_effects_plot_ready.csv
+│   │       ├── borusyak_quality_input_summary_copy.csv
+│   │       ├── borusyak_quality_main_panel_table.csv
+│   │       ├── borusyak_quality_main_panel_table.md
+│   │       ├── borusyak_quality_panel_checks_copy.csv
+│   │       ├── borusyak_quality_static_effects_paper_ready.csv
+│   │       ├── borusyak_quality_static_effects_wide.csv
+│   │       └── borusyak_quality_summary_notes.txt
+│   ├── quality_did_input_manifest_20260629-151355.csv
+│   ├── quality_did_input_manifest_20260629-151521.csv
+│   ├── quality_did_input_manifest_20260629-151528.csv
+│   ├── quality_did_input_qc_all_long.csv
+│   ├── quality_did_input_qc_all_wide.csv
+│   ├── sonarqube_panel_check_manifest_20260629-145857.csv
+│   ├── sonarqube_panel_check_qc_all.csv
+│   ├── sonarqube_panel_check_summary_all.csv
+│   ├── sonarqube_panel_merge_summary.csv
+│   └── warning_category_did
+│       └── code_hygiene
+├── jsts_did_test
+│   ├── adoption_month_check.csv
+│   ├── ai_adoption_dates.csv
+│   ├── cursor_commits.csv
+│   ├── mismatched_adoption_month_repos.csv
+│   ├── missing_adoption_month_repos.csv
+│   ├── ts_contributors_monthly.csv
+│   └── ts_repos_monthly.csv
+├── jsts_matched_control_pairs_main_398_clone_failed.csv
+├── jsts_matched_control_pairs_main_398_clone_usable.csv
+├── jsts_matched_control_pairs_main_398_coverage.csv
+├── jsts_matched_control_pairs_main_398.csv
+├── jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv
+├── jsts_matched_control_pairs_main_398_final_clean.csv
+├── jsts_matched_control_pairs_main_398_local_cursor_dropped.csv
+├── jsts_matched_control_pairs_main_398_overlap_pairs.csv
+├── jsts_matched_control_pairs_main_398_raw.csv
+├── jsts_sonarqube_main
+│   ├── backups
+│   │   ├── after_control_20260629-133006
+│   │   │   ├── control_ts_repos_monthly.csv
+│   │   │   ├── control_ts_repos_monthly_scanned.csv
+│   │   │   ├── run9b_sonarqube_jsts_control_20260627-003624.log
+│   │   │   └── sonarqube_metric_coverage_treatment_control.csv
+│   │   ├── after_treatment_20260627-003322
+│   │   │   ├── run9b_sonarqube_jsts_treatment_20260625-021602.log
+│   │   │   ├── sonarqube_input_summary.csv
+│   │   │   ├── treatment_ts_repos_monthly.csv
+│   │   │   └── treatment_ts_repos_monthly_scanned.csv
+│   │   ├── control_metric_coverage_20260629-132553.csv
+│   │   ├── treatment_metric_coverage_20260627-003440.csv
+│   │   └── treatment_metric_coverage_20260627-003448.csv
+│   ├── control
+│   │   └── data
+│   │       ├── control_missing_metrics_rows.csv
+│   │       ├── control_ncloc_zero_rows.csv
+│   │       ├── ts_repos_monthly.csv
+│   │       └── ts_repos_monthly_scanned.csv
+│   ├── control_repos.txt
+│   ├── control_scan_potential_issues.txt
+│   ├── months.txt
+│   ├── sonarqube_input_summary.csv
+│   ├── sonarqube_metric_coverage_treatment_control.csv
+│   ├── treatment
+│   │   └── data
+│   │       ├── ts_repos_monthly.csv
+│   │       └── ts_repos_monthly_scanned.csv
+│   └── treatment_repos.txt
+├── jsts_sonarqube_scan_smoke
+│   └── data
+│       ├── ts_repos_monthly.csv
+│       └── ts_repos_monthly_scanned.csv
+├── jsts_treatment_clone_failed_repos.csv
+├── jsts_treatment_clone_status_20260624-025938.csv
+├── jsts_treatment_clone_status.csv
+├── jsts_treatment_clone_status_smoke10.csv
+├── jsts_treatment_clone_usable_missing_event_month.csv
+├── jsts_treatment_clone_usable_repos.csv
+├── jsts_treatment_clone_usable_repos_with_event.csv
+├── jsts_treatment_clone_usable_repos_with_event_valid.csv
+├── jsts_treatment_missing_matching_main_398.csv
+├── jsts_treatment_repos_lost_all_controls_main_398.csv
+├── jsts_treatment_repos_lost_all_controls_main_398_final_clean.csv
+├── jsts_treatment_sample_diagnostic_10.csv
+├── jsts_treatment_sample_exact_match_381.csv
+├── jsts_treatment_sample_main_398.csv
+├── jsts_treatment_sample_within1_month_388.csv
+├── original_paper_treatment_jsts_repos_bw6.csv
+└── original_paper_treatment_jsts_repos.csv
 
-
-============================================================
-Running panel: main_balanced
-Input:         tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
-Output dir:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_balanced
-HTML:          tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_balanced/borusyak_quality_main_balanced.html
-============================================================
-
-
-processing file: DiffInDiffBorusyak_quality_v2.Rmd
-1/24                    
-2/24 [setup]            
-3/24                    
-4/24 [load-packages]    
-5/24                    
-6/24 [load-panel]       
-7/24                    
-8/24 [utility-functions]
-9/24                    
-10/24 [panel-checks]     
-11/24                    
-12/24 [prepare-data]     
-13/24                    
-14/24 [outcomes]         
-15/24                    
-16/24 [static-effects]   
-17/24                    
-18/24 [dynamic-effects]  
-19/24                    
-20/24 [dynamic-plot]     
-Fontconfig warning: using without calling FcInit()
-21/24                    
-22/24 [metadata]         
-23/24                    
-24/24 [session-info]     
-output file: DiffInDiffBorusyak_quality_v2.knit.md
-
-/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_quality_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_balanced/borusyak_quality_main_balanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/RtmpGmhjCx/rmarkdown-str22b88327ff1ca6.html 
-[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
-
-Output created: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_balanced/borusyak_quality_main_balanced.html
-
-============================================================
-Running panel: main_unbalanced
-Input:         tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
-Output dir:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_unbalanced
-HTML:          tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_unbalanced/borusyak_quality_main_unbalanced.html
-============================================================
-
-
-processing file: DiffInDiffBorusyak_quality_v2.Rmd
-1/24                    
-2/24 [setup]            
-3/24                    
-4/24 [load-packages]    
-5/24                    
-6/24 [load-panel]       
-7/24                    
-8/24 [utility-functions]
-9/24                    
-10/24 [panel-checks]     
-11/24                    
-12/24 [prepare-data]     
-13/24                    
-14/24 [outcomes]         
-15/24                    
-16/24 [static-effects]   
-17/24                    
-18/24 [dynamic-effects]  
-19/24                    
-20/24 [dynamic-plot]     
-Fontconfig warning: using without calling FcInit()
-21/24                    
-22/24 [metadata]         
-23/24                    
-24/24 [session-info]     
-output file: DiffInDiffBorusyak_quality_v2.knit.md
-
-/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_quality_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_unbalanced/borusyak_quality_main_unbalanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/RtmpeDiPOz/rmarkdown-str22be6f37e435d8.html 
-[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
-
-Output created: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/main_unbalanced/borusyak_quality_main_unbalanced.html
-
-============================================================
-Running panel: strict_1to3_balanced
-Input:         tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
-Output dir:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_balanced
-HTML:          tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_balanced/borusyak_quality_strict_1to3_balanced.html
-============================================================
-
-
-processing file: DiffInDiffBorusyak_quality_v2.Rmd
-1/24                    
-2/24 [setup]            
-3/24                    
-4/24 [load-packages]    
-5/24                    
-6/24 [load-panel]       
-7/24                    
-8/24 [utility-functions]
-9/24                    
-10/24 [panel-checks]     
-11/24                    
-12/24 [prepare-data]     
-13/24                    
-14/24 [outcomes]         
-15/24                    
-16/24 [static-effects]   
-17/24                    
-18/24 [dynamic-effects]  
-19/24                    
-20/24 [dynamic-plot]     
-Fontconfig warning: using without calling FcInit()
-21/24                    
-22/24 [metadata]         
-23/24                    
-24/24 [session-info]     
-output file: DiffInDiffBorusyak_quality_v2.knit.md
-
-/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_quality_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_balanced/borusyak_quality_strict_1to3_balanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/RtmpM7u4qh/rmarkdown-str22c43f5e7a695c.html 
-[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
-
-Output created: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_balanced/borusyak_quality_strict_1to3_balanced.html
-
-============================================================
-Running panel: strict_1to3_unbalanced
-Input:         tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
-Output dir:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_unbalanced
-HTML:          tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_unbalanced/borusyak_quality_strict_1to3_unbalanced.html
-============================================================
-
-
-processing file: DiffInDiffBorusyak_quality_v2.Rmd
-1/24                    
-2/24 [setup]            
-3/24                    
-4/24 [load-packages]    
-5/24                    
-6/24 [load-panel]       
-7/24                    
-8/24 [utility-functions]
-9/24                    
-10/24 [panel-checks]     
-11/24                    
-12/24 [prepare-data]     
-13/24                    
-14/24 [outcomes]         
-15/24                    
-16/24 [static-effects]   
-17/24                    
-18/24 [dynamic-effects]  
-19/24                    
-20/24 [dynamic-plot]     
-Fontconfig warning: using without calling FcInit()
-21/24                    
-22/24 [metadata]         
-23/24                    
-24/24 [session-info]     
-output file: DiffInDiffBorusyak_quality_v2.knit.md
-
-/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_quality_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_unbalanced/borusyak_quality_strict_1to3_unbalanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/RtmpvNi795/rmarkdown-str22ca145528b959.html 
-[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
-
-Output created: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/strict_1to3_unbalanced/borusyak_quality_strict_1to3_unbalanced.html
-
-** Building combined run9f outputs
-------------------------------------------------------------
-Combined static effects:
-                     outcome  term  estimate  std_error  conf_low  conf_high  p_value                             note            outcome_label                  panel
-log_static_analysis_warnings treat  0.048649   0.044354 -0.038284   0.135581      NaN Borusyak static treatment effect Static Analysis Warnings          main_balanced
-  log_duplicate_line_density treat  0.038626   0.071613 -0.101735   0.178986      NaN Borusyak static treatment effect   Duplicate Line Density          main_balanced
-         log_code_complexity treat  0.159333   0.049492  0.062328   0.256338      NaN Borusyak static treatment effect          Code Complexity          main_balanced
-log_static_analysis_warnings treat  0.038994   0.045369 -0.049930   0.127918      NaN Borusyak static treatment effect Static Analysis Warnings        main_unbalanced
-  log_duplicate_line_density treat  0.001929   0.067417 -0.130208   0.134065      NaN Borusyak static treatment effect   Duplicate Line Density        main_unbalanced
-         log_code_complexity treat  0.102034   0.050811  0.002445   0.201624      NaN Borusyak static treatment effect          Code Complexity        main_unbalanced
-log_static_analysis_warnings treat  0.072610   0.046769 -0.019056   0.164277      NaN Borusyak static treatment effect Static Analysis Warnings   strict_1to3_balanced
-  log_duplicate_line_density treat  0.022988   0.077670 -0.129245   0.175221      NaN Borusyak static treatment effect   Duplicate Line Density   strict_1to3_balanced
-         log_code_complexity treat  0.197141   0.053765  0.091762   0.302520      NaN Borusyak static treatment effect          Code Complexity   strict_1to3_balanced
-log_static_analysis_warnings treat  0.075234   0.047559 -0.017982   0.168449      NaN Borusyak static treatment effect Static Analysis Warnings strict_1to3_unbalanced
-  log_duplicate_line_density treat  0.001477   0.074765 -0.145063   0.148017      NaN Borusyak static treatment effect   Duplicate Line Density strict_1to3_unbalanced
-         log_code_complexity treat  0.137114   0.056648  0.026085   0.248144      NaN Borusyak static treatment effect          Code Complexity strict_1to3_unbalanced
-
-Combined dynamic effects rows: 144
-Combined panel checks rows: 76
-Combined input summary rows: 8
-Combined error rows: 0
-
-Saved combined static effects: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_static_effects_all.csv
-Saved combined dynamic effects: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_dynamic_effects_all.csv
-Saved combined panel checks: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_panel_checks_all.csv
-Saved combined input summary: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_input_summary_all.csv
-Saved combined errors: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_errors_all.csv
-
-============================================================
-run9f completed successfully.
-Completed:                Mon Jun 29 03:47:13 PM CDT 2026
-Manifest:                 tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_manifest_20260629-154702.csv
-Combined static:          tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_static_effects_all.csv
-Combined dynamic:         tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_dynamic_effects_all.csv
-Combined checks:          tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_panel_checks_all.csv
-Combined input summary:   tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_input_summary_all.csv
-Combined errors:          tmp_jsts_test/data/jsts_did_final/quality_did_borusyak/borusyak_quality_errors_all.csv
-Log file:                 logs/run9f_did_borusyak_quality_20260629-154702.log
-============================================================
-Saved log to logs/run9f_did_borusyak_quality_20260629-154702.log
+21 directories, 174 files
