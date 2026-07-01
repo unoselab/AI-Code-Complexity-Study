@@ -71,6 +71,16 @@ panel_label <- params$panel_label
 panel_path <- params$panel_path
 out_dir <- params$out_dir
 
+# rmarkdown::render() knits with the Rmd's own folder (proc_r/) as the
+# working directory, which breaks project-root-relative paths like
+# "tmp_jsts_test/...". If the panel file is visible one level up, shift
+# every relative path to the project root.
+if (!file.exists(panel_path) && file.exists(file.path("..", panel_path))) {
+  cat("NOTE: resolving paths from project root (..) instead of proc_r/\n")
+  panel_path <- file.path("..", panel_path)
+  out_dir <- file.path("..", out_dir)
+}
+
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 cat("Panel label:", panel_label, "\n")
@@ -266,8 +276,6 @@ panel_data <- panel_data[
   event_yyyymm == 0L |
     (event_yyyymm > 202407L & event_yyyymm <= 202503L)
 ]
-
-
 
 panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
 panel_data[, event_id := ifelse(event_yyyymm == 0L, 0L, yyyymm_to_month_id(event_yyyymm))]
@@ -618,29 +626,59 @@ if (length(dynamic_errors) > 0) {
 
 # Dynamic Plot
 
-```{r dynamic-plot, fig.width=10, fig.height=5}
+```{r dynamic-plot, fig.width=9, fig.height=3.5}
 if (nrow(dynamic_df) > 0) {
+  dynamic_df$outcome_label <- factor(dynamic_df$outcome_label, levels = outcome_names)
+
   p <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
-    geom_hline(yintercept = 0, linetype = "dashed") +
-    geom_vline(xintercept = -1, linetype = "dotted") +
-    geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.15) +
-    geom_point() +
-    geom_line() +
-    facet_wrap(~ outcome_label, scales = "free_y") +
-    labs(
-      title = paste("Borusyak Dynamic Effects for Velocity Outcomes:", panel_label),
-      x = "Months relative to Cursor adoption",
-      y = "Estimate on log scale"
+    geom_errorbar(
+      data = subset(dynamic_df, significant %in% TRUE),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "solid"
     ) +
-    theme_minimal()
+    geom_errorbar(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "dotted"
+    ) +
+    geom_point(
+      data = subset(dynamic_df, significant %in% TRUE),
+      shape = 19,
+      size = 1.7
+    ) +
+    geom_point(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      shape = 21,
+      fill = "transparent",
+      size = 1.7
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
+    labs(
+      title = paste("Borusyak Velocity DiD:", panel_label),
+      subtitle = "JS/TS velocity DiD input from run8e final matched panel",
+      x = "Months Relative to Cursor Adoption",
+      y = "Treatment Effect (log scale)",
+      caption = "Filled dots: CI excludes 0. Hollow dots: CI includes 0."
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
 
   print(p)
 
   ggsave(
     filename = file.path(out_dir, "dynamic_effects_borusyak_velocity.pdf"),
     plot = p,
-    width = 10,
-    height = 5
+    width = 9,
+    height = 3.5
   )
 } else {
   cat("No dynamic effects to plot.\n")

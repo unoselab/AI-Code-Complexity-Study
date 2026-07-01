@@ -1,106 +1,222 @@
-tmp_jsts_test/data/jsts_did_final/
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_check_summary.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_missing_analysis_outcomes.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_qc.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_qc.csv
-├── panel_event_monthly_matched_final_clean_1to3_only.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_check_summary.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_missing_analysis_outcomes.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_qc.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_missing_core_quality.csv
-├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_qc.csv
-├── panel_event_monthly_matched_final_clean_balanced.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_check_summary.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_missing_analysis_outcomes.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_qc.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
-├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_qc.csv
-├── panel_event_monthly_matched_final_clean.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube_check_summary.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube_missing_analysis_outcomes.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube_qc.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_missing_core_quality.csv
-├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_qc.csv
-├── panel_qc_summary.csv
-├── quality_did_borusyak
-│   ├── borusyak_quality_dynamic_effects_all.csv
-│   ├── borusyak_quality_errors_all.csv
-│   ├── borusyak_quality_input_summary_all.csv
-│   ├── borusyak_quality_manifest_20260629-153637.csv
-│   ├── borusyak_quality_manifest_20260629-154254.csv
-│   ├── borusyak_quality_manifest_20260629-154645.csv
-│   ├── borusyak_quality_manifest_20260629-154702.csv
-│   ├── borusyak_quality_panel_checks_all.csv
-│   ├── borusyak_quality_static_effects_all.csv
-│   ├── main_balanced
-│   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   ├── borusyak_quality_input_summary.csv
-│   │   ├── borusyak_quality_main_balanced.html
-│   │   ├── borusyak_quality_metadata.csv
-│   │   ├── borusyak_quality_panel_checks.csv
-│   │   ├── borusyak_quality_static_effects.csv
-│   │   └── dynamic_effects_borusyak_quality.pdf
-│   ├── main_unbalanced
-│   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   ├── borusyak_quality_input_summary.csv
-│   │   ├── borusyak_quality_main_unbalanced.html
-│   │   ├── borusyak_quality_metadata.csv
-│   │   ├── borusyak_quality_panel_checks.csv
-│   │   ├── borusyak_quality_static_effects.csv
-│   │   └── dynamic_effects_borusyak_quality.pdf
-│   ├── strict_1to3_balanced
-│   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   ├── borusyak_quality_input_summary.csv
-│   │   ├── borusyak_quality_metadata.csv
-│   │   ├── borusyak_quality_panel_checks.csv
-│   │   ├── borusyak_quality_static_effects.csv
-│   │   ├── borusyak_quality_strict_1to3_balanced.html
-│   │   └── dynamic_effects_borusyak_quality.pdf
-│   ├── strict_1to3_unbalanced
-│   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   ├── borusyak_quality_input_summary.csv
-│   │   ├── borusyak_quality_metadata.csv
-│   │   ├── borusyak_quality_panel_checks.csv
-│   │   ├── borusyak_quality_static_effects.csv
-│   │   ├── borusyak_quality_strict_1to3_unbalanced.html
-│   │   └── dynamic_effects_borusyak_quality.pdf
-│   └── summary
-│       ├── borusyak_quality_dynamic_effects_percent.csv
-│       ├── borusyak_quality_dynamic_effects_plot_ready.csv
-│       ├── borusyak_quality_input_summary_copy.csv
-│       ├── borusyak_quality_main_panel_table.csv
-│       ├── borusyak_quality_main_panel_table.md
-│       ├── borusyak_quality_panel_checks_copy.csv
-│       ├── borusyak_quality_static_effects_paper_ready.csv
-│       ├── borusyak_quality_static_effects_wide.csv
-│       └── borusyak_quality_summary_notes.txt
-├── quality_did_input_manifest_20260629-151355.csv
-├── quality_did_input_manifest_20260629-151521.csv
-├── quality_did_input_manifest_20260629-151528.csv
-├── quality_did_input_qc_all_long.csv
-├── quality_did_input_qc_all_wide.csv
-├── sonarqube_panel_check_manifest_20260629-145857.csv
-├── sonarqube_panel_check_qc_all.csv
-├── sonarqube_panel_check_summary_all.csv
-├── sonarqube_panel_merge_summary.csv
-├── velocity_did_borusyak
-│   ├── main_unbalanced
-│   └── summary
-└── warning_category_did
-    └── code_hygiene
+1. check below.
+2. if the below result is okay, let us see first 1 to 3 strict unbalanced. I'll share the generated HTML file (tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/strict_1to3_unbalanced/borusyak_velocity_strict_1to3_unbalanced.html).
 
-11 directories, 92 files
+
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ ./run9h-did-velocity-borusyak.sh 
+============================================================
+run9h: JS/TS development velocity Borusyak DiD
+Started:        Wed Jul  1 03:51:19 PM CDT 2026
+Rmd:            proc_r/DiffInDiffBorusyak_velocity_v2.Rmd
+DID dir:        tmp_jsts_test/data/jsts_did_final
+Output root:    tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak
+Summary dir:    tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/summary
+Log file:       logs/run9h_did_velocity_borusyak_20260701-155119.log
+============================================================
+
+
+============================================================
+Rendering velocity Borusyak panel: main_unbalanced
+Panel:      tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv
+Output dir: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/main_unbalanced
+============================================================
+
+
+processing file: DiffInDiffBorusyak_velocity_v2.Rmd
+1/30                            
+2/30 [setup]                    
+3/30                            
+4/30 [packages]                 
+5/30                            
+6/30 [params]                   
+7/30                            
+8/30 [source-helpers]           
+9/30                            
+10/30 [helper-functions]         
+11/30                            
+12/30 [load-panel]               
+13/30                            
+14/30 [panel-checks]             
+15/30                            
+16/30 [prepare-data]             
+17/30                            
+18/30 [input-summary]            
+19/30                            
+20/30 [panel-checks-after-filter]
+21/30                            
+22/30 [outcomes-first-stage]     
+23/30                            
+24/30 [static-effects]           
+25/30                            
+26/30 [dynamic-effects]          
+27/30                            
+28/30 [dynamic-plot]             
+Fontconfig warning: using without calling FcInit()
+29/30                            
+30/30 [metadata]                 
+output file: DiffInDiffBorusyak_velocity_v2.knit.md
+
+/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_velocity_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/main_unbalanced/borusyak_velocity_main_unbalanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/Rtmp04WGkC/rmarkdown-str25a39938265cfa.html 
+[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
+
+Output created: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/main_unbalanced/borusyak_velocity_main_unbalanced.html
+
+============================================================
+Rendering velocity Borusyak panel: main_balanced
+Panel:      tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_balanced.csv
+Output dir: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/main_balanced
+============================================================
+
+
+processing file: DiffInDiffBorusyak_velocity_v2.Rmd
+1/30                            
+2/30 [setup]                    
+3/30                            
+4/30 [packages]                 
+5/30                            
+6/30 [params]                   
+7/30                            
+8/30 [source-helpers]           
+9/30                            
+10/30 [helper-functions]         
+11/30                            
+12/30 [load-panel]               
+13/30                            
+14/30 [panel-checks]             
+15/30                            
+16/30 [prepare-data]             
+17/30                            
+18/30 [input-summary]            
+19/30                            
+20/30 [panel-checks-after-filter]
+21/30                            
+22/30 [outcomes-first-stage]     
+23/30                            
+24/30 [static-effects]           
+25/30                            
+26/30 [dynamic-effects]          
+27/30                            
+28/30 [dynamic-plot]             
+Fontconfig warning: using without calling FcInit()
+29/30                            
+30/30 [metadata]                 
+output file: DiffInDiffBorusyak_velocity_v2.knit.md
+
+/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_velocity_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/main_balanced/borusyak_velocity_main_balanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/Rtmpv6m2z2/rmarkdown-str25a82033a15b8c.html 
+[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
+
+Output created: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/main_balanced/borusyak_velocity_main_balanced.html
+
+============================================================
+Rendering velocity Borusyak panel: strict_1to3_unbalanced
+Panel:      tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv
+Output dir: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/strict_1to3_unbalanced
+============================================================
+
+
+processing file: DiffInDiffBorusyak_velocity_v2.Rmd
+1/30                            
+2/30 [setup]                    
+3/30                            
+4/30 [packages]                 
+5/30                            
+6/30 [params]                   
+7/30                            
+8/30 [source-helpers]           
+9/30                            
+10/30 [helper-functions]         
+11/30                            
+12/30 [load-panel]               
+13/30                            
+14/30 [panel-checks]             
+15/30                            
+16/30 [prepare-data]             
+17/30                            
+18/30 [input-summary]            
+19/30                            
+20/30 [panel-checks-after-filter]
+21/30                            
+22/30 [outcomes-first-stage]     
+23/30                            
+24/30 [static-effects]           
+25/30                            
+26/30 [dynamic-effects]          
+27/30                            
+28/30 [dynamic-plot]             
+Fontconfig warning: using without calling FcInit()
+29/30                            
+30/30 [metadata]                 
+output file: DiffInDiffBorusyak_velocity_v2.knit.md
+
+/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_velocity_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/strict_1to3_unbalanced/borusyak_velocity_strict_1to3_unbalanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/Rtmpnr4c88/rmarkdown-str25aca6513df5e5.html 
+[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
+
+Output created: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/strict_1to3_unbalanced/borusyak_velocity_strict_1to3_unbalanced.html
+
+============================================================
+Rendering velocity Borusyak panel: strict_1to3_balanced
+Panel:      tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+Output dir: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/strict_1to3_balanced
+============================================================
+
+
+processing file: DiffInDiffBorusyak_velocity_v2.Rmd
+1/30                            
+2/30 [setup]                    
+3/30                            
+4/30 [packages]                 
+5/30                            
+6/30 [params]                   
+7/30                            
+8/30 [source-helpers]           
+9/30                            
+10/30 [helper-functions]         
+11/30                            
+12/30 [load-panel]               
+13/30                            
+14/30 [panel-checks]             
+15/30                            
+16/30 [prepare-data]             
+17/30                            
+18/30 [input-summary]            
+19/30                            
+20/30 [panel-checks-after-filter]
+21/30                            
+22/30 [outcomes-first-stage]     
+23/30                            
+24/30 [static-effects]           
+25/30                            
+26/30 [dynamic-effects]          
+27/30                            
+28/30 [dynamic-plot]             
+Fontconfig warning: using without calling FcInit()
+29/30                            
+30/30 [metadata]                 
+output file: DiffInDiffBorusyak_velocity_v2.knit.md
+
+/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_velocity_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/Documents/repro-test01/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/strict_1to3_balanced/borusyak_velocity_strict_1to3_balanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/Rtmp1GW43h/rmarkdown-str25b11d230075f4.html 
+[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
+
+Output created: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/strict_1to3_balanced/borusyak_velocity_strict_1to3_balanced.html
+
+** Building combined velocity summaries
+------------------------------------------------------------
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/borusyak_velocity_static_effects_all.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/borusyak_velocity_dynamic_effects_all.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/borusyak_velocity_input_summary_all.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/borusyak_velocity_panel_checks_all.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/summary/borusyak_velocity_static_effects_paper_ready.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/summary/borusyak_velocity_static_effects_wide.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/summary/borusyak_velocity_dynamic_effects_percent.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/summary/borusyak_velocity_dynamic_effects_plot_ready.csv
+Saved: tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/summary/borusyak_velocity_summary_notes.txt
+
+============================================================
+run9h completed successfully.
+Completed:       Wed Jul  1 03:51:29 PM CDT 2026
+Output root:     tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak
+Summary dir:     tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/summary
+Log file:        logs/run9h_did_velocity_borusyak_20260701-155119.log
+============================================================
+Saved log to logs/run9h_did_velocity_borusyak_20260701-155119.log
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 

@@ -78,6 +78,7 @@ rmarkdown::render(
     panel_path = panel_path,
     out_dir = out_dir
   ),
+  knit_root_dir = getwd(),
   envir = new.env(parent = globalenv()),
   quiet = FALSE
 )

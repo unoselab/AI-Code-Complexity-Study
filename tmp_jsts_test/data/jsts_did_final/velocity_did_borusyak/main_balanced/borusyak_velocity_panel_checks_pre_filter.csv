@@ -1,0 +1,11 @@
+check,value
+panel_label,main_balanced
+rows,12270
+repos,827
+treatment_rows,5028
+control_rows,7242
+treated_repos,380
+control_repos,447
+commits_nonmissing,12270
+lines_added_nonmissing,12270
+duplicate_repo_time_source_rows,0

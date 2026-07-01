@@ -1,0 +1,1 @@
+Velocity Borusyak DiD completed for main_unbalanced, main_balanced, strict_1to3_unbalanced, and strict_1to3_balanced panels. Outcomes are log_commits and log_lines_added. Static effects summarize average post-adoption treatment effects. Dynamic effects use event-time horizons -6 to 6 with pretrend horizons -6 to -2.
