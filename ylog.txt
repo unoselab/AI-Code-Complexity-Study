@@ -1,198 +1,106 @@
-./tmp_jsts_test/data/
-├── jsts_control_clone_failed_repos_main_398.csv
-├── jsts_control_clone_status_main_398_20260624-164811.csv
-├── jsts_control_clone_status_main_398_20260624-165336.csv
-├── jsts_control_clone_status_main_398.csv
-├── jsts_control_clone_usable_repos_main_398.csv
-├── jsts_control_clone_usable_repos_main_398_final_clean.csv
-├── jsts_control_clone_usable_summary_main_398.csv
-├── jsts_control_extract_summary_main_398.csv
-├── jsts_control_local_cursor_evidence_in_window.csv
-├── jsts_control_local_cursor_evidence_post_window.csv
-├── jsts_control_local_cursor_filter_summary_main_398.csv
-├── jsts_control_overlap_with_full_adopters.csv
-├── jsts_control_pair_coverage_main_398_clone_usable.csv
-├── jsts_control_pair_coverage_main_398_final_clean_1to3_only.csv
-├── jsts_control_pair_coverage_main_398_final_clean.csv
-├── jsts_control_repos_to_clone_main_398.csv
-├── jsts_control_repos_to_clone_main_398_overlap_repos.csv
-├── jsts_control_repos_to_clone_main_398_raw.csv
-├── jsts_did_control
-│   ├── ai_adoption_dates.csv
-│   ├── cursor_commits.csv
-│   ├── ts_contributors_monthly.csv
-│   ├── ts_contributors_monthly_final_clean.csv
-│   ├── ts_repos_monthly.csv
-│   └── ts_repos_monthly_final_clean.csv
-├── jsts_did_final
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_check_summary.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_missing_analysis_outcomes.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_qc.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_qc.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_check_summary.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_missing_analysis_outcomes.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_qc.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_missing_core_quality.csv
-│   ├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_qc.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_check_summary.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_missing_analysis_outcomes.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_qc.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
-│   ├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_qc.csv
-│   ├── panel_event_monthly_matched_final_clean.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_check_summary.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_missing_analysis_outcomes.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_qc.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_missing_core_quality.csv
-│   ├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_qc.csv
-│   ├── panel_qc_summary.csv
-│   ├── quality_did_borusyak
-│   │   ├── borusyak_quality_dynamic_effects_all.csv
-│   │   ├── borusyak_quality_errors_all.csv
-│   │   ├── borusyak_quality_input_summary_all.csv
-│   │   ├── borusyak_quality_manifest_20260629-153637.csv
-│   │   ├── borusyak_quality_manifest_20260629-154254.csv
-│   │   ├── borusyak_quality_manifest_20260629-154645.csv
-│   │   ├── borusyak_quality_manifest_20260629-154702.csv
-│   │   ├── borusyak_quality_panel_checks_all.csv
-│   │   ├── borusyak_quality_static_effects_all.csv
-│   │   ├── main_balanced
-│   │   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   │   ├── borusyak_quality_input_summary.csv
-│   │   │   ├── borusyak_quality_main_balanced.html
-│   │   │   ├── borusyak_quality_metadata.csv
-│   │   │   ├── borusyak_quality_panel_checks.csv
-│   │   │   ├── borusyak_quality_static_effects.csv
-│   │   │   └── dynamic_effects_borusyak_quality.pdf
-│   │   ├── main_unbalanced
-│   │   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   │   ├── borusyak_quality_input_summary.csv
-│   │   │   ├── borusyak_quality_main_unbalanced.html
-│   │   │   ├── borusyak_quality_metadata.csv
-│   │   │   ├── borusyak_quality_panel_checks.csv
-│   │   │   ├── borusyak_quality_static_effects.csv
-│   │   │   └── dynamic_effects_borusyak_quality.pdf
-│   │   ├── strict_1to3_balanced
-│   │   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   │   ├── borusyak_quality_input_summary.csv
-│   │   │   ├── borusyak_quality_metadata.csv
-│   │   │   ├── borusyak_quality_panel_checks.csv
-│   │   │   ├── borusyak_quality_static_effects.csv
-│   │   │   ├── borusyak_quality_strict_1to3_balanced.html
-│   │   │   └── dynamic_effects_borusyak_quality.pdf
-│   │   ├── strict_1to3_unbalanced
-│   │   │   ├── borusyak_quality_dynamic_effects.csv
-│   │   │   ├── borusyak_quality_input_summary.csv
-│   │   │   ├── borusyak_quality_metadata.csv
-│   │   │   ├── borusyak_quality_panel_checks.csv
-│   │   │   ├── borusyak_quality_static_effects.csv
-│   │   │   ├── borusyak_quality_strict_1to3_unbalanced.html
-│   │   │   └── dynamic_effects_borusyak_quality.pdf
-│   │   └── summary
-│   │       ├── borusyak_quality_dynamic_effects_percent.csv
-│   │       ├── borusyak_quality_dynamic_effects_plot_ready.csv
-│   │       ├── borusyak_quality_input_summary_copy.csv
-│   │       ├── borusyak_quality_main_panel_table.csv
-│   │       ├── borusyak_quality_main_panel_table.md
-│   │       ├── borusyak_quality_panel_checks_copy.csv
-│   │       ├── borusyak_quality_static_effects_paper_ready.csv
-│   │       ├── borusyak_quality_static_effects_wide.csv
-│   │       └── borusyak_quality_summary_notes.txt
-│   ├── quality_did_input_manifest_20260629-151355.csv
-│   ├── quality_did_input_manifest_20260629-151521.csv
-│   ├── quality_did_input_manifest_20260629-151528.csv
-│   ├── quality_did_input_qc_all_long.csv
-│   ├── quality_did_input_qc_all_wide.csv
-│   ├── sonarqube_panel_check_manifest_20260629-145857.csv
-│   ├── sonarqube_panel_check_qc_all.csv
-│   ├── sonarqube_panel_check_summary_all.csv
-│   ├── sonarqube_panel_merge_summary.csv
-│   └── warning_category_did
-│       └── code_hygiene
-├── jsts_did_test
-│   ├── adoption_month_check.csv
-│   ├── ai_adoption_dates.csv
-│   ├── cursor_commits.csv
-│   ├── mismatched_adoption_month_repos.csv
-│   ├── missing_adoption_month_repos.csv
-│   ├── ts_contributors_monthly.csv
-│   └── ts_repos_monthly.csv
-├── jsts_matched_control_pairs_main_398_clone_failed.csv
-├── jsts_matched_control_pairs_main_398_clone_usable.csv
-├── jsts_matched_control_pairs_main_398_coverage.csv
-├── jsts_matched_control_pairs_main_398.csv
-├── jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv
-├── jsts_matched_control_pairs_main_398_final_clean.csv
-├── jsts_matched_control_pairs_main_398_local_cursor_dropped.csv
-├── jsts_matched_control_pairs_main_398_overlap_pairs.csv
-├── jsts_matched_control_pairs_main_398_raw.csv
-├── jsts_sonarqube_main
-│   ├── backups
-│   │   ├── after_control_20260629-133006
-│   │   │   ├── control_ts_repos_monthly.csv
-│   │   │   ├── control_ts_repos_monthly_scanned.csv
-│   │   │   ├── run9b_sonarqube_jsts_control_20260627-003624.log
-│   │   │   └── sonarqube_metric_coverage_treatment_control.csv
-│   │   ├── after_treatment_20260627-003322
-│   │   │   ├── run9b_sonarqube_jsts_treatment_20260625-021602.log
-│   │   │   ├── sonarqube_input_summary.csv
-│   │   │   ├── treatment_ts_repos_monthly.csv
-│   │   │   └── treatment_ts_repos_monthly_scanned.csv
-│   │   ├── control_metric_coverage_20260629-132553.csv
-│   │   ├── treatment_metric_coverage_20260627-003440.csv
-│   │   └── treatment_metric_coverage_20260627-003448.csv
-│   ├── control
-│   │   └── data
-│   │       ├── control_missing_metrics_rows.csv
-│   │       ├── control_ncloc_zero_rows.csv
-│   │       ├── ts_repos_monthly.csv
-│   │       └── ts_repos_monthly_scanned.csv
-│   ├── control_repos.txt
-│   ├── control_scan_potential_issues.txt
-│   ├── months.txt
-│   ├── sonarqube_input_summary.csv
-│   ├── sonarqube_metric_coverage_treatment_control.csv
-│   ├── treatment
-│   │   └── data
-│   │       ├── ts_repos_monthly.csv
-│   │       └── ts_repos_monthly_scanned.csv
-│   └── treatment_repos.txt
-├── jsts_sonarqube_scan_smoke
-│   └── data
-│       ├── ts_repos_monthly.csv
-│       └── ts_repos_monthly_scanned.csv
-├── jsts_treatment_clone_failed_repos.csv
-├── jsts_treatment_clone_status_20260624-025938.csv
-├── jsts_treatment_clone_status.csv
-├── jsts_treatment_clone_status_smoke10.csv
-├── jsts_treatment_clone_usable_missing_event_month.csv
-├── jsts_treatment_clone_usable_repos.csv
-├── jsts_treatment_clone_usable_repos_with_event.csv
-├── jsts_treatment_clone_usable_repos_with_event_valid.csv
-├── jsts_treatment_missing_matching_main_398.csv
-├── jsts_treatment_repos_lost_all_controls_main_398.csv
-├── jsts_treatment_repos_lost_all_controls_main_398_final_clean.csv
-├── jsts_treatment_sample_diagnostic_10.csv
-├── jsts_treatment_sample_exact_match_381.csv
-├── jsts_treatment_sample_main_398.csv
-├── jsts_treatment_sample_within1_month_388.csv
-├── original_paper_treatment_jsts_repos_bw6.csv
-└── original_paper_treatment_jsts_repos.csv
+tmp_jsts_test/data/jsts_did_final/
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_check_summary.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_missing_analysis_outcomes.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_qc.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_complete.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_balanced_with_sonarqube_quality_did_input_qc.csv
+├── panel_event_monthly_matched_final_clean_1to3_only.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_check_summary.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_missing_analysis_outcomes.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_qc.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_missing_core_quality.csv
+├── panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_qc.csv
+├── panel_event_monthly_matched_final_clean_balanced.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_check_summary.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_missing_analysis_outcomes.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_qc.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_complete.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_missing_core_quality.csv
+├── panel_event_monthly_matched_final_clean_balanced_with_sonarqube_quality_did_input_qc.csv
+├── panel_event_monthly_matched_final_clean.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube_check_summary.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube_missing_analysis_outcomes.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube_qc.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_complete.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_missing_core_quality.csv
+├── panel_event_monthly_matched_final_clean_with_sonarqube_quality_did_input_qc.csv
+├── panel_qc_summary.csv
+├── quality_did_borusyak
+│   ├── borusyak_quality_dynamic_effects_all.csv
+│   ├── borusyak_quality_errors_all.csv
+│   ├── borusyak_quality_input_summary_all.csv
+│   ├── borusyak_quality_manifest_20260629-153637.csv
+│   ├── borusyak_quality_manifest_20260629-154254.csv
+│   ├── borusyak_quality_manifest_20260629-154645.csv
+│   ├── borusyak_quality_manifest_20260629-154702.csv
+│   ├── borusyak_quality_panel_checks_all.csv
+│   ├── borusyak_quality_static_effects_all.csv
+│   ├── main_balanced
+│   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   ├── borusyak_quality_input_summary.csv
+│   │   ├── borusyak_quality_main_balanced.html
+│   │   ├── borusyak_quality_metadata.csv
+│   │   ├── borusyak_quality_panel_checks.csv
+│   │   ├── borusyak_quality_static_effects.csv
+│   │   └── dynamic_effects_borusyak_quality.pdf
+│   ├── main_unbalanced
+│   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   ├── borusyak_quality_input_summary.csv
+│   │   ├── borusyak_quality_main_unbalanced.html
+│   │   ├── borusyak_quality_metadata.csv
+│   │   ├── borusyak_quality_panel_checks.csv
+│   │   ├── borusyak_quality_static_effects.csv
+│   │   └── dynamic_effects_borusyak_quality.pdf
+│   ├── strict_1to3_balanced
+│   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   ├── borusyak_quality_input_summary.csv
+│   │   ├── borusyak_quality_metadata.csv
+│   │   ├── borusyak_quality_panel_checks.csv
+│   │   ├── borusyak_quality_static_effects.csv
+│   │   ├── borusyak_quality_strict_1to3_balanced.html
+│   │   └── dynamic_effects_borusyak_quality.pdf
+│   ├── strict_1to3_unbalanced
+│   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   ├── borusyak_quality_input_summary.csv
+│   │   ├── borusyak_quality_metadata.csv
+│   │   ├── borusyak_quality_panel_checks.csv
+│   │   ├── borusyak_quality_static_effects.csv
+│   │   ├── borusyak_quality_strict_1to3_unbalanced.html
+│   │   └── dynamic_effects_borusyak_quality.pdf
+│   └── summary
+│       ├── borusyak_quality_dynamic_effects_percent.csv
+│       ├── borusyak_quality_dynamic_effects_plot_ready.csv
+│       ├── borusyak_quality_input_summary_copy.csv
+│       ├── borusyak_quality_main_panel_table.csv
+│       ├── borusyak_quality_main_panel_table.md
+│       ├── borusyak_quality_panel_checks_copy.csv
+│       ├── borusyak_quality_static_effects_paper_ready.csv
+│       ├── borusyak_quality_static_effects_wide.csv
+│       └── borusyak_quality_summary_notes.txt
+├── quality_did_input_manifest_20260629-151355.csv
+├── quality_did_input_manifest_20260629-151521.csv
+├── quality_did_input_manifest_20260629-151528.csv
+├── quality_did_input_qc_all_long.csv
+├── quality_did_input_qc_all_wide.csv
+├── sonarqube_panel_check_manifest_20260629-145857.csv
+├── sonarqube_panel_check_qc_all.csv
+├── sonarqube_panel_check_summary_all.csv
+├── sonarqube_panel_merge_summary.csv
+├── velocity_did_borusyak
+│   ├── main_unbalanced
+│   └── summary
+└── warning_category_did
+    └── code_hygiene
 
-21 directories, 174 files
+11 directories, 92 files

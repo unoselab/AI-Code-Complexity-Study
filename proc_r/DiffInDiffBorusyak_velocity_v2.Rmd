@@ -1,0 +1,690 @@
+---
+title: "Borusyak DiD for JS/TS Development Velocity"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+params:
+  panel_label: "main_unbalanced"
+  panel_path: "tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean.csv"
+  out_dir: "tmp_jsts_test/data/jsts_did_final/velocity_did_borusyak/main_unbalanced"
+  helpers_path: "diff_in_diff_borusyak_helpers.R"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = TRUE,
+  warning = TRUE,
+  error = FALSE
+)
+```
+
+# Purpose
+
+This report estimates Borusyak imputation-based Difference-in-Differences models for JS/TS development velocity outcomes.
+
+The velocity outcomes are:
+
+* `commits`
+* `lines_added`
+
+The analysis uses the same four-panel structure as the quality DiD analysis:
+
+* `main_unbalanced`
+* `main_balanced`
+* `strict_1to3_unbalanced`
+* `strict_1to3_balanced`
+
+Model runners and result extractors are shared with the other Borusyak reports
+via `diff_in_diff_borusyak_helpers.R`.
+
+# Load Packages
+
+```{r packages}
+required_packages <- c(
+  "data.table",
+  "dplyr",
+  "ggplot2",
+  "knitr",
+  "didimputation"
+)
+
+for (pkg in required_packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop("Required package is not installed: ", pkg)
+  }
+}
+
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(didimputation)
+```
+
+# Parameters
+
+```{r params}
+panel_label <- params$panel_label
+panel_path <- params$panel_path
+out_dir <- params$out_dir
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+
+cat("Panel label:", panel_label, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Output dir:", out_dir, "\n")
+```
+
+# Shared Borusyak Helpers
+
+```{r source-helpers}
+# Shared functions (sourced, not redefined here):
+#   run_borusyak_static(), run_borusyak_dynamic(),
+#   extract_static_result(), extract_dynamic_result(),
+#   extract_event_time_from_term(),
+#   get_col_or_na(), get_first_available_col_or_na()
+
+resolve_helpers_path <- function(configured_path) {
+  rmd_dir <- tryCatch(
+    dirname(normalizePath(knitr::current_input())),
+    error = function(e) NA_character_
+  )
+
+  candidates <- c(
+    configured_path,
+    if (!is.na(rmd_dir)) file.path(rmd_dir, basename(configured_path)),
+    file.path("proc_r", basename(configured_path)),
+    basename(configured_path)
+  )
+
+  candidates <- unique(candidates[!is.na(candidates)])
+  hits <- candidates[file.exists(candidates)]
+
+  if (length(hits) == 0) {
+    stop(
+      "Borusyak helper script not found. Tried: ",
+      paste(candidates, collapse = ", ")
+    )
+  }
+
+  normalizePath(hits[1])
+}
+
+helpers_path <- resolve_helpers_path(params$helpers_path)
+cat("Sourcing shared helpers from:", helpers_path, "\n")
+source(helpers_path)
+```
+
+# Report-Local Helper Functions
+
+```{r helper-functions}
+# These helpers are specific to this report's panel encoding and output
+# post-processing, so they intentionally stay local rather than moving to
+# diff_in_diff_borusyak_helpers.R.
+
+normalize_yyyymm <- function(x) {
+  x_chr <- as.character(x)
+  out <- rep(NA_integer_, length(x_chr))
+
+  is_missing <- is.na(x_chr) | x_chr == "" | x_chr == "NA" | x_chr == "NaN"
+  x_chr[is_missing] <- NA_character_
+
+  dash_format <- !is.na(x_chr) & grepl("^\\d{4}-\\d{2}$", x_chr)
+  out[dash_format] <- as.integer(gsub("-", "", x_chr[dash_format]))
+
+  numeric_format <- !is.na(x_chr) & grepl("^\\d{6}$", x_chr)
+  out[numeric_format] <- as.integer(x_chr[numeric_format])
+
+  out
+}
+
+yyyymm_to_month_id <- function(yyyymm) {
+  yyyymm <- as.integer(yyyymm)
+  year <- yyyymm %/% 100L
+  month <- yyyymm %% 100L
+
+  out <- year * 12L + month
+  out[is.na(yyyymm) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+calc_p_value <- function(estimate, std_error) {
+  ifelse(
+    is.na(estimate) | is.na(std_error) | std_error <= 0,
+    NA_real_,
+    2 * pnorm(-abs(estimate / std_error))
+  )
+}
+
+# didimputation::did_imputation() does not return a p-value column, so the
+# shared extractors leave p_value as NA. Recover it from estimate / std_error
+# with a normal approximation, preserving this report's previous output.
+fill_missing_p_values <- function(df) {
+  if (nrow(df) == 0 || !all(c("p_value", "estimate", "std_error") %in% names(df))) {
+    return(df)
+  }
+
+  missing_p <- is.na(df$p_value)
+  df$p_value[missing_p] <- calc_p_value(
+    df$estimate[missing_p],
+    df$std_error[missing_p]
+  )
+
+  df
+}
+```
+
+# Load Velocity Panel
+
+```{r load-panel}
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+
+cat("Rows:", nrow(panel_raw), "\n")
+cat("Repos:", uniqueN(panel_raw$repo_name), "\n")
+cat("Columns:", ncol(panel_raw), "\n")
+
+required_cols <- c("repo_name", "time", "event", "dataset_source", "post_event", "commits", "lines_added")
+missing_cols <- setdiff(required_cols, names(panel_raw))
+
+if (length(missing_cols) > 0) {
+  stop("Missing required columns: ", paste(missing_cols, collapse = ", "))
+}
+
+cat("Months:", min(panel_raw$time, na.rm = TRUE), "to", max(panel_raw$time, na.rm = TRUE), "\n")
+```
+
+# Panel Sanity Checks Before Estimation
+
+```{r panel-checks}
+panel_checks <- data.frame(
+  check = c(
+    "panel_label",
+    "rows",
+    "repos",
+    "treatment_rows",
+    "control_rows",
+    "treated_repos",
+    "control_repos",
+    "commits_nonmissing",
+    "lines_added_nonmissing",
+    "duplicate_repo_time_source_rows"
+  ),
+  value = c(
+    panel_label,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    sum(panel_raw$dataset_source == "treatment", na.rm = TRUE),
+    sum(panel_raw$dataset_source == "control", na.rm = TRUE),
+    uniqueN(panel_raw[dataset_source == "treatment"]$repo_name),
+    uniqueN(panel_raw[dataset_source == "control"]$repo_name),
+    sum(!is.na(panel_raw$commits)),
+    sum(!is.na(panel_raw$lines_added)),
+    sum(duplicated(panel_raw[, .(repo_name, time, dataset_source)]))
+  )
+)
+
+print(panel_checks)
+
+fwrite(
+  panel_checks,
+  file.path(out_dir, "borusyak_velocity_panel_checks_pre_filter.csv")
+)
+```
+
+# Prepare Data for Borusyak Estimator
+
+```{r prepare-data}
+panel_data <- copy(panel_raw)
+
+panel_data[, time_yyyymm := normalize_yyyymm(time)]
+
+
+event_yyyymm_raw <- normalize_yyyymm(panel_data$event)
+event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
+panel_data[, event_yyyymm := event_yyyymm_raw]
+
+# Safety rule:
+# Controls are never-treated in the Borusyak estimator.
+# Even if a control row carries a pseudo-event month for matching provenance,
+# it should not be treated as an adoption event.
+panel_data[, dataset_source := as.character(dataset_source)]
+panel_data[dataset_source != "treatment", event_yyyymm := 0L]
+
+if ("post_event" %in% names(panel_data)) {
+  panel_data[dataset_source != "treatment", post_event := 0L]
+}
+
+# Match the cohort restriction used in the quality Borusyak pipeline.
+panel_data <- panel_data[
+  event_yyyymm == 0L |
+    (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+]
+
+
+
+panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+panel_data[, event_id := ifelse(event_yyyymm == 0L, 0L, yyyymm_to_month_id(event_yyyymm))]
+
+panel_data <- panel_data[!is.na(time_id)]
+panel_data <- panel_data[event_id == 0L | !is.na(event_id)]
+
+panel_data[, repo_name_str := repo_name]
+panel_data[, repo_id := as.integer(factor(repo_name_str))]
+panel_data[, treated := ifelse(event_id > 0L, 1L, 0L)]
+panel_data[, time_to_event_calc := ifelse(treated == 1L, time_id - event_id, NA_integer_)]
+
+panel_data[, commits := as.numeric(commits)]
+panel_data[, lines_added := as.numeric(lines_added)]
+
+panel_data[commits < 0, commits := NA_real_]
+panel_data[lines_added < 0, lines_added := NA_real_]
+
+panel_data[, log_commits := log1p(commits)]
+panel_data[, log_lines_added := log1p(lines_added)]
+
+
+
+
+add_log_covariate <- function(dt, raw_col, log_col) {
+  if (!(raw_col %in% names(dt))) {
+    return(NULL)
+  }
+
+  dt[, (log_col) := log1p(as.numeric(get(raw_col)))]
+
+  if (sum(!is.na(dt[[log_col]])) == nrow(dt)) {
+    return(log_col)
+  }
+
+  return(NULL)
+}
+
+covariates <- c()
+
+# Contributor count from version-control history.
+if ("contributors" %in% names(panel_data)) {
+  covariates <- c(covariates, add_log_covariate(panel_data, "contributors", "contributors_log"))
+} else if ("users_involved" %in% names(panel_data)) {
+  covariates <- c(covariates, add_log_covariate(panel_data, "users_involved", "contributors_log"))
+}
+
+# Original-paper-aligned time-varying covariates when available.
+covariates <- c(covariates, add_log_covariate(panel_data, "age", "age_log"))
+covariates <- c(covariates, add_log_covariate(panel_data, "stars", "stars_log"))
+covariates <- c(covariates, add_log_covariate(panel_data, "issues", "issues_log"))
+
+# Include ncloc only if available and complete.
+# This may be missing in non-SonarQube velocity panels, so keep it optional.
+covariates <- c(covariates, add_log_covariate(panel_data, "ncloc", "log_ncloc"))
+
+covariates <- unique(covariates[!is.na(covariates) & nzchar(covariates)])
+
+model_required_cols <- c("log_commits", "log_lines_added")
+complete_cols <- c(model_required_cols, covariates)
+
+panel_data <- panel_data[complete.cases(panel_data[, ..complete_cols])]
+
+covariate_availability <- data.frame(
+  covariate = c("contributors_log", "age_log", "stars_log", "issues_log", "log_ncloc"),
+  included = c("contributors_log", "age_log", "stars_log", "issues_log", "log_ncloc") %in% covariates
+)
+
+print(covariate_availability)
+
+fwrite(
+  covariate_availability,
+  file.path(out_dir, "borusyak_velocity_covariate_availability.csv")
+)
+
+cat("Rows after readiness and cohort filtering:", nrow(panel_data), "\n")
+cat("Repos after filtering:", uniqueN(panel_data$repo_id), "\n")
+cat("Treated repos:", uniqueN(panel_data[treated == 1, repo_id]), "\n")
+cat("Control repos:", uniqueN(panel_data[treated == 0, repo_id]), "\n")
+cat("Time id range:", min(panel_data$time_id), "to", max(panel_data$time_id), "\n")
+cat("Covariates:", ifelse(length(covariates) == 0, "none", paste(covariates, collapse = ", ")), "\n")
+```
+
+# Estimation Input Summary
+
+```{r input-summary}
+input_summary <- panel_data[, .(
+  rows = .N,
+  repos = uniqueN(repo_id),
+  mean_commits = mean(commits, na.rm = TRUE),
+  mean_lines_added = mean(lines_added, na.rm = TRUE),
+  mean_log_commits = mean(log_commits, na.rm = TRUE),
+  mean_log_lines_added = mean(log_lines_added, na.rm = TRUE),
+  mean_contributors_log = if ("contributors_log" %in% names(panel_data)) mean(contributors_log, na.rm = TRUE) else NA_real_
+), by = dataset_source]
+
+print(input_summary)
+
+fwrite(
+  input_summary,
+  file.path(out_dir, "borusyak_velocity_input_summary.csv")
+)
+
+event_time_counts <- panel_data[treated == 1, .N, by = time_to_event_calc][order(time_to_event_calc)]
+print(event_time_counts)
+
+fwrite(
+  event_time_counts,
+  file.path(out_dir, "borusyak_velocity_event_time_counts.csv")
+)
+```
+
+# Panel Checks After Filtering
+
+```{r panel-checks-after-filter}
+control_post_event_sum <- if ("post_event" %in% names(panel_data)) {
+  sum(panel_data[treated == 0]$post_event, na.rm = TRUE)
+} else {
+  NA_integer_
+}
+
+treated_post_rows <- panel_data[treated == 1 & time_id >= event_id, .N]
+
+post_event_mismatch_rows <- if ("post_event" %in% names(panel_data)) {
+  expected_post <- ifelse(panel_data$treated == 1L & panel_data$time_id >= panel_data$event_id, 1L, 0L)
+  sum(as.integer(panel_data$post_event) != expected_post, na.rm = TRUE)
+} else {
+  NA_integer_
+}
+
+panel_checks_filtered <- data.frame(
+  check = c(
+    "panel_label",
+    "rows",
+    "repos",
+    "treatment_rows",
+    "control_rows",
+    "treated_repos",
+    "control_repos",
+    "control_post_event_sum",
+    "treated_post_rows",
+    "post_event_mismatch_rows",
+    "analysis_ready_velocity_did_rows",
+    "commits_nonmissing",
+    "lines_added_nonmissing",
+    "log_commits_nonmissing",
+    "log_lines_added_nonmissing",
+    "min_time",
+    "max_time"
+  ),
+  value = c(
+    panel_label,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    sum(panel_data$dataset_source == "treatment", na.rm = TRUE),
+    sum(panel_data$dataset_source == "control", na.rm = TRUE),
+    uniqueN(panel_data[treated == 1]$repo_id),
+    uniqueN(panel_data[treated == 0]$repo_id),
+    control_post_event_sum,
+    treated_post_rows,
+    post_event_mismatch_rows,
+    nrow(panel_data),
+    sum(!is.na(panel_data$commits)),
+    sum(!is.na(panel_data$lines_added)),
+    sum(!is.na(panel_data$log_commits)),
+    sum(!is.na(panel_data$log_lines_added)),
+    min(panel_data$time, na.rm = TRUE),
+    max(panel_data$time, na.rm = TRUE)
+  )
+)
+
+print(panel_checks_filtered)
+
+fwrite(
+  panel_checks_filtered,
+  file.path(out_dir, "borusyak_velocity_panel_checks.csv")
+)
+```
+
+# Outcomes and First Stage
+
+```{r outcomes-first-stage}
+outcome_vars <- c(
+  "log_commits",
+  "log_lines_added"
+)
+
+outcome_names <- c(
+  "Commits",
+  "Lines Added"
+)
+
+if (length(covariates) == 0) {
+  first_stage_rhs <- "1"
+} else {
+  first_stage_rhs <- paste(covariates, collapse = " + ")
+}
+
+first_stage_formula <- as.formula(
+  paste0("~ ", first_stage_rhs, " | repo_id + time_id")
+)
+
+# The shared runners pass `data` straight to didimputation::did_imputation(),
+# so convert the data.table once here (the previous inline runners converted
+# inside the function).
+panel_data_df <- as.data.frame(panel_data)
+
+cat("Outcomes:\n")
+print(data.frame(outcome = outcome_vars, label = outcome_names))
+
+cat("\nFirst-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Static Borusyak Effects
+
+```{r static-effects}
+static_results <- list()
+static_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running static Borusyak model for:", var, "\n")
+
+  static_results[[var]] <- tryCatch(
+    run_borusyak_static(
+      data = panel_data_df,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      static_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+static_df <- dplyr::bind_rows(lapply(outcome_vars, function(v) {
+  extract_static_result(static_results[[v]], v)
+}))
+
+static_df <- fill_missing_p_values(static_df)
+
+static_df$outcome_label <- outcome_names[match(static_df$outcome, outcome_vars)]
+static_df$panel <- panel_label
+
+static_df$estimate_pct <- (exp(static_df$estimate) - 1) * 100
+static_df$conf_low_pct <- (exp(static_df$conf_low) - 1) * 100
+static_df$conf_high_pct <- (exp(static_df$conf_high) - 1) * 100
+
+print(static_df)
+
+fwrite(
+  static_df,
+  file.path(out_dir, "borusyak_velocity_static_effects.csv")
+)
+
+if (length(static_errors) > 0) {
+  static_error_df <- data.frame(
+    panel = panel_label,
+    outcome = names(static_errors),
+    error = unlist(static_errors),
+    row.names = NULL
+  )
+
+  print(static_error_df)
+
+  fwrite(
+    static_error_df,
+    file.path(out_dir, "borusyak_velocity_static_errors.csv")
+  )
+}
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_results <- list()
+dynamic_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running dynamic Borusyak model for:", var, "\n")
+
+  dynamic_results[[var]] <- tryCatch(
+    run_borusyak_dynamic(
+      data = panel_data_df,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      horizon = -6:6,
+      pretrends = -6:-2,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      dynamic_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+dynamic_df <- dplyr::bind_rows(lapply(seq_along(outcome_vars), function(i) {
+  v <- outcome_vars[i]
+
+  extract_dynamic_result(
+    dynamic_results[[v]],
+    outcome = v,
+    outcome_label = outcome_names[i],
+    min_horizon = -6,
+    max_horizon = 6
+  )
+}))
+
+dynamic_df <- fill_missing_p_values(dynamic_df)
+
+if (nrow(dynamic_df) > 0) {
+  dynamic_df$panel <- panel_label
+  dynamic_df$estimate_pct <- (exp(dynamic_df$estimate) - 1) * 100
+  dynamic_df$conf_low_pct <- (exp(dynamic_df$conf_low) - 1) * 100
+  dynamic_df$conf_high_pct <- (exp(dynamic_df$conf_high) - 1) * 100
+}
+
+print(dynamic_df)
+
+fwrite(
+  dynamic_df,
+  file.path(out_dir, "borusyak_velocity_dynamic_effects.csv")
+)
+
+if (length(dynamic_errors) > 0) {
+  dynamic_error_df <- data.frame(
+    panel = panel_label,
+    outcome = names(dynamic_errors),
+    error = unlist(dynamic_errors),
+    row.names = NULL
+  )
+
+  print(dynamic_error_df)
+
+  fwrite(
+    dynamic_error_df,
+    file.path(out_dir, "borusyak_velocity_dynamic_errors.csv")
+  )
+}
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=10, fig.height=5}
+if (nrow(dynamic_df) > 0) {
+  p <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -1, linetype = "dotted") +
+    geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.15) +
+    geom_point() +
+    geom_line() +
+    facet_wrap(~ outcome_label, scales = "free_y") +
+    labs(
+      title = paste("Borusyak Dynamic Effects for Velocity Outcomes:", panel_label),
+      x = "Months relative to Cursor adoption",
+      y = "Estimate on log scale"
+    ) +
+    theme_minimal()
+
+  print(p)
+
+  ggsave(
+    filename = file.path(out_dir, "dynamic_effects_borusyak_velocity.pdf"),
+    plot = p,
+    width = 10,
+    height = 5
+  )
+} else {
+  cat("No dynamic effects to plot.\n")
+}
+```
+
+# Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "helpers",
+    "panel_label",
+    "panel_path",
+    "out_dir",
+    "outcomes",
+    "covariates",
+    "estimator",
+    "time_encoding",
+    "cohort_filter",
+    "input_source",
+    "interpretation_note"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_velocity_v2.Rmd",
+    helpers_path,
+    panel_label,
+    panel_path,
+    out_dir,
+    paste(outcome_vars, collapse = ", "),
+    ifelse(length(covariates) == 0, "none", paste(covariates, collapse = " + ")),
+    "Borusyak imputation via didimputation::did_imputation",
+    "YYYY-MM converted to month_id = year * 12 + month",
+    "controls kept with event_yyyymm == 0; treatment cohorts kept if 202407 < event_yyyymm <= 202503",
+    "run8e final matched panel",
+    "Use main panel as primary analysis and other panels as robustness checks"
+  )
+)
+
+print(metadata)
+
+fwrite(
+  metadata,
+  file.path(out_dir, "borusyak_velocity_metadata.csv")
+)
+```
