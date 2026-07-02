@@ -1,100 +1,49 @@
+이 두 파일도 확인했습니다 — 결론: **`_1to3_only` 필터의 정의는 여기에도 없습니다.** 하지만 이 파일들이 그 필터의 위치를 최종적으로 좁혀줬고, 코드 없이도 질문을 확정할 수 있는 데이터 확인법이 생겼습니다. 쉽게 정리합니다.
 
-(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ ./run10a-did-warning-subcategories-borusyak.sh 
-============================================================
-run10a: JS/TS SonarQube warning-subcategory Borusyak DiD
-Started:        Thu Jul  2 01:42:39 PM CDT 2026
-Rmd:            proc_r/DiffInDiffBorusyak_warning_subcategories_v2.Rmd
-Summary script: proc_scripts/summarize_borusyak_warning_subcategories.py
-DID dir:        tmp_jsts_test/data/jsts_did_final
-Output root:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories
-Summary dir:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary
-RUN_ALL:        0
-Log file:       logs/run10a_did_warning_subcategories_borusyak_20260702-134239.log
-============================================================
+**run9c가 하는 일 — 필터가 아니라 순수 merge입니다.** 셸 스크립트를 보면 네 패널이 전부 **입력**입니다: `panel_event_monthly_matched_final_clean.csv`(main)과 `..._1to3_only.csv`(strict)가 이미 존재해야 하고("panel file not found"면 에러 종료), run9c는 거기에 SonarQube 메트릭을 **왼쪽-조인으로 붙이기만** 합니다. `merge_sonarqube_panel_v2.py`는 깨끗합니다: `validate="one_to_one"` + 행 수 보존 assert(행이 늘거나 줄면 즉시 실패), 결측 미대치·미삭제 정책 명시(docstring "Do not impute / Do not drop"), 원시값은 `*_raw`로 보존. 그리고 중요한 정합성 하나 — `static_analysis_warnings = bugs_raw + vulnerabilities_raw + code_smells_raw`를 일반 `+`로 계산하는데, pandas에서 일반 `+`는 성분 하나라도 NaN이면 결과가 NaN이라 run9e의 `min_count=3`과 **동일한 보수적 동작**입니다. 두 단계의 결측 정책이 일치함을 확인했습니다. 또 main과 strict가 **같은** 메트릭 파일(`jsts_sonarqube_main/...`)을 받으므로, 두 설정의 차이는 오직 패널 멤버십뿐 — 비교 가능성도 확보됐습니다.
 
+**그래서 필터 정의는 run9c의 상류, 즉 `panel_event_monthly_matched_final_clean*.csv` 네 개를 만든 빌더**(아마 run9a/9b 계열 + 그 파이썬)에 있습니다. 체인이 이제 완전히 그려졌습니다: 논문 matching.csv 상속 → run8c(클론 필터, usable_pairs + coverage 생성) → **[미확인: run9a/9b 패널 빌더 — 여기가 main/strict 분기]** → run9c(SonarQube merge) → run9e(quality DiD input) → Rmd.
 
-============================================================
-Rendering warning-subcategory Borusyak panel: strict_1to3_unbalanced
-Panel:      tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
-Output dir: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced
-============================================================
+**그런데 그 파일을 기다리지 않고도 질문을 확정할 방법이 있습니다.** run8c가 만든 coverage 파일(`num_usable_controls` per treatment)과 두 패널을 직접 대조하면, "1개라도 vs 3개 전부 vs 짝 control만" 중 무엇인지 데이터가 답합니다:
 
+```python
+import pandas as pd
+D = "tmp_jsts_test/data"
+m = pd.read_csv(f"{D}/jsts_did_final/panel_event_monthly_matched_final_clean.csv")
+s = pd.read_csv(f"{D}/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv")
+pairs = pd.read_csv(f"{D}/jsts_matched_control_pairs_main_398_clone_usable.csv")
+cov = pd.read_csv(f"{D}/jsts_control_pair_coverage_main_398_clone_usable.csv")
 
-processing file: DiffInDiffBorusyak_warning_subcategories_v2.Rmd
-1/32                            
-2/32 [setup]                    
-3/32                            
-4/32 [packages]                 
-5/32                            
-6/32 [params]                   
-7/32                            
-8/32 [source-helpers]           
-9/32                            
-10/32 [helper-functions]         
-11/32                            
-12/32 [load-panel]               
-13/32                            
-14/32 [raw-panel-checks]         
-15/32                            
-16/32 [warning-composition]      
-17/32                            
-18/32 [prepare-data]             
-19/32                            
-20/32 [input-summary]            
-21/32                            
-22/32 [panel-checks-after-filter]
-23/32                            
-24/32 [outcomes-first-stage]     
-25/32                            
-26/32 [static-effects]           
-27/32                            
-28/32 [dynamic-effects]          
-29/32                            
-30/32 [dynamic-plot]             
-Fontconfig warning: using without calling FcInit()
-31/32                            
-32/32 [metadata]                 
-output file: DiffInDiffBorusyak_warning_subcategories_v2.knit.md
+mt = set(m.loc[m.ever_treated==1,"repo_name"]); st = set(s.loc[s.ever_treated==1,"repo_name"])
+mc = set(m.loc[m.ever_treated==0,"repo_name"]); sc = set(s.loc[s.ever_treated==0,"repo_name"])
+print("treated  main/strict/strict에서빠짐:", len(mt), len(st), len(mt-st))
+print("control  main/strict/strict에서빠짐:", len(mc), len(sc), len(mc-sc))
 
-/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_warning_subcategories_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced/borusyak_warning_subcategories_strict_1to3_unbalanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/Rtmp2j4ecC/rmarkdown-str2791337ecb81a3.html 
-[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
+# 가설 A: strict treated = usable control 3개 전부 보유한 treated
+covA = set(cov.loc[cov.num_usable_controls==3,"treatment_repo"])
+# 가설 B: strict treated = usable control 1개 이상 보유한 treated
+covB = set(cov.loc[cov.num_usable_controls>=1,"treatment_repo"])
+print("가설A(3개 전부 요구)와 일치?", st == (covA & mt))
+print("가설B(1개 이상)와 일치?",   st == (covB & mt))
 
-Output created: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced/borusyak_warning_subcategories_strict_1to3_unbalanced.html
+# control 쪽: strict control이 '유지된 treated의 짝 control'로 정확히 한정되는지
+paired = set(pairs.loc[pairs["treatment_repo"].isin(st), "control_repo"])
+print("strict control ⊆ 유지 treated의 짝 control?", sc <= paired)
+print("strict control == 그 짝 control 전부?", sc == (paired & mc))
+```
 
-** Building combined warning-subcategory summaries
-------------------------------------------------------------
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_static_effects.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_static_effects.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_static_effects.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_static_effects_all.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_dynamic_effects.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_dynamic_effects.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_dynamic_effects.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_dynamic_effects_all.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_input_summary.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_input_summary.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_input_summary.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_input_summary_all.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_panel_checks.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_panel_checks.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_panel_checks.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_panel_checks_all.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_composition.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_composition.csv
-Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_composition.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_composition_all.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_static_effects_paper_ready.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_static_effects_wide.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_dynamic_effects_percent.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_dynamic_effects_plot_ready.csv
-Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_summary_notes.txt
+읽는 법: 가설A가 True면 "3개 전부 usable인 treated만 유지"(가장 엄격), 가설B가 True면 "1개라도 있으면 유지", 마지막 두 줄이 True면 "control은 유지된 treated의 짝만 남김"이 확정됩니다. main 375 vs strict 333(−42)이라는 차이 규모로 보면 가설A(3개 전부 요구)일 가능성이 높지만, 이 스니펫이 추측을 확정으로 바꿔 줍니다.
 
-============================================================
-run10a completed successfully.
-Completed:       Thu Jul  2 01:42:42 PM CDT 2026
-Output root:     tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories
-Summary dir:     tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary
-Log file:        logs/run10a_did_warning_subcategories_borusyak_20260702-134239.log
-============================================================
-Saved log to logs/run10a_did_warning_subcategories_borusyak_20260702-134239.log
-(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 
+판정에 주는 의미는 변하지 않습니다 — 어느 가설이든 strict는 논문에 없는 **추가 제약**이고, 논문 설계(control pool, treated는 coverage 무관 유지)와 동형인 것은 main입니다. 이 스니펫은 strict를 robustness로 보고할 때 "정확히 무슨 제약인지" 한 줄로 쓰기 위한 마지막 확인입니다. 스니펫 결과(또는 run9a/9b 빌더 파일) 주시면 이 건은 종결하고, 보고서 문구까지 정리해 드리겠습니다.
+
+[Result]
+
+treated  main/strict/strict에서빠짐: 380 337 43
+control  main/strict/strict에서빠짐: 393 354 39
+가설A(3개 전부 요구)와 일치? False
+가설B(1개 이상)와 일치? False
+strict control ⊆ 유지 treated의 짝 control? False
+strict control == 그 짝 control 전부? False
+
+[Explanation]
+
