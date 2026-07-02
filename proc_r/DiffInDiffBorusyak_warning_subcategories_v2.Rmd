@@ -1,0 +1,765 @@
+---
+title: "Borusyak DiD for SonarQube Warning Subcategories"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+params:
+  panel_label: "strict_1to3_unbalanced"
+  panel_path: "tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv"
+  out_dir: "tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced"
+  helpers_path: "diff_in_diff_borusyak_helpers.R"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = TRUE,
+  warning = TRUE,
+  error = FALSE
+)
+```
+
+# Purpose
+
+This report estimates Borusyak imputation-based Difference-in-Differences models for SonarQube static-analysis warning subcategories.
+
+The outcomes are:
+
+- `bugs`
+- `vulnerabilities`
+- `code_smells`
+
+These decompose the aggregate `static_analysis_warnings` outcome.
+
+# Load Packages
+
+```{r packages}
+required_packages <- c(
+  "data.table",
+  "dplyr",
+  "ggplot2",
+  "knitr",
+  "didimputation"
+)
+
+for (pkg in required_packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop("Required package is not installed: ", pkg)
+  }
+}
+
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(didimputation)
+```
+
+# Parameters
+
+```{r params}
+panel_label <- params$panel_label
+panel_path <- params$panel_path
+out_dir <- params$out_dir
+helpers_path_param <- params$helpers_path
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+
+cat("Panel label:", panel_label, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Output dir:", out_dir, "\n")
+cat("Helpers path parameter:", helpers_path_param, "\n")
+```
+
+# Source Shared Borusyak Helpers
+
+```{r source-helpers}
+resolve_helpers_path <- function(configured_path) {
+  current_input <- tryCatch(knitr::current_input(), error = function(e) NA_character_)
+
+  rmd_dir <- NA_character_
+  if (!is.na(current_input) && nzchar(current_input)) {
+    rmd_dir <- dirname(normalizePath(current_input, mustWork = FALSE))
+  }
+
+  candidates <- unique(c(
+    configured_path,
+    file.path("proc_r", basename(configured_path)),
+    if (!is.na(rmd_dir)) file.path(rmd_dir, basename(configured_path)) else character(0),
+    basename(configured_path)
+  ))
+
+  existing <- candidates[file.exists(candidates)]
+
+  if (length(existing) == 0) {
+    stop(
+      "Could not find diff_in_diff_borusyak_helpers.R. Tried: ",
+      paste(candidates, collapse = ", ")
+    )
+  }
+
+  normalizePath(existing[1], mustWork = TRUE)
+}
+
+helpers_path <- resolve_helpers_path(helpers_path_param)
+cat("Sourcing shared helpers from:", helpers_path, "\n")
+source(helpers_path)
+
+required_helper_functions <- c(
+  "run_borusyak_static",
+  "run_borusyak_dynamic",
+  "extract_static_result",
+  "extract_dynamic_result"
+)
+
+missing_helper_functions <- required_helper_functions[
+  !vapply(required_helper_functions, exists, logical(1), mode = "function")
+]
+
+if (length(missing_helper_functions) > 0) {
+  stop("Missing helper functions: ", paste(missing_helper_functions, collapse = ", "))
+}
+
+cat("Shared Borusyak helper reuse: PASS\n")
+```
+
+# Local Helper Functions
+
+```{r helper-functions}
+normalize_yyyymm <- function(x) {
+  x_chr <- as.character(x)
+  out <- rep(NA_integer_, length(x_chr))
+
+  is_missing <- is.na(x_chr) | x_chr == "" | x_chr == "NA" | x_chr == "NaN"
+  x_chr[is_missing] <- NA_character_
+
+  dash_format <- !is.na(x_chr) & grepl("^\\d{4}-\\d{2}$", x_chr)
+  out[dash_format] <- as.integer(gsub("-", "", x_chr[dash_format]))
+
+  numeric_format <- !is.na(x_chr) & grepl("^\\d{6}$", x_chr)
+  out[numeric_format] <- as.integer(x_chr[numeric_format])
+
+  out
+}
+
+yyyymm_to_month_id <- function(yyyymm) {
+  yyyymm <- as.integer(yyyymm)
+  year <- yyyymm %/% 100L
+  month <- yyyymm %% 100L
+
+  out <- year * 12L + month
+  out[is.na(yyyymm) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+calc_p_value <- function(estimate, std_error) {
+  ifelse(
+    is.na(estimate) | is.na(std_error) | std_error <= 0,
+    NA_real_,
+    2 * pnorm(-abs(estimate / std_error))
+  )
+}
+
+fill_missing_p_values <- function(df) {
+  if (!("p_value" %in% names(df))) {
+    df$p_value <- NA_real_
+  }
+
+  if ("std_error" %in% names(df) && "estimate" %in% names(df)) {
+    missing_p <- is.na(df$p_value)
+    df$p_value[missing_p] <- calc_p_value(
+      df$estimate[missing_p],
+      df$std_error[missing_p]
+    )
+  }
+
+  df
+}
+
+alias_metric_column <- function(dt, raw_col, fallback_col) {
+  if (!(raw_col %in% names(dt)) && fallback_col %in% names(dt)) {
+    dt[, (raw_col) := get(fallback_col)]
+  }
+  invisible(dt)
+}
+```
+
+# Load Panel
+
+```{r load-panel}
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+
+alias_metric_column(panel_raw, "bugs_raw", "bugs")
+alias_metric_column(panel_raw, "vulnerabilities_raw", "vulnerabilities")
+alias_metric_column(panel_raw, "code_smells_raw", "code_smells")
+alias_metric_column(panel_raw, "ncloc_raw", "ncloc")
+
+required_cols <- c(
+  "repo_name",
+  "time",
+  "event",
+  "dataset_source",
+  "post_event",
+  "contributors",
+  "log_ncloc",
+  "bugs_raw",
+  "vulnerabilities_raw",
+  "code_smells_raw"
+)
+
+missing_cols <- setdiff(required_cols, names(panel_raw))
+
+if (length(missing_cols) > 0) {
+  stop("Missing required columns: ", paste(missing_cols, collapse = ", "))
+}
+
+cat("Rows:", nrow(panel_raw), "\n")
+cat("Repos:", uniqueN(panel_raw$repo_name), "\n")
+cat("Columns:", ncol(panel_raw), "\n")
+cat("Months:", min(panel_raw$time, na.rm = TRUE), "to", max(panel_raw$time, na.rm = TRUE), "\n")
+```
+
+# Raw Panel Sanity Checks
+
+```{r raw-panel-checks}
+raw_panel_checks <- data.frame(
+  check = c(
+    "panel_label",
+    "rows",
+    "repos",
+    "treatment_rows",
+    "control_rows",
+    "treated_repos",
+    "control_repos",
+    "bugs_raw_nonmissing",
+    "vulnerabilities_raw_nonmissing",
+    "code_smells_raw_nonmissing",
+    "duplicate_repo_time_source_rows"
+  ),
+  value = c(
+    panel_label,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    sum(panel_raw$dataset_source == "treatment", na.rm = TRUE),
+    sum(panel_raw$dataset_source == "control", na.rm = TRUE),
+    uniqueN(panel_raw[dataset_source == "treatment"]$repo_name),
+    uniqueN(panel_raw[dataset_source == "control"]$repo_name),
+    sum(!is.na(panel_raw$bugs_raw)),
+    sum(!is.na(panel_raw$vulnerabilities_raw)),
+    sum(!is.na(panel_raw$code_smells_raw)),
+    sum(duplicated(panel_raw[, .(repo_name, time, dataset_source)]))
+  )
+)
+
+print(raw_panel_checks)
+
+fwrite(
+  raw_panel_checks,
+  file.path(out_dir, "borusyak_warning_subcategories_panel_checks_pre_filter.csv")
+)
+```
+
+# Warning Composition
+
+```{r warning-composition}
+warning_cols <- c("bugs_raw", "vulnerabilities_raw", "code_smells_raw")
+
+composition_overall_wide <- panel_raw[, lapply(.SD, sum, na.rm = TRUE), .SDcols = warning_cols]
+composition_overall <- data.table::melt(
+  composition_overall_wide,
+  measure.vars = warning_cols,
+  variable.name = "subcategory",
+  value.name = "count"
+)
+composition_overall[, dataset_source := "overall"]
+composition_overall[, share_pct := count / sum(count) * 100]
+
+composition_by_source_wide <- panel_raw[, lapply(.SD, sum, na.rm = TRUE), by = dataset_source, .SDcols = warning_cols]
+composition_by_source <- data.table::melt(
+  composition_by_source_wide,
+  id.vars = "dataset_source",
+  measure.vars = warning_cols,
+  variable.name = "subcategory",
+  value.name = "count"
+)
+composition_by_source[, share_pct := count / sum(count), by = dataset_source]
+composition_by_source[, share_pct := share_pct * 100]
+
+composition <- rbindlist(
+  list(
+    composition_overall[, .(dataset_source, subcategory, count, share_pct)],
+    composition_by_source[, .(dataset_source, subcategory, count, share_pct)]
+  ),
+  use.names = TRUE
+)
+
+composition[, panel := panel_label]
+
+print(composition)
+
+fwrite(
+  composition,
+  file.path(out_dir, "borusyak_warning_subcategories_composition.csv")
+)
+```
+
+# Prepare Data for Borusyak Estimator
+
+```{r prepare-data}
+panel_data <- copy(panel_raw)
+
+panel_data[, time_yyyymm := normalize_yyyymm(time)]
+
+event_yyyymm_raw <- normalize_yyyymm(panel_data$event)
+event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
+panel_data[, event_yyyymm := event_yyyymm_raw]
+
+# Safety rule:
+# Controls are never-treated in the Borusyak estimator.
+# Even if a control row carries a pseudo-event month for matching provenance,
+# it should not be treated as an adoption event.
+panel_data[, dataset_source := as.character(dataset_source)]
+panel_data[dataset_source != "treatment", event_yyyymm := 0L]
+
+if ("post_event" %in% names(panel_data)) {
+  panel_data[dataset_source != "treatment", post_event := 0L]
+}
+
+# Match the cohort restriction used in the aggregate quality Borusyak pipeline.
+# Keep never-treated controls and treatment cohorts with sufficient pre/post support.
+panel_data <- panel_data[
+  event_yyyymm == 0L |
+    (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+]
+
+panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+panel_data[, event_id := ifelse(event_yyyymm == 0L, 0L, yyyymm_to_month_id(event_yyyymm))]
+
+panel_data <- panel_data[!is.na(time_id)]
+panel_data <- panel_data[event_id == 0L | !is.na(event_id)]
+
+panel_data[, repo_name_str := repo_name]
+panel_data[, repo_id := as.integer(factor(repo_name_str))]
+panel_data[, treated := ifelse(event_id > 0L, 1L, 0L)]
+panel_data[, time_to_event_calc := ifelse(treated == 1L, time_id - event_id, NA_integer_)]
+
+metric_cols <- c("bugs_raw", "vulnerabilities_raw", "code_smells_raw")
+for (col in metric_cols) {
+  panel_data[, (col) := as.numeric(get(col))]
+  panel_data[get(col) < 0, (col) := NA_real_]
+}
+
+panel_data[, contributors_log := log1p(as.numeric(contributors))]
+
+if (!("log_ncloc" %in% names(panel_data))) {
+  if ("ncloc_raw" %in% names(panel_data)) {
+    panel_data[, log_ncloc := log1p(as.numeric(ncloc_raw))]
+  } else if ("ncloc" %in% names(panel_data)) {
+    panel_data[, log_ncloc := log1p(as.numeric(ncloc))]
+  } else {
+    stop("Cannot create log_ncloc because ncloc_raw/ncloc is missing.")
+  }
+} else {
+  panel_data[, log_ncloc := as.numeric(log_ncloc)]
+}
+
+panel_data[, log_bugs := log1p(bugs_raw)]
+panel_data[, log_vulnerabilities := log1p(vulnerabilities_raw)]
+panel_data[, log_code_smells := log1p(code_smells_raw)]
+
+model_required_cols <- c(
+  "log_bugs",
+  "log_vulnerabilities",
+  "log_code_smells",
+  "contributors_log",
+  "log_ncloc"
+)
+
+panel_data <- panel_data[complete.cases(panel_data[, ..model_required_cols])]
+
+cat("Rows after readiness and cohort filtering:", nrow(panel_data), "\n")
+cat("Repos after filtering:", uniqueN(panel_data$repo_id), "\n")
+cat("Treated repos:", uniqueN(panel_data[treated == 1, repo_id]), "\n")
+cat("Control repos:", uniqueN(panel_data[treated == 0, repo_id]), "\n")
+cat("Time id range:", min(panel_data$time_id), "to", max(panel_data$time_id), "\n")
+```
+
+# Estimation Input Summary
+
+```{r input-summary}
+input_summary <- panel_data[, .(
+  rows = .N,
+  repos = uniqueN(repo_id),
+  mean_bugs_raw = mean(bugs_raw, na.rm = TRUE),
+  mean_vulnerabilities_raw = mean(vulnerabilities_raw, na.rm = TRUE),
+  mean_code_smells_raw = mean(code_smells_raw, na.rm = TRUE),
+  mean_log_bugs = mean(log_bugs, na.rm = TRUE),
+  mean_log_vulnerabilities = mean(log_vulnerabilities, na.rm = TRUE),
+  mean_log_code_smells = mean(log_code_smells, na.rm = TRUE),
+  mean_contributors_log = mean(contributors_log, na.rm = TRUE),
+  mean_log_ncloc = mean(log_ncloc, na.rm = TRUE),
+  zero_share_bugs = mean(bugs_raw == 0, na.rm = TRUE),
+  zero_share_vulnerabilities = mean(vulnerabilities_raw == 0, na.rm = TRUE),
+  zero_share_code_smells = mean(code_smells_raw == 0, na.rm = TRUE)
+), by = dataset_source]
+
+input_summary[, panel := panel_label]
+
+print(input_summary)
+
+fwrite(
+  input_summary,
+  file.path(out_dir, "borusyak_warning_subcategories_input_summary.csv")
+)
+
+event_time_counts <- panel_data[treated == 1, .N, by = time_to_event_calc][order(time_to_event_calc)]
+print(event_time_counts)
+
+fwrite(
+  event_time_counts,
+  file.path(out_dir, "borusyak_warning_subcategories_event_time_counts.csv")
+)
+```
+
+# Panel Checks After Filtering
+
+```{r panel-checks-after-filter}
+control_post_event_sum <- if ("post_event" %in% names(panel_data)) {
+  sum(panel_data[treated == 0]$post_event, na.rm = TRUE)
+} else {
+  NA_integer_
+}
+
+treated_post_rows <- panel_data[treated == 1 & time_id >= event_id, .N]
+
+post_event_mismatch_rows <- if ("post_event" %in% names(panel_data)) {
+  expected_post <- ifelse(panel_data$treated == 1L & panel_data$time_id >= panel_data$event_id, 1L, 0L)
+  sum(as.integer(panel_data$post_event) != expected_post, na.rm = TRUE)
+} else {
+  NA_integer_
+}
+
+panel_checks_filtered <- data.frame(
+  panel = panel_label,
+  check = c(
+    "rows",
+    "repos",
+    "treatment_rows",
+    "control_rows",
+    "treated_repos",
+    "control_repos",
+    "control_post_event_sum",
+    "treated_post_rows",
+    "post_event_mismatch_rows",
+    "analysis_ready_warning_subcategory_did_rows",
+    "bugs_raw_nonmissing",
+    "vulnerabilities_raw_nonmissing",
+    "code_smells_raw_nonmissing",
+    "log_bugs_nonmissing",
+    "log_vulnerabilities_nonmissing",
+    "log_code_smells_nonmissing",
+    "contributors_log_nonmissing",
+    "log_ncloc_nonmissing",
+    "bugs_zero_rows",
+    "vulnerabilities_zero_rows",
+    "code_smells_zero_rows",
+    "min_time",
+    "max_time"
+  ),
+  value = c(
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    sum(panel_data$dataset_source == "treatment", na.rm = TRUE),
+    sum(panel_data$dataset_source == "control", na.rm = TRUE),
+    uniqueN(panel_data[treated == 1]$repo_id),
+    uniqueN(panel_data[treated == 0]$repo_id),
+    control_post_event_sum,
+    treated_post_rows,
+    post_event_mismatch_rows,
+    nrow(panel_data),
+    sum(!is.na(panel_data$bugs_raw)),
+    sum(!is.na(panel_data$vulnerabilities_raw)),
+    sum(!is.na(panel_data$code_smells_raw)),
+    sum(!is.na(panel_data$log_bugs)),
+    sum(!is.na(panel_data$log_vulnerabilities)),
+    sum(!is.na(panel_data$log_code_smells)),
+    sum(!is.na(panel_data$contributors_log)),
+    sum(!is.na(panel_data$log_ncloc)),
+    sum(panel_data$bugs_raw == 0, na.rm = TRUE),
+    sum(panel_data$vulnerabilities_raw == 0, na.rm = TRUE),
+    sum(panel_data$code_smells_raw == 0, na.rm = TRUE),
+    min(panel_data$time, na.rm = TRUE),
+    max(panel_data$time, na.rm = TRUE)
+  )
+)
+
+print(panel_checks_filtered)
+
+fwrite(
+  panel_checks_filtered,
+  file.path(out_dir, "borusyak_warning_subcategories_panel_checks.csv")
+)
+```
+
+# Outcomes and First Stage
+
+```{r outcomes-first-stage}
+outcome_vars <- c(
+  "log_bugs",
+  "log_vulnerabilities",
+  "log_code_smells"
+)
+
+outcome_names <- c(
+  "Bugs",
+  "Vulnerabilities",
+  "Code Smells"
+)
+
+first_stage_formula <- as.formula(
+  "~ contributors_log + log_ncloc | repo_id + time_id"
+)
+
+cat("Outcomes:\n")
+print(data.frame(outcome = outcome_vars, label = outcome_names))
+
+cat("\nFirst-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Static Borusyak Effects
+
+```{r static-effects}
+static_results <- list()
+static_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running static Borusyak model for:", var, "\n")
+
+  static_results[[var]] <- tryCatch(
+    run_borusyak_static(
+      data = as.data.frame(panel_data),
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      static_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+static_df <- dplyr::bind_rows(lapply(outcome_vars, function(v) {
+  if (is.null(static_results[[v]])) {
+    return(data.frame(
+      outcome = v,
+      term = "treat",
+      estimate = NA_real_,
+      std_error = NA_real_,
+      conf_low = NA_real_,
+      conf_high = NA_real_,
+      p_value = NA_real_,
+      note = "model failed"
+    ))
+  }
+
+  extract_static_result(static_results[[v]], v)
+}))
+
+static_df <- fill_missing_p_values(static_df)
+
+static_df$outcome_label <- outcome_names[match(static_df$outcome, outcome_vars)]
+static_df$panel <- panel_label
+
+static_df$estimate_pct <- (exp(static_df$estimate) - 1) * 100
+static_df$conf_low_pct <- (exp(static_df$conf_low) - 1) * 100
+static_df$conf_high_pct <- (exp(static_df$conf_high) - 1) * 100
+
+print(static_df)
+
+fwrite(
+  static_df,
+  file.path(out_dir, "borusyak_warning_subcategories_static_effects.csv")
+)
+
+if (length(static_errors) > 0) {
+  static_error_df <- data.frame(
+    panel = panel_label,
+    outcome = names(static_errors),
+    error = unlist(static_errors),
+    row.names = NULL
+  )
+
+  print(static_error_df)
+
+  fwrite(
+    static_error_df,
+    file.path(out_dir, "borusyak_warning_subcategories_static_errors.csv")
+  )
+}
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_results <- list()
+dynamic_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running dynamic Borusyak model for:", var, "\n")
+
+  dynamic_results[[var]] <- tryCatch(
+    run_borusyak_dynamic(
+      data = as.data.frame(panel_data),
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      horizon = -6:6,
+      pretrends = -6:-2,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      dynamic_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+dynamic_df <- dplyr::bind_rows(lapply(seq_along(outcome_vars), function(i) {
+  v <- outcome_vars[i]
+
+  if (is.null(dynamic_results[[v]])) {
+    return(data.frame())
+  }
+
+  extract_dynamic_result(
+    dynamic_results[[v]],
+    outcome = v,
+    outcome_label = outcome_names[i],
+    min_horizon = -6,
+    max_horizon = 6
+  )
+}))
+
+if (nrow(dynamic_df) > 0) {
+  dynamic_df <- fill_missing_p_values(dynamic_df)
+
+  dynamic_df$panel <- panel_label
+  dynamic_df$estimate_pct <- (exp(dynamic_df$estimate) - 1) * 100
+  dynamic_df$conf_low_pct <- (exp(dynamic_df$conf_low) - 1) * 100
+  dynamic_df$conf_high_pct <- (exp(dynamic_df$conf_high) - 1) * 100
+
+  if (!("significant" %in% names(dynamic_df))) {
+    dynamic_df$significant <- !is.na(dynamic_df$conf_low) &
+      !is.na(dynamic_df$conf_high) &
+      ((dynamic_df$conf_low > 0) | (dynamic_df$conf_high < 0))
+  }
+}
+
+print(dynamic_df)
+
+fwrite(
+  dynamic_df,
+  file.path(out_dir, "borusyak_warning_subcategories_dynamic_effects.csv")
+)
+
+if (length(dynamic_errors) > 0) {
+  dynamic_error_df <- data.frame(
+    panel = panel_label,
+    outcome = names(dynamic_errors),
+    error = unlist(dynamic_errors),
+    row.names = NULL
+  )
+
+  print(dynamic_error_df)
+
+  fwrite(
+    dynamic_error_df,
+    file.path(out_dir, "borusyak_warning_subcategories_dynamic_errors.csv")
+  )
+}
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=11, fig.height=6}
+if (nrow(dynamic_df) > 0) {
+  p <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -1, linetype = "dotted") +
+    geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.15) +
+    geom_point(aes(shape = significant)) +
+    geom_line() +
+    facet_wrap(~ outcome_label, scales = "free_y") +
+    labs(
+      title = paste("Borusyak Dynamic Effects for Warning Subcategories:", panel_label),
+      x = "Months relative to Cursor adoption",
+      y = "Estimate on log scale",
+      shape = "95% CI excludes 0"
+    ) +
+    theme_minimal()
+
+  print(p)
+
+  ggsave(
+    filename = file.path(out_dir, "dynamic_effects_borusyak_warning_subcategories.pdf"),
+    plot = p,
+    width = 11,
+    height = 6
+  )
+} else {
+  cat("No dynamic effects to plot.\n")
+}
+```
+
+# Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "helper_file",
+    "panel_label",
+    "panel_path",
+    "out_dir",
+    "outcomes",
+    "covariates",
+    "estimator",
+    "time_encoding",
+    "cohort_filter",
+    "input_source",
+    "interpretation_note"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_warning_subcategories_v2.Rmd",
+    helpers_path,
+    panel_label,
+    panel_path,
+    out_dir,
+    paste(outcome_vars, collapse = ", "),
+    "contributors_log + log_ncloc",
+    "Borusyak imputation via didimputation::did_imputation",
+    "YYYY-MM converted to month_id = year * 12 + month",
+    "controls kept with event_yyyymm == 0; treatment cohorts kept if 202407 < event_yyyymm <= 202503",
+    "run9e complete-case quality DiD input",
+    "Warning subcategory decomposition of aggregate static_analysis_warnings"
+  )
+)
+
+print(metadata)
+
+fwrite(
+  metadata,
+  file.path(out_dir, "borusyak_warning_subcategories_metadata.csv")
+)
+```
