@@ -21,6 +21,8 @@ RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/run10a_did_warning_subcategories_borusyak_${RUN_TS}.log}"
 
 RMD="${RMD:-proc_r/DiffInDiffBorusyak_warning_subcategories_v2.Rmd}"
+SUMMARY_SCRIPT="${SUMMARY_SCRIPT:-proc_scripts/summarize_borusyak_warning_subcategories.py}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
 
 DID_DIR="${DID_DIR:-tmp_jsts_test/data/jsts_did_final}"
 OUT_ROOT="${OUT_ROOT:-${DID_DIR}/quality_did_borusyak_warning_subcategories}"
@@ -94,6 +96,7 @@ RS
   echo "run10a: JS/TS SonarQube warning-subcategory Borusyak DiD"
   echo "Started:        $(date)"
   echo "Rmd:            ${RMD}"
+  echo "Summary script: ${SUMMARY_SCRIPT}"
   echo "DID dir:        ${DID_DIR}"
   echo "Output root:    ${OUT_ROOT}"
   echo "Summary dir:    ${SUMMARY_DIR}"
@@ -104,6 +107,11 @@ RS
 
   if [[ ! -f "${RMD}" ]]; then
     echo "ERROR: Rmd file not found: ${RMD}"
+    exit 1
+  fi
+
+  if [[ ! -f "${SUMMARY_SCRIPT}" ]]; then
+    echo "ERROR: summary script not found: ${SUMMARY_SCRIPT}"
     exit 1
   fi
 
@@ -120,138 +128,9 @@ RS
   echo "** Building combined warning-subcategory summaries"
   echo "------------------------------------------------------------"
 
-  python - <<PY
-import math
-from pathlib import Path
-import pandas as pd
-
-out_root = Path("${OUT_ROOT}")
-summary_dir = Path("${SUMMARY_DIR}")
-summary_dir.mkdir(parents=True, exist_ok=True)
-
-labels = [
-    "main_unbalanced",
-    "main_balanced",
-    "strict_1to3_unbalanced",
-    "strict_1to3_balanced",
-]
-
-def read_if_exists(label, filename):
-    path = out_root / label / filename
-    if not path.exists():
-        return None
-    df = pd.read_csv(path)
-    if "panel" not in df.columns:
-        df["panel"] = label
-    return df
-
-combined_specs = [
-    ("borusyak_warning_subcategories_static_effects.csv", "borusyak_warning_subcategories_static_effects_all.csv"),
-    ("borusyak_warning_subcategories_dynamic_effects.csv", "borusyak_warning_subcategories_dynamic_effects_all.csv"),
-    ("borusyak_warning_subcategories_input_summary.csv", "borusyak_warning_subcategories_input_summary_all.csv"),
-    ("borusyak_warning_subcategories_panel_checks.csv", "borusyak_warning_subcategories_panel_checks_all.csv"),
-    ("borusyak_warning_subcategories_composition.csv", "borusyak_warning_subcategories_composition_all.csv"),
-]
-
-for src_name, out_name in combined_specs:
-    parts = []
-    for label in labels:
-        df = read_if_exists(label, src_name)
-        if df is not None:
-            parts.append(df)
-    if parts:
-        combined = pd.concat(parts, ignore_index=True)
-        out = out_root / out_name
-        combined.to_csv(out, index=False)
-        print("Saved:", out)
-
-static_path = out_root / "borusyak_warning_subcategories_static_effects_all.csv"
-if static_path.exists():
-    static = pd.read_csv(static_path)
-
-    for col in ["estimate", "conf_low", "conf_high"]:
-        if col in static.columns:
-            static[f"{col}_pct"] = static[col].apply(
-                lambda x: None if pd.isna(x) else (math.exp(x) - 1.0) * 100.0
-            )
-
-    paper_cols = [
-        "panel",
-        "outcome",
-        "outcome_label",
-        "estimate",
-        "estimate_pct",
-        "conf_low",
-        "conf_low_pct",
-        "conf_high",
-        "conf_high_pct",
-        "std_error",
-        "p_value",
-        "note",
-    ]
-    paper_cols = [c for c in paper_cols if c in static.columns]
-
-    paper = static[paper_cols].copy()
-    out = summary_dir / "borusyak_warning_subcategories_static_effects_paper_ready.csv"
-    paper.to_csv(out, index=False)
-    print("Saved:", out)
-
-    try:
-        wide = paper.pivot_table(
-            index=["panel"],
-            columns=["outcome"],
-            values=["estimate_pct", "conf_low_pct", "conf_high_pct"],
-            aggfunc="first"
-        )
-        wide.columns = ["_".join([str(x) for x in col if str(x) != ""]) for col in wide.columns]
-        wide = wide.reset_index()
-        out = summary_dir / "borusyak_warning_subcategories_static_effects_wide.csv"
-        wide.to_csv(out, index=False)
-        print("Saved:", out)
-    except Exception as e:
-        print("Could not create static wide summary:", e)
-
-dynamic_path = out_root / "borusyak_warning_subcategories_dynamic_effects_all.csv"
-if dynamic_path.exists():
-    dynamic = pd.read_csv(dynamic_path)
-
-    for col in ["estimate", "conf_low", "conf_high"]:
-        if col in dynamic.columns:
-            dynamic[f"{col}_pct"] = dynamic[col].apply(
-                lambda x: None if pd.isna(x) else (math.exp(x) - 1.0) * 100.0
-            )
-
-    out = summary_dir / "borusyak_warning_subcategories_dynamic_effects_percent.csv"
-    dynamic.to_csv(out, index=False)
-    print("Saved:", out)
-
-    plot_cols = [
-        "panel",
-        "outcome",
-        "outcome_label",
-        "time",
-        "estimate",
-        "conf_low",
-        "conf_high",
-        "estimate_pct",
-        "conf_low_pct",
-        "conf_high_pct",
-        "significant",
-    ]
-    plot_cols = [c for c in plot_cols if c in dynamic.columns]
-    out = summary_dir / "borusyak_warning_subcategories_dynamic_effects_plot_ready.csv"
-    dynamic[plot_cols].to_csv(out, index=False)
-    print("Saved:", out)
-
-notes = summary_dir / "borusyak_warning_subcategories_summary_notes.txt"
-notes.write_text(
-    "Warning-subcategory Borusyak DiD completed. "
-    "Outcomes are log_bugs, log_vulnerabilities, and log_code_smells. "
-    "The model uses repository and month fixed effects with contributors_log and log_ncloc as covariates. "
-    "Default run analyzes strict_1to3_unbalanced only; use RUN_ALL=1 for all four panels.\\n"
-)
-print("Saved:", notes)
-PY
+  "${PYTHON_BIN}" "${SUMMARY_SCRIPT}" \
+    --out-root "${OUT_ROOT}" \
+    --summary-dir "${SUMMARY_DIR}"
 
   echo
   echo "============================================================"

@@ -692,59 +692,30 @@ if (length(dynamic_errors) > 0) {
 
 # Dynamic Plot
 
-```{r dynamic-plot, fig.width=9, fig.height=3.5}
+```{r dynamic-plot, fig.width=11, fig.height=6}
 if (nrow(dynamic_df) > 0) {
-  dynamic_df$outcome_label <- factor(dynamic_df$outcome_label, levels = outcome_names)
-
   p <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
-    geom_errorbar(
-      data = subset(dynamic_df, significant %in% TRUE),
-      aes(ymin = conf_low, ymax = conf_high),
-      width = 0.4,
-      linetype = "solid"
-    ) +
-    geom_errorbar(
-      data = subset(dynamic_df, !(significant %in% TRUE)),
-      aes(ymin = conf_low, ymax = conf_high),
-      width = 0.4,
-      linetype = "dotted"
-    ) +
-    geom_point(
-      data = subset(dynamic_df, significant %in% TRUE),
-      shape = 19,
-      size = 1.7
-    ) +
-    geom_point(
-      data = subset(dynamic_df, !(significant %in% TRUE)),
-      shape = 21,
-      fill = "transparent",
-      size = 1.7
-    ) +
     geom_hline(yintercept = 0, linetype = "dashed") +
-    geom_vline(xintercept = -0.5, linetype = "dashed") +
-    scale_x_continuous(breaks = -6:6) +
-    coord_cartesian(xlim = c(-6.5, 6.5)) +
-    facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
+    geom_vline(xintercept = -1, linetype = "dotted") +
+    geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.15) +
+    geom_point(aes(shape = significant)) +
+    geom_line() +
+    facet_wrap(~ outcome_label, scales = "free_y") +
     labs(
-      title = paste("Borusyak Warning-Subcategory DiD:", panel_label),
-      subtitle = "JS/TS warning subcategories from run9e complete-case panel",
-      x = "Months Relative to Cursor Adoption",
-      y = "Treatment Effect",
-      caption = "Filled dots: CI excludes 0. Hollow dots: CI includes 0."
+      title = paste("Borusyak Dynamic Effects for Warning Subcategories:", panel_label),
+      x = "Months relative to Cursor adoption",
+      y = "Estimate on log scale",
+      shape = "95% CI excludes 0"
     ) +
-    theme_minimal() +
-    theme(
-      panel.grid.minor = element_blank(),
-      plot.caption = element_text(hjust = 0.5, size = 8)
-    )
+    theme_minimal()
 
   print(p)
 
   ggsave(
     filename = file.path(out_dir, "dynamic_effects_borusyak_warning_subcategories.pdf"),
     plot = p,
-    width = 9,
-    height = 3.5
+    width = 11,
+    height = 6
   )
 } else {
   cat("No dynamic effects to plot.\n")

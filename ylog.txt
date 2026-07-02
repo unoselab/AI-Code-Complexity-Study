@@ -1,29 +1,100 @@
-Overall warning composition
-bugs_raw                244658.0
-vulnerabilities_raw      21363.0
-code_smells_raw        5635991.0
 
-bugs_raw                4.15%
-vulnerabilities_raw     0.36%
-code_smells_raw        95.49%
-dtype: object
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ ./run10a-did-warning-subcategories-borusyak.sh 
+============================================================
+run10a: JS/TS SonarQube warning-subcategory Borusyak DiD
+Started:        Thu Jul  2 01:42:39 PM CDT 2026
+Rmd:            proc_r/DiffInDiffBorusyak_warning_subcategories_v2.Rmd
+Summary script: proc_scripts/summarize_borusyak_warning_subcategories.py
+DID dir:        tmp_jsts_test/data/jsts_did_final
+Output root:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories
+Summary dir:    tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary
+RUN_ALL:        0
+Log file:       logs/run10a_did_warning_subcategories_borusyak_20260702-134239.log
+============================================================
 
-By dataset_source
 
-control
-bugs_raw                 62241.0
-vulnerabilities_raw       7104.0
-code_smells_raw        1840609.0
-bugs_raw                3.26%
-vulnerabilities_raw     0.37%
-code_smells_raw        96.37%
-dtype: object
+============================================================
+Rendering warning-subcategory Borusyak panel: strict_1to3_unbalanced
+Panel:      tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
+Output dir: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced
+============================================================
 
-treatment
-bugs_raw                182417.0
-vulnerabilities_raw      14259.0
-code_smells_raw        3795382.0
-bugs_raw                4.57%
-vulnerabilities_raw     0.36%
-code_smells_raw        95.07%
-dtype: object
+
+processing file: DiffInDiffBorusyak_warning_subcategories_v2.Rmd
+1/32                            
+2/32 [setup]                    
+3/32                            
+4/32 [packages]                 
+5/32                            
+6/32 [params]                   
+7/32                            
+8/32 [source-helpers]           
+9/32                            
+10/32 [helper-functions]         
+11/32                            
+12/32 [load-panel]               
+13/32                            
+14/32 [raw-panel-checks]         
+15/32                            
+16/32 [warning-composition]      
+17/32                            
+18/32 [prepare-data]             
+19/32                            
+20/32 [input-summary]            
+21/32                            
+22/32 [panel-checks-after-filter]
+23/32                            
+24/32 [outcomes-first-stage]     
+25/32                            
+26/32 [static-effects]           
+27/32                            
+28/32 [dynamic-effects]          
+29/32                            
+30/32 [dynamic-plot]             
+Fontconfig warning: using without calling FcInit()
+31/32                            
+32/32 [metadata]                 
+output file: DiffInDiffBorusyak_warning_subcategories_v2.knit.md
+
+/home/user1-system12/miniconda3/envs/aicomplexity/bin/pandoc +RTS -K512m -RTS DiffInDiffBorusyak_warning_subcategories_v2.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study/tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced/borusyak_warning_subcategories_strict_1to3_unbalanced.html --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --table-of-contents --toc-depth 3 --template /home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /tmp/Rtmp2j4ecC/rmarkdown-str2791337ecb81a3.html 
+[WARNING] Deprecated: --no-highlight. Use --syntax-highlighting=none instead.
+
+Output created: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced/borusyak_warning_subcategories_strict_1to3_unbalanced.html
+
+** Building combined warning-subcategory summaries
+------------------------------------------------------------
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_static_effects.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_static_effects.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_static_effects.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_static_effects_all.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_dynamic_effects.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_dynamic_effects.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_dynamic_effects.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_dynamic_effects_all.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_input_summary.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_input_summary.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_input_summary.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_input_summary_all.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_panel_checks.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_panel_checks.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_panel_checks.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_panel_checks_all.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_unbalanced/borusyak_warning_subcategories_composition.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/main_balanced/borusyak_warning_subcategories_composition.csv
+Missing: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_balanced/borusyak_warning_subcategories_composition.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/borusyak_warning_subcategories_composition_all.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_static_effects_paper_ready.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_static_effects_wide.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_dynamic_effects_percent.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_dynamic_effects_plot_ready.csv
+Saved: tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary/borusyak_warning_subcategories_summary_notes.txt
+
+============================================================
+run10a completed successfully.
+Completed:       Thu Jul  2 01:42:42 PM CDT 2026
+Output root:     tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories
+Summary dir:     tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/summary
+Log file:        logs/run10a_did_warning_subcategories_borusyak_20260702-134239.log
+============================================================
+Saved log to logs/run10a_did_warning_subcategories_borusyak_20260702-134239.log
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 

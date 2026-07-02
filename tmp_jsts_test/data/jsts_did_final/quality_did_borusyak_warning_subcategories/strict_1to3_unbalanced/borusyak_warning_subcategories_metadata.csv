@@ -1,0 +1,13 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_warning_subcategories_v2.Rmd
+helper_file,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study/proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict_1to3_unbalanced
+panel_path,tmp_jsts_test/data/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only_with_sonarqube_quality_did_input_complete.csv
+out_dir,tmp_jsts_test/data/jsts_did_final/quality_did_borusyak_warning_subcategories/strict_1to3_unbalanced
+outcomes,"log_bugs, log_vulnerabilities, log_code_smells"
+covariates,contributors_log + log_ncloc
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,YYYY-MM converted to month_id = year * 12 + month
+cohort_filter,controls kept with event_yyyymm == 0; treatment cohorts kept if 202407 < event_yyyymm <= 202503
+input_source,run9e complete-case quality DiD input
+interpretation_note,Warning subcategory decomposition of aggregate static_analysis_warnings

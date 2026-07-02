@@ -1,0 +1,12 @@
+check,value
+panel_label,strict_1to3_unbalanced
+rows,5425
+repos,686
+treatment_rows,2890
+control_rows,2535
+treated_repos,334
+control_repos,352
+bugs_raw_nonmissing,5425
+vulnerabilities_raw_nonmissing,5425
+code_smells_raw_nonmissing,5425
+duplicate_repo_time_source_rows,0

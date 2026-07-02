@@ -1,0 +1,1 @@
+Warning-subcategory Borusyak DiD completed. Outcomes are log_bugs, log_vulnerabilities, and log_code_smells. The model uses repository and month fixed effects with contributors_log and log_ncloc as covariates. Default run analyzes strict_1to3_unbalanced only; use RUN_ALL=1 for all four panels.

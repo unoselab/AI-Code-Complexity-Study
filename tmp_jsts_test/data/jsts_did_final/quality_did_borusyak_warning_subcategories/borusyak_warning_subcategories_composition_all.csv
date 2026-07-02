@@ -1,0 +1,10 @@
+dataset_source,subcategory,count,share_pct,panel
+overall,bugs_raw,244658,4.14533213419424,strict_1to3_unbalanced
+overall,vulnerabilities_raw,21363,0.361961310820784,strict_1to3_unbalanced
+overall,code_smells_raw,5635991,95.492706554985,strict_1to3_unbalanced
+treatment,bugs_raw,182417,4.56949773775832,strict_1to3_unbalanced
+control,bugs_raw,62241,3.25876958293236,strict_1to3_unbalanced
+treatment,vulnerabilities_raw,14259,0.357184189207672,strict_1to3_unbalanced
+control,vulnerabilities_raw,7104,0.371946130639796,strict_1to3_unbalanced
+treatment,code_smells_raw,3795382,95.073318073034,strict_1to3_unbalanced
+control,code_smells_raw,1840609,96.3692842864278,strict_1to3_unbalanced
