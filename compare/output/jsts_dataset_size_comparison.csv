@@ -1,0 +1,5 @@
+dataset,treatment_repos,control_repos,total_observations,post_treatment_observations,min_time,max_time
+paper_appendix_jsts_table7,411,422,8870,2279,,
+paper_baseline_panel_recomputed_jsts_treatment_repos_only,441,1,4833,2262,2024-01,2025-08
+our_main_unbalanced_panel,380,393,6281,1821,2024-01,2025-08
+our_strict_1to3_unbalanced_panel,337,354,5518,1601,2024-01,2025-08
