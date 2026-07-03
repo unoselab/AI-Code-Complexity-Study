@@ -1,0 +1,97 @@
+repo,type,reason,detail
+0xAquaWolf/portfolio,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+0xfrankz/Kaas,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+0xsend/sendapp,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+AnEntrypoint/apptoapp,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+Bistutu/FluentRead,treat,dropped_by_strict_1to3,"Repo has 1 final controls in main pairs, not exactly 3."
+CopilotKit/open-multi-agent-canvas,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+DA0-DA0/dao-dao-ui,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+GaloyMoney/lana-bank,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+IQAIcom/brain,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+IndieYe/sqlwise,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+Just-Understanding-Data-Ltd/ai-coding-with-cursor,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+KaizeNodeLabs/SafeSwap,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+LIT-Protocol/developer-guides-code,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+LastBotInc/nextjs-supabase-ai-webapp,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+Ly-GGboy/AI-Library,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+MaggieAppleton/lodestone,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+Malte2036/thw-tools,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+Melvynx/next-zod-route,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+Schroedinger-Hat/osday,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+Shopify/cli,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+ahmedkhaleel2004/gitdiagram,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+ai-hero-dev/ai-hero,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+alexander-turner/TurnTrout.com,treat,in_strict_pairs_no_panel_rows,Repo is in strict pairs but has no usable strict panel rows.
+andrewhopper/dotai,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+antiwork/helper,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+antiwork/iffy,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+autonomys/astral,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+badass-courses/course-builder,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+ballerine-io/ballerine,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+betagouv/france-chaleur-urbaine,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+brandon-schabel/octoprompt,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+buster-so/buster,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+ccbikai/github-stars,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+christophebe/julius-gpt,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+constROD/template-hono-prisma-kysely,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+cool-team-official/cool-admin-midway,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+dalenguyen/dalenguyen.github.io,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+ditto-assistant/ditto-app,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+dustland/agentok,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+f3liiix/nav-site,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+fatwang2/search1api-mcp,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+frostime/sy-f-misc,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+genesis-ai-dev/codex-editor,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+getgrinta/grinta,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+ghostlexly/ultimate-typescript-starter-kit,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+gly-hub/dandelion-admin,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+hackclub/print-legion,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+haydenbleasel/next-forge,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+howoii/SmartBookmark,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+johanguse/next-saas-template,treat,dropped_by_strict_1to3,"Repo has 1 final controls in main pairs, not exactly 3."
+jonathanbertholet/promptmanager,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+jsnanigans/blac,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+kazuph/mcp-screenshot,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+kelvin6365/rocksdev.tools,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+konecty/Konecty,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+latitude-dev/latitude-llm,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+leemonade/leemons,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+magebitcom/magento-toolbox,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+mamertofabian/arch-spec,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+mayneyao/eidos,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+mazeincoding/Mazeway,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+meshery/meshery,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+metriport/metriport,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+milaboratory/platforma,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+mzxrai/mcp-openai,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+notional-finance/notional-monorepo,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+novuhq/novu,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+omnisat/lasereyes-mono,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+one-ie/one,treat,in_strict_pairs_no_panel_rows,Repo is in strict pairs but has no usable strict panel rows.
+openintegrations/openint,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+openshiporg/openfront,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+opentoolsteam/cli,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+paramountric/digitaltwincityviewer,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+paulboguta/alternativeoss,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+piotrkulpinski/openalternative,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+pnd280/complexity,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+pollinations/pollinations,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+q1226189767/FlyAdmin,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+rivet-gg/actor-core,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+sadmann7/shadcn-table,treat,dropped_by_strict_1to3,"Repo has 1 final controls in main pairs, not exactly 3."
+serge-0v/next-js-sanity-starter,treat,dropped_by_strict_1to3,"Repo has 1 final controls in main pairs, not exactly 3."
+social-embed/social-embed,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+srikanth235/openastra,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+stacksjs/vite-plugin-local,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+stolinski/drop-in,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+timothywarner/ai900,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+tweneboah/youtube-tutorials-projects,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+unsend-dev/unsend,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+wakeyi-git/obsidian-card-navigator-plugin,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+webdevcody/survive-the-night-game,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+wham/kaja,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+yayxs/ai-coding,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."
+yenche123/liubai,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+zueai/cloudflare-api-mcp,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+zueai/create-mcp,treat,not_in_our_jsts_sample,Paper JS/TS treatment is absent from our JS/TS treatment sample.
+zzfn/zzf,treat,dropped_by_strict_1to3,"Repo has 2 final controls in main pairs, not exactly 3."

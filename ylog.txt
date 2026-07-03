@@ -1,49 +1,350 @@
-이 두 파일도 확인했습니다 — 결론: **`_1to3_only` 필터의 정의는 여기에도 없습니다.** 하지만 이 파일들이 그 필터의 위치를 최종적으로 좁혀줬고, 코드 없이도 질문을 확정할 수 있는 데이터 확인법이 생겼습니다. 쉽게 정리합니다.
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ ./run7a-count-repo.sh 
 
-**run9c가 하는 일 — 필터가 아니라 순수 merge입니다.** 셸 스크립트를 보면 네 패널이 전부 **입력**입니다: `panel_event_monthly_matched_final_clean.csv`(main)과 `..._1to3_only.csv`(strict)가 이미 존재해야 하고("panel file not found"면 에러 종료), run9c는 거기에 SonarQube 메트릭을 **왼쪽-조인으로 붙이기만** 합니다. `merge_sonarqube_panel_v2.py`는 깨끗합니다: `validate="one_to_one"` + 행 수 보존 assert(행이 늘거나 줄면 즉시 실패), 결측 미대치·미삭제 정책 명시(docstring "Do not impute / Do not drop"), 원시값은 `*_raw`로 보존. 그리고 중요한 정합성 하나 — `static_analysis_warnings = bugs_raw + vulnerabilities_raw + code_smells_raw`를 일반 `+`로 계산하는데, pandas에서 일반 `+`는 성분 하나라도 NaN이면 결과가 NaN이라 run9e의 `min_count=3`과 **동일한 보수적 동작**입니다. 두 단계의 결측 정책이 일치함을 확인했습니다. 또 main과 strict가 **같은** 메트릭 파일(`jsts_sonarqube_main/...`)을 받으므로, 두 설정의 차이는 오직 패널 멤버십뿐 — 비교 가능성도 확보됐습니다.
+Panel file: data_baseline_backup/panel_event_monthly.csv
+Repos file: data_baseline_backup/repos.csv
+panel rows: 22096
+repos rows: 8621
 
-**그래서 필터 정의는 run9c의 상류, 즉 `panel_event_monthly_matched_final_clean*.csv` 네 개를 만든 빌더**(아마 run9a/9b 계열 + 그 파이썬)에 있습니다. 체인이 이제 완전히 그려졌습니다: 논문 matching.csv 상속 → run8c(클론 필터, usable_pairs + coverage 생성) → **[미확인: run9a/9b 패널 빌더 — 여기가 main/strict 분기]** → run9c(SonarQube merge) → run9e(quality DiD input) → Rmd.
+dataset_source counts:
+dataset_source
+control      12203
+treatment     9893
 
-**그런데 그 파일을 기다리지 않고도 질문을 확정할 방법이 있습니다.** run8c가 만든 coverage 파일(`num_usable_controls` per treatment)과 두 패널을 직접 대조하면, "1개라도 vs 3개 전부 vs 짝 control만" 중 무엇인지 데이터가 답합니다:
+unique treatment repos from panel: 858
+repos after metadata join: 858
+missing primary language: 24
 
-```python
-import pandas as pd
-D = "tmp_jsts_test/data"
-m = pd.read_csv(f"{D}/jsts_did_final/panel_event_monthly_matched_final_clean.csv")
-s = pd.read_csv(f"{D}/jsts_did_final/panel_event_monthly_matched_final_clean_1to3_only.csv")
-pairs = pd.read_csv(f"{D}/jsts_matched_control_pairs_main_398_clone_usable.csv")
-cov = pd.read_csv(f"{D}/jsts_control_pair_coverage_main_398_clone_usable.csv")
+Primary language counts among treatment repos:
+repo_primary_language
+TypeScript          379
+Python              128
+JavaScript           62
+Go                   36
+(missing)            24
+Rust                 24
+PHP                  23
+Vue                  16
+HTML                 16
+C#                   13
+Jupyter Notebook     13
+Dart                 12
+Swift                11
+C++                  11
+Shell                11
+Ruby                 10
+Elixir                8
+Svelte                7
+CSS                   7
+MDX                   6
+Astro                 5
+Java                  5
+C                     4
+Solidity              4
+Lua                   4
+Kotlin                3
+OCaml                 2
+HCL                   1
+Liquid                1
+Mathematica           1
 
-mt = set(m.loc[m.ever_treated==1,"repo_name"]); st = set(s.loc[s.ever_treated==1,"repo_name"])
-mc = set(m.loc[m.ever_treated==0,"repo_name"]); sc = set(s.loc[s.ever_treated==0,"repo_name"])
-print("treated  main/strict/strict에서빠짐:", len(mt), len(st), len(mt-st))
-print("control  main/strict/strict에서빠짐:", len(mc), len(sc), len(mc-sc))
+Selected languages: TypeScript, JavaScript
+Group name: JavaScript_TypeScript
+JavaScript_TypeScript treatment repos: 441
+Unique repos: 441
 
-# 가설 A: strict treated = usable control 3개 전부 보유한 treated
-covA = set(cov.loc[cov.num_usable_controls==3,"treatment_repo"])
-# 가설 B: strict treated = usable control 1개 이상 보유한 treated
-covB = set(cov.loc[cov.num_usable_controls>=1,"treatment_repo"])
-print("가설A(3개 전부 요구)와 일치?", st == (covA & mt))
-print("가설B(1개 이상)와 일치?",   st == (covB & mt))
+Saved language subset: tmp_jsts_test/data/original_paper_treatment_jsts_repos.csv
+...
+============================================================
+Event-window coverage among selected language-group repos
+============================================================
+Duplicated repo-month rows collapsed: 51
+All JavaScript_TypeScript treatment repos with window summary: 418
+Unique repos: 418
 
-# control 쪽: strict control이 '유지된 treated의 짝 control'로 정확히 한정되는지
-paired = set(pairs.loc[pairs["treatment_repo"].isin(st), "control_repo"])
-print("strict control ⊆ 유지 treated의 짝 control?", sc <= paired)
-print("strict control == 그 짝 control 전부?", sc == (paired & mc))
-```
+Primary language counts in window-summary subset:
+repo_primary_language
+TypeScript    360
+JavaScript     58
 
-읽는 법: 가설A가 True면 "3개 전부 usable인 treated만 유지"(가장 엄격), 가설B가 True면 "1개라도 있으면 유지", 마지막 두 줄이 True면 "control은 유지된 treated의 짝만 남김"이 확정됩니다. main 375 vs strict 333(−42)이라는 차이 규모로 보면 가설A(3개 전부 요구)일 가능성이 높지만, 이 스니펫이 추측을 확정으로 바꿔 줍니다.
+balanced_window counts:
+balanced_window
+0    172
+1     43
+2     11
+3     27
+4     23
+5     50
+6     43
+7     21
+8     16
+9     12
 
-판정에 주는 의미는 변하지 않습니다 — 어느 가설이든 strict는 논문에 없는 **추가 제약**이고, 논문 설계(control pool, treated는 coverage 무관 유지)와 동형인 것은 main입니다. 이 스니펫은 strict를 robustness로 보고할 때 "정확히 무슨 제약인지" 한 줄로 쓰기 위한 마지막 확인입니다. 스니펫 결과(또는 run9a/9b 빌더 파일) 주시면 이 건은 종결하고, 보고서 문구까지 정리해 드리겠습니다.
+balanced_window >= 3: 192
+balanced_window >= 4: 165
+balanced_window >= 5: 142
+balanced_window >= 6: 92
+balanced_window >= 7: 49
+balanced_window >= 8: 28
+balanced_window >= 9: 12
 
-[Result]
+Good-window JavaScript_TypeScript repos, balanced_window >= 6: 92
+Unique good-window repos: 92
 
-treated  main/strict/strict에서빠짐: 380 337 43
-control  main/strict/strict에서빠짐: 393 354 39
-가설A(3개 전부 요구)와 일치? False
-가설B(1개 이상)와 일치? False
-strict control ⊆ 유지 treated의 짝 control? False
-strict control == 그 짝 control 전부? False
+Event month counts for balanced_window >= 6:
+event_month
+2024-08     5
+2024-09     9
+2024-10     6
+2024-11    11
+2024-12    12
+2025-01    16
+2025-02    33
 
-[Explanation]
+Saved good-window subset: tmp_jsts_test/data/original_paper_treatment_jsts_repos_bw6.csv
+...
 
+
+./run7b-detect-ai-adoption-repo.sh
+
+============================================================
+run7b: candidate selection and repository cloning
+Data dir:                  data_baseline_backup
+Output dir:                tmp_adoption_test/data
+Candidate file:            tmp_adoption_test/data/top_100_clone_candidates.csv
+All eligible file:         tmp_adoption_test/data/top_100_clone_candidates_all_eligible.csv
+Clone root:                ../ai_code_complexity_study_repo_dataset
+Top N:                     100
+Min pre months:            3
+Min post months:           3
+Rank by:                   high_contributor
+Require Cursor evidence:   true
+Skip candidate selection:  false
+Inspect only:              true
+Inspect clone:             false
+Max clones:                0
+Clone log:                 logs/run7b_clone_log_20260703-1548.csv
+Check clone status:        true
+Check languages CSV:       
+Check output file:         tmp_adoption_test/data/clone_status_merged.csv
+============================================================
+
+** Select candidate repositories
+------------------------------------------------------------
+Data dir: data_baseline_backup | rank_by: high_contributor | share_col: cursor_commit_share
+Treatment repos summarized: 813
+Duplicated (repo, month) rows collapsed: 51
+Eligible repos: 392 | Top N written: 100 -> tmp_adoption_test/data/top_100_clone_candidates.csv
+...
+run7b completed successfully.
+
+
+
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ MAX_CLONES=0  bash run7c1-clone-ai-adoption-repo.sh
+
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ head logs/run7c_clone_ai_adoption_repo_20260703-155529.log
+============================================================
+run7c: clone JS/TS AI-adopting treatment repositories
+Timestamp:                 20260703-155529
+Log file:                  logs/run7c_clone_ai_adoption_repo_20260703-155529.log
+Skip candidate selection:  true
+Inspect only:              false
+Inspect clone:             true
+Output dir:                tmp_jsts_test/data
+Candidate file:            tmp_jsts_test/data/original_paper_treatment_jsts_repos.csv
+Clone root:                ../ai_code_complexity_study_jsts_repo_dataset
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 
+...
+** Check cloned repositories
+------------------------------------------------------------
+Candidate rows: 441
+Clone log rows: 441
+Report rows: 441
+Unique report repos: 441
+
+Primary language counts:
+repo_primary_language
+TypeScript    379
+JavaScript     62
+
+Clone status counts:
+status
+skipped_existing    421
+failed               20
+
+Usable repos: 421
+Failed repos: 20
+Missing log rows: 0
+
+Saved merged clone status: tmp_jsts_test/data/jsts_treatment_clone_status.csv
+...
+run7b completed successfully.
+
+============================================================
+run7c finished with exit code: 0
+Main log: logs/run7c_clone_ai_adoption_repo_20260703-155529.log
+Clone status file: tmp_jsts_test/data/jsts_treatment_clone_status.csv
+Clone status backup: tmp_jsts_test/data/jsts_treatment_clone_status_20260703-155529.csv
+============================================================
+
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ bash run7c2-create-clone-usable-repos.sh
+
+============================================================
+run7c2: create usable JS/TS treatment repo list with event metadata
+Timestamp:            20260703-155848
+Log file:             logs/run7c2_create_clone_usable_repos_20260703-155848.log
+Clone status file:    tmp_jsts_test/data/jsts_treatment_clone_status.csv
+Panel file:           data_baseline_backup/panel_event_monthly.csv
+Output file:          tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+Failed output file:   tmp_jsts_test/data/jsts_treatment_clone_failed_repos.csv
+Dataset source:       treatment
+Top print:            50
+============================================================
+
+Clone status file: tmp_jsts_test/data/jsts_treatment_clone_status.csv
+Panel file: data_baseline_backup/panel_event_monthly.csv
+Output file: tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+Failed output file: tmp_jsts_test/data/jsts_treatment_clone_failed_repos.csv
+
+Total rows: 441
+Unique repos: 441
+
+Status counts:
+status
+skipped_existing    421
+failed               20
+
+Usable repos: 421
+Failed repos: 20
+
+Language counts among all candidates:
+repo_primary_language
+TypeScript    379
+JavaScript     62
+
+Language counts among usable repos:
+repo_primary_language
+TypeScript    361
+JavaScript     60
+...
+
+Event metadata merge summary:
+Usable rows: 421
+Unique usable repos: 421
+Rows with event_month: 398
+Rows missing event_month: 23
+
+Usable language counts:
+repo_primary_language
+TypeScript    361
+JavaScript     60
+
+Balanced window counts among usable repos:
+balanced_window
+0    163
+1     39
+2     11
+3     26
+4     23
+5     46
+6     43
+7     20
+8     15
+9     12
+(missing) 23
+...
+
+Saved usable repo file: tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+Saved failed repo file: tmp_jsts_test/data/jsts_treatment_clone_failed_repos.csv
+
+============================================================
+run7c2 finished with exit code: 0
+Log file: logs/run7c2_create_clone_usable_repos_20260703-155848.log
+Output file: tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+Failed output file: tmp_jsts_test/data/jsts_treatment_clone_failed_repos.csv
+============================================================
+
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ wc -l tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+422 tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ wc -l tmp_jsts_test/data/jsts_treatment_clone_failed_repos.csv
+21 tmp_jsts_test/data/jsts_treatment_clone_failed_repos.csv
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 
+
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ head tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+repo_name,repo_primary_language,repo_stars,repo_commits,repo_contributors,repo_size,repo_languages,status,target_dir,note,event_month,panel_first_month,panel_latest_month,panel_month_count,min_relative_month,max_relative_month,pre_panel_months,event_months,post_panel_months,balanced_window
+0xfrankz/Kaas,TypeScript,69,492.0,1.0,13872.0,TypeScript: 417295; Rust: 260538; CSS: 5597; HTML: 312; JavaScript: 229,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/0xfrankz_Kaas,already_has_git_dir,2024-08,2024-02,2025-04,15.0,-6.0,8.0,6.0,1.0,8.0,6.0
+AIDC-AI/ComfyUI-Copilot,TypeScript,1215,177.0,9.0,39404.0,TypeScript: 197223; CSS: 52174; Python: 13599; JavaScript: 6588; HTML: 381,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/AIDC-AI_ComfyUI-Copilot,already_has_git_dir,2025-01,2025-01,2025-08,8.0,0.0,7.0,0.0,1.0,7.0,0.0
+AdirD/nestjs-context-logger,TypeScript,32,57.0,2.0,183.0,TypeScript: 67238; JavaScript: 416,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/AdirD_nestjs-context-logger,already_has_git_dir,2025-03,2024-12,2025-08,9.0,-3.0,5.0,3.0,1.0,5.0,3.0
+AlbertoBasalo/ng-lab,TypeScript,28,345.0,1.0,6621.0,TypeScript: 104316; JavaScript: 1137; HTML: 629; CSS: 139,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/AlbertoBasalo_ng-lab,already_has_git_dir,2024-10,2024-01,2024-11,11.0,-9.0,1.0,9.0,1.0,1.0,1.0
+Alezander9/WiiWork,TypeScript,10,50.0,1.0,1251.0,TypeScript: 149987; JavaScript: 7735; CSS: 3767; HTML: 355,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/Alezander9_WiiWork,already_has_git_dir,2025-02,2025-02,2025-02,1.0,0.0,0.0,0.0,1.0,0.0,0.0
+AnEntrypoint/apptoapp,JavaScript,18,628.0,2.0,700.0,JavaScript: 114461,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/AnEntrypoint_apptoapp,already_has_git_dir,2025-02,2024-01,2025-02,14.0,-13.0,0.0,13.0,1.0,0.0,0.0
+Ashref-dev/entretien-ai,TypeScript,43,292.0,3.0,9576.0,TypeScript: 716526; MDX: 68760; CSS: 4238; JavaScript: 3107; Dockerfile: 1584; Shell: 157,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/Ashref-dev_entretien-ai,already_has_git_dir,2024-12,2024-10,2025-01,4.0,-2.0,1.0,2.0,1.0,1.0,1.0
+AudiusProject/audius-protocol,TypeScript,577,15427.0,43.0,738514.0,TypeScript: 15119337; Python: 4322748; PLpgSQL: 3502854; JavaScript: 1994913; CSS: 620810; Rust: 555378; Solidity: 383422; Go: 235745; HTML: 183838; Shell: 121466; MDX: 101292; Mustache: 74071; Ruby: 18438; Lua: 15827; Dockerfile: 9402; Objective-C: 7094; GLSL: 5911; Objective-C++: 3563; Kotlin: 3318; Java: 1991; Makefile: 1620; jq: 1011; Swift: 221; C: 104,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/AudiusProject_audius-protocol,already_has_git_dir,2025-02,2024-01,2025-08,20.0,-13.0,6.0,13.0,1.0,6.0,6.0
+Automattic/wp-calypso,TypeScript,12469,74301.0,354.0,911263.0,TypeScript: 20464282; JavaScript: 17159981; SCSS: 3965568; PHP: 55277; HTML: 49914; Shell: 16664; CSS: 8930; Dockerfile: 5160; Ruby: 3506; Handlebars: 2806; Makefile: 2671; EJS: 632; Pug: 568,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/Automattic_wp-calypso,already_has_git_dir,2025-02,2024-01,2025-08,20.0,-13.0,6.0,13.0,1.0,6.0,6.0
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 
+
+
+
+
+
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ bash run7c3-split-valid-event-repos.sh
+============================================================
+run7c3: split usable cloned repos by event_month
+Timestamp:            20260703-162014
+Log file:             logs/run7c3_split_valid_event_repos_20260703-162014.log
+Input file:           tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+Valid output file:    tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event_valid.csv
+Missing output file:  tmp_jsts_test/data/jsts_treatment_clone_usable_missing_event_month.csv
+============================================================
+
+Input file: tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event.csv
+Input rows: 421
+Valid rows with event_month: 398
+Missing event_month rows: 23
+
+Saved valid file: tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event_valid.csv
+Saved missing-event file: tmp_jsts_test/data/jsts_treatment_clone_usable_missing_event_month.csv
+
+Valid language counts:
+repo_primary_language
+TypeScript    342
+JavaScript     56
+
+Missing event_month language counts:
+repo_primary_language
+TypeScript    19
+JavaScript     4
+
+Missing event_month repos:
+                                        repo_name repo_primary_language           status                                                                                                                                                        target_dir
+               CopilotKit/open-multi-agent-canvas            TypeScript skipped_existing                /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/CopilotKit_open-multi-agent-canvas
+                               DA0-DA0/dao-dao-ui            TypeScript skipped_existing                                /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/DA0-DA0_dao-dao-ui
+                                  IndieYe/sqlwise            TypeScript skipped_existing                                   /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/IndieYe_sqlwise
+Just-Understanding-Data-Ltd/ai-coding-with-cursor            TypeScript skipped_existing /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/Just-Understanding-Data-Ltd_ai-coding-with-cursor
+                               andrewhopper/dotai            JavaScript skipped_existing                                /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/andrewhopper_dotai
+                                 autonomys/astral            TypeScript skipped_existing                                  /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/autonomys_astral
+                           ballerine-io/ballerine            TypeScript skipped_existing                            /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/ballerine-io_ballerine
+                               daangn/seed-design            TypeScript skipped_existing                                /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/daangn_seed-design
+                  dalenguyen/dalenguyen.github.io            TypeScript skipped_existing                   /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/dalenguyen_dalenguyen.github.io
+                                 dustland/agentok            TypeScript skipped_existing                                  /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/dustland_agentok
+       ghostlexly/ultimate-typescript-starter-kit            TypeScript skipped_existing        /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/ghostlexly_ultimate-typescript-starter-kit
+                          gly-hub/dandelion-admin            TypeScript skipped_existing                           /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/gly-hub_dandelion-admin
+                            hackclub/print-legion            TypeScript skipped_existing                             /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/hackclub_print-legion
+                         haydenbleasel/next-forge            TypeScript skipped_existing                          /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/haydenbleasel_next-forge
+                                   mayneyao/eidos            TypeScript skipped_existing                                    /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/mayneyao_eidos
+               notional-finance/notional-monorepo            TypeScript skipped_existing                /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/notional-finance_notional-monorepo
+                                      novuhq/novu            TypeScript skipped_existing                                       /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/novuhq_novu
+                            openshiporg/openfront            JavaScript skipped_existing                             /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/openshiporg_openfront
+               paramountric/digitaltwincityviewer            TypeScript skipped_existing                /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/paramountric_digitaltwincityviewer
+                                stolinski/drop-in            TypeScript skipped_existing                                 /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/stolinski_drop-in
+                              timothywarner/ai900            JavaScript skipped_existing                               /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/timothywarner_ai900
+             tweneboah/youtube-tutorials-projects            JavaScript skipped_existing              /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/tweneboah_youtube-tutorials-projects
+                                 yenche123/liubai            TypeScript skipped_existing                                  /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study_jsts_repo_dataset/yenche123_liubai
+
+============================================================
+run7c3 finished with exit code: 0
+Log file: logs/run7c3_split_valid_event_repos_20260703-162014.log
+Valid output file: tmp_jsts_test/data/jsts_treatment_clone_usable_repos_with_event_valid.csv
+Missing output file: tmp_jsts_test/data/jsts_treatment_clone_usable_missing_event_month.csv
+============================================================
+(aicomplexity) OISSE-IST173C01:ai_code_complexity_study$ 

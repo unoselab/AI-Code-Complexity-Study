@@ -1,0 +1,6 @@
+ds,treat,ctrl,obs,post,min_t,max_t
+paper_table7_jsts,411,422,8870,2279,,
+paper_jsts_matched_panel_recomputed,441,471,9818,2262,2024-01,2025-08
+paper_jsts_treatment_only_panel,441,1,4833,2262,2024-01,2025-08
+our_main_unbalanced,380,393,6281,1821,2024-01,2025-08
+our_strict_1to3_unbalanced,337,354,5518,1601,2024-01,2025-08

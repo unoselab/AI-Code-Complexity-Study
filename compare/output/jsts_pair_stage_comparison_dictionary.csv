@@ -1,0 +1,13 @@
+col,meaning
+stage,Pair-file or matching stage label.
+pairs,Number of treatment-control pair rows.
+treat,Number of treatment repositories.
+ctrl,Number of unique control repositories.
+t1,Treatments with exactly 1 unique control.
+t2,Treatments with exactly 2 unique controls.
+t3,Treatments with exactly 3 unique controls.
+t_other,"Treatments with a control count other than 1, 2, or 3."
+max_c,Maximum controls per treatment.
+mean_c,Mean controls per treatment.
+max_reuse,Maximum number of treatments sharing one control.
+mean_reuse,Mean number of treatments per control.

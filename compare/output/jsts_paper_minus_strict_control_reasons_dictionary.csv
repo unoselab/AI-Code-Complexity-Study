@@ -1,0 +1,7 @@
+col,meaning
+repo,Repository full name.
+type,Repository role: treat or ctrl.
+reason,Short reason category.
+paper_treats,For controls: paper treatments matched to this control.
+main_treats,For controls: main-pair treatments linked to this control.
+detail,Human-readable explanation.

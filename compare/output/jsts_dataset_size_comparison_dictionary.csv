@@ -1,0 +1,9 @@
+col,meaning
+ds,Dataset/stage label.
+treat,Number of treatment repositories.
+ctrl,Number of control repositories.
+obs,Total panel observations/rows.
+post,Treatment-group post-treatment observations.
+min_t,"First time period in the panel, if available."
+max_t,"Last time period in the panel, if available."
+note,Short explanation of the dataset row.

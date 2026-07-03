@@ -1,0 +1,8 @@
+col,meaning,label
+cmp,Set-difference comparison name.,
+n,Number of repositories in the set difference.,
+repos,Semicolon-separated repository names.,
+,Paper JS/TS treatment repos not in strict treatment repos.,paper_treat_minus_strict_treat
+,Paper JS/TS matched controls not in strict controls.,paper_ctrl_minus_strict_ctrl
+,Main treatment repos not in strict treatment repos.,main_treat_minus_strict_treat
+,Main control repos not in strict control repos.,main_ctrl_minus_strict_ctrl

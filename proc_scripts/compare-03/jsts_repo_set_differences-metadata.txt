@@ -1,0 +1,83 @@
+File: jsts_repo_set_differences.csv
+---
+Purpose
+Compare treatment/control repository set differences across paper baseline JS/TS matching, our main JS/TS pairs, and our strict 1:3 JS/TS pairs.
+
+Important interpretation
+The paper uses 1:3 nearest-neighbor matching, meaning three matched control slots per treated repository. The same control repository may be reused across multiple treatment repositories.
+
+This file is focused on repository-set differences. It does not compare panel row counts directly. For dataset-size comparison, use jsts_dataset_size_comparison.csv.
+
+---
+Stage notes
+paper         - Baseline paper matching.csv restricted to JS/TS treatment repositories identified from data_baseline_backup/repos.csv.
+paper_sample  - Baseline paper matching.csv restricted to our JS/TS treatment sample. This stage helps separate paper-vs-our-sample differences from later replication filtering differences.
+initial       - Our initially extracted JS/TS treatment-control pairs, before later clone/local-Cursor filtering, if the file exists.
+main          - Our main final-clean JS/TS pair file. This may include treatments with 1, 2, or 3 final controls.
+strict        - Our strict 1:3 JS/TS pair file. This should keep only treatments with exactly 3 final controls.
+
+---
+Columns
+comparison     - Set-difference label, such as paper_treatment_minus_strict_treatment.
+left_stage     - Left-side stage alias in the set difference.
+right_stage    - Right-side stage alias in the set difference.
+role           - Repository role being compared: treatment or control.
+repo_name      - GitHub repository full name.
+reason_code    - Pipeline-stage diagnostic reason code.
+in_paper       - Whether the repo appears in the paper JS/TS matching stage for this role.
+in_paper_sample - Whether the repo appears in paper matching restricted to our JS/TS sample for this role.
+in_initial     - Whether the repo appears in our initially extracted pair stage for this role.
+in_main        - Whether the repo appears in our main final-clean pair stage for this role.
+in_strict      - Whether the repo appears in our strict 1:3 pair stage for this role.
+n_paper        - Link count in paper stage. For treatment, number of controls; for control, number of treatments.
+n_paper_sample - Link count in paper_sample stage. Same meaning as n_paper.
+n_initial      - Link count in initial stage. Same meaning as n_paper.
+n_main         - Link count in main stage. Same meaning as n_paper.
+n_strict       - Link count in strict stage. Same meaning as n_paper.
+
+---
+Reason codes
+less_than_3_final_controls_after_filtering - Treatment is in main but not strict because it has fewer than 3 final controls.
+control_removed_when_strict_dropped_treatments - Control is in main but not strict because strict removed the associated treatment(s).
+paper_jsts_treatment_not_in_our_jsts_sample - Paper JS/TS treatment is not in our JS/TS treatment sample file.
+paper_jsts_control_not_matched_to_our_jsts_sample - Paper JS/TS control is not linked to our JS/TS treatment sample.
+not_in_our_initial_extracted_pairs - Repository is absent from our initial extracted pair stage.
+removed_before_main_final_clean_pairs - Repository disappears before our main final-clean pair stage.
+removed_after_initial_pair_extraction - Repository is in initial pairs but not in main final-clean pairs.
+present_in_strict_but_not_in_paper_jsts_reference - Repository appears in strict but not in paper JS/TS reference.
+present_in_main_but_not_in_paper_jsts_reference - Repository appears in main but not in paper JS/TS reference.
+present_in_strict_but_not_in_main_unexpected - Repository appears in strict but not in main; this should normally be zero.
+stage_membership_difference - Generic stage-membership difference.
+
+---
+Comparison counts
+initial_control_minus_main_control                      17
+initial_control_minus_strict_control                    60
+initial_treatment_minus_strict_treatment                45
+main_control_minus_strict_control                       43
+main_treatment_minus_strict_treatment                   45
+paper_control_minus_main_control                        93
+paper_control_minus_strict_control                      136
+paper_sample_control_minus_strict_control               73
+paper_sample_treatment_minus_strict_treatment           45
+paper_treatment_minus_main_treatment                    49
+paper_treatment_minus_strict_treatment                  94
+
+---
+Input files
+project_root: /home/user1-system12/project-workspace/ai_code_complexity_study_jsts/ai_code_complexity_study
+paper_repos          : data_baseline_backup/repos.csv
+paper_matching       : data_baseline_backup/matching.csv
+our_treatment_sample : tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
+our_initial_pairs (1129 rows)   : tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv
+our_main_pairs    (1103 rows)   : tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean.csv
+our_strict_pairs  (1017 rows)   : tmp_jsts_test/data/jsts_matched_control_pairs_main_398_final_clean_1to3_only.csv
+
+---
+Output files
+csv: jsts_repo_set_differences.csv
+metadata: jsts_repo_set_differences-metadata.txt
+
+---
+Generated at: 2026-07-03T14:38:58
+Generated by: compare_jsts_03_repo_set_differences.py

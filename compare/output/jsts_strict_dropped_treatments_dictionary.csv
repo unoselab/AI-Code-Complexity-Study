@@ -1,0 +1,6 @@
+col,meaning
+treat_repo,Treatment repository dropped from strict pairs.
+n_ctrl_main,Number of final controls in main final-clean pairs.
+ctrls_main,Controls linked to this treatment in main final-clean pairs.
+reason,Reason category for dropping from strict.
+detail,Human-readable explanation.

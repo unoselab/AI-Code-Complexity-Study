@@ -1,0 +1,190 @@
+repo,type,reason,paper_treats,main_treats,detail
+3loop/loop-decoder,ctrl,removed_before_final_clean,webdevcody/survive-the-night-game,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+59de44955ebd/twitter-to-bsky,ctrl,linked_only_to_strict_dropped_treatments,AnEntrypoint/apptoapp,AnEntrypoint/apptoapp,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+AdrenaFoundation/frontend,ctrl,removed_before_final_clean,magebitcom/magento-toolbox;serge-0v/next-js-sanity-starter,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+AjayiMike/extrascan,ctrl,linked_only_to_strict_dropped_treatments,webdevcody/survive-the-night-game,webdevcody/survive-the-night-game,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+AmandaloveYang/ClearPage,ctrl,not_in_original_extracted_pairs,q1226189767/FlyAdmin;stacksjs/vite-plugin-local,,Control is absent from our originally extracted JS/TS pair file.
+Amogh2409/Pregrad-MERN-Data,ctrl,linked_only_to_strict_dropped_treatments,Ly-GGboy/AI-Library;howoii/SmartBookmark,Ly-GGboy/AI-Library;howoii/SmartBookmark,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+AnshSinghal/DHARA.github.io,ctrl,linked_only_to_strict_dropped_treatments,0xfrankz/Kaas,0xfrankz/Kaas,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+Blazity/next-news,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+BuddyChewChew/My-Streams,ctrl,in_strict_pairs_no_panel_rows,gruntwork-io/docs,gruntwork-io/docs,Control is in strict pairs but has no usable strict panel rows.
+CakeDC/cakephp-datatables,ctrl,in_strict_pairs_no_panel_rows,ThatGuySam/doesitarm,ThatGuySam/doesitarm,Control is in strict pairs but has no usable strict panel rows.
+Charles-Chrismann/next,ctrl,removed_before_final_clean,Bistutu/FluentRead;johanguse/next-saas-template,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+Codehagen/Badget,ctrl,not_in_original_extracted_pairs,LastBotInc/nextjs-supabase-ai-webapp;MaggieAppleton/lodestone,,Control is absent from our originally extracted JS/TS pair file.
+CodelyTV/eslint-plugin-hexagonal-architecture,ctrl,in_strict_pairs_no_panel_rows,rohenaz/allaboard-bitchat-nitro,rohenaz/allaboard-bitchat-nitro,Control is in strict pairs but has no usable strict panel rows.
+Colorfulshadow/live-2d,ctrl,in_strict_pairs_no_panel_rows,ThatGuySam/doesitarm,ThatGuySam/doesitarm,Control is in strict pairs but has no usable strict panel rows.
+Convertiv/handoff-app,ctrl,linked_only_to_strict_dropped_treatments,Malte2036/thw-tools,Malte2036/thw-tools,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+CorentinTh/quadtree-js,ctrl,in_strict_pairs_no_panel_rows,ShieldBattery/ShieldBattery,ShieldBattery/ShieldBattery,Control is in strict pairs but has no usable strict panel rows.
+Couchers-org/couchers,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+Curious-Ecosystem/Curious-Connect,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+CyberAgentHack/web-speed-hackathon-2021-leaderboard,ctrl,linked_only_to_strict_dropped_treatments,social-embed/social-embed,social-embed/social-embed,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+Dereje1/smart-recipe-generator,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+DonTaka/Mobile2024,ctrl,linked_only_to_strict_dropped_treatments,KaizeNodeLabs/SafeSwap,KaizeNodeLabs/SafeSwap,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+Donald-Ennis/Jsrepo_jp,ctrl,linked_only_to_strict_dropped_treatments,betagouv/france-chaleur-urbaine;fatwang2/search1api-mcp;opentoolsteam/cli,betagouv/france-chaleur-urbaine;fatwang2/search1api-mcp;opentoolsteam/cli,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+Emiliano-Bucci/react-spring-carousel,ctrl,linked_only_to_strict_dropped_treatments,social-embed/social-embed,social-embed/social-embed,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+EnzoDeg40/42-Evals,ctrl,removed_before_final_clean,AnEntrypoint/apptoapp,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+FaiChou/IntraPaste,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+FrancescoXX/rustcrab,ctrl,linked_only_to_strict_dropped_treatments,Shopify/cli;latitude-dev/latitude-llm,Shopify/cli;latitude-dev/latitude-llm,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+Freeedle/Essential-Audio-Player,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+FriedRiceNoodles/banana-ui,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+GlobalArtInc/nestcord,ctrl,linked_only_to_strict_dropped_treatments,kelvin6365/rocksdev.tools,kelvin6365/rocksdev.tools,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+IacopomC/robot_arm_three_js,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+IsAmitprajapati/Full-Stack-E-Commerce-MERN-APP,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+JSREI/js-script-hook,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+JolyneAnasui/picgo-plugin-squoosh,ctrl,in_strict_pairs_no_panel_rows,MultiQC/MultiQC,MultiQC/MultiQC,Control is in strict pairs but has no usable strict panel rows.
+Kilcekru/dcc,ctrl,in_strict_pairs_no_panel_rows,teamreflex/cosmo-web,teamreflex/cosmo-web,Control is in strict pairs but has no usable strict panel rows.
+LINBIT/linstor-gui,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+Liadrinz/tetris3d,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+LordGrimmauld/aw-watcher-obsidian,ctrl,in_strict_pairs_no_panel_rows,turbostarter/extro,turbostarter/extro,Control is in strict pairs but has no usable strict panel rows.
+Mapform/Mapform,ctrl,linked_only_to_strict_dropped_treatments,ai-hero-dev/ai-hero;wham/kaja,ai-hero-dev/ai-hero;wham/kaja,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+MiladJoodi/Express_Starter_Project,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+MiladJoodi/Fullstack_CRUD,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+MoonContentCreator/BixbyBot-Md,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+OpenWebGAL/WebGAL,ctrl,linked_only_to_strict_dropped_treatments,kelvin6365/rocksdev.tools,kelvin6365/rocksdev.tools,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+OracleBrain/AgeCalc,ctrl,in_strict_pairs_no_panel_rows,lucasromerodb/impuestito-extension,lucasromerodb/impuestito-extension,Control is in strict pairs but has no usable strict panel rows.
+PRAKALP-PANDE/ShoppingApp,ctrl,in_strict_pairs_no_panel_rows,warmachine028/memories,warmachine028/memories,Control is in strict pairs but has no usable strict panel rows.
+Playgama/bridge,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+QuiiBz/ogstudio,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+Roshan-R/ieee-xplore-unlocker,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+ShinokiX3/MangaDexClone,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+SquirrelCorporation/SquirrelServersManager,ctrl,not_in_original_extracted_pairs,ahmedkhaleel2004/gitdiagram;milaboratory/platforma;omnisat/lasereyes-mono;rivet-gg/actor-core,,Control is absent from our originally extracted JS/TS pair file.
+Takiyo0/Kazagumo,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+The-Blockchain-Association/sec-notice-list,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+Yunbierdika/ImotoFantasyAndroidFramework,ctrl,removed_before_final_clean,ccbikai/github-stars;kazuph/mcp-screenshot;mzxrai/mcp-openai,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+abhinav7895/interviewgenie,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+abiteman/DumbKan,ctrl,not_in_original_extracted_pairs,Ly-GGboy/AI-Library;howoii/SmartBookmark,,Control is absent from our originally extracted JS/TS pair file.
+abmaonline/aemfed,ctrl,in_strict_pairs_no_panel_rows,mantou132/gem,mantou132/gem,Control is in strict pairs but has no usable strict panel rows.
+acutmore/proposal-composites,ctrl,linked_only_to_strict_dropped_treatments,yayxs/ai-coding,yayxs/ai-coding,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+adrianhajdin/project_e_commerce,ctrl,in_strict_pairs_no_panel_rows,netresearch/timetracker,netresearch/timetracker,Control is in strict pairs but has no usable strict panel rows.
+ainoya/cloudflare-dom-distiller,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+ajaynegi45/LibraryMan,ctrl,linked_only_to_strict_dropped_treatments,leemonade/leemons;metriport/metriport;pollinations/pollinations,leemonade/leemons;metriport/metriport;pollinations/pollinations,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+ajcwebdev/autoshow,ctrl,linked_only_to_strict_dropped_treatments,q1226189767/FlyAdmin;stacksjs/vite-plugin-local,q1226189767/FlyAdmin;stacksjs/vite-plugin-local,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+akashyap2013/nextjs_blog_app,ctrl,in_strict_pairs_no_panel_rows,MultiQC/MultiQC,MultiQC/MultiQC,Control is in strict pairs but has no usable strict panel rows.
+alabsi91/react-native-material-you-colors,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+aldrin-labs/opensvm,ctrl,not_in_original_extracted_pairs,betagouv/france-chaleur-urbaine;fatwang2/search1api-mcp;opentoolsteam/cli,,Control is absent from our originally extracted JS/TS pair file.
+algora-io/xtrpc,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+andreisergiu98/baeta,ctrl,linked_only_to_strict_dropped_treatments,Shopify/cli;latitude-dev/latitude-llm,Shopify/cli;latitude-dev/latitude-llm,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+any-listen/any-listen,ctrl,linked_only_to_strict_dropped_treatments,ahmedkhaleel2004/gitdiagram;milaboratory/platforma;omnisat/lasereyes-mono;rivet-gg/actor-core,ahmedkhaleel2004/gitdiagram;milaboratory/platforma;omnisat/lasereyes-mono;rivet-gg/actor-core,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+arielweinberger/nestjs-course-gql-mongodb,ctrl,in_strict_pairs_no_panel_rows,tkt-actions/add-issue-links,tkt-actions/add-issue-links,Control is in strict pairs but has no usable strict panel rows.
+ataylorm/FluxAIGridComparisons,ctrl,removed_before_final_clean,leemonade/leemons;metriport/metriport;pollinations/pollinations,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+aukilabs/posemesh,ctrl,linked_only_to_strict_dropped_treatments,leemonade/leemons,leemonade/leemons,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+berkysr/react-social-media-app,ctrl,in_strict_pairs_no_panel_rows,gaetansenn/vue-api,gaetansenn/vue-api,Control is in strict pairs but has no usable strict panel rows.
+bitcoinlayers/bitcoinlayers,ctrl,removed_before_final_clean,piotrkulpinski/openalternative,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+btcoin23/pumpfun_volume_bot_portfolio,ctrl,removed_before_final_clean,Melvynx/next-zod-route;genesis-ai-dev/codex-editor,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+bugsdev2/bookaccio,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+carlos-talavera/nextjs-laravel-breeze,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+cdloh/obsidian-cron,ctrl,linked_only_to_strict_dropped_treatments,Malte2036/thw-tools,Malte2036/thw-tools,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+chain-notes-brussels/chain-notes-snap,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+checkerschaf/sherlock-deno,ctrl,linked_only_to_strict_dropped_treatments,zzfn/zzf,zzfn/zzf,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+codebucks27/AI-Powered-Twitter-Bio-Generator,ctrl,linked_only_to_strict_dropped_treatments,constROD/template-hono-prisma-kysely,constROD/template-hono-prisma-kysely,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+craigsdennis/shorty-dot-dev,ctrl,linked_only_to_strict_dropped_treatments,Melvynx/next-zod-route,Melvynx/next-zod-route,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+damienallen/urban-heat,ctrl,linked_only_to_strict_dropped_treatments,genesis-ai-dev/codex-editor,genesis-ai-dev/codex-editor,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+dekguh/Leaflet.MoveMarker,ctrl,in_strict_pairs_no_panel_rows,infinite-table/infinite-react,infinite-table/infinite-react,Control is in strict pairs but has no usable strict panel rows.
+developerrahulofficial/dictionary-app,ctrl,in_strict_pairs_no_panel_rows,alanhe421/alfred-workflows,alanhe421/alfred-workflows,Control is in strict pairs but has no usable strict panel rows.
+digitalroute/bagger,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+elebitzero/openai-react-chat,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+enlomy/pumpfun-bundler,ctrl,removed_before_final_clean,ai-hero-dev/ai-hero;wham/kaja,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+equilibria-xyz/perennial-v2,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+evrenyal/llmbus,ctrl,removed_before_final_clean,jonathanbertholet/promptmanager,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+extendui/extendui,ctrl,not_in_original_extracted_pairs,Bistutu/FluentRead;johanguse/next-saas-template,,Control is absent from our originally extracted JS/TS pair file.
+fedi-dayeg/complete-nestjs-boilerplate,ctrl,in_strict_pairs_no_panel_rows,RiverTwilight/Geekits,RiverTwilight/Geekits,Control is in strict pairs but has no usable strict panel rows.
+filipemeneses/fatec-api,ctrl,in_strict_pairs_no_panel_rows,melissamcewen/CurlsBotSite,melissamcewen/CurlsBotSite,Control is in strict pairs but has no usable strict panel rows.
+freetonik/vscode-dnts,ctrl,in_strict_pairs_no_panel_rows,SunHuawei/SourceDetector,SunHuawei/SourceDetector,Control is in strict pairs but has no usable strict panel rows.
+freshsomebody/posenet-similarity,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+fwilhe2/setup-kotlin,ctrl,linked_only_to_strict_dropped_treatments,zzfn/zzf,zzfn/zzf,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+gcascio/next-intl-zod,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+get-convex/template-nextjs-convexauth-shadcn,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+golbin/llm-chunk,ctrl,in_strict_pairs_no_panel_rows,GODrums/BetterFloat,GODrums/BetterFloat,Control is in strict pairs but has no usable strict panel rows.
+gravity-ui/graph,ctrl,not_in_original_extracted_pairs,frostime/sy-f-misc,,Control is absent from our originally extracted JS/TS pair file.
+helianthuswhite/chatgpt-web-next,ctrl,in_strict_pairs_no_panel_rows,L-Blondy/up-fetch,L-Blondy/up-fetch,Control is in strict pairs but has no usable strict panel rows.
+hexnome/pumpfun-cli-bot-tools,ctrl,linked_only_to_strict_dropped_treatments,ccbikai/github-stars;kazuph/mcp-screenshot;mzxrai/mcp-openai,ccbikai/github-stars;kazuph/mcp-screenshot;mzxrai/mcp-openai,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+hqm012/HM-vue3-echarts,ctrl,in_strict_pairs_no_panel_rows,infinite-table/infinite-react,infinite-table/infinite-react,Control is in strict pairs but has no usable strict panel rows.
+hywax/lxc-idmapper,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+janus-idp/backstage-showcase,ctrl,not_in_original_extracted_pairs,Shopify/cli;latitude-dev/latitude-llm,,Control is absent from our originally extracted JS/TS pair file.
+jasperbaes/Conditional-Access-Matrix,ctrl,linked_only_to_strict_dropped_treatments,jonathanbertholet/promptmanager,jonathanbertholet/promptmanager,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+jherr/start-trpc,ctrl,removed_before_final_clean,yayxs/ai-coding,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+jrf0110/cf-workers-boilerplate,ctrl,in_strict_pairs_no_panel_rows,rohenaz/bmap,rohenaz/bmap,Control is in strict pairs but has no usable strict panel rows.
+kartikkpawar/flow-scrape,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+kimatata/unittcms,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+kpostekk/caats,ctrl,in_strict_pairs_no_panel_rows,PostHog/posthog-foss,PostHog/posthog-foss,Control is in strict pairs but has no usable strict panel rows.
+lambospeed/ionic-taxi-booking-app-web-admin,ctrl,in_strict_pairs_no_panel_rows,mantou132/gem,mantou132/gem,Control is in strict pairs but has no usable strict panel rows.
+lingualdev/react-i18n-transformations,ctrl,linked_only_to_strict_dropped_treatments,webdevcody/survive-the-night-game,webdevcody/survive-the-night-game,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+loskoderos/georender,ctrl,linked_only_to_strict_dropped_treatments,AnEntrypoint/apptoapp,AnEntrypoint/apptoapp,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+luixaviles/web-speech-angular,ctrl,in_strict_pairs_no_panel_rows,SunHuawei/SourceDetector,SunHuawei/SourceDetector,Control is in strict pairs but has no usable strict panel rows.
+lynn/lidysisku,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+mathieuher/RetroSki,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+maxentr/skyjo,ctrl,not_in_original_extracted_pairs,0xfrankz/Kaas,,Control is absent from our originally extracted JS/TS pair file.
+mdatz/GPToolkit,ctrl,in_strict_pairs_no_panel_rows,ThatGuySam/doesitarm,ThatGuySam/doesitarm,Control is in strict pairs but has no usable strict panel rows.
+mendix/web-widgets,ctrl,not_in_original_extracted_pairs,sadmann7/shadcn-table,,Control is absent from our originally extracted JS/TS pair file.
+merri-ment/lazy-line-painter,ctrl,in_strict_pairs_no_panel_rows,lucasromerodb/impuestito-extension,lucasromerodb/impuestito-extension,Control is in strict pairs but has no usable strict panel rows.
+mizchi-sandbox/react-ts-patterns,ctrl,in_strict_pairs_no_panel_rows,ShieldBattery/ShieldBattery,ShieldBattery/ShieldBattery,Control is in strict pairs but has no usable strict panel rows.
+modern-agile-team/modern-kit,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+moinulmoin/chadnext,ctrl,not_in_original_extracted_pairs,constROD/template-hono-prisma-kysely,,Control is absent from our originally extracted JS/TS pair file.
+monorepolint/monorepolint,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+mrgnlabs/mrgn-ts,ctrl,linked_only_to_strict_dropped_treatments,Melvynx/next-zod-route;genesis-ai-dev/codex-editor,Melvynx/next-zod-route;genesis-ai-dev/codex-editor,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+mtmacdonald/docgen,ctrl,in_strict_pairs_no_panel_rows,one-ie/one,one-ie/one,Control is in strict pairs but has no usable strict panel rows.
+mvaneijgen/wled-draw-something,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+n8n-community-node/n8n-nodes-mastodon,ctrl,in_strict_pairs_no_panel_rows,owid/owid-grapher,owid/owid-grapher,Control is in strict pairs but has no usable strict panel rows.
+nayak-nirmalya/discord-clone,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+nicitaacom/19_spotify-clone,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+openhotel/openhotel,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+pages-cms/pages-cms,ctrl,linked_only_to_strict_dropped_treatments,unsend-dev/unsend,unsend-dev/unsend,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+pancakeswap/lottery-contract,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+partofmyid/register,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+patorjk/image-quilter,ctrl,linked_only_to_strict_dropped_treatments,Ly-GGboy/AI-Library;howoii/SmartBookmark,Ly-GGboy/AI-Library;howoii/SmartBookmark,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+paulshestakov/aws-step-functions-constructor,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+pbogre/jetlog,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+petertodd/bitcoin,ctrl,in_strict_pairs_no_panel_rows,transloadit/node-sdk,transloadit/node-sdk,Control is in strict pairs but has no usable strict panel rows.
+piokto/https-bypass,ctrl,in_strict_pairs_no_panel_rows,Tmeister/wppb-generator,Tmeister/wppb-generator,Control is in strict pairs but has no usable strict panel rows.
+pmndrs/directed,ctrl,linked_only_to_strict_dropped_treatments,frostime/sy-f-misc,frostime/sy-f-misc,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+project-au-lait/svqk,ctrl,removed_before_final_clean,unsend-dev/unsend,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+pskill9/website-downloader,ctrl,linked_only_to_strict_dropped_treatments,jonathanbertholet/promptmanager,jonathanbertholet/promptmanager,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+qiuxiang/react-native-amap-geolocation,ctrl,in_strict_pairs_no_panel_rows,imbhargav5/rooks,imbhargav5/rooks,Control is in strict pairs but has no usable strict panel rows.
+reddit/devvit,ctrl,removed_before_final_clean,KaizeNodeLabs/SafeSwap,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+reservoirprotocol/marketplace-v1,ctrl,removed_before_final_clean,Malte2036/thw-tools,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+robotchangzhang/chainrobot,ctrl,in_strict_pairs_no_panel_rows,MultiQC/MultiQC,MultiQC/MultiQC,Control is in strict pairs but has no usable strict panel rows.
+roldanjr/next-crud,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+saddamarbaa/node-express-typescript-social-media-rest-api,ctrl,in_strict_pairs_no_panel_rows,PostHog/posthog-foss,PostHog/posthog-foss,Control is in strict pairs but has no usable strict panel rows.
+safrazik/vue-file-agent,ctrl,in_strict_pairs_no_panel_rows,obytes/react-native-template-obytes,obytes/react-native-template-obytes,Control is in strict pairs but has no usable strict panel rows.
+santosharron/3D-Mars-landing-page,ctrl,in_strict_pairs_no_panel_rows,Tmeister/wppb-generator,Tmeister/wppb-generator,Control is in strict pairs but has no usable strict panel rows.
+sauermar/web-browser-recorder,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+serkanyersen/ifvisible.js,ctrl,in_strict_pairs_no_panel_rows,transloadit/node-sdk,transloadit/node-sdk,Control is in strict pairs but has no usable strict panel rows.
+shepherdjerred/astro-opengraph-images,ctrl,removed_before_final_clean,kelvin6365/rocksdev.tools,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+sidewalklabs/sumo-web3d,ctrl,in_strict_pairs_no_panel_rows,orionjs/orionjs,orionjs/orionjs,Control is in strict pairs but has no usable strict panel rows.
+sinnedpenguin/animeden,ctrl,in_strict_pairs_no_panel_rows,unmonk/chainlink,unmonk/chainlink,Control is in strict pairs but has no usable strict panel rows.
+slsa-framework/example-package,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+smartive/es-model,ctrl,in_strict_pairs_no_panel_rows,mantou132/gem,mantou132/gem,Control is in strict pairs but has no usable strict panel rows.
+snapshot-labs/snapshot-strategies,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+soulerror/HivisionIDPhotos-Uniapp,ctrl,linked_only_to_strict_dropped_treatments,Bistutu/FluentRead;johanguse/next-saas-template,Bistutu/FluentRead;johanguse/next-saas-template,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+sst/sst,ctrl,linked_only_to_strict_dropped_treatments,wham/kaja,wham/kaja,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+steve-ng/merkle-airdrop,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+sunpm/unisave,ctrl,linked_only_to_strict_dropped_treatments,frostime/sy-f-misc,frostime/sy-f-misc,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+teal-fm/teal,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+terry8204/gwebmgr,ctrl,in_strict_pairs_no_panel_rows,netresearch/timetracker,netresearch/timetracker,Control is in strict pairs but has no usable strict panel rows.
+thanhlmm/refi-app,ctrl,in_strict_pairs_no_panel_rows,searchfe/hoth,searchfe/hoth,Control is in strict pairs but has no usable strict panel rows.
+therohk/datum-merge,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+thesandboxgame/sandbox-smart-contracts,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+thesysdev/crayon,ctrl,not_in_original_extracted_pairs,serge-0v/next-js-sanity-starter,,Control is absent from our originally extracted JS/TS pair file.
+tim-hub/nestjs-hexagonal-example,ctrl,in_strict_pairs_no_panel_rows,Vrooli/Vrooli,Vrooli/Vrooli,Control is in strict pairs but has no usable strict panel rows.
+tomquist/hame-relay,ctrl,linked_only_to_strict_dropped_treatments,ai-hero-dev/ai-hero,ai-hero-dev/ai-hero,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+trashhalo/logseq-dictionary,ctrl,in_strict_pairs_no_panel_rows,hooray/fantastic-startkit,hooray/fantastic-startkit,Control is in strict pairs but has no usable strict panel rows.
+tsky-dev/tsky,ctrl,linked_only_to_strict_dropped_treatments,unsend-dev/unsend,unsend-dev/unsend,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+tux86/serverless-todo-clean-architecture-boilerplate,ctrl,in_strict_pairs_no_panel_rows,tact-lang/tact-template,tact-lang/tact-template,Control is in strict pairs but has no usable strict panel rows.
+umarprogrammer19/CLI-Currency-Converter,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+uzochukwueddie/chatty-backend,ctrl,in_strict_pairs_no_panel_rows,a-polishchuk/mastering-react,a-polishchuk/mastering-react,Control is in strict pairs but has no usable strict panel rows.
+valndev/vaporBooster,ctrl,in_strict_pairs_no_panel_rows,Tmeister/wppb-generator,Tmeister/wppb-generator,Control is in strict pairs but has no usable strict panel rows.
+vermaysha/elysia-compress,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+viduycheung/ticktick-obsidian,ctrl,in_strict_pairs_no_panel_rows,gaetansenn/vue-api,gaetansenn/vue-api,Control is in strict pairs but has no usable strict panel rows.
+vikejs/bati,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+vladmeer/pumpfun-bundler,ctrl,removed_before_final_clean,pnd280/complexity;sadmann7/shadcn-table,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+walnuthq/op-scan,ctrl,linked_only_to_strict_dropped_treatments,q1226189767/FlyAdmin;stacksjs/vite-plugin-local,q1226189767/FlyAdmin;stacksjs/vite-plugin-local,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+weaviate/BookRecs,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+webexpe13/blog-template-using-nextjs-typescript-tailwindcss,ctrl,in_strict_pairs_no_panel_rows,rohenaz/allaboard-bitchat-nitro,rohenaz/allaboard-bitchat-nitro,Control is in strict pairs but has no usable strict panel rows.
+wso2/choreo-training-artifacts,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
+xhofe/imgbed,ctrl,in_strict_pairs_no_panel_rows,teamreflex/cosmo-web,teamreflex/cosmo-web,Control is in strict pairs but has no usable strict panel rows.
+yaming116/docker-pull-proxy,ctrl,linked_only_to_strict_dropped_treatments,metriport/metriport;pollinations/pollinations,metriport/metriport;pollinations/pollinations,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+yosle/xnauta-electron,ctrl,linked_only_to_strict_dropped_treatments,KaizeNodeLabs/SafeSwap,KaizeNodeLabs/SafeSwap,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+yuiseki/TRIDENT,ctrl,not_in_original_extracted_pairs,social-embed/social-embed,,Control is absent from our originally extracted JS/TS pair file.
+zaidmukaddam/o3-mini-search,ctrl,linked_only_to_strict_dropped_treatments,betagouv/france-chaleur-urbaine;fatwang2/search1api-mcp;opentoolsteam/cli,betagouv/france-chaleur-urbaine;fatwang2/search1api-mcp;opentoolsteam/cli,Control appears in main pairs but is not linked to any treatment kept by strict_1to3.
+zerdos/spike.land,ctrl,removed_before_final_clean,zzfn/zzf,,"Control was removed before final-clean pairs, likely due to clone unavailability, overlap filtering, or local Cursor-evidence filtering."
+zyonse/homebridge-dreo,ctrl,not_in_paper_matching_for_our_sample,,,Control is not matched to our JS/TS treatment sample in paper matching.
