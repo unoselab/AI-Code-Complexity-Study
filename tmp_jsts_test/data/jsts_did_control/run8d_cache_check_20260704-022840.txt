@@ -1,0 +1,6 @@
+REQUESTED_REPOS=453
+ANALYZED_REPOS_IN_CACHE=453
+MISSING_REPOS=0
+MISSING_REPOS_FILE=tmp_jsts_test/data/jsts_did_control/run8d_missing_repos_20260704-022840.csv
+CACHE_STATUS=complete
+CACHE_REASON=all_requested_repos_already_analyzed

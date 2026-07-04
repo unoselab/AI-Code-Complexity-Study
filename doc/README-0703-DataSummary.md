@@ -147,3 +147,193 @@ paper 공식 JS/TS 기준은 411이다.
 398은 현재 clone 가능하고 event_month까지 있는 우리 replication sample이다.
 따라서 398은 paper의 411과 직접 같은 단계의 숫자가 아니다.
 ```
+
+
+---
+---
+---
+
+
+## Daily Research Report
+
+**Date:** 2026-07-04
+**Project:** 2026 MSR Speed at the Cost of Quality Replication / JS-TS Analysis
+
+## Objective
+
+Today’s goal was to clarify how the JS/TS treatment sample was created, verify the role of `run7d3-save-treatment-options.sh`, and check whether the `run8d` control-repository analysis cache and metadata were valid before moving to `run8d2`.
+
+## What We Did
+
+We reviewed the JS/TS treatment-count pipeline and clarified why a simple language filter on `data_baseline_backup/repos.csv` returns `4744`, while our treatment sample has only `398` repositories.
+
+We confirmed the distinction among these counts:
+
+```text
+4744 = all JS/TS repositories in repos.csv by language only
+441  = raw JS/TS treatment repositories reconstructed from baseline panel metadata
+411  = official paper Table 7 JS/TS treatment repositories
+421  = clone-usable JS/TS treatment repositories
+398  = clone-usable + valid event_month JS/TS treatment repositories
+```
+
+We reviewed `run7c3-split-valid-event-repos.sh` output and confirmed:
+
+```text
+Input rows: 421
+Valid rows with event_month: 398
+Missing event_month rows: 23
+```
+
+We then reviewed `run7d3-save-treatment-options.sh`. This script reads:
+
+```text
+tmp_jsts_test/data/jsts_did_test/adoption_month_check.csv
+```
+
+and saves four treatment-sample options:
+
+```text
+jsts_treatment_sample_main_398.csv
+jsts_treatment_sample_exact_match_381.csv
+jsts_treatment_sample_within1_month_388.csv
+jsts_treatment_sample_diagnostic_10.csv
+```
+
+The main sample keeps all 398 valid event-month repositories. The exact sample keeps only repositories where baseline `event_month` and locally detected `adoption_month` exactly match. The within-one-month sample allows small month-level disagreement. The diagnostic sample keeps missing or large-mismatch cases.
+
+We also reviewed these two control-analysis files:
+
+```text
+check_cache_control_repos.py
+run8d-analyze-control-repos.sh
+```
+
+We identified and discussed several updates:
+
+```text
+1. The cache-check script name needed to match the actual file name.
+2. MAX_REPOS=5 default is risky for production because it can pollute the manifest after a smoke test.
+3. The incremental merge here-doc position needed to be safe.
+4. Incremental merge keys should use month/week rather than time.
+5. repo_name normalization in cache checking should handle empty/nan-like values.
+```
+
+Then we checked the actual `run8d` result using:
+
+```bash
+MAX_REPOS=0 bash run8d-analyze-control-repos.sh
+```
+
+The cache check reported:
+
+```text
+REQUESTED_REPOS=453
+ANALYZED_REPOS_IN_CACHE=453
+MISSING_REPOS=0
+CACHE_STATUS=complete
+```
+
+So `run8d` correctly skipped expensive git-history analysis because all 453 usable control repositories were already analyzed.
+
+After that, we discovered a stale metadata issue in:
+
+```text
+tmp_jsts_test/data/jsts_control_clone_usable_repos_main_398.csv
+```
+
+The `target_dir` column still pointed to an old absolute path:
+
+```text
+/home/user1-system12/Documents/repro-test01/ai_code_complexity_study_jsts_control_repo_dataset/...
+```
+
+but the actual current clone directory is:
+
+```text
+../ai_code_complexity_study_jsts_control_repo_dataset
+```
+
+Before the fix:
+
+```text
+Rows: 453
+Unique repos: 453
+target_dir exists: 0
+target_dir missing: 453
+```
+
+We updated the `target_dir` column by rebuilding it from the current clone directory and `repo_name`.
+
+After the fix:
+
+```text
+Rows: 453
+Unique repos: 453
+target_dir exists: 453
+target_dir missing: 0
+
+All target_dir values are valid.
+```
+
+## Key Findings
+
+The most important finding is that `398` is not a simple JS/TS language count. It is the currently reproducible JS/TS treatment sample after clone usability and event-month validity checks.
+
+The paper’s official JS/TS benchmark remains:
+
+```text
+Treatment Repos: 411
+Control Repos: 422
+Total Observations: 8,870
+Post-Treatment Observations: 2,279
+```
+
+Our current pipeline starts from a raw reconstructed JS/TS treatment set of 441, then narrows to 398 valid treatment repositories. Therefore, `398` should be described as our replication treatment sample, not as the paper’s official JS/TS treatment count.
+
+We also found that `run8d` outputs are complete and do not need to be regenerated. The control time-series data already covers all 453 usable control repositories.
+
+The stale `target_dir` paths were only a metadata/path-cleanup issue. They did not invalidate the existing `run8d` cache result because `run8d` uses the current `--clone-dir` argument. However, fixing the paths was necessary to prevent confusion and avoid downstream errors if any script later reads `target_dir` directly.
+
+## Files Checked or Updated
+
+```text
+run7d3-save-treatment-options.sh
+check_cache_control_repos.py
+run8d-analyze-control-repos.sh
+tmp_jsts_test/data/jsts_control_clone_usable_repos_main_398.csv
+```
+
+## Files Confirmed
+
+```text
+tmp_jsts_test/data/jsts_treatment_sample_main_398.csv
+tmp_jsts_test/data/jsts_treatment_sample_exact_match_381.csv
+tmp_jsts_test/data/jsts_treatment_sample_within1_month_388.csv
+tmp_jsts_test/data/jsts_treatment_sample_diagnostic_10.csv
+
+tmp_jsts_test/data/jsts_did_control/ts_repos_monthly.csv
+tmp_jsts_test/data/jsts_did_control/ts_contributors_monthly.csv
+tmp_jsts_test/data/jsts_did_control/cursor_commits.csv
+tmp_jsts_test/data/jsts_did_control/ai_adoption_dates.csv
+```
+
+## Current Status
+
+The treatment sample logic is now clearer.
+
+The control repo cache is complete.
+
+The stale `target_dir` metadata has been fixed.
+
+The project is ready to continue with:
+
+```bash
+bash run8d2-filter-local-cursor-controls.sh
+```
+
+## Next Step
+
+Run `run8d2` to filter control repositories with local Cursor evidence and regenerate the final clean control/pair files before rebuilding the matched JS/TS panel.
+
+
