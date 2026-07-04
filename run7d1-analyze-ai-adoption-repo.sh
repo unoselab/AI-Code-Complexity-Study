@@ -15,6 +15,7 @@ set -euo pipefail
 #   NUM_PROCESSES=2 \
 #   bash run7d1-analyze-ai-adoption-repo.sh
 # ============================================================
+SKIP_HISTORY_ANALYSIS="${SKIP_HISTORY_ANALYSIS:-false}"
 
 CLONE_STATUS_FILE="${CLONE_STATUS_FILE:-tmp_jsts_test/data/jsts_treatment_clone_status.csv}"
 
@@ -44,6 +45,7 @@ mkdir -p "${OUTPUT_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run7d: analyze cloned JS/TS AI-adopting treatment repositories" | tee -a "${LOG_FILE}"
+echo "Skip history analysis:      ${SKIP_HISTORY_ANALYSIS}" | tee -a "${LOG_FILE}"
 echo "Timestamp:                  ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Clone status file:          ${CLONE_STATUS_FILE}" | tee -a "${LOG_FILE}"
 echo "Usable repos file:          ${USABLE_REPOS_FILE}" | tee -a "${LOG_FILE}"
@@ -173,38 +175,89 @@ if [[ "${validate_status}" -ne 0 ]]; then
 fi
 
 echo | tee -a "${LOG_FILE}"
-echo "** Step 1: Run repository history analysis" | tee -a "${LOG_FILE}"
-echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
-cmd=(
-  python proc_scripts/analyze_repos_v2.py
-  --repos-file "${REPOS_FILE}"
-  --clone-dir "${CLONE_DIR}"
-  --output-dir "${OUTPUT_DIR}"
-  --aggregation "${AGGREGATION}"
-  --num-processes "${NUM_PROCESSES}"
-)
 
-if [[ "${MAX_REPOS}" != "0" ]]; then
-  cmd+=(--max-repos "${MAX_REPOS}")
-fi
+# [DELETED]
+# echo "** Step 1: Run repository history analysis" | tee -a "${LOG_FILE}"
+# echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+# 
+# cmd=(
+#   python proc_scripts/analyze_repos_v2.py
+#   --repos-file "${REPOS_FILE}"
+#   --clone-dir "${CLONE_DIR}"
+#   --output-dir "${OUTPUT_DIR}"
+#   --aggregation "${AGGREGATION}"
+#   --num-processes "${NUM_PROCESSES}"
+# )
+# 
+# if [[ "${MAX_REPOS}" != "0" ]]; then
+#   cmd+=(--max-repos "${MAX_REPOS}")
+# fi
+# 
+# printf "Command:" | tee -a "${LOG_FILE}"
+# printf " %q" "${cmd[@]}" | tee -a "${LOG_FILE}"
+# echo | tee -a "${LOG_FILE}"
+# echo | tee -a "${LOG_FILE}"
+# 
+# set +e
+# "${cmd[@]}" 2>&1 | tee -a "${LOG_FILE}"
+# analyze_status=${PIPESTATUS[0]}
+# set -e
+# 
+# if [[ "${analyze_status}" -ne 0 ]]; then
+#   echo | tee -a "${LOG_FILE}"
+#   echo "run7d failed during repository history analysis with exit code ${analyze_status}" | tee -a "${LOG_FILE}"
+#   echo "See log: ${LOG_FILE}" | tee -a "${LOG_FILE}"
+#   exit "${analyze_status}"
+# fi
 
-printf "Command:" | tee -a "${LOG_FILE}"
-printf " %q" "${cmd[@]}" | tee -a "${LOG_FILE}"
-echo | tee -a "${LOG_FILE}"
-echo | tee -a "${LOG_FILE}"
+# [INSERTED]
+if [[ "${SKIP_HISTORY_ANALYSIS}" == "true" ]]; then
+  echo "** Step 1: Repository history analysis skipped" | tee -a "${LOG_FILE}"
+  echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+  echo "Using existing adoption file: ${ADOPTION_FILE}" | tee -a "${LOG_FILE}"
 
-set +e
-"${cmd[@]}" 2>&1 | tee -a "${LOG_FILE}"
-analyze_status=${PIPESTATUS[0]}
-set -e
+  if [[ ! -f "${ADOPTION_FILE}" ]]; then
+    echo "ERROR: SKIP_HISTORY_ANALYSIS=true but adoption file not found: ${ADOPTION_FILE}" | tee -a "${LOG_FILE}"
+    exit 1
+  fi
+else
+  echo "** Step 1: Run repository history analysis" | tee -a "${LOG_FILE}"
+  echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
-if [[ "${analyze_status}" -ne 0 ]]; then
+  cmd=(
+    python proc_scripts/analyze_repos_v2.py
+    --repos-file "${REPOS_FILE}"
+    --clone-dir "${CLONE_DIR}"
+    --output-dir "${OUTPUT_DIR}"
+    --aggregation "${AGGREGATION}"
+    --num-processes "${NUM_PROCESSES}"
+  )
+
+  if [[ "${MAX_REPOS}" != "0" ]]; then
+    cmd+=(--max-repos "${MAX_REPOS}")
+  fi
+
+  printf "Command:" | tee -a "${LOG_FILE}"
+  printf " %q" "${cmd[@]}" | tee -a "${LOG_FILE}"
   echo | tee -a "${LOG_FILE}"
-  echo "run7d failed during repository history analysis with exit code ${analyze_status}" | tee -a "${LOG_FILE}"
-  echo "See log: ${LOG_FILE}" | tee -a "${LOG_FILE}"
-  exit "${analyze_status}"
+  echo | tee -a "${LOG_FILE}"
+
+  set +e
+  "${cmd[@]}" 2>&1 | tee -a "${LOG_FILE}"
+  analyze_status=${PIPESTATUS[0]}
+  set -e
+
+  if [[ "${analyze_status}" -ne 0 ]]; then
+    echo | tee -a "${LOG_FILE}"
+    echo "run7d failed during repository history analysis with exit code ${analyze_status}" | tee -a "${LOG_FILE}"
+    echo "See log: ${LOG_FILE}" | tee -a "${LOG_FILE}"
+    exit "${analyze_status}"
+  fi
 fi
+
+
+
 
 if [[ "${SKIP_ADOPTION_CHECK}" == "true" ]]; then
   echo | tee -a "${LOG_FILE}"
@@ -237,6 +290,36 @@ else
     exit "${check_status}"
   fi
 fi
+
+
+echo | tee -a "${LOG_FILE}"
+echo "** Step 2b: Save diagnostic adoption-month files" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+
+python - <<PY 2>&1 | tee -a "${LOG_FILE}"
+import pandas as pd
+from pathlib import Path
+
+match_file = Path("${ADOPTION_MATCH_FILE}")
+out_dir = Path("${OUTPUT_DIR}")
+
+df = pd.read_csv(match_file)
+
+mismatched = df[df["match_status"].eq("mismatched")].copy()
+missing = df[df["match_status"].eq("missing_adoption_month")].copy()
+
+mismatched_file = out_dir / "mismatched_adoption_month_repos.csv"
+missing_file = out_dir / "missing_adoption_month_repos.csv"
+
+mismatched.to_csv(mismatched_file, index=False)
+missing.to_csv(missing_file, index=False)
+
+print("Input rows:", len(df))
+print("Mismatched rows:", len(mismatched), "->", mismatched_file)
+print("Missing adoption rows:", len(missing), "->", missing_file)
+PY
+
+
 
 echo | tee -a "${LOG_FILE}"
 echo "** Output files" | tee -a "${LOG_FILE}"

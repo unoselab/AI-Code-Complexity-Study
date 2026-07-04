@@ -46,4 +46,46 @@ echo "Control clone file: ${CONTROL_CLONE_FILE}" | tee -a "${LOG_FILE}"
 echo "Missing match file: ${MISSING_MATCH_FILE}" | tee -a "${LOG_FILE}"
 echo "Summary file: ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
 
+
+echo
+echo "============================================================"
+echo "run8a output check"
+echo "============================================================"
+
+echo
+echo "===== Pair output file ====="
+echo "File: tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv"
+echo "Command: wc -l tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv"
+wc -l tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv
+echo
+echo "Command: head tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv"
+head tmp_jsts_test/data/jsts_matched_control_pairs_main_398.csv
+
+echo
+echo "===== Control clone file ====="
+echo "File: tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv"
+echo "Command: wc -l tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv"
+wc -l tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv
+echo
+echo "Command: head tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv"
+head tmp_jsts_test/data/jsts_control_repos_to_clone_main_398.csv
+
+echo
+echo "===== Missing match file ====="
+echo "File: tmp_jsts_test/data/jsts_treatment_missing_matching_main_398.csv"
+echo "Command: wc -l tmp_jsts_test/data/jsts_treatment_missing_matching_main_398.csv"
+wc -l tmp_jsts_test/data/jsts_treatment_missing_matching_main_398.csv
+echo
+echo "Command: head tmp_jsts_test/data/jsts_treatment_missing_matching_main_398.csv"
+head tmp_jsts_test/data/jsts_treatment_missing_matching_main_398.csv
+
+echo
+echo "===== Summary file ====="
+echo "File: tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv"
+echo "Command: wc -l tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv"
+wc -l tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv
+echo
+echo "Command: cat tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv"
+cat tmp_jsts_test/data/jsts_control_extract_summary_main_398.csv
+
 exit "${run_status}"
