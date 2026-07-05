@@ -1,0 +1,6 @@
+repo_name,adoption_tool,adoption_commit,adoption_date,adoption_month,evidence_paths,evidence_type,confidence,message
+1mrat/cursor-taskrunner,cursor,538924ea4aa38844f13087b2293ec10fb426482d,2024-08-06,2024-08,.cursorrules,cursor_related_path,high,alpha poc release
+Altinity/clickhouse-grafana,cursor,1df89e363e2a4f6140f8989afb6374ea96227af1,2024-04-28,2024-04,.cursorignore,cursor_related_path,high,add $perSecondColumnsAggregated macro function
+Anemll/Anemll,cursor,e53105d98664acff2e33121bb69e78c7ce647d40,2025-02-08,2025-02,.cursor/rules,cursor_related_path,high,Initial implementation v0.1.0.
+Apocrathia/home-assistant-config,cursor,6094e420724b395dfa9d2b01d8e799b188be2da9,2025-02-17,2025-02,.cursor/rules/homeassistant.mdc,cursor_related_path,high,docs: add Home Assistant configuration rule for Cursor
+Aronnaxx/Behold-Urwar-Droid-Concepts,cursor,9e3949c2296e1c87916b3bf0a3c1b9799b861998,2025-03-24,2025-03,.cursorignore,cursor_related_path,high,cleanups and removing docs until better ones are made to reduce confusions

@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ============================================================
+# run-py-1g: Extract matched Python control repositories
+# ============================================================
+#
+# This wrapper is adapted from the logic of run8a-extract-jsts-control-repos.sh,
+# but it does NOT call the existing JS/TS shell wrapper.
+#
+# Design rule for the Python experiment:
+#   - Reuse existing Python processing logic.
+#   - Do not depend on existing shell wrappers.
+#   - Keep Python experiment paths and filenames explicit.
+#
+# Main Python script:
+#   proc_scripts/extract_matched_control_repos.py
+#
+# Input:
+#   repo_python/treatment_python_sample_main_118.csv
+#     - Primary Python treatment sample created by run-py-1f.
+#     - For the current Python run, main/exact/within1 are all identical,
+#       but main is the primary replication input.
+#
+#   data_baseline_backup/matching.csv
+#     - Matching file from the paper replication data.
+#     - Expected columns:
+#         repo_name
+#         matched_control_1
+#         matched_control_2
+#         matched_control_3
+#
+# Outputs:
+#   repo_python/python_matched_control_pairs_main_118.csv
+#     - Clean treatment-control pair file after overlap removal.
+#
+#   repo_python/python_control_repos_to_clone_main_118.csv
+#     - Unique clean control repos to clone in the next step.
+#
+#   repo_python/python_treatment_missing_matching_main_118.csv
+#     - Treatment repos without matching rows.
+#
+#   repo_python/python_control_extract_summary_main_118.csv
+#     - Summary metrics for audit.
+#
+# Sidecar outputs:
+#   Raw pairs, raw controls, overlap diagnostics, and coverage files.
+# ============================================================
+
+LOG_DIR="${LOG_DIR:-logs}"
+RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1g_extract_control_repos_${RUN_TS}.log}"
+
+PY_SCRIPT="${PY_SCRIPT:-proc_scripts/extract_matched_control_repos.py}"
+
+OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+
+TREATMENT_SAMPLE_FILE="${TREATMENT_SAMPLE_FILE:-${OUTPUT_DIR}/treatment_sample_main.csv}"
+MATCHING_FILE="${MATCHING_FILE:-data_baseline_backup/matching.csv}"
+
+PAIR_OUTPUT_FILE="${PAIR_OUTPUT_FILE:-${OUTPUT_DIR}/matched_control_pairs_main.csv}"
+CONTROL_CLONE_FILE="${CONTROL_CLONE_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main.csv}"
+MISSING_MATCH_FILE="${MISSING_MATCH_FILE:-${OUTPUT_DIR}/treatment_missing_matching_main.csv}"
+SUMMARY_FILE="${SUMMARY_FILE:-${OUTPUT_DIR}/control_extract_summary_main.csv}"
+
+RAW_PAIR_OUTPUT_FILE="${RAW_PAIR_OUTPUT_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_raw.csv}"
+RAW_CONTROL_CLONE_FILE="${RAW_CONTROL_CLONE_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main_raw.csv}"
+OVERLAP_PAIR_FILE="${OVERLAP_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_overlap_pairs.csv}"
+OVERLAP_REPO_FILE="${OVERLAP_REPO_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main_overlap_repos.csv}"
+COVERAGE_FILE="${COVERAGE_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_coverage.csv}"
+
+FULL_ADOPTER_FILE="${FULL_ADOPTER_FILE:-data_baseline_backup/panel_event_monthly.csv}"
+FULL_ADOPTER_FILTER_COLUMN="${FULL_ADOPTER_FILTER_COLUMN:-is_treatment}"
+FULL_ADOPTER_FILTER_VALUE="${FULL_ADOPTER_FILTER_VALUE:-1}"
+
+TOP_PRINT="${TOP_PRINT:-50}"
+
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+
+echo "============================================================" | tee "${LOG_FILE}"
+echo "run-py-1g: extract matched Python control repositories" | tee -a "${LOG_FILE}"
+echo "Timestamp:                     ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Python script:                 ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
+echo "Treatment sample file:         ${TREATMENT_SAMPLE_FILE}" | tee -a "${LOG_FILE}"
+echo "Matching file:                 ${MATCHING_FILE}" | tee -a "${LOG_FILE}"
+echo "Output dir:                    ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Pair output file:              ${PAIR_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "Control clone file:            ${CONTROL_CLONE_FILE}" | tee -a "${LOG_FILE}"
+echo "Missing match file:            ${MISSING_MATCH_FILE}" | tee -a "${LOG_FILE}"
+echo "Summary file:                  ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
+echo "Coverage file:                 ${COVERAGE_FILE}" | tee -a "${LOG_FILE}"
+echo "Full adopter file:             ${FULL_ADOPTER_FILE}" | tee -a "${LOG_FILE}"
+echo "Full adopter filter column:    ${FULL_ADOPTER_FILTER_COLUMN}" | tee -a "${LOG_FILE}"
+echo "Full adopter filter value:     ${FULL_ADOPTER_FILTER_VALUE}" | tee -a "${LOG_FILE}"
+echo "Top print:                     ${TOP_PRINT}" | tee -a "${LOG_FILE}"
+echo "Log file:                      ${LOG_FILE}" | tee -a "${LOG_FILE}"
+echo "============================================================" | tee -a "${LOG_FILE}"
+echo | tee -a "${LOG_FILE}"
+
+if [[ ! -f "${PY_SCRIPT}" ]]; then
+  echo "ERROR: Python script not found: ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
+  echo "Create it first, for example:" | tee -a "${LOG_FILE}"
+  echo "  cp proc_scripts/extract-jsts-control-repos.py proc_scripts/extract_matched_control_repos.py" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -f "${TREATMENT_SAMPLE_FILE}" ]]; then
+  echo "ERROR: treatment sample file not found: ${TREATMENT_SAMPLE_FILE}" | tee -a "${LOG_FILE}"
+  echo "Run run-py-1f-save-treatment-options.sh first." | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+if [[ ! -f "${MATCHING_FILE}" ]]; then
+  echo "ERROR: matching file not found: ${MATCHING_FILE}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+echo "** Input treatment sample summary" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+
+python - <<PY 2>&1 | tee -a "${LOG_FILE}"
+import pandas as pd
+from pathlib import Path
+
+path = Path("${TREATMENT_SAMPLE_FILE}")
+df = pd.read_csv(path)
+
+if "repo_name" not in df.columns:
+    raise SystemExit("ERROR: treatment sample must contain repo_name column.")
+
+print("Rows:", len(df))
+print("Unique repos:", df["repo_name"].nunique())
+
+if "repo_primary_language" in df.columns:
+    print()
+    print("Primary language counts:")
+    print(df["repo_primary_language"].fillna("(missing)").value_counts().to_string())
+
+if "match_status" in df.columns:
+    print()
+    print("Treatment adoption match-status counts:")
+    print(df["match_status"].fillna("(missing)").value_counts().to_string())
+
+print()
+print(df.head(20).to_string(index=False))
+PY
+
+echo | tee -a "${LOG_FILE}"
+echo "** Extract matched Python controls" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+
+set +e
+python "${PY_SCRIPT}" \
+  --treatment-sample-file "${TREATMENT_SAMPLE_FILE}" \
+  --matching-file "${MATCHING_FILE}" \
+  --pair-output-file "${PAIR_OUTPUT_FILE}" \
+  --control-clone-file "${CONTROL_CLONE_FILE}" \
+  --missing-match-file "${MISSING_MATCH_FILE}" \
+  --summary-file "${SUMMARY_FILE}" \
+  --full-adopter-file "${FULL_ADOPTER_FILE}" \
+  --full-adopter-filter-column "${FULL_ADOPTER_FILTER_COLUMN}" \
+  --full-adopter-filter-value "${FULL_ADOPTER_FILTER_VALUE}" \
+  --raw-pair-output-file "${RAW_PAIR_OUTPUT_FILE}" \
+  --raw-control-clone-file "${RAW_CONTROL_CLONE_FILE}" \
+  --overlap-pair-file "${OVERLAP_PAIR_FILE}" \
+  --overlap-repo-file "${OVERLAP_REPO_FILE}" \
+  --coverage-file "${COVERAGE_FILE}" \
+  --top-print "${TOP_PRINT}" \
+  2>&1 | tee -a "${LOG_FILE}"
+
+run_status=${PIPESTATUS[0]}
+set -e
+
+if [[ "${run_status}" -ne 0 ]]; then
+  echo "ERROR: control extraction failed with exit code ${run_status}" | tee -a "${LOG_FILE}"
+  exit "${run_status}"
+fi
+
+echo | tee -a "${LOG_FILE}"
+echo "** Output file check" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+
+for f in \
+  "${PAIR_OUTPUT_FILE}" \
+  "${CONTROL_CLONE_FILE}" \
+  "${MISSING_MATCH_FILE}" \
+  "${SUMMARY_FILE}" \
+  "${RAW_PAIR_OUTPUT_FILE}" \
+  "${RAW_CONTROL_CLONE_FILE}" \
+  "${OVERLAP_PAIR_FILE}" \
+  "${OVERLAP_REPO_FILE}" \
+  "${COVERAGE_FILE}"
+do
+  if [[ -f "${f}" ]]; then
+    echo "Command: wc -l ${f}" | tee -a "${LOG_FILE}"
+    wc -l "${f}" | tee -a "${LOG_FILE}"
+  else
+    echo "MISSING: ${f}" | tee -a "${LOG_FILE}"
+  fi
+done
+
+echo | tee -a "${LOG_FILE}"
+echo "============================================================" | tee -a "${LOG_FILE}"
+echo "run-py-1g completed successfully." | tee -a "${LOG_FILE}"
+echo "Pair output file: ${PAIR_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "Control clone file: ${CONTROL_CLONE_FILE}" | tee -a "${LOG_FILE}"
+echo "Missing match file: ${MISSING_MATCH_FILE}" | tee -a "${LOG_FILE}"
+echo "Summary file: ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
+echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
+echo "============================================================" | tee -a "${LOG_FILE}"

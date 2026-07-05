@@ -1,34 +1,35 @@
 #!/usr/bin/env python3
 """
-Save treatment sample options from adoption_month_check.csv.
+Save treatment sample options from adoption-month validation results.
 
-This script reads the event/adoption-month validation output created by
-run7d1/run7d2 and creates four treatment sample files:
+This script reads an adoption_month_check.csv file and creates four
+treatment sample files:
 
-1. Main sample
-   - Includes all valid treatment repositories in adoption_month_check.csv.
+1. main
+   - All valid event-month treatment repositories.
+   - This is the primary sample for the unbalanced-panel replication.
 
-2. Exact-match sample
-   - Includes only repositories where event_month exactly matches the
-     git-detected adoption_month.
+2. exact
+   - Repositories where event_month exactly matches git-detected adoption_month.
 
-3. Within-one-month sample
-   - Includes exact matches.
-   - Also includes mismatched repositories if the detected adoption month is
-     within the configured month tolerance, usually +/- 1 month.
+3. within1
+   - Repositories where:
+       a) event_month exactly matches adoption_month, or
+       b) event_month and adoption_month differ by at most one month.
+   - This can be used as a robustness sample.
 
-4. Diagnostic sample
-   - Includes repositories with no locally detected adoption month.
-   - Also includes mismatched repositories where the month difference is larger
-     than the configured tolerance.
+4. diagnostic
+   - Repositories with missing local adoption evidence or large mismatch.
+   - This file is for audit/debugging, not for primary analysis.
 
-The output filenames include the actual row counts. For the current JS/TS
-treatment pipeline, this should reproduce filenames such as:
+Expected input columns:
+  repo_name
+  event_month
+  adoption_month
+  match_status
+  month_difference
 
-  jsts_treatment_sample_main_398.csv
-  jsts_treatment_sample_exact_match_381.csv
-  jsts_treatment_sample_within1_month_388.csv
-  jsts_treatment_sample_diagnostic_10.csv
+Additional columns are preserved in all output files.
 """
 
 from __future__ import annotations
@@ -40,216 +41,125 @@ import pandas as pd
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command-line arguments for input/output paths and sample rules."""
     parser = argparse.ArgumentParser(
-        description="Save treatment sample options from adoption_month_check.csv."
+        description="Create main/exact/within1/diagnostic treatment samples."
     )
 
     parser.add_argument(
         "--check-file",
-        default="tmp_jsts_test/data/jsts_did_test/adoption_month_check.csv",
-        help=(
-            "Input CSV created by check_time_of_event_and_adoption.py. "
-            "It must contain match_status and month_difference columns."
-        ),
+        required=True,
+        help="Input adoption_month_check.csv file.",
     )
-
     parser.add_argument(
         "--output-dir",
-        default="tmp_jsts_test/data",
-        help="Directory where treatment sample option CSV files will be saved.",
+        required=True,
+        help="Directory where treatment sample option files will be saved.",
     )
-
     parser.add_argument(
         "--prefix",
-        default="jsts_treatment_sample",
-        help="Filename prefix for all output sample files.",
+        default="treatment_sample",
+        help="Output filename prefix.",
     )
-
-    parser.add_argument(
-        "--within-month-tolerance",
-        type=int,
-        default=1,
-        help=(
-            "Maximum absolute month difference allowed for the within-month "
-            "validation sample. Default is 1, meaning +/- 1 month."
-        ),
-    )
-
     parser.add_argument(
         "--top-print",
         type=int,
         default=50,
-        help="Maximum number of diagnostic repositories to print.",
+        help="Number of diagnostic rows to print.",
     )
 
     return parser.parse_args()
 
 
-def read_check_file(check_path: Path) -> pd.DataFrame:
-    """
-    Read adoption_month_check.csv and validate the required columns.
+def require_columns(df: pd.DataFrame, required: list[str], path: Path) -> None:
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise SystemExit(
+            f"ERROR: {path} is missing required columns: {missing}. "
+            f"Available columns: {list(df.columns)}"
+        )
 
-    Required columns:
-      - match_status: identifies matched, mismatched, and missing adoption rows.
-      - month_difference: numeric month difference between adoption_month and
-        event_month. Missing values are expected for missing_adoption_month rows.
-    """
+
+def save_csv(df: pd.DataFrame, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
+
+
+def main() -> int:
+    args = parse_args()
+
+    check_path = Path(args.check_file)
+    out_dir = Path(args.output_dir)
+
     if not check_path.exists():
         raise SystemExit(f"ERROR: check file not found: {check_path}")
 
     df = pd.read_csv(check_path)
 
-    required_columns = ["match_status", "month_difference"]
-    missing_columns = [col for col in required_columns if col not in df.columns]
+    require_columns(
+        df,
+        required=["repo_name", "event_month", "match_status", "month_difference"],
+        path=check_path,
+    )
 
-    if missing_columns:
-        raise SystemExit(
-            "ERROR: check file is missing required columns: "
-            f"{missing_columns}"
-        )
-
-    if len(df) == 0:
-        raise SystemExit(f"ERROR: check file has zero rows: {check_path}")
-
-    return df
-
-
-def build_sample_options(
-    df: pd.DataFrame,
-    within_month_tolerance: int,
-) -> dict[str, pd.DataFrame]:
-    """
-    Build the four treatment sample options.
-
-    The input DataFrame is expected to contain one row per treatment repository.
-
-    Sample definitions:
-      - main:
-          Every row from adoption_month_check.csv.
-      - exact:
-          Rows where match_status == "matched".
-      - within1:
-          Rows where match_status == "matched", plus mismatched rows whose
-          absolute month_difference is within the configured tolerance.
-      - diagnostic:
-          Rows where match_status == "missing_adoption_month", plus mismatched
-          rows whose absolute month_difference is larger than the configured
-          tolerance.
-
-    Note:
-      pd.to_numeric(..., errors="coerce") converts blank values to NaN.
-      This is useful because missing_adoption_month rows usually do not have
-      a valid month_difference value.
-    """
-    month_diff = pd.to_numeric(df["month_difference"], errors="coerce")
-
-    matched_mask = df["match_status"].eq("matched")
-    mismatched_mask = df["match_status"].eq("mismatched")
-    missing_adoption_mask = df["match_status"].eq("missing_adoption_month")
-
-    within_tolerance_mask = month_diff.abs().le(within_month_tolerance)
-    large_mismatch_mask = ~within_tolerance_mask
-
+    # Main sample:
+    # Keep all validated treatment repositories. This is the primary sample.
     main = df.copy()
 
-    exact = df[matched_mask].copy()
+    # Exact-match sample:
+    # Keep repositories where baseline event_month equals local git adoption_month.
+    exact = df[df["match_status"].eq("matched")].copy()
 
-    within = df[
-        matched_mask
+    # Within-one-month sample:
+    # Keep exact matches plus small timing differences.
+    month_diff = pd.to_numeric(df["month_difference"], errors="coerce")
+    within1 = df[
+        df["match_status"].eq("matched")
         | (
-            mismatched_mask
-            & within_tolerance_mask
+            df["match_status"].eq("mismatched")
+            & month_diff.abs().le(1)
         )
     ].copy()
 
+    # Diagnostic sample:
+    # Missing local adoption evidence or mismatch larger than one month.
     diagnostic = df[
-        missing_adoption_mask
+        df["match_status"].eq("missing_adoption_month")
         | (
-            mismatched_mask
-            & large_mismatch_mask
+            df["match_status"].eq("mismatched")
+            & ~month_diff.abs().le(1)
         )
     ].copy()
 
-    return {
-        "main": main,
-        "exact": exact,
-        "within": within,
-        "diagnostic": diagnostic,
+    files = {
+        "main": out_dir / f"{args.prefix}_main_{len(main)}.csv",
+        "exact": out_dir / f"{args.prefix}_exact_match_{len(exact)}.csv",
+        "within1": out_dir / f"{args.prefix}_within1_month_{len(within1)}.csv",
+        "diagnostic": out_dir / f"{args.prefix}_diagnostic_{len(diagnostic)}.csv",
     }
 
+    save_csv(main, files["main"])
+    save_csv(exact, files["exact"])
+    save_csv(within1, files["within1"])
+    save_csv(diagnostic, files["diagnostic"])
 
-def build_output_files(
-    output_dir: Path,
-    prefix: str,
-    samples: dict[str, pd.DataFrame],
-    within_month_tolerance: int,
-) -> dict[str, Path]:
-    """
-    Create output filenames using actual row counts.
-
-    Counted filenames are safer than hard-coded filenames because they make the
-    output self-documenting. If the input sample changes later, the filename will
-    automatically reflect the new row count.
-    """
-    return {
-        "main": output_dir / f"{prefix}_main_{len(samples['main'])}.csv",
-        "exact": output_dir / f"{prefix}_exact_match_{len(samples['exact'])}.csv",
-        "within": (
-            output_dir
-            / f"{prefix}_within{within_month_tolerance}_month_{len(samples['within'])}.csv"
-        ),
-        "diagnostic": (
-            output_dir
-            / f"{prefix}_diagnostic_{len(samples['diagnostic'])}.csv"
-        ),
-    }
-
-
-def save_samples(
-    samples: dict[str, pd.DataFrame],
-    output_files: dict[str, Path],
-) -> None:
-    """Save each treatment sample DataFrame to its corresponding CSV file."""
-    for sample_name, sample_df in samples.items():
-        output_path = output_files[sample_name]
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        sample_df.to_csv(output_path, index=False)
-
-
-def print_summary(
-    df: pd.DataFrame,
-    samples: dict[str, pd.DataFrame],
-    output_files: dict[str, Path],
-    top_print: int,
-) -> None:
-    """Print row counts, output paths, and diagnostic repositories."""
+    print("Input file:", check_path)
     print("Input rows:", len(df))
-    print("Main rows:", len(samples["main"]), "->", output_files["main"])
-    print("Exact matched rows:", len(samples["exact"]), "->", output_files["exact"])
-    print(
-        "Within-one-month rows:",
-        len(samples["within"]),
-        "->",
-        output_files["within"],
-    )
-    print(
-        "Diagnostic rows:",
-        len(samples["diagnostic"]),
-        "->",
-        output_files["diagnostic"],
-    )
-
+    print("Unique repos:", df["repo_name"].nunique())
     print()
+
     print("Match status counts:")
-    print(df["match_status"].fillna("(missing)").value_counts().to_string())
-
+    print(df["match_status"].fillna("(missing)").value_counts(dropna=False).to_string())
     print()
+
+    print("Saved treatment sample files:")
+    print("Main rows:", len(main), "->", files["main"])
+    print("Exact matched rows:", len(exact), "->", files["exact"])
+    print("Within-one-month rows:", len(within1), "->", files["within1"])
+    print("Diagnostic rows:", len(diagnostic), "->", files["diagnostic"])
+    print()
+
     print("Diagnostic repos:")
-
-    diagnostic = samples["diagnostic"]
-
-    diagnostic_columns = [
+    cols = [
         "repo_name",
         "repo_primary_language",
         "event_month",
@@ -259,54 +169,15 @@ def print_summary(
         "confidence",
         "evidence_paths",
     ]
-    diagnostic_columns = [
-        col for col in diagnostic_columns if col in diagnostic.columns
-    ]
+    cols = [c for c in cols if c in diagnostic.columns]
 
     if len(diagnostic) == 0:
-        print("(No diagnostic repositories.)")
-        return
+        print("(No diagnostic repos.)")
+    else:
+        print(diagnostic[cols].head(args.top_print).to_string(index=False))
 
-    if top_print > 0:
-        diagnostic = diagnostic.head(top_print)
-
-    print(diagnostic[diagnostic_columns].to_string(index=False))
-
-
-def main() -> None:
-    """Run the treatment sample export workflow."""
-    args = parse_args()
-
-    check_path = Path(args.check_file)
-    output_dir = Path(args.output_dir)
-
-    df = read_check_file(check_path)
-
-    samples = build_sample_options(
-        df=df,
-        within_month_tolerance=args.within_month_tolerance,
-    )
-
-    output_files = build_output_files(
-        output_dir=output_dir,
-        prefix=args.prefix,
-        samples=samples,
-        within_month_tolerance=args.within_month_tolerance,
-    )
-
-    save_samples(
-        samples=samples,
-        output_files=output_files,
-    )
-
-    print_summary(
-        df=df,
-        samples=samples,
-        output_files=output_files,
-        top_print=args.top_print,
-    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
-    
+    raise SystemExit(main())

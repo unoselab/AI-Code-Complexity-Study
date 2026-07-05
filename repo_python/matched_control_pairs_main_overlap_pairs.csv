@@ -1,0 +1,4 @@
+treatment_repo,control_repo,control_rank,matched_period,matching_propensity_score,repo_primary_language,event_month,adoption_month,match_status,month_difference,target_dir,overlap_current_treatment_sample,overlap_full_adopter_population
+cbardyn/ai-swiss-workflows,Scrapybara/scrapybara-playground,3,202411,0.0322652722433117,Python,2024-12,2024-12,matched,0,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/cbardyn_ai-swiss-workflows,False,True
+grapeot/devin.cursorrules,Scrapybara/scrapybara-playground,3,202411,0.0322652722433117,Python,2024-12,2024-12,matched,0,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/grapeot_devin.cursorrules,False,True
+ttmouse/Wispr-Flow-CN,Scrapybara/scrapybara-playground,3,202411,0.0322652722433117,Python,2024-12,2024-12,matched,0,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/ttmouse_Wispr-Flow-CN,False,True

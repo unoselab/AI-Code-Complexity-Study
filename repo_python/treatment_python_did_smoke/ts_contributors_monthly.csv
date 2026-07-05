@@ -1,0 +1,413 @@
+repo_name,author,month,commits,lines_added,lines_removed
+1mrat/cursor-taskrunner,Imrat Jn <me@imrat.com>,2024-08,4,264,8
+Altinity/clickhouse-grafana,Aliaksandr Valialkin <valyala@gmail.com>,2017-01,1,0,0
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2017-01,4,14,11
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-01,5,3330,148
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2017-02,2,28,19
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-02,5,188,150
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2017-03,1,4,0
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-03,5,1385,1578
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2017-04,2,85,4
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-04,3,279,95
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-05,3,128,32
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-07,2,105,54
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-08,1,429,429
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-10,1,200,146
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2017-11,4,9013,1567
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2017-11,1,3,3
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-11,44,13889,2822
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2017-12,10,353,205
+Altinity/clickhouse-grafana,Marlowe.W <wych101010@gmail.com>,2018-01,1,9,9
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2018-01,3,581,513
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2018-01,5,608,524
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-02,3,391,57
+Altinity/clickhouse-grafana,r.khavronenko <r.khavronenko@vertamedia.com>,2018-02,4,268,39
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2018-03,5,764,105
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-03,9,363,55
+Altinity/clickhouse-grafana,王邈 <shankerwangmiao@gmail.com>,2018-03,1,4,4
+Altinity/clickhouse-grafana,Simon Podlipsky <simon@podlipsky.net>,2018-04,2,17,16
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-04,8,183,50
+Altinity/clickhouse-grafana,Marek Vavruša <marek@vavrusa.com>,2018-05,1,308,104
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2018-05,2,17,16
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-05,1,22,2
+Altinity/clickhouse-grafana,Marek Vavruša <marek@vavrusa.com>,2018-06,1,155,78
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-06,4,99,9
+Altinity/clickhouse-grafana,Šimon Podlipský <simon@podlipsky.net>,2018-07,1,41,63
+Altinity/clickhouse-grafana,Marek Vavruša <marek@vavrusa.com>,2018-08,1,47,8
+Altinity/clickhouse-grafana,atsirin <39264149+atsirin@users.noreply.github.com>,2018-08,1,326,15
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-08,8,413,178
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-09,2,63,32
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2018-10,2,52,11
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-10,10,1765,1076
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2018-11,4,98,54
+Altinity/clickhouse-grafana,Šimon Podlipský <simon@podlipsky.net>,2018-12,3,245,85
+Altinity/clickhouse-grafana,Andrew Privalov <negasus@gmail.com>,2019-02,1,131,45
+Altinity/clickhouse-grafana,Roman Khavronenko <hagen1778@gmail.com>,2019-02,2,41,10
+Altinity/clickhouse-grafana,hagen1778 <hagen1778@gmail.com>,2019-02,7,222,101
+Altinity/clickhouse-grafana,nvartolomei <nvartolomei@users.noreply.github.com>,2019-02,1,35,26
+Altinity/clickhouse-grafana,Šimon Podlipský <simon@podlipsky.net>,2019-02,3,356,6395
+Altinity/clickhouse-grafana,Denis Fulachier <44165041+dfulachier@users.noreply.github.com>,2019-03,1,29,3
+Altinity/clickhouse-grafana,Šimon Podlipský <simon@podlipsky.net>,2019-03,1,97,11
+Altinity/clickhouse-grafana,Thierry <38243024+TH-HA@users.noreply.github.com>,2019-04,5,132,46
+Altinity/clickhouse-grafana,Fenix <f.fenix@gmail.com>,2019-05,2,31,16
+Altinity/clickhouse-grafana,Andrey Monakhov <gimm3fuel@users.noreply.github.com>,2019-08,3,159,20
+Altinity/clickhouse-grafana,Fenix <f.fenix@gmail.com>,2019-08,1,29,0
+Altinity/clickhouse-grafana,Thierry <38243024+TH-HA@users.noreply.github.com>,2019-08,3,35,18
+Altinity/clickhouse-grafana,alex-zaitsev <alz@altinity.com>,2019-08,1,6,1
+Altinity/clickhouse-grafana,amonakhov <amonakhov@ivinco.com>,2019-08,2,129,18
+Altinity/clickhouse-grafana,yuqing <liyuqing@lizhi.fm>,2019-09,2,9,8
+Altinity/clickhouse-grafana,Andrey Monakhov <gimm3fuel@users.noreply.github.com>,2019-10,6,2162,2109
+Altinity/clickhouse-grafana,root <root@static.196.208.99.88.clients.your-server.de>,2019-10,7,2161,2108
+Altinity/clickhouse-grafana,Šimon Podlipský <simon@podlipsky.net>,2019-10,1,1,1
+Altinity/clickhouse-grafana,Andrey Monakhov <gimm3fuel@users.noreply.github.com>,2019-11,1,61,46
+Altinity/clickhouse-grafana,amonakhov <andrey@altinity.com>,2019-11,1,8,2
+Altinity/clickhouse-grafana,root <root@static.196.208.99.88.clients.your-server.de>,2019-11,1,53,44
+Altinity/clickhouse-grafana,Andrey Monakhov <gimm3fuel@users.noreply.github.com>,2019-12,1,1,1
+Altinity/clickhouse-grafana,amonakhov <andrey@altinity.com>,2019-12,1,1,1
+Altinity/clickhouse-grafana,roman <roman@cloudflare.com>,2019-12,1,56146,24
+Altinity/clickhouse-grafana,Andrey Monakhov <gimm3fuel@users.noreply.github.com>,2020-01,2,56183,56163
+Altinity/clickhouse-grafana,amonakhov <andrey@altinity.com>,2020-01,3,28,8
+Altinity/clickhouse-grafana,Andrey Monakhov <gimm3fuel@users.noreply.github.com>,2020-04,1,81,2
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-04,1,81,2
+Altinity/clickhouse-grafana,Andrey Monakhov <gimm3fuel@users.noreply.github.com>,2020-05,1,39,280
+Altinity/clickhouse-grafana,Brian Thai <brian.thai@rdbrck.com>,2020-05,13,794,89
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-05,1,39,280
+Altinity/clickhouse-grafana,Fagadar-Ghisa Bogdan <fgbogdan@gmail.com>,2020-05,5,178707,83
+Altinity/clickhouse-grafana,Simon Podlipsky <simon@podlipsky.net>,2020-05,4,390,405
+Altinity/clickhouse-grafana,alex-zaitsev <alz@altinity.com>,2020-05,2,1118,427
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-06,28,1503,490
+Altinity/clickhouse-grafana,Fagadar-Ghisa Bogdan <fgbogdan@gmail.com>,2020-06,11,432,59556
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-07,75,11762,1873
+Altinity/clickhouse-grafana,Fagadar-Ghisa Bogdan <fgbogdan@gmail.com>,2020-07,3,4847,488
+Altinity/clickhouse-grafana,Ivan A. Torgashov <ivan.torgashov@domru.ru>,2020-07,1,1,1
+Altinity/clickhouse-grafana,Slach <bloodjazman@gmail.com>,2020-07,9,325,75
+Altinity/clickhouse-grafana,it1804 <it1804@mail.ru>,2020-07,1,5,3
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-08,24,5903,2535
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-09,7,979,4494
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-11,19,1597,1718
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2020-12,3,291,53
+Altinity/clickhouse-grafana,Brian Thai <brian.thai@rdbrck.com>,2021-01,3,792,124
+Altinity/clickhouse-grafana,Brian Thai <brian.thai@rdbrck.com>,2021-02,1,67,43
+Altinity/clickhouse-grafana,Derek <dschaller@users.noreply.github.com>,2021-02,1,1,1
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-02,20,329,131
+Altinity/clickhouse-grafana,Brian Thai <brian.thai@rdbrck.com>,2021-03,13,1096,311
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-03,5,3101,332
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-04,12,3348,2819
+Altinity/clickhouse-grafana,Anton Lindström <anton.lindstrom@svt.se>,2021-06,1,8,3
+Altinity/clickhouse-grafana,Anton Lindström <carlantonlindstrom@gmail.com>,2021-06,2,3,2
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-06,2,9,3
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-09,1,377,67
+Altinity/clickhouse-grafana,Slach <bloodjazman@gmail.com>,2021-09,1,377,67
+Altinity/clickhouse-grafana,David Sztykman <david@hydrolix.io>,2021-10,1,4,16
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-10,3,40,18
+Altinity/clickhouse-grafana,Slach <bloodjazman@gmail.com>,2021-10,2,27,9
+Altinity/clickhouse-grafana,daiwei212@live.cn <daiwei212@live.cn>,2021-10,1,35,1
+Altinity/clickhouse-grafana,pierre <6323714+PierreNowak@users.noreply.github.com>,2021-10,1,1,1
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-11,7,57104,457
+Altinity/clickhouse-grafana,Slach <bloodjazman@gmail.com>,2021-11,10,117931,61304
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2021-12,22,13536,13762
+Altinity/clickhouse-grafana,oleksandr.venger <oleksandr.venger@ihsmarkit.com>,2021-12,1,1,2
+Altinity/clickhouse-grafana,stephan-hof <sh@axiros.com>,2021-12,1,15,0
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-01,1,15,2
+Altinity/clickhouse-grafana,Vitaly Bihov <vitalyb@wix.com>,2022-01,1,15,2
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-02,1,96,33
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-03,6,468,141
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-04,11,549,530
+Altinity/clickhouse-grafana,Slach <bloodjazman@gmail.com>,2022-04,1,26,26
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2022-04,2,16,16
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-05,4,1497,403
+Altinity/clickhouse-grafana,Fiery-Fenix <f.fenix@gmail.com>,2022-05,3,1487,405
+Altinity/clickhouse-grafana,Nikolina697 <nzelic00@fesb.hr>,2022-05,1,7,1
+Altinity/clickhouse-grafana,Slach <bloodjazman@gmail.com>,2022-05,17,86259,83898
+Altinity/clickhouse-grafana,sbengo <serigna@gmail.com>,2022-05,1,8,2
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-06,7,165,84
+Altinity/clickhouse-grafana,Slach <bloodjazman@gmail.com>,2022-06,5,691,95
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-07,1,421,1
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2022-07,2,148,51
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-08,10,508,208
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-09,8,285,66
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-10,2,94,36
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2022-10,1,268,513
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-11,5,1651,119
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2022-12,1,6,6
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2022-12,2,12,12
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-01,5,705,1267
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-02,1,3,42
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-02,1,3,42
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-03,6,79025,110384
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-03,3,20560,37334
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-07,1,2,2
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-07,1,9,9
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-09,7,451,212
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-10,3,33,29
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-10,3,152,146
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-11,16,22099,19635
+Altinity/clickhouse-grafana,Version bot <bot@flowhealth.com>,2023-11,12,9329,8633
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-11,1,47,49
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2023-12,8,8633,7282
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2023-12,1,276,5
+Altinity/clickhouse-grafana,Version bot <bot@flowhealth.com>,2023-12,13,2853,3056
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-01,21,29770,33672
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2024-01,2,29,6116
+Altinity/clickhouse-grafana,Version bot <bot@flowhealth.com>,2024-01,5,3894,1277
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-01,2,9,9
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-02,1,1,1
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-02,12,5180,161
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-02,58,1482,928
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-03,13,2783,1905
+Altinity/clickhouse-grafana,Roman Misyurin <roman.misyurin@gmail.com>,2024-03,9,2211,1133
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-03,10,21194,18352
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-03,3,50,64
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-03,1,3,3
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-04,50,15122,12643
+Altinity/clickhouse-grafana,Roman Misyurin <roman.misyurin@gmail.com>,2024-04,12,5010,5866
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-04,44,1744,1067
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-04,1,2046,988
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-05,40,3498,1022
+Altinity/clickhouse-grafana,Roman M <roman.misyurin@gmail.com>,2024-05,8,260,19
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2024-05,1,2,1
+Altinity/clickhouse-grafana,Roman Misyurin <roman.misyurin@gmail.com>,2024-05,9,108,52
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-05,11,9431,6603
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-05,1,1,1
+Altinity/clickhouse-grafana,Doug Tidwell <doug_tidwell@yahoo.com>,2024-06,2,1349,0
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-06,25,17135,960
+Altinity/clickhouse-grafana,Roman M <roman.misyurin@gmail.com>,2024-06,25,1416,788
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2024-06,1,0,0
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-06,38,3947,5270
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-06,15,20,20
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-06,1,9,9
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-07,8,328,80
+Altinity/clickhouse-grafana,Robert Hodges <rhodges@altinity.com>,2024-07,1,1,1
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2024-07,6,227,155
+Altinity/clickhouse-grafana,Roman M <roman.misyurin@gmail.com>,2024-07,1,5,1
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-07,12,82,51
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-07,1,1,1
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-07,1,5,5
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-08,21,4670,2048
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2024-08,6,1608,888
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-08,11,3552,251
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-08,1,1,1
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-09,12,1582,296
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2024-09,1,70,16
+Altinity/clickhouse-grafana,addshore <addshorewiki@gmail.com>,2024-09,1,111,1
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-09,12,1186,407
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-09,5,131,125
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-10,44,25561,12932
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2024-10,24,5852,4983
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-10,38,8584,3024
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-10,1,1,1
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-11,43,37103,43339
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2024-11,27,11774,13785
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-11,26,3258,1547
+Altinity/clickhouse-grafana,antip00 <antipow.andreey2012@gmail.com>,2024-11,2,24,23
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-11,1,913,1059
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2024-12,70,27061,8360
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2024-12,70,11129,9761
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2024-12,2,2089,629
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2024-12,45,8335,2974
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-01,24,10518,952
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2025-01,25,3594,1367
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2025-01,21,211,131
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-02,17,3340,600
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2025-02,9,659,306
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2025-02,6,93,64
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-03,45,10440,9694
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2025-03,21,6784,7750
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2025-03,10,536,22
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-03,2,41,101
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-04,14,1590,475
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2025-04,17,763,460
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2025-04,1,217,146
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2025-04,2,123,13
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-04,1,7,98
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-05,10,128,87
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2025-05,8,71,51173
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2025-05,13,103445,1758
+Altinity/clickhouse-grafana,antip00 <antipov@altinity.com>,2025-05,2,17,17
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-05,1,3,3
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-06,23,53780,53476
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2025-06,11,1852,103224
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-06,1,134,54
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-07,13,4947,755
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2025-07,8,3467,802
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-07,1,25,24
+Altinity/clickhouse-grafana,selfeer <selfeers@gmail.com>,2025-07,2,119,58
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-08,9,3807,702
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2025-08,22,6491,3385
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2025-08,1,757,65
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-08,2,24,12
+Altinity/clickhouse-grafana,selfeer <selfeers@gmail.com>,2025-08,1,90,35
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-09,3,41,27
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2025-09,1,34,24
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-10,1,326,160
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2025-10,1,42,19
+Altinity/clickhouse-grafana,Selfeer <selfeers@gmail.com>,2025-10,5,284,141
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-11,14,6280,5918
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2025-11,5,8167,8124
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-11,2,84,75
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2025-12,8,298,138
+Altinity/clickhouse-grafana,Selfeer <selfeers@gmail.com>,2025-12,3,3,4
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2026-01,5,1091,62
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2026-01,12,1107,77
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2026-01,1,5,4
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-01,1,3,4
+Altinity/clickhouse-grafana,slach <bloodjazman@gmail.com>,2026-01,5,307,57
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2026-02,19,875,647
+Altinity/clickhouse-grafana,Rishub Kumar <rishub.kumar@olacabs.com>,2026-02,1,1,1
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2026-02,7,299,79
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-02,5,135,165
+Altinity/clickhouse-grafana,slach <bloodjazman@gmail.com>,2026-02,7,364,114
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2026-03,52,12357,8824
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2026-03,11,491,141
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2026-03,1,377,228
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-03,8,692,509
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2026-04,12,526,210
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2026-04,6,1954,459
+Altinity/clickhouse-grafana,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-04,4,10,13
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2026-05,7,519,183
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2026-05,1,33,45
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2026-05,5,1726,1798
+Altinity/clickhouse-grafana,Eugene Klimov <eklimov@altinity.com>,2026-06,8,6010,4625
+Altinity/clickhouse-grafana,Olli-Pekka Lehto <olehto@jumptrading.com>,2026-06,1,171,32
+Altinity/clickhouse-grafana,Roman M <lunaticsugreen@gmail.com>,2026-06,6,1954,459
+Altinity/clickhouse-grafana,Roman M <lunaticusgreen@gmail.com>,2026-06,1,239,0
+Altinity/clickhouse-grafana,Roman Misyurin <lunaticusgreen@users.noreply.github.com>,2026-06,1,171,32
+Anemll/Anemll,Anemll <RealAnemll@gmail.com>,2025-02,1,915,282
+Anemll/Anemll,anemll <realanemll@gmail.com>,2025-02,7,1827,419
+Anemll/Anemll,Anemll <RealAnemll@gmail.com>,2025-04,1,22554,178
+Anemll/Anemll,anemll <realanemll@gmail.com>,2025-04,4,584,245
+Anemll/Anemll,Anemll <RealAnemll@gmail.com>,2025-05,1,2,2
+Anemll/Anemll,Anemll <RealAnemll@gmail.com>,2025-06,14,3842,913
+Anemll/Anemll,anemll <alex@streambox.com>,2025-06,26,53403,3740
+Anemll/Anemll,anemll <realanemll@gmail.com>,2025-06,25,34042,4501
+Anemll/Anemll,Anemll <RealAnemll@gmail.com>,2025-07,1,5389,567
+Anemll/Anemll,Anemll <RealAnemll@gmail.com>,2026-02,4,59286,19591
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2018-05,81,3747,2479
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2018-06,35,355,171
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2018-06,21,416,137
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2018-07,10,390,132
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2018-08,22,442,244
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2018-08,3,518,46
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2018-09,10,53,178
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2018-10,24,457,138
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2018-11,7,101,42
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2018-12,6,215,119
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2019-01,8,87,245
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2019-02,12,81,39
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2019-03,12,3906,3895
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2019-04,31,1828,1772
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2019-04,1,2,4
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2019-05,5,12,12
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2019-05,1,3,1
+Apocrathia/home-assistant-config,Ross Dargan <rossdargan@users.noreply.github.com>,2019-05,1,3,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2019-06,4,68,101
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2019-07,2,4,1
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2019-09,4,20,15
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2019-12,4,836,1852
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2019-12,1,2,7
+Apocrathia/home-assistant-config,root <root@a0d7b954-vscode.local.hass.io>,2019-12,1,746,1842
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-01,18,400,187
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-02,31,350,115
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-03,39,429,253
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-04,15,238,83
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-05,13,181,248
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-06,3,4,63
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-07,6,63,32
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-08,14,668,110
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2020-08,1,10,0
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-09,5,195,75
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-10,26,585,145
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2020-10,5,221,3
+Apocrathia/home-assistant-config,Richard <contact@richardsoloman.com>,2020-10,1,3,3
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-11,21,697,257
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2020-11,1,3,3
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2020-12,9,178,71
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-01,21,381,260
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-02,23,390,82
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2021-02,1,2,2
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-03,19,279,148
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-04,33,610,771
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-05,8,1669,1691
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-06,12,153,130
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-07,15,338,645
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-09,10,204,38
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-10,3,63,4
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-11,9,84,184
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2021-12,15,197,78
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2021-12,2,8,8
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2021-12,2,8,8
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-01,10,288,275
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2022-01,1,5,0
+Apocrathia/home-assistant-config,Renovate Bot <bot@renovateapp.com>,2022-01,1,5,0
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-03,22,1026,821
+Apocrathia/home-assistant-config,DeepSource Bot <bot@deepsource.io>,2022-03,1,16,0
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2022-03,5,205,127
+Apocrathia/home-assistant-config,Renovate Bot <bot@renovateapp.com>,2022-03,1,5,5
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-04,5,177,14
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-05,16,254,176
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-06,5,83,19
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-08,1,22,9
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-09,10,64,67
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-10,8,140,66
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2022-12,5,124,44
+Apocrathia/home-assistant-config,Brandon Shutter <brandon@brandonshutter.com>,2023-01,1,1,1
+Apocrathia/home-assistant-config,iraklis10 <1414477+iraklis10@users.noreply.github.com>,2023-01,1,1,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-02,13,384,208
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2023-02,3,378,202
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-05,11,402,237
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2023-05,2,78,3
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-06,11,108,78
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-07,3,25,4
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2023-07,8,17,12
+Apocrathia/home-assistant-config,renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>,2023-07,7,11,11
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-08,4,249,106
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-09,1,66,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-10,7,47,44
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-11,13,635,346
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2023-12,3,84,107
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2023-12,1,1,1
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2023-12,1,1,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2024-01,5,32,22
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-02,1,1,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2024-03,3,14,147
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2024-04,6,108,40
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2024-05,4,99,25
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2024-05,7,11,11
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-05,1,5,5
+Apocrathia/home-assistant-config,renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>,2024-05,5,5,5
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-06,1,5,5
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2024-07,14,493,54
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2024-07,2,6,6
+Apocrathia/home-assistant-config,renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>,2024-07,1,1,1
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2024-10,1,5,5
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2024-11,35,300,417
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2024-11,6,10,19
+Apocrathia/home-assistant-config,renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>,2024-11,5,5,14
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2024-12,2,26,8
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-01,21,464,212
+Apocrathia/home-assistant-config,renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>,2025-01,1,1,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-02,7,207,78
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-03,4,16,9
+Apocrathia/home-assistant-config,renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>,2025-05,1,1,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-06,1,14,2
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-07,17,832,140
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2025-07,5,12,10
+Apocrathia/home-assistant-config,renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>,2025-07,4,11,9
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-08,5,125,27
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2025-08,1,4,4
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-08,1,4,4
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2025-09,1,1,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-10,3,5,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2025-11,1,27,8
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2026-01,13,982,292
+Apocrathia/home-assistant-config,dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>,2026-01,1,4,4
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2026-03,2,2,1
+Apocrathia/home-assistant-config,Apocrathia <ian@apocrathia.com>,2026-04,10,571,86
+Apocrathia/home-assistant-config,Ian <ian@apocrathia.com>,2026-04,2,5,5
+Apocrathia/home-assistant-config,ESPHome Device Builder <device-builder@esphome.io>,2026-06,4,103,2
+Aronnaxx/Behold-Urwar-Droid-Concepts,Ethan W. <79958715+Aronnaxx@users.noreply.github.com>,2025-03,10,15116,12370
+Aronnaxx/Behold-Urwar-Droid-Concepts,Ethan Wyant <wyantethan@gmail.com>,2025-03,12,321215,317454
+Aronnaxx/Behold-Urwar-Droid-Concepts,wyantethan <wyantethan@gmail.com>,2025-03,42,20763,14871
+Aronnaxx/Behold-Urwar-Droid-Concepts,Ethan W. <79958715+Aronnaxx@users.noreply.github.com>,2025-04,2,3,1
+Aronnaxx/Behold-Urwar-Droid-Concepts,Ethan Wyant <wyantethan@gmail.com>,2025-06,1,3,3
+Aronnaxx/Behold-Urwar-Droid-Concepts,Ethan Wyant <wyantethan@gmail.com>,2025-08,1,1009,1

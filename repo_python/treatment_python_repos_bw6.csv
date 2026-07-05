@@ -1,0 +1,20 @@
+repo_name,event_month,panel_first_month,panel_latest_month,panel_month_count,min_relative_month,max_relative_month,pre_panel_months,event_months,post_panel_months,balanced_window,repo_primary_language,repo_stars,repo_commits,repo_contributors,repo_size,repo_languages
+VRSEN/agency-swarm,2024-10,2024-01,2025-08,20,-9,10,9,1,10,9,Python,3605,574.0,16.0,5947.0,Python: 389581; Jupyter Notebook: 87169; HTML: 1038
+ericmjl/llamabot,2024-09,2024-01,2025-08,20,-8,11,8,1,11,8,Python,135,1656.0,12.0,4822.0,Python: 385531; Jupyter Notebook: 353882; HTML: 20441; CSS: 7743; Dockerfile: 871; JavaScript: 624
+OpenMOSS/Language-Model-SAEs,2024-12,2024-03,2025-07,17,-9,7,9,1,7,7,Python,105,577.0,8.0,10244.0,Python: 412037; TypeScript: 196983; JavaScript: 3620; CSS: 1618; HTML: 383
+PrefectHQ/marvin,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,5586,3817.0,52.0,64290.0,Python: 450250; Jinja: 2905; Just: 1103; Mako: 494
+assafelovic/gpt-researcher,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,20634,2492.0,146.0,34132.0,Python: 431237; TypeScript: 114500; CSS: 18459; JavaScript: 17539; HTML: 11108; Dockerfile: 2886; Shell: 1214; Procfile: 78
+atopile/atopile,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,2054,2489.0,32.0,108255.0,Python: 2160023; C++: 103410; TypeScript: 30583; ANTLR: 11517; CMake: 2916; JavaScript: 2040; Shell: 397
+terryyin/lizard,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,1938,1117.0,49.0,2881.0,Python: 530214; Less: 175512; HTML: 102979; JavaScript: 77780; PHP: 4914; CSS: 4084; XSLT: 2233; Makefile: 1026; Nix: 896; Shell: 504; C: 76
+tsukumijima/KonomiTV,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,725,2994.0,18.0,161519.0,Python: 1295281; Vue: 769210; TypeScript: 686372; HTML: 7579; Dockerfile: 6249; SCSS: 2580; JavaScript: 83
+Apocrathia/home-assistant-config,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,Python,182,1000.0,9.0,3652.0,Python: 2728; C++: 2037; Shell: 983
+ChatFAQ/ChatFAQ,2024-09,2024-02,2025-03,14,-7,6,7,1,6,6,Python,128,1391.0,8.0,14270.0,Python: 1066102; Vue: 363332; SCSS: 43290; JavaScript: 37927; Dockerfile: 5938; TypeScript: 2181; Makefile: 1927; Shell: 989
+DutchCryptoDad/bamboo-ta,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,Python,12,129.0,1.0,30773.0,Python: 1952044
+KroMiose/nekro-agent,2025-01,2024-07,2025-08,14,-6,7,6,1,7,6,Python,149,434.0,4.0,5649.0,Python: 454387; TypeScript: 308345; Shell: 18151; JavaScript: 1106; HTML: 366; CSS: 245
+Metta-AI/metta,2025-02,2024-08,2025-08,13,-6,6,6,1,6,6,Python,21,686.0,8.0,2270.0,Python: 391836; Shell: 18076; HTML: 3811; Dockerfile: 1282
+PostHog/posthog,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,Python,25398,22659.0,275.0,2044832.0,Python: 22679665; TypeScript: 20277702; Rust: 1867097; C++: 686533; JavaScript: 451915; SCSS: 324234; HTML: 144866; Shell: 93437; Go: 39846; Perl: 35898; MDX: 33574; ANTLR: 23533; Dockerfile: 17237; PLpgSQL: 9521; EJS: 4831; Smarty: 1517; CSS: 520; C: 285
+allthingslinux/tux,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,Python,93,1908.0,35.0,11944.0,Python: 742055; Dockerfile: 2806
+cgevans/qslib,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,Python,10,447.0,2.0,1237.0,Python: 395024; Rust: 206027
+getsentry/sentry,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,Python,40425,82057.0,337.0,590738.0,Python: 42565515; TypeScript: 33301709; HTML: 265688; Less: 219675; Lua: 74682; JavaScript: 55575; PEG.js: 20144; Shell: 17052; Makefile: 7073; Dockerfile: 4296; EJS: 1803; Ruby: 708
+kenshiro-o/nagato-ai,2025-02,2024-03,2025-08,18,-11,6,11,1,6,6,Python,115,115.0,1.0,38216.0,Python: 614025; Makefile: 1196
+tw-haiven/haiven,2025-02,2024-04,2025-08,17,-10,6,10,1,6,6,Python,129,1331.0,10.0,43524.0,Python: 320430; JavaScript: 277810; CSS: 135713; Shell: 2565; HTML: 1992; Dockerfile: 1452

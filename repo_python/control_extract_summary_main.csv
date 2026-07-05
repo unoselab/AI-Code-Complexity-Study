@@ -1,0 +1,15 @@
+metric,value
+treatment_sample_rows,118
+full_adopter_population_rows,830
+matching_rows_for_treatment_sample,110
+treatments_missing_matching_row,8
+raw_matched_pair_rows,330
+clean_matched_pair_rows,327
+removed_overlap_pair_rows,3
+raw_unique_control_repos,156
+clean_unique_control_repos,155
+removed_overlap_unique_control_repos,1
+current_treatment_overlap_unique_control_repos,0
+full_adopter_overlap_unique_control_repos,1
+treatment_repos_with_clean_pairs,110
+treatment_repos_missing_after_cleaning,8
