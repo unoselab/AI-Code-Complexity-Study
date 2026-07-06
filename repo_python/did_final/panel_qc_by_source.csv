@@ -1,0 +1,9 @@
+panel,dataset_source,repos,rows,post_rows
+flexible,treatment,110,917,471
+flexible,control,122,789,0
+strict,treatment,100,853,432
+strict,control,120,780,0
+flexible_window_driven,treatment,110,1384,829
+flexible_window_driven,control,153,2420,0
+strict_window_driven,treatment,100,1264,736
+strict_window_driven,control,151,2399,0

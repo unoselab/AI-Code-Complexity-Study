@@ -1,0 +1,6 @@
+CACHE_STATUS=run_full
+CACHE_REASON=missing_required_outputs
+MISSING_OUTPUTS=repo_python/control_did_smoke/ts_repos_monthly.csv;repo_python/control_did_smoke/ts_contributors_monthly.csv;repo_python/control_did_smoke/cursor_commits.csv;repo_python/control_did_smoke/ai_adoption_dates.csv
+REQUESTED_REPOS=5
+MISSING_REPOS=5
+MISSING_REPOS_FILE=repo_python/control_did_smoke/run-py-1j_missing_repos_20260705-200115.csv

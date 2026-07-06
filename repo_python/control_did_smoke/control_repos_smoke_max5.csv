@@ -1,0 +1,6 @@
+repo_name,status,target_dir,note,status_norm
+00sapo/taskcheck,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/00sapo_taskcheck,already_has_git_dir,skipped_existing
+2019211474/DL-NASA-SOH-CNN-BILSTM-Attention,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/2019211474_DL-NASA-SOH-CNN-BILSTM-Attention,already_has_git_dir,skipped_existing
+4mritGiri/NumberTracker,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/4mritGiri_NumberTracker,already_has_git_dir,skipped_existing
+666wcy/ARPT-Bot,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/666wcy_ARPT-Bot,already_has_git_dir,skipped_existing
+AkariAsai/ScholarQABench,skipped_existing,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench,already_has_git_dir,skipped_existing

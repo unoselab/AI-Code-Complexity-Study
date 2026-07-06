@@ -1,0 +1,3 @@
+repo_name,status,target_dir,note,status_norm
+QiuChenly/InjectLib,failed,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/QiuChenly_InjectLib,Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/QiuChenly_InjectLib'... fatal: could not read Username for 'https://github.com': terminal prompts disabled,failed
+justin4ai/Quark,failed,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/justin4ai_Quark,Cloning into '/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/justin4ai_Quark'... fatal: could not read Username for 'https://github.com': terminal prompts disabled,failed
