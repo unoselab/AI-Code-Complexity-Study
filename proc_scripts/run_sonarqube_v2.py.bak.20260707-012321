@@ -370,12 +370,7 @@ def wait_for_analysis_ready(
 
 
 def process_repository(
-    ts_df: pd.DataFrame,
-    repo_name: str,
-    aggregation: str,
-    clone_dir: Path,
-    language_profile: str = "generic",
-    project_key_prefix: str = "",
+    ts_df: pd.DataFrame, repo_name: str, aggregation: str, clone_dir: Path, language_profile: str = "generic",
 ) -> pd.DataFrame:
     """
     Process a single repository's SonarQube analysis.
@@ -390,9 +385,8 @@ def process_repository(
         pd.DataFrame: Updated time series dataframe for this repository.
     """
     # Setup repository info and data.
-    base_project_key = repo_name.replace("/", "_")
-    project_key = f"{project_key_prefix}{base_project_key}"
-    repo_path = Path(clone_dir) / base_project_key
+    project_key = repo_name.replace("/", "_")
+    repo_path = Path(clone_dir) / project_key
 
     if not repo_path.exists():
         logging.warning("Repository %s not found at %s", repo_name, repo_path)
@@ -623,16 +617,6 @@ def main() -> None:
         ),
     )
 
-    parser.add_argument(
-        "--project-key-prefix",
-        default="",
-        help=(
-            "Optional prefix added to SonarQube project keys. "
-            "Use this for from-scratch rescans without deleting existing SonarQube projects, "
-            "for example: pyv2_."
-        ),
-    )
-
     args = parser.parse_args()
     TIME_KEY = "week" if args.aggregation == "week" else "month"
 
@@ -671,7 +655,6 @@ def main() -> None:
     logging.info("Using clone directory: %s", clone_dir)
     logging.info("Using num processes: %s", args.num_processes)
     logging.info("Using language profile: %s", args.language_profile)
-    logging.info("Using project key prefix: %s", args.project_key_prefix)
 
     # Read repository time series data and adoption data
     try:
@@ -693,7 +676,7 @@ def main() -> None:
     repo_names = sorted(set(ts_df["repo_name"].unique()) - set(REPO_IGNORE))
 
     args_list = [
-        (ts_df, repo_name, args.aggregation, clone_dir, args.language_profile, args.project_key_prefix)
+        (ts_df, repo_name, args.aggregation, clone_dir, args.language_profile)
         for repo_name in repo_names
     ]
 

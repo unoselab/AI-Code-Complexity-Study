@@ -35,8 +35,6 @@ set -euo pipefail
 TARGET="${TARGET:-treatment}"
 PANEL_VARIANT="${PANEL_VARIANT:-flexible}"
 LANGUAGE_PROFILE="${LANGUAGE_PROFILE:-python}"
-PROJECT_KEY_PREFIX="${PROJECT_KEY_PREFIX:-}"
-OUTPUT_SUFFIX="${OUTPUT_SUFFIX:-}"
 
 if [[ "${TARGET}" != "treatment" && "${TARGET}" != "control" ]]; then
   echo "ERROR: TARGET must be either 'treatment' or 'control'. Got: ${TARGET}"
@@ -61,19 +59,11 @@ AGGREGATION="${AGGREGATION:-month}"
 
 if [[ "${TARGET}" == "treatment" ]]; then
   INPUT_FILE="${INPUT_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly.csv}"
-  if [[ -n "${OUTPUT_SUFFIX}" ]]; then
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly_scanned_${OUTPUT_SUFFIX}.csv}"
-  else
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly_scanned.csv}"
-  fi
+  OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly_scanned.csv}"
   CLONE_DIR="${CLONE_DIR:-../treatment-repos}"
 else
   INPUT_FILE="${INPUT_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly.csv}"
-  if [[ -n "${OUTPUT_SUFFIX}" ]]; then
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly_scanned_${OUTPUT_SUFFIX}.csv}"
-  else
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly_scanned.csv}"
-  fi
+  OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly_scanned.csv}"
   CLONE_DIR="${CLONE_DIR:-../control-repos}"
 fi
 
@@ -114,8 +104,6 @@ export SONAR_SCANNER_PATH="${SONAR_PATH}"
   echo "Output file:   ${OUTPUT_FILE}"
   echo "Clone dir:     ${CLONE_DIR}"
   echo "Language:      ${LANGUAGE_PROFILE}"
-  echo "Project prefix:${PROJECT_KEY_PREFIX}"
-  echo "Output suffix: ${OUTPUT_SUFFIX}"
   echo "Num processes: ${NUM_PROCESSES}"
   echo "Log file:      ${LOG_FILE}"
   echo "============================================================"
@@ -198,7 +186,6 @@ PY
     --clone-dir "${CLONE_DIR}"
     --num-processes "${NUM_PROCESSES}"
     --language-profile "${LANGUAGE_PROFILE}"
-    --project-key-prefix "${PROJECT_KEY_PREFIX}"
     --incremental-save
   )
 
