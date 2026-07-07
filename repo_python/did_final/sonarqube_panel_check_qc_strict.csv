@@ -1,0 +1,2 @@
+panel,input_file,rows,repos,treatment_rows,control_rows,missing_analysis_rows,missing_analysis_repos,missing_output_file
+strict,repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv,1633,220,853,780,29,15,repo_python/did_final/panel_event_matched_strict_with_sonarqube_missing_analysis_outcomes.csv

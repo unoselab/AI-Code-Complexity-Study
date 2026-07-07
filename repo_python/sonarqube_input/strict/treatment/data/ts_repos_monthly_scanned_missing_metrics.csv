@@ -1,0 +1,11 @@
+repo_name,month,latest_commit,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
+getsentry/sentry,2025-03,2d92281805254325dbedb3cafcfdd53d09b1d9df,,,,,,,,
+getsentry/sentry,2025-04,32cb664b86c13cc020c06f7e208cd9a62e6891a0,,,,,,,,
+getsentry/sentry,2025-05,975f8d773e5a6c5ed6595176a42ff31e887ec95d,,,,,,,,
+hyperb1iss/droidmind,2025-02,0d7eb7376eb0578b3aae50e0c5bd1cdec205a368,,0.0,0.0,0.0,,,,0.0
+ilanbenb/wa_llm,2024-12,f56e3e01bc6dc3f46168b179967818623657dda1,,0.0,0.0,0.0,,,,0.0
+trycua/cua,2025-01,19a07d24d3c1207aa0809c77975087d92c070b0a,,0.0,0.0,0.0,,,,0.0
+trycua/cua,2025-02,b187511acfabe7fad390c581961fb7718748d07d,,0.0,0.0,0.0,,,,0.0
+zauberzeug/nicegui,2024-08,06921814203898f7f83abb27899f34082e76f804,,,,,,,,
+zauberzeug/nicegui,2024-09,b7b6956f26ba5e731ec2f7feae53b604f624495c,,,,,,,,
+zauberzeug/nicegui,2024-10,c810dda1c4380fd0cca20a40dfe78653af080f38,,,,,,,,

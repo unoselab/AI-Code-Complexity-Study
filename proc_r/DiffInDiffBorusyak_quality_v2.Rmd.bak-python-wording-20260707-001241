@@ -1,5 +1,5 @@
 ---
-title: "Diff-in-Diff Borusyak: Python SonarQube Quality Outcomes"
+title: "Diff-in-Diff Borusyak: JS/TS SonarQube Quality Outcomes"
 output:
   html_document:
     toc: true
@@ -37,7 +37,7 @@ if (panel_path == "") {
 if (out_dir == "") {
   out_dir <- file.path(
     project_root,
-    "repo_python/did_final/quality_did_borusyak",
+    "tmp_jsts_test/data/jsts_did_final/quality_did_borusyak",
     panel_label
   )
 }
@@ -47,9 +47,9 @@ dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 # Purpose
 
-This notebook runs Borusyak imputation DiD analysis for Python SonarQube quality outcomes.
+This notebook runs Borusyak imputation DiD analysis for JS/TS SonarQube quality outcomes.
 
-The input files are complete-case quality DiD inputs produced by run-py-2e.
+The input files are complete-case quality DiD inputs produced by run9e.
 
 # Load Packages and Helper Functions
 
@@ -485,7 +485,7 @@ if (nrow(dynamic_df) > 0) {
     facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
     labs(
       title = paste("Borusyak Quality DiD:", panel_label),
-      subtitle = "Python quality DiD input from run-py-2e complete-case panel",
+      subtitle = "JS/TS quality DiD input from run9e complete-case panel",
       x = "Months Relative to Cursor Adoption",
       y = "Treatment Effect",
       caption = "Filled dots: CI excludes 0. Hollow dots: CI includes 0."
@@ -536,8 +536,8 @@ metadata <- data.frame(
     first_stage_rhs,
     "Borusyak imputation via didimputation::did_imputation",
     "YYYY-MM converted to month_id = year * 12 + month",
-    "run-py-2e complete-case quality DiD input",
-    "Use flexible as the sample-coverage panel and strict as the 1:3 matching-rule panel"
+    "run9e complete-case quality DiD input",
+    "Use main panel as primary analysis and other panels as robustness checks"
   )
 )
 

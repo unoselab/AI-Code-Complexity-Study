@@ -188,3 +188,4 @@ cython_debug/
 dataset_zenodo/
 data_baseline_backup
 xrun.sh
+*.tar.gz

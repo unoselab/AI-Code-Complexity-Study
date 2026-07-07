@@ -1,26 +1,246 @@
-[       4096]  .
-├── [       4096]  flexible
-│   ├── [       4096]  control
-│   │   └── [       4096]  data
-│   │       └── [     131109]  ts_repos_monthly.csv
-│   ├── [       2955]  control_repos.txt
-│   ├── [        160]  months.txt
-│   ├── [        319]  sonarqube_input_summary.csv
-│   ├── [       4096]  treatment
-│   │   └── [       4096]  data
-│   │       └── [      99566]  ts_repos_monthly.csv
-│   └── [       2623]  treatment_repos.txt
-└── [       4096]  strict
-    ├── [       4096]  control
-    │   └── [       4096]  data
-    │       └── [     129690]  ts_repos_monthly.csv
-    ├── [       2918]  control_repos.txt
-    ├── [        160]  months.txt
-    ├── [        315]  sonarqube_input_summary.csv
-    ├── [       4096]  treatment
-    │   └── [       4096]  data
-    │       ├── [      90965]  ts_repos_monthly.csv
-    │       └── [     101199]  ts_repos_monthly_scanned.csv
-    └── [       2393]  treatment_repos.txt
+[Checking Result 1]
 
-10 directories, 13 files
+===== strict treatment scanned output basic check =====
+1265 repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly.csv
+1265 repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly_scanned.csv
+Rows: 1264
+Repos: 100
+Months: 2024-01 to 2025-08
+Missing latest_commit: 0
+Duplicate repo-month rows: 0
+
+Metric coverage:
+ncloc: 1254 / 1264 non-null
+bugs: 1258 / 1264 non-null
+vulnerabilities: 1258 / 1264 non-null
+code_smells: 1258 / 1264 non-null
+duplicated_lines_density: 1254 / 1264 non-null
+comment_lines_density: 1254 / 1264 non-null
+cognitive_complexity: 1254 / 1264 non-null
+technical_debt: 1258 / 1264 non-null
+software_quality_maintainability_remediation_effort: MISSING
+
+
+[Checking Result 2]
+
+
+
+===== rows with missing key SonarQube metrics =====
+Rows with any missing key metric: 10
+Repos with any missing key metric: 5
+
+Missing rows:
+           repo_name   month                            latest_commit  ncloc  bugs  vulnerabilities  code_smells  duplicated_lines_density  comment_lines_density  cognitive_complexity  technical_debt
+    getsentry/sentry 2025-03 2d92281805254325dbedb3cafcfdd53d09b1d9df    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
+    getsentry/sentry 2025-04 32cb664b86c13cc020c06f7e208cd9a62e6891a0    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
+    getsentry/sentry 2025-05 975f8d773e5a6c5ed6595176a42ff31e887ec95d    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
+hyperb1iss/droidmind 2025-02 0d7eb7376eb0578b3aae50e0c5bd1cdec205a368    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
+     ilanbenb/wa_llm 2024-12 f56e3e01bc6dc3f46168b179967818623657dda1    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
+          trycua/cua 2025-01 19a07d24d3c1207aa0809c77975087d92c070b0a    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
+          trycua/cua 2025-02 b187511acfabe7fad390c581961fb7718748d07d    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
+  zauberzeug/nicegui 2024-08 06921814203898f7f83abb27899f34082e76f804    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
+  zauberzeug/nicegui 2024-09 b7b6956f26ba5e731ec2f7feae53b604f624495c    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
+  zauberzeug/nicegui 2024-10 c810dda1c4380fd0cca20a40dfe78653af080f38    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
+
+Missing rows by repo:
+repo_name
+getsentry/sentry        3
+zauberzeug/nicegui      3
+trycua/cua              2
+ilanbenb/wa_llm         1
+hyperb1iss/droidmind    1
+
+
+[Checking Result 3]
+
+
+
+===== scan log error/warning check =====
+4855:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4856:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4857:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4862:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4864:	at io.grpc.Status.asRuntimeException(Status.java:532)
+4870:2026-07-06 05:46:36,613 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-03
+4872:2026-07-06 05:50:59,767 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-04: 05:49:28.029 ERROR TypeError: Cannot read properties of undefined (reading 'name')
+4893:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4894:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4895:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4921:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4923:	at io.grpc.Status.asRuntimeException(Status.java:532)
+4929:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4930:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4931:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4957:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4959:	at io.grpc.Status.asRuntimeException(Status.java:532)
+4966:java.lang.IllegalStateException: Analysis of JS/TS files failed
+4990:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4991:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4992:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4997:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4999:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5005:2026-07-06 05:50:59,767 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-04
+5007:2026-07-06 05:55:28,327 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-05: 05:53:36.456 ERROR TypeError: Cannot read properties of undefined (reading 'name')
+5028:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+5029:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+5030:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+5056:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+5058:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5064:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+5065:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+5066:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+5092:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+5094:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5101:java.lang.IllegalStateException: Analysis of JS/TS files failed
+5125:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+5126:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+5127:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+5132:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+5134:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5140:2026-07-06 05:55:28,327 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-05
+5196:2026-07-06 06:14:17,608 [ERROR] Failed to check existing analysis for grapeot_web_agentic_ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=grapeot_web_agentic_ai&category=VERSION&p=1&ps=100
+5249:2026-07-06 06:16:16,629 [ERROR] Failed to check existing analysis for hyperb1iss_droidmind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=hyperb1iss_droidmind&category=VERSION&p=1&ps=100
+5302:2026-07-06 06:18:02,795 [ERROR] Failed to check existing analysis for ilanbenb_wa_llm: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=ilanbenb_wa_llm&category=VERSION&p=1&ps=100
+5370:2026-07-06 06:20:12,621 [ERROR] Failed to check existing analysis for instructor-ai_instructor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=instructor-ai_instructor&category=VERSION&p=1&ps=100
+5514:2026-07-06 06:26:25,757 [ERROR] Failed to check existing analysis for jmurth1234_ClaudePlayer: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=jmurth1234_ClaudePlayer&category=VERSION&p=1&ps=100
+5567:2026-07-06 06:27:57,453 [ERROR] Failed to check existing analysis for keephq_keep: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=keephq_keep&category=VERSION&p=1&ps=100
+5720:2026-07-06 06:39:27,054 [ERROR] Failed to check existing analysis for leettools-dev_leettools: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=leettools-dev_leettools&category=VERSION&p=1&ps=100
+5787:2026-07-06 06:42:09,309 [ERROR] Failed to check existing analysis for loftwah_auto-jira: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=loftwah_auto-jira&category=VERSION&p=1&ps=100
+5840:2026-07-06 06:43:39,859 [ERROR] Failed to check existing analysis for lss233_kirara-ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=lss233_kirara-ai&category=VERSION&p=1&ps=100
+5984:2026-07-06 06:49:34,755 [ERROR] Failed to check existing analysis for martinnormark_neural-mesh-simplification: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=martinnormark_neural-mesh-simplification&category=VERSION&p=1&ps=100
+6079:2026-07-06 06:52:31,850 [ERROR] Failed to check existing analysis for matebenyovszky_healing-agent: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=matebenyovszky_healing-agent&category=VERSION&p=1&ps=100
+6160:2026-07-06 06:55:00,386 [ERROR] Failed to check existing analysis for namuan_trading-utils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=namuan_trading-utils&category=VERSION&p=1&ps=100
+6443:2026-07-06 07:05:14,420 [ERROR] Failed to check existing analysis for osomai_servicenow-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=osomai_servicenow-mcp&category=VERSION&p=1&ps=100
+6489:2026-07-06 07:06:40,610 [ERROR] Failed to check existing analysis for panther-labs_panther-analysis: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=panther-labs_panther-analysis&category=VERSION&p=1&ps=100
+6633:2026-07-06 07:12:42,830 [ERROR] Failed to check existing analysis for raphaelmansuy_code2prompt: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_code2prompt&category=VERSION&p=1&ps=100
+6763:2026-07-06 07:16:46,679 [ERROR] Failed to check existing analysis for raphaelmansuy_iteration_of_tought: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_iteration_of_tought&category=VERSION&p=1&ps=100
+6851:2026-07-06 07:19:22,394 [ERROR] Failed to check existing analysis for samuelgursky_davinci-resolve-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=samuelgursky_davinci-resolve-mcp&category=VERSION&p=1&ps=100
+6897:2026-07-06 07:20:50,452 [ERROR] Failed to check existing analysis for sbomify_sbomify: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sbomify_sbomify&category=VERSION&p=1&ps=100
+6996:2026-07-06 07:23:57,236 [ERROR] Failed to check existing analysis for smartian1_tgtrader: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smartian1_tgtrader&category=VERSION&p=1&ps=100
+7063:2026-07-06 07:26:35,281 [ERROR] Failed to check existing analysis for smorin_py-launch-blueprint: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smorin_py-launch-blueprint&category=VERSION&p=1&ps=100
+7123:2026-07-06 07:28:38,155 [ERROR] Failed to check existing analysis for sshtunnelvision_MCP-LOGO-GEN: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sshtunnelvision_MCP-LOGO-GEN&category=VERSION&p=1&ps=100
+7169:2026-07-06 07:29:56,920 [ERROR] Failed to check existing analysis for synaptiai_prompt-decorators: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=synaptiai_prompt-decorators&category=VERSION&p=1&ps=100
+7222:2026-07-06 07:31:41,185 [ERROR] Failed to check existing analysis for terryyin_lizard: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=terryyin_lizard&category=VERSION&p=1&ps=100
+7366:2026-07-06 07:40:35,221 [ERROR] Failed to check existing analysis for tmux-python_tmuxp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tmux-python_tmuxp&category=VERSION&p=1&ps=100
+7510:2026-07-06 07:46:11,112 [ERROR] Failed to check existing analysis for tony_django-docutils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-docutils&category=VERSION&p=1&ps=100
+7654:2026-07-06 07:51:34,187 [ERROR] Failed to check existing analysis for tony_django-slugify-processor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-slugify-processor&category=VERSION&p=1&ps=100
+7798:2026-07-06 07:56:46,595 [ERROR] Failed to check existing analysis for trycua_cua: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=trycua_cua&category=VERSION&p=1&ps=100
+7857:2026-07-06 07:59:04,469 [ERROR] Failed to check existing analysis for tsukumijima_KonomiTV: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tsukumijima_KonomiTV&category=VERSION&p=1&ps=100
+8001:2026-07-06 08:06:40,069 [ERROR] Failed to check existing analysis for tw-haiven_haiven: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tw-haiven_haiven&category=VERSION&p=1&ps=100
+8165:2026-07-06 08:13:33,017 [ERROR] Failed to check existing analysis for vcs-python_vcspull: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vcs-python_vcspull&category=VERSION&p=1&ps=100
+8309:2026-07-06 08:18:53,829 [ERROR] Failed to check existing analysis for vietanhdev_anylabeling: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vietanhdev_anylabeling&category=VERSION&p=1&ps=100
+8678:2026-07-06 08:29:04,601 [ERROR] Failed to check existing analysis for whiteducksoftware_flock: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=whiteducksoftware_flock&category=VERSION&p=1&ps=100
+8731:2026-07-06 08:31:17,745 [ERROR] Failed to check existing analysis for xzq-xu_jvm-mcp-server: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=xzq-xu_jvm-mcp-server&category=VERSION&p=1&ps=100
+8777:2026-07-06 08:32:38,012 [ERROR] Failed to check existing analysis for yagami1997_CursorMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_CursorMind&category=VERSION&p=1&ps=100
+8823:2026-07-06 08:33:59,321 [ERROR] Failed to check existing analysis for yagami1997_TradeMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_TradeMind&category=VERSION&p=1&ps=100
+8876:2026-07-06 08:36:03,969 [ERROR] Failed to check existing analysis for yeagerai_genlayer-studio: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yeagerai_genlayer-studio&category=VERSION&p=1&ps=100
+9006:2026-07-06 08:41:59,442 [ERROR] Failed to check existing analysis for zauberzeug_nicegui: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zauberzeug_nicegui&category=VERSION&p=1&ps=100
+9230:2026-07-06 09:17:48,565 [ERROR] Failed to check existing analysis for zilliztech_mcp-server-milvus: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zilliztech_mcp-server-milvus&category=VERSION&p=1&ps=100
+
+
+
+
+
+[Checking Result 4]
+
+
+
+
+
+===== required before next scan =====
+1265 repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly_scanned.csv
+4855:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4856:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4857:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4862:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4864:	at io.grpc.Status.asRuntimeException(Status.java:532)
+4870:2026-07-06 05:46:36,613 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-03
+4872:2026-07-06 05:50:59,767 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-04: 05:49:28.029 ERROR TypeError: Cannot read properties of undefined (reading 'name')
+4893:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4894:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4895:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4921:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4923:	at io.grpc.Status.asRuntimeException(Status.java:532)
+4929:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4930:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4931:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4957:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4959:	at io.grpc.Status.asRuntimeException(Status.java:532)
+4966:java.lang.IllegalStateException: Analysis of JS/TS files failed
+4990:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+4991:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+4992:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+4997:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+4999:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5005:2026-07-06 05:50:59,767 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-04
+5007:2026-07-06 05:55:28,327 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-05: 05:53:36.456 ERROR TypeError: Cannot read properties of undefined (reading 'name')
+5028:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+5029:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+5030:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+5056:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+5058:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5064:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+5065:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+5066:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+5092:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+5094:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5101:java.lang.IllegalStateException: Analysis of JS/TS files failed
+5125:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
+5126:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
+5127:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
+5132:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
+5134:	at io.grpc.Status.asRuntimeException(Status.java:532)
+5140:2026-07-06 05:55:28,327 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-05
+5196:2026-07-06 06:14:17,608 [ERROR] Failed to check existing analysis for grapeot_web_agentic_ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=grapeot_web_agentic_ai&category=VERSION&p=1&ps=100
+5249:2026-07-06 06:16:16,629 [ERROR] Failed to check existing analysis for hyperb1iss_droidmind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=hyperb1iss_droidmind&category=VERSION&p=1&ps=100
+5302:2026-07-06 06:18:02,795 [ERROR] Failed to check existing analysis for ilanbenb_wa_llm: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=ilanbenb_wa_llm&category=VERSION&p=1&ps=100
+5370:2026-07-06 06:20:12,621 [ERROR] Failed to check existing analysis for instructor-ai_instructor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=instructor-ai_instructor&category=VERSION&p=1&ps=100
+5514:2026-07-06 06:26:25,757 [ERROR] Failed to check existing analysis for jmurth1234_ClaudePlayer: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=jmurth1234_ClaudePlayer&category=VERSION&p=1&ps=100
+5567:2026-07-06 06:27:57,453 [ERROR] Failed to check existing analysis for keephq_keep: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=keephq_keep&category=VERSION&p=1&ps=100
+5720:2026-07-06 06:39:27,054 [ERROR] Failed to check existing analysis for leettools-dev_leettools: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=leettools-dev_leettools&category=VERSION&p=1&ps=100
+5787:2026-07-06 06:42:09,309 [ERROR] Failed to check existing analysis for loftwah_auto-jira: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=loftwah_auto-jira&category=VERSION&p=1&ps=100
+5840:2026-07-06 06:43:39,859 [ERROR] Failed to check existing analysis for lss233_kirara-ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=lss233_kirara-ai&category=VERSION&p=1&ps=100
+5984:2026-07-06 06:49:34,755 [ERROR] Failed to check existing analysis for martinnormark_neural-mesh-simplification: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=martinnormark_neural-mesh-simplification&category=VERSION&p=1&ps=100
+6079:2026-07-06 06:52:31,850 [ERROR] Failed to check existing analysis for matebenyovszky_healing-agent: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=matebenyovszky_healing-agent&category=VERSION&p=1&ps=100
+6160:2026-07-06 06:55:00,386 [ERROR] Failed to check existing analysis for namuan_trading-utils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=namuan_trading-utils&category=VERSION&p=1&ps=100
+6443:2026-07-06 07:05:14,420 [ERROR] Failed to check existing analysis for osomai_servicenow-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=osomai_servicenow-mcp&category=VERSION&p=1&ps=100
+6489:2026-07-06 07:06:40,610 [ERROR] Failed to check existing analysis for panther-labs_panther-analysis: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=panther-labs_panther-analysis&category=VERSION&p=1&ps=100
+6633:2026-07-06 07:12:42,830 [ERROR] Failed to check existing analysis for raphaelmansuy_code2prompt: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_code2prompt&category=VERSION&p=1&ps=100
+6763:2026-07-06 07:16:46,679 [ERROR] Failed to check existing analysis for raphaelmansuy_iteration_of_tought: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_iteration_of_tought&category=VERSION&p=1&ps=100
+6851:2026-07-06 07:19:22,394 [ERROR] Failed to check existing analysis for samuelgursky_davinci-resolve-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=samuelgursky_davinci-resolve-mcp&category=VERSION&p=1&ps=100
+6897:2026-07-06 07:20:50,452 [ERROR] Failed to check existing analysis for sbomify_sbomify: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sbomify_sbomify&category=VERSION&p=1&ps=100
+6996:2026-07-06 07:23:57,236 [ERROR] Failed to check existing analysis for smartian1_tgtrader: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smartian1_tgtrader&category=VERSION&p=1&ps=100
+7063:2026-07-06 07:26:35,281 [ERROR] Failed to check existing analysis for smorin_py-launch-blueprint: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smorin_py-launch-blueprint&category=VERSION&p=1&ps=100
+7123:2026-07-06 07:28:38,155 [ERROR] Failed to check existing analysis for sshtunnelvision_MCP-LOGO-GEN: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sshtunnelvision_MCP-LOGO-GEN&category=VERSION&p=1&ps=100
+7169:2026-07-06 07:29:56,920 [ERROR] Failed to check existing analysis for synaptiai_prompt-decorators: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=synaptiai_prompt-decorators&category=VERSION&p=1&ps=100
+7222:2026-07-06 07:31:41,185 [ERROR] Failed to check existing analysis for terryyin_lizard: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=terryyin_lizard&category=VERSION&p=1&ps=100
+7366:2026-07-06 07:40:35,221 [ERROR] Failed to check existing analysis for tmux-python_tmuxp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tmux-python_tmuxp&category=VERSION&p=1&ps=100
+7510:2026-07-06 07:46:11,112 [ERROR] Failed to check existing analysis for tony_django-docutils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-docutils&category=VERSION&p=1&ps=100
+7654:2026-07-06 07:51:34,187 [ERROR] Failed to check existing analysis for tony_django-slugify-processor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-slugify-processor&category=VERSION&p=1&ps=100
+7798:2026-07-06 07:56:46,595 [ERROR] Failed to check existing analysis for trycua_cua: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=trycua_cua&category=VERSION&p=1&ps=100
+7857:2026-07-06 07:59:04,469 [ERROR] Failed to check existing analysis for tsukumijima_KonomiTV: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tsukumijima_KonomiTV&category=VERSION&p=1&ps=100
+8001:2026-07-06 08:06:40,069 [ERROR] Failed to check existing analysis for tw-haiven_haiven: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tw-haiven_haiven&category=VERSION&p=1&ps=100
+8165:2026-07-06 08:13:33,017 [ERROR] Failed to check existing analysis for vcs-python_vcspull: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vcs-python_vcspull&category=VERSION&p=1&ps=100
+8309:2026-07-06 08:18:53,829 [ERROR] Failed to check existing analysis for vietanhdev_anylabeling: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vietanhdev_anylabeling&category=VERSION&p=1&ps=100
+8678:2026-07-06 08:29:04,601 [ERROR] Failed to check existing analysis for whiteducksoftware_flock: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=whiteducksoftware_flock&category=VERSION&p=1&ps=100
+8731:2026-07-06 08:31:17,745 [ERROR] Failed to check existing analysis for xzq-xu_jvm-mcp-server: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=xzq-xu_jvm-mcp-server&category=VERSION&p=1&ps=100
+8777:2026-07-06 08:32:38,012 [ERROR] Failed to check existing analysis for yagami1997_CursorMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_CursorMind&category=VERSION&p=1&ps=100
+8823:2026-07-06 08:33:59,321 [ERROR] Failed to check existing analysis for yagami1997_TradeMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_TradeMind&category=VERSION&p=1&ps=100
+8876:2026-07-06 08:36:03,969 [ERROR] Failed to check existing analysis for yeagerai_genlayer-studio: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yeagerai_genlayer-studio&category=VERSION&p=1&ps=100
+9006:2026-07-06 08:41:59,442 [ERROR] Failed to check existing analysis for zauberzeug_nicegui: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zauberzeug_nicegui&category=VERSION&p=1&ps=100
+9230:2026-07-06 09:17:48,565 [ERROR] Failed to check existing analysis for zilliztech_mcp-server-milvus: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zilliztech_mcp-server-milvus&category=VERSION&p=1&ps=100
+Rows: 1264
+Rows with any missing key metric: 10
+Repos with any missing key metric: 5
+
+           repo_name   month                            latest_commit
+    getsentry/sentry 2025-03 2d92281805254325dbedb3cafcfdd53d09b1d9df
+    getsentry/sentry 2025-04 32cb664b86c13cc020c06f7e208cd9a62e6891a0
+    getsentry/sentry 2025-05 975f8d773e5a6c5ed6595176a42ff31e887ec95d
+hyperb1iss/droidmind 2025-02 0d7eb7376eb0578b3aae50e0c5bd1cdec205a368
+     ilanbenb/wa_llm 2024-12 f56e3e01bc6dc3f46168b179967818623657dda1
+          trycua/cua 2025-01 19a07d24d3c1207aa0809c77975087d92c070b0a
+          trycua/cua 2025-02 b187511acfabe7fad390c581961fb7718748d07d
+  zauberzeug/nicegui 2024-08 06921814203898f7f83abb27899f34082e76f804
+  zauberzeug/nicegui 2024-09 b7b6956f26ba5e731ec2f7feae53b604f624495c
+  zauberzeug/nicegui 2024-10 c810dda1c4380fd0cca20a40dfe78653af080f38
