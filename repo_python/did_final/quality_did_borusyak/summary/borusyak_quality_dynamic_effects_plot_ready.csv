@@ -1,0 +1,37 @@
+panel,panel_label,outcome,outcome_label,time,percent_change,conf_low_percent,conf_high_percent,ci_excludes_zero,stars
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,-6,1.5836322428137484,-6.10481323149844,9.901632818360383,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,-5,6.7119413591645305,-0.16259785513831337,14.05984314494546,False,+
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,-4,8.185079910355931,-0.5898135539526339,17.73452936397204,False,+
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,-3,12.977980583324156,1.4472319706253955,25.819343206740776,True,*
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,-2,4.262961254015396,-3.708739454142995,12.894618139091719,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,0,6.78362959429748,-9.281872713467509,25.694212285893457,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,1,10.528218648547472,-6.915036825044685,31.240177800360126,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,2,14.968755072748973,-4.88307918780142,38.9638618461519,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,3,3.296243616387784,-14.441705254241144,24.711624711116052,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,4,9.866418505184992,-9.782849321993348,33.79529085592219,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,5,13.112530599004412,-2.765584860879222,31.583499116076386,False,
+strict,Strict 1:3 matching-rule panel,log_static_analysis_warnings,Static analysis warnings,6,11.89751955055005,-8.702799913488379,37.14609943898615,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,-6,0.7522570143507323,-11.530587192600771,14.740416731202721,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,-5,-1.357505850930818,-13.953619430934438,13.082521165884952,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,-4,-5.824905607064023,-19.216206873483678,9.786233855454828,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,-3,-1.79371766141051,-16.6652718282543,15.73174956412322,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,-2,-7.658878076725606,-15.81114515029256,1.2827982192070486,False,+
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,0,-10.208724946289005,-26.41063627667637,9.560304204883895,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,1,-9.854959101313765,-26.845047133922883,11.081042092968051,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,2,-13.674846507660599,-31.41405955196751,8.652474206756079,False,
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,3,-23.765019337343173,-38.880915957262175,-4.910677775017913,True,*
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,4,-25.19100352559709,-41.03082203171867,-5.096422464674022,True,*
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,5,-21.47969546665821,-39.062732624145404,1.176808372140492,False,+
+strict,Strict 1:3 matching-rule panel,log_duplicate_line_density,Duplicate line density,6,-2.4416869812375896,-26.134099252261546,28.850042343228587,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,-6,-3.241292792133199,-7.25709381976829,0.9483938571386963,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,-5,-2.140805803227508,-5.538182221066634,1.378759312604938,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,-4,-2.874014107045797,-7.776217845561517,2.2887688544481533,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,-3,-3.7226623160548367,-8.385133293202562,1.1770914995029136,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,-2,-3.5117752280594217,-7.796170311166151,0.9717009701169843,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,0,5.510140706947042,-9.548090223317429,23.075232125939714,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,1,4.950922571169092,-15.097272393948913,29.73312470769791,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,2,3.807560188521597,-17.92667562465714,31.297344591672747,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,3,11.94170657960334,-7.091063037538936,34.873415643717976,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,4,9.401235768111116,-12.99666604208568,37.56519254054525,False,
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,5,20.12393094165823,-2.8638652559093147,48.55191451556211,False,+
+strict,Strict 1:3 matching-rule panel,log_code_complexity,Code complexity,6,-0.630090448070475,-17.22639531069017,19.293813063017673,False,

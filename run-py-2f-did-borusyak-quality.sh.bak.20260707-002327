@@ -50,7 +50,7 @@ LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2f_did_borusyak_quality_${PANEL_VARIANT}
 export PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
 
 DID_DIR="${DID_DIR:-repo_python/did_final}"
-RMD_FILE="${RMD_FILE:-proc_r/DiffInDiffBorusyak_quality_python_v2.Rmd}"
+RMD_FILE="${RMD_FILE:-proc_r/DiffInDiffBorusyak_quality_v2.Rmd}"
 HELPER_FILE="${HELPER_FILE:-proc_r/diff_in_diff_borusyak_helpers.R}"
 OUT_ROOT="${OUT_ROOT:-${DID_DIR}/quality_did_borusyak}"
 

@@ -1,0 +1,13 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_velocity_v2.Rmd
+helpers,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,flexible
+panel_path,repo_python/did_final/panel_event_matched_flexible.csv
+out_dir,repo_python/did_final/velocity_did_borusyak/flexible
+outcomes,"log_commits, log_lines_added"
+covariates,contributors_log
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,YYYY-MM converted to month_id = year * 12 + month
+cohort_filter,controls kept with event_yyyymm == 0; treatment cohorts kept if 202407 < event_yyyymm <= 202503
+input_source,run8e final matched panel
+interpretation_note,Use main panel as primary analysis and other panels as robustness checks

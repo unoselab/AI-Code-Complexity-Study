@@ -127,8 +127,61 @@ def check_analysis_exists(project_key: str, version: str) -> bool:
         return False
 
 
+def build_language_specific_sonar_args(language_profile: str) -> list[str]:
+    """Return language-specific SonarScanner CLI arguments.
+
+    Keep this function conservative because run_sonarqube_v2.py is used for
+    multiple programming languages.
+    """
+    profile = (language_profile or "generic").strip().lower()
+
+    common_args = [
+        "-Dsonar.sourceEncoding=UTF-8",
+        (
+            "-Dsonar.exclusions="
+            "**/.git/**,"
+            "**/__pycache__/**,"
+            "**/.venv/**,"
+            "**/venv/**,"
+            "**/env/**,"
+            "**/node_modules/**,"
+            "**/dist/**,"
+            "**/build/**,"
+            "**/.tox/**,"
+            "**/.mypy_cache/**,"
+            "**/.pytest_cache/**,"
+            "**/coverage/**,"
+            "**/.next/**,"
+            "**/.nuxt/**"
+        ),
+    ]
+
+    if profile in {"generic", "auto"}:
+        return common_args
+
+    if profile in {"python", "py"}:
+        return common_args + [
+            "-Dsonar.python.version=3.11",
+        ]
+
+    if profile in {"javascript", "typescript", "js", "ts", "js-ts", "jsts"}:
+        return common_args + [
+            # Keep JS/TS settings conservative. The scanner can usually find
+            # tsconfig.json files automatically.
+            # "-Dsonar.javascript.maxFileSize=1000",
+        ]
+
+    raise ValueError(
+        f"Unsupported language profile: {language_profile}. "
+        "Use one of: generic, python, js-ts."
+    )
+
+
+# def run_sonar_scan(
+#     repo_path: Path, commit_hash: str, version: str, project_key: str
+# ) -> bool:
 def run_sonar_scan(
-    repo_path: Path, commit_hash: str, version: str, project_key: str
+    repo_path: Path, commit_hash: str, version: str, project_key: str, language_profile: str = "generic",
 ) -> bool:
     """
     Run SonarQube scanner on a specific commit.
@@ -154,16 +207,28 @@ def run_sonar_scan(
 
         try:
             # Run sonar-scanner
+            # cmd = [
+            #     SONAR_PATH,
+            #     f"-Dsonar.projectKey={project_key}",
+            #     f"-Dsonar.projectName={project_key}",
+            #     f"-Dsonar.projectVersion={version}",
+            #     "-Dsonar.sources=.",
+            #     f"-Dsonar.java.binaries=.",  # Fix Java errors, hopefully we find some .class here
+            #     f"-Dsonar.host.url={SONAR_HOST}",
+            #     f"-Dsonar.token={SONAR_TOKEN}",
+            #     "-Dsonar.scm.disabled=true",  # Disable SCM to speed up analysis
+            # ]
             cmd = [
                 SONAR_PATH,
                 f"-Dsonar.projectKey={project_key}",
                 f"-Dsonar.projectName={project_key}",
                 f"-Dsonar.projectVersion={version}",
                 "-Dsonar.sources=.",
-                f"-Dsonar.java.binaries=.",  # Fix Java errors, hopefully we find some .class here
+                *build_language_specific_sonar_args(language_profile),
+                "-Dsonar.java.binaries=.",
                 f"-Dsonar.host.url={SONAR_HOST}",
                 f"-Dsonar.token={SONAR_TOKEN}",
-                "-Dsonar.scm.disabled=true",  # Disable SCM to speed up analysis
+                "-Dsonar.scm.disabled=true",
             ]
 
             subprocess.run(
@@ -305,10 +370,7 @@ def wait_for_analysis_ready(
 
 
 def process_repository(
-    ts_df: pd.DataFrame,
-    repo_name: str,
-    aggregation: str,
-    clone_dir: Path,
+    ts_df: pd.DataFrame, repo_name: str, aggregation: str, clone_dir: Path, language_profile: str = "generic",
 ) -> pd.DataFrame:
     """
     Process a single repository's SonarQube analysis.
@@ -368,10 +430,7 @@ def process_repository(
             logging.info("%s at %s (%s)", repo_name, time_period, commit_hash[:8])
 
             scan_result = run_sonar_scan(
-                repo_path,
-                commit_hash,
-                time_period,
-                project_key,
+                repo_path, commit_hash, time_period, project_key, language_profile,
             )
 
             # Some versions of run_sonar_scan may return None on success.
@@ -551,6 +610,13 @@ def main() -> None:
             "Recommended for long full scans."
         ),
     )
+    parser.add_argument(
+        "--language-profile", choices=["generic", "auto", "python", "py", "js-ts", "jsts", "javascript", "typescript", "js", "ts"],
+        default="generic", help=(
+            "Language-specific SonarQube scanner settings. " "Use 'python' for Python repos, 'js-ts' for JavaScript/TypeScript repos, " "or 'generic' for language-neutral scans."
+        ),
+    )
+
     args = parser.parse_args()
     TIME_KEY = "week" if args.aggregation == "week" else "month"
 
@@ -588,6 +654,7 @@ def main() -> None:
     logging.info("Using output file: %s", output_file)
     logging.info("Using clone directory: %s", clone_dir)
     logging.info("Using num processes: %s", args.num_processes)
+    logging.info("Using language profile: %s", args.language_profile)
 
     # Read repository time series data and adoption data
     try:
@@ -607,8 +674,9 @@ def main() -> None:
 
     # Get unique repository names.
     repo_names = sorted(set(ts_df["repo_name"].unique()) - set(REPO_IGNORE))
+
     args_list = [
-        (ts_df, repo_name, args.aggregation, clone_dir)
+        (ts_df, repo_name, args.aggregation, clone_dir, args.language_profile)
         for repo_name in repo_names
     ]
 

@@ -34,6 +34,7 @@ set -euo pipefail
 
 TARGET="${TARGET:-treatment}"
 PANEL_VARIANT="${PANEL_VARIANT:-flexible}"
+LANGUAGE_PROFILE="${LANGUAGE_PROFILE:-python}"
 
 if [[ "${TARGET}" != "treatment" && "${TARGET}" != "control" ]]; then
   echo "ERROR: TARGET must be either 'treatment' or 'control'. Got: ${TARGET}"
@@ -98,6 +99,7 @@ fi
   echo "Input file:    ${INPUT_FILE}"
   echo "Output file:   ${OUTPUT_FILE}"
   echo "Clone dir:     ${CLONE_DIR}"
+  echo "Language:      ${LANGUAGE_PROFILE}"
   echo "Num processes: ${NUM_PROCESSES}"
   echo "Log file:      ${LOG_FILE}"
   echo "============================================================"
@@ -179,6 +181,7 @@ PY
     --output-file "${OUTPUT_FILE}"
     --clone-dir "${CLONE_DIR}"
     --num-processes "${NUM_PROCESSES}"
+    --language-profile "${LANGUAGE_PROFILE}"
     --incremental-save
   )
 

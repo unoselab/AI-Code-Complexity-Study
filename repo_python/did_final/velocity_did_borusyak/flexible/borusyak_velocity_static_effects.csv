@@ -1,0 +1,3 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,panel,estimate_pct,conf_low_pct,conf_high_pct
+log_commits,treat,0.221026935553459,0.120950091864855,-0.0160352445016567,0.458089115608575,0.0676362486537121,Borusyak static treatment effect,Commits,flexible,24.7357028363495,-1.5907364410455,58.1049893006983
+log_lines_added,treat,1.02610970763697,0.258653358253764,0.519149125459591,1.53307028981434,7.27454294148362e-05,Borusyak static treatment effect,Lines Added,flexible,179.019003840416,68.0597063906318,363.237775288877
