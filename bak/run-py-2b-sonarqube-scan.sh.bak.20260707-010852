@@ -88,10 +88,6 @@ if [[ -n "${SONAR_PATH:-}" && -d "${SONAR_PATH}" && -x "${SONAR_PATH}/bin/sonar-
   export SONAR_PATH="${SONAR_PATH}/bin/sonar-scanner"
 fi
 
-# Keep both variable names synchronized because older/newer scripts may read either one.
-export SONAR_PATH
-export SONAR_SCANNER_PATH="${SONAR_PATH}"
-
 {
   echo "============================================================"
   echo "run-py-2b: Python SonarQube scan"

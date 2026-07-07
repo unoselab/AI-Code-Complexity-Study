@@ -31,7 +31,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 # Constants
-SONAR_PATH = os.getenv("SONAR_PATH") or os.getenv("SONAR_SCANNER_PATH")
+SONAR_PATH = os.getenv("SONAR_SCANNER_PATH")
 SONAR_TOKEN = os.getenv("SONAR_TOKEN")
 SONAR_HOST = os.getenv("SONAR_HOST")
 
