@@ -34,8 +34,11 @@ set -euo pipefail
 #   OUTPUT_DIR/sonarqube_compare_notes.md
 #
 # Typical usage:
-#   PANEL_VARIANT=strict SCAN_SUFFIX=pyv2 bash run-py-2b3-compare-sonarqube-pyv2-with-paper.sh
+#   PANEL_VARIANT=strict SCAN_SUFFIX=pyv2 bash compare/run-py-2b3-compare-sonarqube-pyv2-with-paper.sh
 # ============================================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${PROJECT_ROOT}"
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
@@ -45,7 +48,7 @@ PANEL_VARIANT="${PANEL_VARIANT:-strict}"
 SCAN_SUFFIX="${SCAN_SUFFIX:-pyv2}"
 
 PAPER_PANEL="${PAPER_PANEL:-data/panel_event_monthly.csv}"
-PY_SCRIPT="${PY_SCRIPT:-compare/py/compare-sonarqube-with-paper.py}"
+PY_SCRIPT="${PY_SCRIPT:-compare/py/compare_sonarqube_with_paper.py}"
 
 TREATMENT_SCAN="${TREATMENT_SCAN:-repo_python/sonarqube_input/${PANEL_VARIANT}/treatment/data/ts_repos_monthly_scanned_${SCAN_SUFFIX}.csv}"
 CONTROL_SCAN="${CONTROL_SCAN:-repo_python/sonarqube_input/${PANEL_VARIANT}/control/data/ts_repos_monthly_scanned_${SCAN_SUFFIX}.csv}"

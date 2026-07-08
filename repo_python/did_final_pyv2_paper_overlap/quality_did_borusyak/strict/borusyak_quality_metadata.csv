@@ -1,0 +1,12 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_quality_python_v2.Rmd
+helper_file,proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/did_final_pyv2_paper_overlap/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/did_final_pyv2_paper_overlap/quality_did_borusyak/strict
+outcomes,"log_static_analysis_warnings, log_duplicate_line_density, log_code_complexity"
+covariates,contributors_log + log_ncloc
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,YYYY-MM converted to month_id = year * 12 + month
+input_source,run-py-2e complete-case quality DiD input
+interpretation_note,Use flexible as the sample-coverage panel and strict as the 1:3 matching-rule panel
