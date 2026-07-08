@@ -1,0 +1,4 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,panel
+log_static_analysis_warnings,treat,0.0736736181571038,0.0727652227079626,-0.0689462183505029,0.21629345466471,,Borusyak static treatment effect,Static Analysis Warnings,strict
+log_duplicate_line_density,treat,-0.170851303143871,0.0945101384341767,-0.356091174474858,0.0143885681871151,,Borusyak static treatment effect,Duplicate Line Density,strict
+log_code_complexity,treat,0.0907364572401535,0.0812821372976976,-0.0685765318633339,0.250049446343641,,Borusyak static treatment effect,Code Complexity,strict

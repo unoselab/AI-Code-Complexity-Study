@@ -1,0 +1,2 @@
+repo_name,time,is_treatment,event,post_event,time_to_event,dataset_source,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,static_analysis_warnings
+JustinSparrrow/IOOI-EmotionEgg,2024-08,0,,0,,control,19864.0,16.0,0.0,488.0,24.5,12.8,3183.0,2897.0,504.0

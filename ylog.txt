@@ -1,246 +1,461 @@
-[Checking Result 1]
+============================================================
+run-py-2c: merge Python SonarQube metrics into matched panel
+Started:           Tue Jul  7 08:12:52 PM CDT 2026
+Panel variant:     strict
+Python script:     proc_scripts/merge_sonarqube_panel_v2.py
+DID dir:           repo_python/did_final
+Sonar root:        repo_python/sonarqube_input/strict
+Panel file:        repo_python/did_final/panel_event_matched_strict.csv
+Treatment metrics: repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly_scanned.csv
+Control metrics:   repo_python/sonarqube_input/strict/control/data/ts_repos_monthly_scanned.csv
+Output file:       repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+QC output file:    repo_python/did_final/panel_event_matched_strict_with_sonarqube_qc.csv
+Merge summary:     repo_python/did_final/sonarqube_panel_merge_summary_strict.csv
+Log file:          logs/run-py-2c_merge_sonarqube_panel_strict_20260707-201252.log
+============================================================
 
-===== strict treatment scanned output basic check =====
-1265 repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly.csv
-1265 repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly_scanned.csv
-Rows: 1264
-Repos: 100
-Months: 2024-01 to 2025-08
-Missing latest_commit: 0
-Duplicate repo-month rows: 0
+** Compile Python script
+------------------------------------------------------------
 
-Metric coverage:
-ncloc: 1254 / 1264 non-null
-bugs: 1258 / 1264 non-null
-vulnerabilities: 1258 / 1264 non-null
-code_smells: 1258 / 1264 non-null
-duplicated_lines_density: 1254 / 1264 non-null
-comment_lines_density: 1254 / 1264 non-null
-cognitive_complexity: 1254 / 1264 non-null
-technical_debt: 1258 / 1264 non-null
-software_quality_maintainability_remediation_effort: MISSING
+** Input file summary before merge
+------------------------------------------------------------
+Panel: repo_python/did_final/panel_event_matched_strict.csv
+  rows: 1633
+  repos: 220
+  sources:
+dataset_source
+treatment    853
+control      780
 
+treatment_metrics: repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly_scanned.csv
+  rows: 1264
+  repos: 100
+  months: 2024-01 to 2025-08
+  missing latest_commit: 0
+  duplicate repo-month rows: 0
 
-[Checking Result 2]
+control_metrics: repo_python/sonarqube_input/strict/control/data/ts_repos_monthly_scanned.csv
+  rows: 1779
+  repos: 120
+  months: 2024-01 to 2025-08
+  missing latest_commit: 0
+  duplicate repo-month rows: 0
 
+** Merge SonarQube metrics
+------------------------------------------------------------
+2026-07-07 20:12:52,825 [INFO] Loading panel: repo_python/did_final/panel_event_matched_strict.csv
+2026-07-07 20:12:52,830 [INFO] Loaded panel rows: 1633
+2026-07-07 20:12:52,830 [INFO] Loading treatment metrics: repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly_scanned.csv
+2026-07-07 20:12:52,832 [INFO] Loaded treatment metrics rows: 1264
+2026-07-07 20:12:52,832 [INFO] Loading control metrics: repo_python/sonarqube_input/strict/control/data/ts_repos_monthly_scanned.csv
+2026-07-07 20:12:52,834 [INFO] Loaded control metrics rows: 1779
+2026-07-07 20:12:52,837 [INFO] Prepared treatment metrics: rows=1264, repos=100, months=2024-01 to 2025-08
+2026-07-07 20:12:52,839 [INFO] Prepared control metrics: rows=1779, repos=120, months=2024-01 to 2025-08
+2026-07-07 20:12:52,839 [INFO] Merging SonarQube metrics into panel
+2026-07-07 20:12:52,842 [INFO] Merged panel rows: 1633
+2026-07-07 20:12:52,868 [INFO] Saved merged panel: repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+2026-07-07 20:12:52,872 [INFO] Saved QC summary: repo_python/did_final/panel_event_matched_strict_with_sonarqube_qc.csv
+2026-07-07 20:12:52,872 [INFO] QC summary:
+2026-07-07 20:12:52,872 [INFO] 
+                                     check   value
+                          input_panel_rows    1633
+                               merged_rows    1633
+                       row_count_preserved       1
+                                     repos     220
+                            treatment_rows     853
+                              control_rows     780
+                           treatment_repos     100
+                             control_repos     120
+                                  min_time 2024-01
+                                  max_time 2025-08
+           duplicate_repo_time_source_rows       0
+           missing_sonarqube_latest_commit       0
+                      ncloc_raw_nonmissing    1605
+                         ncloc_raw_missing      28
+                       bugs_raw_nonmissing    1627
+                          bugs_raw_missing       6
+            vulnerabilities_raw_nonmissing    1627
+               vulnerabilities_raw_missing       6
+                code_smells_raw_nonmissing    1627
+                   code_smells_raw_missing       6
+   duplicated_lines_density_raw_nonmissing    1605
+      duplicated_lines_density_raw_missing      28
+      comment_lines_density_raw_nonmissing    1605
+         comment_lines_density_raw_missing      28
+       cognitive_complexity_raw_nonmissing    1604
+          cognitive_complexity_raw_missing      29
+             technical_debt_raw_nonmissing    1627
+                technical_debt_raw_missing       6
+       static_analysis_warnings_nonmissing    1627
+          static_analysis_warnings_missing       6
+         duplicate_line_density_nonmissing    1605
+            duplicate_line_density_missing      28
+                code_complexity_nonmissing    1604
+                   code_complexity_missing      29
+              warnings_per_kloc_nonmissing    1605
+                 warnings_per_kloc_missing      28
+            complexity_per_kloc_nonmissing    1604
+               complexity_per_kloc_missing      29
+           code_smells_per_kloc_nonmissing    1605
+              code_smells_per_kloc_missing      28
+      sonarqube_any_raw_metric_missing_sum      29
+     sonarqube_all_raw_metrics_missing_sum       6
+                  sonarqube_ncloc_zero_sum       0
+     sonarqube_static_warnings_missing_sum       6
+   sonarqube_duplicate_density_missing_sum      28
+sonarqube_cognitive_complexity_missing_sum      29
+   sonarqube_quality_outcomes_complete_sum    1604
 
+** Add Python run-py-2c QC flags
+------------------------------------------------------------
+Updated output: repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+Updated QC: repo_python/did_final/panel_event_matched_strict_with_sonarqube_qc.csv
+Saved summary: repo_python/did_final/sonarqube_panel_merge_summary_strict.csv
 
-===== rows with missing key SonarQube metrics =====
-Rows with any missing key metric: 10
-Repos with any missing key metric: 5
+ panel                                                                file  rows  repos  treatment_rows  control_rows  treatment_repos  control_repos months_min months_max  all_raw_metrics_missing_rows  ncloc_zero_rows  quality_outcomes_complete_rows  ncloc_nonmissing  bugs_nonmissing  vulnerabilities_nonmissing  code_smells_nonmissing  duplicated_lines_density_nonmissing  comment_lines_density_nonmissing  cognitive_complexity_nonmissing  technical_debt_nonmissing  static_analysis_warnings_nonmissing
+strict repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv  1633    220             853           780              100            120    2024-01    2025-08                             6                0                            1604              1605             1627                        1627                    1627                                 1605                              1605                             1604                       1627                                 1627
 
-Missing rows:
-           repo_name   month                            latest_commit  ncloc  bugs  vulnerabilities  code_smells  duplicated_lines_density  comment_lines_density  cognitive_complexity  technical_debt
-    getsentry/sentry 2025-03 2d92281805254325dbedb3cafcfdd53d09b1d9df    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
-    getsentry/sentry 2025-04 32cb664b86c13cc020c06f7e208cd9a62e6891a0    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
-    getsentry/sentry 2025-05 975f8d773e5a6c5ed6595176a42ff31e887ec95d    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
-hyperb1iss/droidmind 2025-02 0d7eb7376eb0578b3aae50e0c5bd1cdec205a368    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
-     ilanbenb/wa_llm 2024-12 f56e3e01bc6dc3f46168b179967818623657dda1    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
-          trycua/cua 2025-01 19a07d24d3c1207aa0809c77975087d92c070b0a    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
-          trycua/cua 2025-02 b187511acfabe7fad390c581961fb7718748d07d    NaN   0.0              0.0          0.0                       NaN                    NaN                   NaN             0.0
-  zauberzeug/nicegui 2024-08 06921814203898f7f83abb27899f34082e76f804    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
-  zauberzeug/nicegui 2024-09 b7b6956f26ba5e731ec2f7feae53b604f624495c    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
-  zauberzeug/nicegui 2024-10 c810dda1c4380fd0cca20a40dfe78653af080f38    NaN   NaN              NaN          NaN                       NaN                    NaN                   NaN             NaN
+                                           check  value
+                         run_py_2c_panel_variant strict
+                                  run_py_2c_rows   1633
+                                 run_py_2c_repos    220
+                        run_py_2c_treatment_rows    853
+                          run_py_2c_control_rows    780
+                       run_py_2c_treatment_repos    100
+                         run_py_2c_control_repos    120
+run_py_2c_sonarqube_all_raw_metrics_missing_rows      6
+             run_py_2c_sonarqube_ncloc_zero_rows      0
+          run_py_2c_static_warnings_missing_rows      6
+        run_py_2c_duplicate_density_missing_rows     28
+     run_py_2c_cognitive_complexity_missing_rows     29
+        run_py_2c_quality_outcomes_complete_rows   1604
 
-Missing rows by repo:
-repo_name
-getsentry/sentry        3
-zauberzeug/nicegui      3
-trycua/cua              2
-ilanbenb/wa_llm         1
-hyperb1iss/droidmind    1
-
-
-[Checking Result 3]
-
-
-
-===== scan log error/warning check =====
-4855:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4856:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4857:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4862:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4864:	at io.grpc.Status.asRuntimeException(Status.java:532)
-4870:2026-07-06 05:46:36,613 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-03
-4872:2026-07-06 05:50:59,767 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-04: 05:49:28.029 ERROR TypeError: Cannot read properties of undefined (reading 'name')
-4893:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4894:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4895:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4921:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4923:	at io.grpc.Status.asRuntimeException(Status.java:532)
-4929:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4930:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4931:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4957:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4959:	at io.grpc.Status.asRuntimeException(Status.java:532)
-4966:java.lang.IllegalStateException: Analysis of JS/TS files failed
-4990:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4991:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4992:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4997:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4999:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5005:2026-07-06 05:50:59,767 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-04
-5007:2026-07-06 05:55:28,327 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-05: 05:53:36.456 ERROR TypeError: Cannot read properties of undefined (reading 'name')
-5028:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-5029:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-5030:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-5056:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-5058:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5064:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-5065:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-5066:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-5092:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-5094:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5101:java.lang.IllegalStateException: Analysis of JS/TS files failed
-5125:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-5126:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-5127:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-5132:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-5134:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5140:2026-07-06 05:55:28,327 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-05
-5196:2026-07-06 06:14:17,608 [ERROR] Failed to check existing analysis for grapeot_web_agentic_ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=grapeot_web_agentic_ai&category=VERSION&p=1&ps=100
-5249:2026-07-06 06:16:16,629 [ERROR] Failed to check existing analysis for hyperb1iss_droidmind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=hyperb1iss_droidmind&category=VERSION&p=1&ps=100
-5302:2026-07-06 06:18:02,795 [ERROR] Failed to check existing analysis for ilanbenb_wa_llm: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=ilanbenb_wa_llm&category=VERSION&p=1&ps=100
-5370:2026-07-06 06:20:12,621 [ERROR] Failed to check existing analysis for instructor-ai_instructor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=instructor-ai_instructor&category=VERSION&p=1&ps=100
-5514:2026-07-06 06:26:25,757 [ERROR] Failed to check existing analysis for jmurth1234_ClaudePlayer: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=jmurth1234_ClaudePlayer&category=VERSION&p=1&ps=100
-5567:2026-07-06 06:27:57,453 [ERROR] Failed to check existing analysis for keephq_keep: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=keephq_keep&category=VERSION&p=1&ps=100
-5720:2026-07-06 06:39:27,054 [ERROR] Failed to check existing analysis for leettools-dev_leettools: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=leettools-dev_leettools&category=VERSION&p=1&ps=100
-5787:2026-07-06 06:42:09,309 [ERROR] Failed to check existing analysis for loftwah_auto-jira: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=loftwah_auto-jira&category=VERSION&p=1&ps=100
-5840:2026-07-06 06:43:39,859 [ERROR] Failed to check existing analysis for lss233_kirara-ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=lss233_kirara-ai&category=VERSION&p=1&ps=100
-5984:2026-07-06 06:49:34,755 [ERROR] Failed to check existing analysis for martinnormark_neural-mesh-simplification: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=martinnormark_neural-mesh-simplification&category=VERSION&p=1&ps=100
-6079:2026-07-06 06:52:31,850 [ERROR] Failed to check existing analysis for matebenyovszky_healing-agent: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=matebenyovszky_healing-agent&category=VERSION&p=1&ps=100
-6160:2026-07-06 06:55:00,386 [ERROR] Failed to check existing analysis for namuan_trading-utils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=namuan_trading-utils&category=VERSION&p=1&ps=100
-6443:2026-07-06 07:05:14,420 [ERROR] Failed to check existing analysis for osomai_servicenow-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=osomai_servicenow-mcp&category=VERSION&p=1&ps=100
-6489:2026-07-06 07:06:40,610 [ERROR] Failed to check existing analysis for panther-labs_panther-analysis: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=panther-labs_panther-analysis&category=VERSION&p=1&ps=100
-6633:2026-07-06 07:12:42,830 [ERROR] Failed to check existing analysis for raphaelmansuy_code2prompt: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_code2prompt&category=VERSION&p=1&ps=100
-6763:2026-07-06 07:16:46,679 [ERROR] Failed to check existing analysis for raphaelmansuy_iteration_of_tought: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_iteration_of_tought&category=VERSION&p=1&ps=100
-6851:2026-07-06 07:19:22,394 [ERROR] Failed to check existing analysis for samuelgursky_davinci-resolve-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=samuelgursky_davinci-resolve-mcp&category=VERSION&p=1&ps=100
-6897:2026-07-06 07:20:50,452 [ERROR] Failed to check existing analysis for sbomify_sbomify: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sbomify_sbomify&category=VERSION&p=1&ps=100
-6996:2026-07-06 07:23:57,236 [ERROR] Failed to check existing analysis for smartian1_tgtrader: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smartian1_tgtrader&category=VERSION&p=1&ps=100
-7063:2026-07-06 07:26:35,281 [ERROR] Failed to check existing analysis for smorin_py-launch-blueprint: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smorin_py-launch-blueprint&category=VERSION&p=1&ps=100
-7123:2026-07-06 07:28:38,155 [ERROR] Failed to check existing analysis for sshtunnelvision_MCP-LOGO-GEN: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sshtunnelvision_MCP-LOGO-GEN&category=VERSION&p=1&ps=100
-7169:2026-07-06 07:29:56,920 [ERROR] Failed to check existing analysis for synaptiai_prompt-decorators: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=synaptiai_prompt-decorators&category=VERSION&p=1&ps=100
-7222:2026-07-06 07:31:41,185 [ERROR] Failed to check existing analysis for terryyin_lizard: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=terryyin_lizard&category=VERSION&p=1&ps=100
-7366:2026-07-06 07:40:35,221 [ERROR] Failed to check existing analysis for tmux-python_tmuxp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tmux-python_tmuxp&category=VERSION&p=1&ps=100
-7510:2026-07-06 07:46:11,112 [ERROR] Failed to check existing analysis for tony_django-docutils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-docutils&category=VERSION&p=1&ps=100
-7654:2026-07-06 07:51:34,187 [ERROR] Failed to check existing analysis for tony_django-slugify-processor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-slugify-processor&category=VERSION&p=1&ps=100
-7798:2026-07-06 07:56:46,595 [ERROR] Failed to check existing analysis for trycua_cua: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=trycua_cua&category=VERSION&p=1&ps=100
-7857:2026-07-06 07:59:04,469 [ERROR] Failed to check existing analysis for tsukumijima_KonomiTV: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tsukumijima_KonomiTV&category=VERSION&p=1&ps=100
-8001:2026-07-06 08:06:40,069 [ERROR] Failed to check existing analysis for tw-haiven_haiven: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tw-haiven_haiven&category=VERSION&p=1&ps=100
-8165:2026-07-06 08:13:33,017 [ERROR] Failed to check existing analysis for vcs-python_vcspull: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vcs-python_vcspull&category=VERSION&p=1&ps=100
-8309:2026-07-06 08:18:53,829 [ERROR] Failed to check existing analysis for vietanhdev_anylabeling: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vietanhdev_anylabeling&category=VERSION&p=1&ps=100
-8678:2026-07-06 08:29:04,601 [ERROR] Failed to check existing analysis for whiteducksoftware_flock: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=whiteducksoftware_flock&category=VERSION&p=1&ps=100
-8731:2026-07-06 08:31:17,745 [ERROR] Failed to check existing analysis for xzq-xu_jvm-mcp-server: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=xzq-xu_jvm-mcp-server&category=VERSION&p=1&ps=100
-8777:2026-07-06 08:32:38,012 [ERROR] Failed to check existing analysis for yagami1997_CursorMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_CursorMind&category=VERSION&p=1&ps=100
-8823:2026-07-06 08:33:59,321 [ERROR] Failed to check existing analysis for yagami1997_TradeMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_TradeMind&category=VERSION&p=1&ps=100
-8876:2026-07-06 08:36:03,969 [ERROR] Failed to check existing analysis for yeagerai_genlayer-studio: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yeagerai_genlayer-studio&category=VERSION&p=1&ps=100
-9006:2026-07-06 08:41:59,442 [ERROR] Failed to check existing analysis for zauberzeug_nicegui: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zauberzeug_nicegui&category=VERSION&p=1&ps=100
-9230:2026-07-06 09:17:48,565 [ERROR] Failed to check existing analysis for zilliztech_mcp-server-milvus: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zilliztech_mcp-server-milvus&category=VERSION&p=1&ps=100
-
-
+============================================================
+run-py-2c completed successfully.
+Completed:      Tue Jul  7 08:12:53 PM CDT 2026
+Panel variant:  strict
+Output file:    repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+QC output file: repo_python/did_final/panel_event_matched_strict_with_sonarqube_qc.csv
+Merge summary:  repo_python/did_final/sonarqube_panel_merge_summary_strict.csv
+Log file:       logs/run-py-2c_merge_sonarqube_panel_strict_20260707-201252.log
+============================================================
+============================================================
+run-py-2d: check Python merged SonarQube panels
+Started:          Tue Jul  7 08:13:09 PM CDT 2026
+Panel variant:    strict
+Checker script:   proc_scripts/check_sonarqube_panel.py
+DID dir:          repo_python/did_final
+Manifest:         repo_python/did_final/sonarqube_panel_check_manifest_strict_20260707-201309.csv
+Combined summary: repo_python/did_final/sonarqube_panel_check_summary_strict.csv
+Combined QC:      repo_python/did_final/sonarqube_panel_check_qc_strict.csv
+Log file:         logs/run-py-2d_check_sonarqube_panels_strict_20260707-201309.log
+============================================================
 
 
+============================================================
+Checking panel: strict
+Input:          repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+Summary output: repo_python/did_final/panel_event_matched_strict_with_sonarqube_check_summary.csv
+Missing output: repo_python/did_final/panel_event_matched_strict_with_sonarqube_missing_analysis_outcomes.csv
+============================================================
+========================================================================
+Merged SonarQube panel sanity check
+========================================================================
+input: repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+rows: 1633
+repos: 220
+months: 2024-01 to 2025-08
 
-[Checking Result 4]
+Rows by dataset_source:
+dataset_source
+treatment    853
+control      780
+
+duplicated repo-month-source keys: 0
+
+Event column coverage:
+ever_treated: 1633 / 1633
+is_treatment: 1633 / 1633
+post_event: 1633 / 1633
+time_to_event: 853 / 1633
+
+SonarQube commit column coverage:
+sonarqube_latest_commit: 1633 / 1633
+
+Raw metric coverage:
+ncloc_raw: 1605 / 1633
+bugs_raw: 1627 / 1633
+vulnerabilities_raw: 1627 / 1633
+code_smells_raw: 1627 / 1633
+duplicated_lines_density_raw: 1605 / 1633
+comment_lines_density_raw: 1605 / 1633
+cognitive_complexity_raw: 1604 / 1633
+technical_debt_raw: 1627 / 1633
+
+Analysis-ready outcome coverage:
+static_analysis_warnings: 1627 / 1633
+duplicate_line_density: 1605 / 1633
+code_complexity: 1604 / 1633
+warnings_per_kloc: 1605 / 1633
+complexity_per_kloc: 1604 / 1633
+code_smells_per_kloc: 1605 / 1633
+
+QC flag coverage:
+sonarqube_any_raw_metric_missing: 1633 / 1633
+sonarqube_all_raw_metrics_missing: 1633 / 1633
+sonarqube_ncloc_zero: 1633 / 1633
+sonarqube_static_warnings_missing: 1633 / 1633
+sonarqube_duplicate_density_missing: 1633 / 1633
+sonarqube_cognitive_complexity_missing: 1633 / 1633
+sonarqube_quality_outcomes_complete: 1633 / 1633
+
+Metric and QC summary:
+                                metric  exists  nonmissing  missing         mean      median  min          max  zero_count
+                             ncloc_raw       1        1605       28 57103.653583 7639.000000  4.0 2.038242e+06           0
+                              bugs_raw       1        1627        6    39.837124    4.000000  0.0 2.278000e+03         407
+                   vulnerabilities_raw       1        1627        6     7.885065    1.000000  0.0 1.650000e+02         800
+                       code_smells_raw       1        1627        6   954.846343  115.000000  0.0 4.093800e+04          62
+          duplicated_lines_density_raw       1        1605       28     6.362305    2.600000  0.0 9.450000e+01         455
+             comment_lines_density_raw       1        1605       28    15.322804   12.500000  0.0 4.770000e+01          10
+              cognitive_complexity_raw       1        1604       29  5169.276185  927.000000  0.0 1.139040e+05           2
+                    technical_debt_raw       1        1627        6  6056.897357  727.000000  0.0 2.431080e+05          62
+              static_analysis_warnings       1        1627        6  1002.568531  128.000000  0.0 4.322000e+04          56
+                duplicate_line_density       1        1605       28     6.362305    2.600000  0.0 9.450000e+01         455
+                       code_complexity       1        1604       29  5169.276185  927.000000  0.0 1.139040e+05           2
+                     warnings_per_kloc       1        1605       28    26.959110   16.239687  0.0 7.593861e+02          34
+                   complexity_per_kloc       1        1604       29   142.127749  115.503924  0.0 2.494608e+03           2
+                  code_smells_per_kloc       1        1605       28    24.657314   15.299724  0.0 7.579693e+02          40
+      sonarqube_any_raw_metric_missing       1        1633        0     0.017759    0.000000  0.0 1.000000e+00        1604
+     sonarqube_all_raw_metrics_missing       1        1633        0     0.003674    0.000000  0.0 1.000000e+00        1627
+                  sonarqube_ncloc_zero       1        1633        0     0.000000    0.000000  0.0 0.000000e+00        1633
+     sonarqube_static_warnings_missing       1        1633        0     0.003674    0.000000  0.0 1.000000e+00        1627
+   sonarqube_duplicate_density_missing       1        1633        0     0.017146    0.000000  0.0 1.000000e+00        1605
+sonarqube_cognitive_complexity_missing       1        1633        0     0.017759    0.000000  0.0 1.000000e+00        1604
+   sonarqube_quality_outcomes_complete       1        1633        0     0.982241    1.000000  0.0 1.000000e+00          29
+
+Rows with missing core DiD quality outcomes: 29
+                              repo_name    time dataset_source                  sonarqube_latest_commit  static_analysis_warnings  duplicate_line_density  code_complexity  sonarqube_any_raw_metric_missing  sonarqube_all_raw_metrics_missing  sonarqube_ncloc_zero  sonarqube_static_warnings_missing  sonarqube_duplicate_density_missing  sonarqube_cognitive_complexity_missing  sonarqube_quality_outcomes_complete
+                       getsentry/sentry 2025-03      treatment 2d92281805254325dbedb3cafcfdd53d09b1d9df                       NaN                     NaN              NaN                                 1                                  1                     0                                  1                                    1                                       1                                    0
+                       getsentry/sentry 2025-04      treatment 32cb664b86c13cc020c06f7e208cd9a62e6891a0                       NaN                     NaN              NaN                                 1                                  1                     0                                  1                                    1                                       1                                    0
+                       getsentry/sentry 2025-05      treatment 975f8d773e5a6c5ed6595176a42ff31e887ec95d                       NaN                     NaN              NaN                                 1                                  1                     0                                  1                                    1                                       1                                    0
+                   hyperb1iss/droidmind 2025-02      treatment 0d7eb7376eb0578b3aae50e0c5bd1cdec205a368                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                        ilanbenb/wa_llm 2024-12      treatment f56e3e01bc6dc3f46168b179967818623657dda1                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                             trycua/cua 2025-01      treatment 19a07d24d3c1207aa0809c77975087d92c070b0a                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                             trycua/cua 2025-02      treatment b187511acfabe7fad390c581961fb7718748d07d                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                     zauberzeug/nicegui 2024-08      treatment 06921814203898f7f83abb27899f34082e76f804                       NaN                     NaN              NaN                                 1                                  1                     0                                  1                                    1                                       1                                    0
+                     zauberzeug/nicegui 2024-09      treatment b7b6956f26ba5e731ec2f7feae53b604f624495c                       NaN                     NaN              NaN                                 1                                  1                     0                                  1                                    1                                       1                                    0
+                     zauberzeug/nicegui 2024-10      treatment c810dda1c4380fd0cca20a40dfe78653af080f38                       NaN                     NaN              NaN                                 1                                  1                     0                                  1                                    1                                       1                                    0
+                    Event-AHU/OpenEvDET 2024-06        control 9445d9825b622f47cb581339ad6322d28c1f0609                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                    Event-AHU/OpenEvDET 2024-07        control ef3b6902aabe5fcbb4bcbe52f0d7c160db58811b                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                    Event-AHU/OpenEvDET 2024-08        control fe248bc731b4b3bcfe7716459dd97b020d56379a                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                    Event-AHU/OpenEvDET 2024-09        control b18ae742fd121615f5acaef3748206b4905e0314                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                    Event-AHU/OpenEvDET 2024-11        control 070bdea99e2bdc41c69d0c7e883b3b2ca19069ab                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                    Event-AHU/OpenEvDET 2024-12        control 7bee63b33fe810ff1c51382f567cfa9fb7b1a745                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                    Event-AHU/OpenEvDET 2025-01        control bd38079458e2d14cce522f1135b3fde0066ab432                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+Hack-a-Day/2024-Supercon-8-Add-On-Badge 2024-09        control 4d2a96feb531d47bbe11bba02b77f9b9b9aadae9                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                     NiceRingNode/LGGPT 2025-01        control ee2d46bb8d20bd894f56c7db278640f524d8068a                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                        RobinWu218/ToST 2024-12        control aa501aac276809d30d749b54dc299abef6267d23                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                        RobinWu218/ToST 2025-01        control 556d812dc1fe318dc5d75c0aa689e532a66240fe                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+     SEU-ProactiveSecurity-Group/LLM-PD 2024-12        control 366e021b9b2d93ce08ed5488e524686a3bd61d63                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                  TianxingChen/RoboTwin 2025-06        control 8f0222543082deaa21e09a1f5c68e43544cf3309                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+          emresen20/Pau-Bilgisayar-nots 2024-03        control ea20069c80a8f9d2c11529b8dedbc2e0d1be9388                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+          emresen20/Pau-Bilgisayar-nots 2024-04        control 945236bcbb739b31135487d4dbe93cc35c0b1780                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+          emresen20/Pau-Bilgisayar-nots 2024-05        control 0706a69627b488a931cc12b1d61ce0cce4c3b6e9                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                         popey/sbommage 2025-02        control e608148f0a8823535eb5bc5f636ac6ab9af6d4d4                       0.0                     0.0              NaN                                 1                                  0                     0                                  0                                    0                                       1                                    0
+                          ysj9909/SHViT 2024-03        control bab7b9cff49cd59c746e9ef1fc77880ab3007c4d                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+                    zhipeixu/FakeShield 2024-10        control 2d9bb9c074519045f6b998f093ec44216a3fb5f1                       0.0                     NaN              NaN                                 1                                  0                     0                                  0                                    1                                       1                                    0
+
+saved summary: repo_python/did_final/panel_event_matched_strict_with_sonarqube_check_summary.csv
+saved missing rows: repo_python/did_final/panel_event_matched_strict_with_sonarqube_missing_analysis_outcomes.csv
+
+** Building combined run-py-2d summaries
+------------------------------------------------------------
+Saved combined summary: repo_python/did_final/sonarqube_panel_check_summary_strict.csv
+Saved combined QC: repo_python/did_final/sonarqube_panel_check_qc_strict.csv
+
+Combined QC:
+ panel                                                          input_file  rows  repos  treatment_rows  control_rows  missing_analysis_rows  missing_analysis_repos                                                                           missing_output_file
+strict repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv  1633    220             853           780                     29                      15 repo_python/did_final/panel_event_matched_strict_with_sonarqube_missing_analysis_outcomes.csv
+
+============================================================
+run-py-2d completed successfully.
+Completed:        Tue Jul  7 08:13:10 PM CDT 2026
+Panel variant:    strict
+Manifest:         repo_python/did_final/sonarqube_panel_check_manifest_strict_20260707-201309.csv
+Combined summary: repo_python/did_final/sonarqube_panel_check_summary_strict.csv
+Combined QC:      repo_python/did_final/sonarqube_panel_check_qc_strict.csv
+Log file:         logs/run-py-2d_check_sonarqube_panels_strict_20260707-201309.log
+============================================================
+============================================================
+run-py-2e: prepare Python quality DiD input
+Started:          Tue Jul  7 08:13:23 PM CDT 2026
+Panel variant:    strict
+Python script:    proc_scripts/prepare_quality_did_input_v2.py
+DID dir:          repo_python/did_final
+Manifest:         repo_python/did_final/quality_did_input_manifest_strict_20260707-201323.csv
+Combined QC long: repo_python/did_final/quality_did_input_qc_strict_long.csv
+Combined QC wide: repo_python/did_final/quality_did_input_qc_strict_wide.csv
+Log file:         logs/run-py-2e_prepare_quality_did_input_strict_20260707-201323.log
+============================================================
 
 
+============================================================
+Preparing quality DiD input for panel: strict
+Input:           repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+Output:          repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input.csv
+Complete output: repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+QC output:       repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_qc.csv
+Missing output:  repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_missing_core_quality.csv
+============================================================
+2026-07-07 20:13:23,626 [INFO] Loading merged panel: repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+2026-07-07 20:13:23,635 [INFO] Input rows: 1633
+2026-07-07 20:13:23,635 [INFO] Input repos: 220
+2026-07-07 20:13:23,635 [INFO] Input months: 2024-01 to 2025-08
+2026-07-07 20:13:23,723 [INFO] Saved full quality DiD input: repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input.csv
+2026-07-07 20:13:23,723 [INFO] Saved missing core quality rows: repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_missing_core_quality.csv
+2026-07-07 20:13:23,723 [INFO] Saved complete-case quality DiD input: repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+2026-07-07 20:13:23,723 [INFO] Saved QC: repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_qc.csv
 
+QC summary:
+                                     check                                                                                          value
+                               panel_label                                                                                         strict
+                                input_rows                                                                                           1633
+                               output_rows                                                                                           1633
+        row_count_preserved_in_full_output                                                                                              1
+                                     repos                                                                                            220
+                                  min_time                                                                                        2024-01
+                                  max_time                                                                                        2025-08
+                            treatment_rows                                                                                            853
+                              control_rows                                                                                            780
+                           treatment_repos                                                                                            100
+                             control_repos                                                                                            120
+           duplicate_repo_time_source_rows                                                                                              0
+              analysis_ready_did_base_rows                                                                                           1633
+          analysis_ready_core_quality_rows                                                                                           1604
+           analysis_ready_quality_did_rows                                                                                           1604
+                 missing_core_quality_rows                                                                                             29
+        treatment_time_to_event_nonmissing                                                                                            853
+          control_time_to_event_nonmissing                                                                                              0
+                            post_event_sum                                                                                            432
+                    control_post_event_sum                                                                                              0
+                  treatment_post_event_sum                                                                                            432
+           sonarqube_latest_commit_missing                                                                                              0
+      sonarqube_any_raw_metric_missing_sum                                                                                             29
+     sonarqube_all_raw_metrics_missing_sum                                                                                              6
+                  sonarqube_ncloc_zero_sum                                                                                              0
+     sonarqube_static_warnings_missing_sum                                                                                              6
+   sonarqube_duplicate_density_missing_sum                                                                                             28
+sonarqube_cognitive_complexity_missing_sum                                                                                             29
+   sonarqube_quality_outcomes_complete_sum                                                                                           1604
+       static_analysis_warnings_nonmissing                                                                                           1627
+          static_analysis_warnings_missing                                                                                              6
+       static_analysis_warnings_zero_count                                                                                             56
+             static_analysis_warnings_mean                                                                                    1002.568531
+           static_analysis_warnings_median                                                                                          128.0
+         duplicate_line_density_nonmissing                                                                                           1605
+            duplicate_line_density_missing                                                                                             28
+         duplicate_line_density_zero_count                                                                                            455
+               duplicate_line_density_mean                                                                                       6.362305
+             duplicate_line_density_median                                                                                            2.6
+                code_complexity_nonmissing                                                                                           1604
+                   code_complexity_missing                                                                                             29
+                code_complexity_zero_count                                                                                              2
+                      code_complexity_mean                                                                                    5169.276185
+                    code_complexity_median                                                                                          927.0
+              warnings_per_kloc_nonmissing                                                                                           1605
+                 warnings_per_kloc_missing                                                                                             28
+              warnings_per_kloc_zero_count                                                                                             34
+                    warnings_per_kloc_mean                                                                                       26.95911
+                  warnings_per_kloc_median                                                                                      16.239687
+            complexity_per_kloc_nonmissing                                                                                           1604
+               complexity_per_kloc_missing                                                                                             29
+            complexity_per_kloc_zero_count                                                                                              2
+                  complexity_per_kloc_mean                                                                                     142.127749
+                complexity_per_kloc_median                                                                                     115.503924
+           code_smells_per_kloc_nonmissing                                                                                           1605
+              code_smells_per_kloc_missing                                                                                             28
+           code_smells_per_kloc_zero_count                                                                                             40
+                 code_smells_per_kloc_mean                                                                                      24.657314
+               code_smells_per_kloc_median                                                                                      15.299724
+                 technical_debt_nonmissing                                                                                           1627
+                    technical_debt_missing                                                                                              6
+                 technical_debt_zero_count                                                                                             62
+                       technical_debt_mean                                                                                    6056.897357
+                     technical_debt_median                                                                                          727.0
+                          ncloc_nonmissing                                                                                           1605
+                             ncloc_missing                                                                                             28
+                          ncloc_zero_count                                                                                              0
+                                ncloc_mean                                                                                   57103.653583
+                              ncloc_median                                                                                         7639.0
+       duplicated_lines_density_nonmissing                                                                                           1605
+          duplicated_lines_density_missing                                                                                             28
+       duplicated_lines_density_zero_count                                                                                            455
+             duplicated_lines_density_mean                                                                                       6.362305
+           duplicated_lines_density_median                                                                                            2.6
+          comment_lines_density_nonmissing                                                                                           1605
+             comment_lines_density_missing                                                                                             28
+          comment_lines_density_zero_count                                                                                             10
+                comment_lines_density_mean                                                                                      15.322804
+              comment_lines_density_median                                                                                           12.5
+           cognitive_complexity_nonmissing                                                                                           1604
+              cognitive_complexity_missing                                                                                             29
+           cognitive_complexity_zero_count                                                                                              2
+                 cognitive_complexity_mean                                                                                    5169.276185
+               cognitive_complexity_median                                                                                          927.0
+                           bugs_nonmissing                                                                                           1627
+                              bugs_missing                                                                                              6
+                           bugs_zero_count                                                                                            407
+                                 bugs_mean                                                                                      39.837124
+                               bugs_median                                                                                            4.0
+                vulnerabilities_nonmissing                                                                                           1627
+                   vulnerabilities_missing                                                                                              6
+                vulnerabilities_zero_count                                                                                            800
+                      vulnerabilities_mean                                                                                       7.885065
+                    vulnerabilities_median                                                                                            1.0
+                    code_smells_nonmissing                                                                                           1627
+                       code_smells_missing                                                                                              6
+                    code_smells_zero_count                                                                                             62
+                          code_smells_mean                                                                                     954.846343
+                        code_smells_median                                                                                          115.0
+   log_static_analysis_warnings_nonmissing                                                                                           1627
+       log_static_analysis_warnings_finite                                                                                           1627
+            log_code_complexity_nonmissing                                                                                           1604
+                log_code_complexity_finite                                                                                           1604
+             log_technical_debt_nonmissing                                                                                           1627
+                 log_technical_debt_finite                                                                                           1627
+                      log_ncloc_nonmissing                                                                                           1605
+                          log_ncloc_finite                                                                                           1605
+                       log_bugs_nonmissing                                                                                           1627
+                           log_bugs_finite                                                                                           1627
+            log_vulnerabilities_nonmissing                                                                                           1627
+                log_vulnerabilities_finite                                                                                           1627
+                log_code_smells_nonmissing                                                                                           1627
+                    log_code_smells_finite                                                                                           1627
+          log_warnings_per_kloc_nonmissing                                                                                           1605
+              log_warnings_per_kloc_finite                                                                                           1605
+        log_complexity_per_kloc_nonmissing                                                                                           1604
+            log_complexity_per_kloc_finite                                                                                           1604
+       log_code_smells_per_kloc_nonmissing                                                                                           1605
+           log_code_smells_per_kloc_finite                                                                                           1605
+                      complete_output_path repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+                      complete_output_rows                                                                                           1604
+                     complete_output_repos                                                                                            219
 
+** Building combined quality DiD input QC
+------------------------------------------------------------
+Saved combined QC long: repo_python/did_final/quality_did_input_qc_strict_long.csv
+Saved combined QC wide: repo_python/did_final/quality_did_input_qc_strict_wide.csv
 
-===== required before next scan =====
-1265 repo_python/sonarqube_input/strict/treatment/data/ts_repos_monthly_scanned.csv
-4855:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4856:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4857:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4862:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4864:	at io.grpc.Status.asRuntimeException(Status.java:532)
-4870:2026-07-06 05:46:36,613 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-03
-4872:2026-07-06 05:50:59,767 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-04: 05:49:28.029 ERROR TypeError: Cannot read properties of undefined (reading 'name')
-4893:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4894:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4895:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4921:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4923:	at io.grpc.Status.asRuntimeException(Status.java:532)
-4929:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4930:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4931:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4957:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4959:	at io.grpc.Status.asRuntimeException(Status.java:532)
-4966:java.lang.IllegalStateException: Analysis of JS/TS files failed
-4990:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-4991:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-4992:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-4997:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-4999:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5005:2026-07-06 05:50:59,767 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-04
-5007:2026-07-06 05:55:28,327 [ERROR] SonarQube scan failed for getsentry_sentry at 2025-05: 05:53:36.456 ERROR TypeError: Cannot read properties of undefined (reading 'name')
-5028:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-5029:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-5030:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-5056:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-5058:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5064:java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-5065:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-5066:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-5092:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-5094:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5101:java.lang.IllegalStateException: Analysis of JS/TS files failed
-5125:Caused by: java.lang.IllegalStateException: The bridge server is unresponsive. It might be because you don't have enough memory, so please go see the troubleshooting section: https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/languages/javascript-typescript-css/#slow-or-unresponsive-analysis
-5126:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.unresponsiveServerException(BridgeServerImpl.java:508)
-5127:	at org.sonar.plugins.javascript.bridge.BridgeServerImpl.analyzeProjectException(BridgeServerImpl.java:521)
-5132:Caused by: io.grpc.StatusRuntimeException: UNAVAILABLE: HTTP/2 error code: NO_ERROR
-5134:	at io.grpc.Status.asRuntimeException(Status.java:532)
-5140:2026-07-06 05:55:28,327 [WARNING] Skipping metrics because SonarQube scan failed for getsentry/sentry at 2025-05
-5196:2026-07-06 06:14:17,608 [ERROR] Failed to check existing analysis for grapeot_web_agentic_ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=grapeot_web_agentic_ai&category=VERSION&p=1&ps=100
-5249:2026-07-06 06:16:16,629 [ERROR] Failed to check existing analysis for hyperb1iss_droidmind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=hyperb1iss_droidmind&category=VERSION&p=1&ps=100
-5302:2026-07-06 06:18:02,795 [ERROR] Failed to check existing analysis for ilanbenb_wa_llm: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=ilanbenb_wa_llm&category=VERSION&p=1&ps=100
-5370:2026-07-06 06:20:12,621 [ERROR] Failed to check existing analysis for instructor-ai_instructor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=instructor-ai_instructor&category=VERSION&p=1&ps=100
-5514:2026-07-06 06:26:25,757 [ERROR] Failed to check existing analysis for jmurth1234_ClaudePlayer: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=jmurth1234_ClaudePlayer&category=VERSION&p=1&ps=100
-5567:2026-07-06 06:27:57,453 [ERROR] Failed to check existing analysis for keephq_keep: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=keephq_keep&category=VERSION&p=1&ps=100
-5720:2026-07-06 06:39:27,054 [ERROR] Failed to check existing analysis for leettools-dev_leettools: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=leettools-dev_leettools&category=VERSION&p=1&ps=100
-5787:2026-07-06 06:42:09,309 [ERROR] Failed to check existing analysis for loftwah_auto-jira: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=loftwah_auto-jira&category=VERSION&p=1&ps=100
-5840:2026-07-06 06:43:39,859 [ERROR] Failed to check existing analysis for lss233_kirara-ai: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=lss233_kirara-ai&category=VERSION&p=1&ps=100
-5984:2026-07-06 06:49:34,755 [ERROR] Failed to check existing analysis for martinnormark_neural-mesh-simplification: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=martinnormark_neural-mesh-simplification&category=VERSION&p=1&ps=100
-6079:2026-07-06 06:52:31,850 [ERROR] Failed to check existing analysis for matebenyovszky_healing-agent: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=matebenyovszky_healing-agent&category=VERSION&p=1&ps=100
-6160:2026-07-06 06:55:00,386 [ERROR] Failed to check existing analysis for namuan_trading-utils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=namuan_trading-utils&category=VERSION&p=1&ps=100
-6443:2026-07-06 07:05:14,420 [ERROR] Failed to check existing analysis for osomai_servicenow-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=osomai_servicenow-mcp&category=VERSION&p=1&ps=100
-6489:2026-07-06 07:06:40,610 [ERROR] Failed to check existing analysis for panther-labs_panther-analysis: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=panther-labs_panther-analysis&category=VERSION&p=1&ps=100
-6633:2026-07-06 07:12:42,830 [ERROR] Failed to check existing analysis for raphaelmansuy_code2prompt: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_code2prompt&category=VERSION&p=1&ps=100
-6763:2026-07-06 07:16:46,679 [ERROR] Failed to check existing analysis for raphaelmansuy_iteration_of_tought: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=raphaelmansuy_iteration_of_tought&category=VERSION&p=1&ps=100
-6851:2026-07-06 07:19:22,394 [ERROR] Failed to check existing analysis for samuelgursky_davinci-resolve-mcp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=samuelgursky_davinci-resolve-mcp&category=VERSION&p=1&ps=100
-6897:2026-07-06 07:20:50,452 [ERROR] Failed to check existing analysis for sbomify_sbomify: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sbomify_sbomify&category=VERSION&p=1&ps=100
-6996:2026-07-06 07:23:57,236 [ERROR] Failed to check existing analysis for smartian1_tgtrader: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smartian1_tgtrader&category=VERSION&p=1&ps=100
-7063:2026-07-06 07:26:35,281 [ERROR] Failed to check existing analysis for smorin_py-launch-blueprint: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=smorin_py-launch-blueprint&category=VERSION&p=1&ps=100
-7123:2026-07-06 07:28:38,155 [ERROR] Failed to check existing analysis for sshtunnelvision_MCP-LOGO-GEN: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=sshtunnelvision_MCP-LOGO-GEN&category=VERSION&p=1&ps=100
-7169:2026-07-06 07:29:56,920 [ERROR] Failed to check existing analysis for synaptiai_prompt-decorators: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=synaptiai_prompt-decorators&category=VERSION&p=1&ps=100
-7222:2026-07-06 07:31:41,185 [ERROR] Failed to check existing analysis for terryyin_lizard: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=terryyin_lizard&category=VERSION&p=1&ps=100
-7366:2026-07-06 07:40:35,221 [ERROR] Failed to check existing analysis for tmux-python_tmuxp: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tmux-python_tmuxp&category=VERSION&p=1&ps=100
-7510:2026-07-06 07:46:11,112 [ERROR] Failed to check existing analysis for tony_django-docutils: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-docutils&category=VERSION&p=1&ps=100
-7654:2026-07-06 07:51:34,187 [ERROR] Failed to check existing analysis for tony_django-slugify-processor: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tony_django-slugify-processor&category=VERSION&p=1&ps=100
-7798:2026-07-06 07:56:46,595 [ERROR] Failed to check existing analysis for trycua_cua: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=trycua_cua&category=VERSION&p=1&ps=100
-7857:2026-07-06 07:59:04,469 [ERROR] Failed to check existing analysis for tsukumijima_KonomiTV: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tsukumijima_KonomiTV&category=VERSION&p=1&ps=100
-8001:2026-07-06 08:06:40,069 [ERROR] Failed to check existing analysis for tw-haiven_haiven: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=tw-haiven_haiven&category=VERSION&p=1&ps=100
-8165:2026-07-06 08:13:33,017 [ERROR] Failed to check existing analysis for vcs-python_vcspull: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vcs-python_vcspull&category=VERSION&p=1&ps=100
-8309:2026-07-06 08:18:53,829 [ERROR] Failed to check existing analysis for vietanhdev_anylabeling: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=vietanhdev_anylabeling&category=VERSION&p=1&ps=100
-8678:2026-07-06 08:29:04,601 [ERROR] Failed to check existing analysis for whiteducksoftware_flock: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=whiteducksoftware_flock&category=VERSION&p=1&ps=100
-8731:2026-07-06 08:31:17,745 [ERROR] Failed to check existing analysis for xzq-xu_jvm-mcp-server: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=xzq-xu_jvm-mcp-server&category=VERSION&p=1&ps=100
-8777:2026-07-06 08:32:38,012 [ERROR] Failed to check existing analysis for yagami1997_CursorMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_CursorMind&category=VERSION&p=1&ps=100
-8823:2026-07-06 08:33:59,321 [ERROR] Failed to check existing analysis for yagami1997_TradeMind: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yagami1997_TradeMind&category=VERSION&p=1&ps=100
-8876:2026-07-06 08:36:03,969 [ERROR] Failed to check existing analysis for yeagerai_genlayer-studio: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=yeagerai_genlayer-studio&category=VERSION&p=1&ps=100
-9006:2026-07-06 08:41:59,442 [ERROR] Failed to check existing analysis for zauberzeug_nicegui: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zauberzeug_nicegui&category=VERSION&p=1&ps=100
-9230:2026-07-06 09:17:48,565 [ERROR] Failed to check existing analysis for zilliztech_mcp-server-milvus: 404 Client Error:  for url: http://localhost:9000/api/project_analyses/search?project=zilliztech_mcp-server-milvus&category=VERSION&p=1&ps=100
-Rows: 1264
-Rows with any missing key metric: 10
-Repos with any missing key metric: 5
+Combined QC wide:
+ panel                                                                           output_file                                                                           complete_output_file                                                                                        missing_output_file  output_rows  complete_rows  missing_core_quality_rows  output_repos  complete_repos  missing_core_quality_repos
+strict repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input.csv repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_missing_core_quality.csv         1633           1604                         29           220             219                          15
 
-           repo_name   month                            latest_commit
-    getsentry/sentry 2025-03 2d92281805254325dbedb3cafcfdd53d09b1d9df
-    getsentry/sentry 2025-04 32cb664b86c13cc020c06f7e208cd9a62e6891a0
-    getsentry/sentry 2025-05 975f8d773e5a6c5ed6595176a42ff31e887ec95d
-hyperb1iss/droidmind 2025-02 0d7eb7376eb0578b3aae50e0c5bd1cdec205a368
-     ilanbenb/wa_llm 2024-12 f56e3e01bc6dc3f46168b179967818623657dda1
-          trycua/cua 2025-01 19a07d24d3c1207aa0809c77975087d92c070b0a
-          trycua/cua 2025-02 b187511acfabe7fad390c581961fb7718748d07d
-  zauberzeug/nicegui 2024-08 06921814203898f7f83abb27899f34082e76f804
-  zauberzeug/nicegui 2024-09 b7b6956f26ba5e731ec2f7feae53b604f624495c
-  zauberzeug/nicegui 2024-10 c810dda1c4380fd0cca20a40dfe78653af080f38
+============================================================
+run-py-2e completed successfully.
+Completed:        Tue Jul  7 08:13:24 PM CDT 2026
+Panel variant:    strict
+Manifest:         repo_python/did_final/quality_did_input_manifest_strict_20260707-201323.csv
+Combined QC long: repo_python/did_final/quality_did_input_qc_strict_long.csv
+Combined QC wide: repo_python/did_final/quality_did_input_qc_strict_wide.csv
+Log file:         logs/run-py-2e_prepare_quality_did_input_strict_20260707-201323.log
+============================================================

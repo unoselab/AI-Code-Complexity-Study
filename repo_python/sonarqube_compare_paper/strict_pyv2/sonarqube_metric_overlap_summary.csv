@@ -1,0 +1,13 @@
+metric,value
+our_scan_rows,3043
+our_scan_unique_repo_months,3043
+our_scan_unique_repos,220
+paper_panel_rows,21943
+paper_panel_unique_repo_months,21943
+paper_panel_unique_repos,2002
+overlap_repo_months,2169
+our_repo_months_missing_in_paper,874
+paper_repo_months_for_our_repos_missing_in_ours,1
+wide_rows,3043
+wide_rows_with_paper_match,2169
+paper_duplicate_repo_month_rows,204
