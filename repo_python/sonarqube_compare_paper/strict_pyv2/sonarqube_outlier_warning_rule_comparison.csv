@@ -1,0 +1,549 @@
+target_id,variant,source_group,repo_name,time,rule,type,severity,category,paper_count,our_count,diff_our_minus_paper,paper_minus_our,abs_diff
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S878,CODE_SMELL,MAJOR,Code Style,0,2995,2995,-2995,2995
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3504,CODE_SMELL,CRITICAL,Code Style,0,2056,2056,-2056,2056
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2681,CODE_SMELL,MAJOR,Logic Error,0,1122,1122,-1122,1122
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6759,CODE_SMELL,MINOR,Type Safety,0,995,995,-995,995
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3358,CODE_SMELL,MAJOR,Code Complexity,0,801,801,-801,801
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7735,CODE_SMELL,MINOR,Unmapped,0,712,712,-712,712
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1121,CODE_SMELL,MAJOR,Code Style,0,661,661,-661,661
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4325,CODE_SMELL,MINOR,Type Safety,0,551,551,-551,551
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7780,CODE_SMELL,MINOR,Unmapped,0,503,503,-503,503
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,453,453,-453,453
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3358,CODE_SMELL,MAJOR,Code Complexity,0,428,428,-428,428
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7748,CODE_SMELL,MINOR,Unmapped,0,426,426,-426,426
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7764,CODE_SMELL,MINOR,Unmapped,0,359,359,-359,359
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1135,CODE_SMELL,INFO,Code Hygiene,0,333,333,-333,333
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7773,CODE_SMELL,MINOR,Unmapped,0,311,311,-311,311
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1192,CODE_SMELL,CRITICAL,Code Complexity,0,303,303,-303,303
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6861,CODE_SMELL,CRITICAL,Code Style,0,266,266,-266,266
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,260,260,-260,260
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1763,BUG,MAJOR,Logic Error,0,245,245,-245,245
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6582,CODE_SMELL,MAJOR,Code Style,0,214,214,-214,214
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6749,CODE_SMELL,MINOR,React Patterns,0,196,196,-196,196
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1874,CODE_SMELL,MINOR,API Usage,0,171,171,-171,171
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3863,CODE_SMELL,MINOR,Code Style,0,170,170,-170,170
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6479,CODE_SMELL,MAJOR,React Patterns,0,166,166,-166,166
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7773,CODE_SMELL,MINOR,Unmapped,0,165,165,-165,165
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2933,CODE_SMELL,MAJOR,Code Style,0,155,155,-155,155
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6767,CODE_SMELL,MINOR,React Patterns,0,138,138,-138,138
+2,paper_like,treatment,PostHog/posthog,2025-04,css:S125,CODE_SMELL,MAJOR,Code Hygiene,0,133,133,-133,133
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,123,123,-123,123
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2392,CODE_SMELL,MAJOR,Naming Conventions,0,122,122,-122,122
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1313,CODE_SMELL,MINOR,Unmapped,0,114,114,-114,114
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6848,CODE_SMELL,MAJOR,Accessibility,0,108,108,-108,108
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S112,CODE_SMELL,MAJOR,Error Handling,0,105,105,-105,105
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1082,BUG,MINOR,Accessibility,0,103,103,-103,103
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S6582,CODE_SMELL,MAJOR,Code Style,0,101,101,-101,101
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S4624,CODE_SMELL,MAJOR,Code Complexity,0,100,100,-100,100
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6582,CODE_SMELL,MAJOR,Code Style,0,98,98,-98,98
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1264,CODE_SMELL,MINOR,Code Style,0,96,96,-96,96
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6397,CODE_SMELL,MAJOR,Regex Issues,0,95,95,-95,95
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7772,CODE_SMELL,MINOR,Unmapped,0,95,95,-95,95
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2486,CODE_SMELL,MINOR,Error Handling,0,93,93,-93,93
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1135,CODE_SMELL,INFO,Code Hygiene,0,93,93,-93,93
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7744,CODE_SMELL,MINOR,Unmapped,0,91,91,-91,91
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6535,CODE_SMELL,MAJOR,Code Style,0,84,84,-84,84
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S117,CODE_SMELL,MINOR,Naming Conventions,0,83,83,-83,83
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7781,CODE_SMELL,MINOR,Unmapped,0,81,81,-81,81
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1172,CODE_SMELL,MAJOR,Code Hygiene,0,78,78,-78,78
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2430,CODE_SMELL,CRITICAL,Naming Conventions,0,76,76,-76,76
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7755,CODE_SMELL,MINOR,Unmapped,0,74,74,-74,74
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6478,CODE_SMELL,MAJOR,React Patterns,0,73,73,-73,73
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7758,CODE_SMELL,MINOR,Unmapped,0,72,72,-72,72
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7780,CODE_SMELL,MINOR,Unmapped,0,72,72,-72,72
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7723,CODE_SMELL,MINOR,Unmapped,0,69,69,-69,69
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7780,CODE_SMELL,MINOR,Unmapped,0,64,64,-64,64
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S5806,CODE_SMELL,MAJOR,Naming Conventions,1,64,63,-63,63
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7764,CODE_SMELL,MINOR,Unmapped,0,63,63,-63,63
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1542,CODE_SMELL,MAJOR,Naming Conventions,0,62,62,-62,62
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6606,CODE_SMELL,MINOR,Code Style,0,59,59,-59,59
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6594,CODE_SMELL,MINOR,API Usage,0,57,57,-57,57
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6353,CODE_SMELL,MINOR,Regex Issues,0,55,55,-55,55
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7754,CODE_SMELL,MINOR,Unmapped,0,55,55,-55,55
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7735,CODE_SMELL,MINOR,Unmapped,0,54,54,-54,54
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2004,CODE_SMELL,CRITICAL,Code Complexity,0,54,54,-54,54
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S905,BUG,MAJOR,Logic Error,0,53,53,-53,53
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1135,CODE_SMELL,INFO,Code Hygiene,0,53,53,-53,53
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,52,52,-52,52
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7723,CODE_SMELL,MINOR,Unmapped,0,51,51,-51,51
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7741,CODE_SMELL,MINOR,Unmapped,0,50,50,-50,50
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6867,VULNERABILITY,MAJOR,Security,0,49,49,-49,49
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,46,46,-46,46
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7765,CODE_SMELL,MINOR,Unmapped,0,46,46,-46,46
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1186,CODE_SMELL,CRITICAL,Empty/Incomplete Code,0,45,45,-45,45
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6440,BUG,MAJOR,React Patterns,0,43,43,-43,43
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7776,CODE_SMELL,MINOR,Unmapped,0,43,43,-43,43
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6897,CODE_SMELL,MAJOR,Infrastructure,0,43,43,-43,43
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1313,CODE_SMELL,MINOR,Unmapped,0,39,39,-39,39
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6644,CODE_SMELL,MINOR,Code Style,0,39,39,-39,39
+2,paper_like,treatment,PostHog/posthog,2025-04,secrets:S6698,VULNERABILITY,BLOCKER,Security,0,37,37,-37,37
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7781,CODE_SMELL,MINOR,Unmapped,0,37,37,-37,37
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1854,CODE_SMELL,MAJOR,Code Hygiene,0,36,36,-36,36
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2234,CODE_SMELL,MAJOR,Logic Error,0,36,36,-36,36
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S905,BUG,MAJOR,Logic Error,0,36,36,-36,36
+3,paper_like,treatment,DataDog/integrations-core,2025-01,docker:S7031,CODE_SMELL,MINOR,Infrastructure,0,35,35,-35,35
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S125,CODE_SMELL,MAJOR,Code Hygiene,0,34,34,-34,34
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7759,CODE_SMELL,MINOR,Unmapped,0,32,32,-32,32
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7778,CODE_SMELL,MINOR,Unmapped,0,32,32,-32,32
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7773,CODE_SMELL,MINOR,Unmapped,0,30,30,-30,30
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4624,CODE_SMELL,MAJOR,Code Complexity,0,30,30,-30,30
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S112,CODE_SMELL,MAJOR,Error Handling,0,29,29,-29,29
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S107,CODE_SMELL,MAJOR,Code Complexity,0,29,29,-29,29
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6551,CODE_SMELL,MINOR,Code Style,0,29,29,-29,29
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1134,CODE_SMELL,MAJOR,Code Hygiene,0,29,29,-29,29
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1186,CODE_SMELL,CRITICAL,Empty/Incomplete Code,0,29,29,-29,29
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S5843,CODE_SMELL,MAJOR,Regex Issues,0,28,28,-28,28
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S6638,BUG,MAJOR,Logic Error,0,28,28,-28,28
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1940,CODE_SMELL,MINOR,Code Style,0,28,28,-28,28
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4782,CODE_SMELL,MAJOR,Type Safety,0,27,27,-27,27
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6864,VULNERABILITY,MAJOR,Security,0,27,27,-27,27
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S5842,BUG,MINOR,Regex Issues,0,26,26,-26,26
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6661,CODE_SMELL,MAJOR,Code Style,0,26,26,-26,26
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7740,CODE_SMELL,MAJOR,Unmapped,0,26,26,-26,26
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4623,CODE_SMELL,MAJOR,Type Safety,0,26,26,-26,26
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3972,CODE_SMELL,CRITICAL,Logic Error,0,25,25,-25,25
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7747,CODE_SMELL,MINOR,Unmapped,0,25,25,-25,25
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S116,CODE_SMELL,MINOR,Naming Conventions,0,25,25,-25,25
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7504,CODE_SMELL,MINOR,Unmapped,0,25,25,-25,25
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6772,CODE_SMELL,MAJOR,React Patterns,0,24,24,-24,24
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S107,CODE_SMELL,MAJOR,Code Complexity,0,23,23,-23,23
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7721,CODE_SMELL,MAJOR,Unmapped,0,23,23,-23,23
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S3457,CODE_SMELL,MAJOR,Code Style,0,23,23,-23,23
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4323,CODE_SMELL,MINOR,Type Safety,0,23,23,-23,23
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6873,CODE_SMELL,MAJOR,Infrastructure,0,23,23,-23,23
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2004,CODE_SMELL,CRITICAL,Code Complexity,0,22,22,-22,22
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7718,CODE_SMELL,MINOR,Unmapped,0,22,22,-22,22
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7732,CODE_SMELL,MINOR,Unmapped,0,22,22,-22,22
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6892,CODE_SMELL,MAJOR,Infrastructure,0,22,22,-22,22
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5754,CODE_SMELL,CRITICAL,Error Handling,0,22,22,-22,22
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6903,CODE_SMELL,CRITICAL,API Usage,0,22,22,-22,22
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1226,BUG,MINOR,Logic Error,0,21,21,-21,21
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1481,CODE_SMELL,MINOR,Code Hygiene,0,21,21,-21,21
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S5869,CODE_SMELL,MAJOR,Regex Issues,0,21,21,-21,21
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6660,CODE_SMELL,MAJOR,Code Style,0,21,21,-21,21
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7770,CODE_SMELL,MINOR,Unmapped,0,21,21,-21,21
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7786,CODE_SMELL,MINOR,Unmapped,0,21,21,-21,21
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6870,VULNERABILITY,MAJOR,Security,0,21,21,-21,21
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7721,CODE_SMELL,MAJOR,Unmapped,0,20,20,-20,20
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7755,CODE_SMELL,MINOR,Unmapped,0,20,20,-20,20
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1940,CODE_SMELL,MINOR,Code Style,0,19,19,-19,19
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S4138,CODE_SMELL,MINOR,Code Style,0,19,19,-19,19
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7772,CODE_SMELL,MINOR,Unmapped,0,19,19,-19,19
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1192,CODE_SMELL,CRITICAL,Code Complexity,0,17,17,-17,17
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3735,CODE_SMELL,CRITICAL,Code Style,0,17,17,-17,17
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7763,CODE_SMELL,MINOR,Unmapped,0,17,17,-17,17
+3,paper_like,treatment,DataDog/integrations-core,2025-01,docker:S7020,CODE_SMELL,MINOR,Infrastructure,0,17,17,-17,17
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7766,CODE_SMELL,MINOR,Unmapped,0,16,16,-16,16
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7748,CODE_SMELL,MINOR,Unmapped,0,16,16,-16,16
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7767,CODE_SMELL,MAJOR,Unmapped,0,16,16,-16,16
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4043,CODE_SMELL,MAJOR,Code Style,0,16,16,-16,16
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6557,CODE_SMELL,MAJOR,API Usage,0,16,16,-16,16
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7746,CODE_SMELL,MAJOR,Unmapped,0,16,16,-16,16
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1066,CODE_SMELL,MAJOR,Code Style,0,16,16,-16,16
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S3626,CODE_SMELL,MINOR,Code Hygiene,0,16,16,-16,16
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S4624,CODE_SMELL,MAJOR,Code Complexity,0,15,15,-15,15
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S2589,CODE_SMELL,MAJOR,Logic Error,0,15,15,-15,15
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1481,CODE_SMELL,MINOR,Code Hygiene,0,15,15,-15,15
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7519,CODE_SMELL,MINOR,Unmapped,0,15,15,-15,15
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1874,CODE_SMELL,MINOR,API Usage,0,14,14,-14,14
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6353,CODE_SMELL,MINOR,Regex Issues,0,14,14,-14,14
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6679,CODE_SMELL,MAJOR,Code Style,0,14,14,-14,14
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1788,CODE_SMELL,MAJOR,Code Style,0,14,14,-14,14
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1940,CODE_SMELL,MINOR,Code Style,0,14,14,-14,14
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1479,CODE_SMELL,MAJOR,Code Complexity,0,13,13,-13,13
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S4043,CODE_SMELL,MAJOR,Code Style,0,13,13,-13,13
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6836,CODE_SMELL,MAJOR,Code Style,0,13,13,-13,13
+2,paper_like,treatment,PostHog/posthog,2025-04,go:S1135,CODE_SMELL,INFO,Code Hygiene,0,13,13,-13,13
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S2486,CODE_SMELL,MINOR,Unmapped,0,13,13,-13,13
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2819,VULNERABILITY,CRITICAL,Security,0,13,13,-13,13
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6325,CODE_SMELL,MINOR,Regex Issues,0,13,13,-13,13
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6564,CODE_SMELL,MAJOR,Type Safety,0,13,13,-13,13
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S4423,VULNERABILITY,CRITICAL,Unmapped,0,13,13,-13,13
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S128,CODE_SMELL,BLOCKER,Logic Error,0,12,12,-12,12
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S3358,CODE_SMELL,MAJOR,Code Complexity,0,12,12,-12,12
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2201,BUG,MAJOR,Logic Error,0,12,12,-12,12
+3,paper_like,treatment,DataDog/integrations-core,2025-01,docker:S7019,CODE_SMELL,MAJOR,Infrastructure,0,12,12,-12,12
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S3457,CODE_SMELL,MAJOR,Code Style,0,12,12,-12,12
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6353,CODE_SMELL,MINOR,Regex Issues,0,12,12,-12,12
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7722,CODE_SMELL,MINOR,Unmapped,0,11,11,-11,11
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7765,CODE_SMELL,MINOR,Unmapped,0,11,11,-11,11
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7767,CODE_SMELL,MAJOR,Unmapped,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1125,CODE_SMELL,MINOR,Code Style,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S2681,CODE_SMELL,MAJOR,Logic Error,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S117,CODE_SMELL,MINOR,Naming Conventions,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1871,CODE_SMELL,MAJOR,Logic Error,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3626,CODE_SMELL,MINOR,Code Hygiene,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6535,CODE_SMELL,MAJOR,Code Style,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6754,CODE_SMELL,MINOR,React Patterns,0,11,11,-11,11
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7750,CODE_SMELL,MINOR,Unmapped,0,11,11,-11,11
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S100,CODE_SMELL,MINOR,Naming Conventions,0,11,11,-11,11
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S3358,CODE_SMELL,MAJOR,Code Complexity,0,11,11,-11,11
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5914,CODE_SMELL,MAJOR,Type Safety,0,11,11,-11,11
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3800,CODE_SMELL,MAJOR,Logic Error,0,10,10,-10,10
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6557,CODE_SMELL,MAJOR,API Usage,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1121,CODE_SMELL,MAJOR,Code Style,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S4144,CODE_SMELL,MAJOR,Code Complexity,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S125,CODE_SMELL,MAJOR,Code Hygiene,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1077,CODE_SMELL,MINOR,Accessibility,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1301,CODE_SMELL,MINOR,Code Style,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1764,BUG,MAJOR,Logic Error,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6671,CODE_SMELL,MAJOR,Logic Error,0,10,10,-10,10
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7762,CODE_SMELL,MAJOR,Unmapped,0,10,10,-10,10
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2761,CODE_SMELL,MAJOR,Unmapped,0,10,10,-10,10
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7494,CODE_SMELL,MINOR,Unmapped,0,10,10,-10,10
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1788,CODE_SMELL,MAJOR,Code Style,0,9,9,-9,9
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6653,CODE_SMELL,MINOR,API Usage,0,9,9,-9,9
+2,paper_like,treatment,PostHog/posthog,2025-04,go:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,9,9,-9,9
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7764,CODE_SMELL,MINOR,Unmapped,0,9,9,-9,9
+3,paper_like,treatment,DataDog/integrations-core,2025-01,docker:S7029,CODE_SMELL,MAJOR,Infrastructure,0,9,9,-9,9
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S125,CODE_SMELL,MAJOR,Code Hygiene,0,9,9,-9,9
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1854,CODE_SMELL,MAJOR,Code Hygiene,0,9,9,-9,9
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5799,CODE_SMELL,MAJOR,Code Style,0,9,9,-9,9
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8519,CODE_SMELL,MAJOR,Unmapped,0,9,9,-9,9
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6676,CODE_SMELL,MAJOR,Code Style,0,8,8,-8,8
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7769,CODE_SMELL,MINOR,Unmapped,0,8,8,-8,8
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1135,CODE_SMELL,INFO,Code Hygiene,0,8,8,-8,8
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7735,CODE_SMELL,MINOR,Unmapped,0,8,8,-8,8
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S6903,CODE_SMELL,CRITICAL,API Usage,0,8,8,-8,8
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1090,CODE_SMELL,MINOR,Accessibility,0,8,8,-8,8
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2871,BUG,CRITICAL,Logic Error,0,8,8,-8,8
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S5869,CODE_SMELL,MAJOR,Regex Issues,0,8,8,-8,8
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S107,CODE_SMELL,MAJOR,Code Complexity,0,8,8,-8,8
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1845,CODE_SMELL,BLOCKER,Naming Conventions,0,8,8,-8,8
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2836,CODE_SMELL,MAJOR,Code Style,0,8,8,-8,8
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5806,CODE_SMELL,MAJOR,Naming Conventions,0,8,8,-8,8
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,css:S4666,CODE_SMELL,MAJOR,CSS Issues,0,7,7,-7,7
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1994,CODE_SMELL,CRITICAL,Logic Error,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,go:S117,CODE_SMELL,MINOR,Naming Conventions,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S4138,CODE_SMELL,MINOR,Code Style,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7786,CODE_SMELL,MINOR,Unmapped,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1134,CODE_SMELL,MAJOR,Code Hygiene,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2589,CODE_SMELL,MAJOR,Logic Error,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4138,CODE_SMELL,MINOR,Code Style,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6439,BUG,MAJOR,React Patterns,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6819,CODE_SMELL,MAJOR,Accessibility,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7737,CODE_SMELL,MINOR,Unmapped,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7753,CODE_SMELL,MINOR,Unmapped,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7766,CODE_SMELL,MINOR,Unmapped,0,7,7,-7,7
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S905,BUG,MAJOR,Logic Error,0,7,7,-7,7
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2772,CODE_SMELL,MINOR,Code Style,0,7,7,-7,7
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S4830,VULNERABILITY,CRITICAL,Security,0,7,7,-7,7
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5843,CODE_SMELL,MAJOR,Regex Issues,0,7,7,-7,7
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6660,CODE_SMELL,MINOR,Code Style,0,7,7,-7,7
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7496,CODE_SMELL,MINOR,Unmapped,0,7,7,-7,7
+3,paper_like,treatment,DataDog/integrations-core,2025-01,xml:S125,CODE_SMELL,MAJOR,Code Hygiene,0,7,7,-7,7
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,docker:S7031,CODE_SMELL,MINOR,Infrastructure,0,6,6,-6,6
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1764,BUG,MAJOR,Logic Error,0,6,6,-6,6
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S4165,CODE_SMELL,MAJOR,Code Hygiene,0,6,6,-6,6
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6594,CODE_SMELL,MINOR,API Usage,0,6,6,-6,6
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,docker:S7020,CODE_SMELL,MINOR,Infrastructure,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1481,CODE_SMELL,MINOR,Code Hygiene,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S3504,CODE_SMELL,CRITICAL,Code Style,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1481,CODE_SMELL,MINOR,Code Hygiene,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S6553,CODE_SMELL,MAJOR,API Usage,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1121,CODE_SMELL,MAJOR,Code Style,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4144,CODE_SMELL,MAJOR,Code Complexity,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S5843,CODE_SMELL,MAJOR,Regex Issues,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6550,CODE_SMELL,MAJOR,Type Safety,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7751,CODE_SMELL,MINOR,Unmapped,0,6,6,-6,6
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7758,CODE_SMELL,MINOR,Unmapped,0,6,6,-6,6
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1313,CODE_SMELL,MINOR,Unmapped,0,6,6,-6,6
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1871,CODE_SMELL,MAJOR,Logic Error,0,6,6,-6,6
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5527,VULNERABILITY,CRITICAL,Security,0,6,6,-6,6
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5869,CODE_SMELL,MAJOR,Regex Issues,0,6,6,-6,6
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5886,CODE_SMELL,MAJOR,Type Safety,0,6,6,-6,6
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8513,CODE_SMELL,MAJOR,Unmapped,0,6,6,-6,6
+3,paper_like,treatment,DataDog/integrations-core,2025-01,xml:S2068,VULNERABILITY,MAJOR,Unmapped,0,6,6,-6,6
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2259,BUG,MAJOR,Logic Error,0,5,5,-5,5
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6666,CODE_SMELL,MAJOR,Code Style,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S4165,CODE_SMELL,MAJOR,Code Hygiene,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1172,CODE_SMELL,MAJOR,Code Hygiene,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1854,CODE_SMELL,MAJOR,Code Hygiene,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2137,BUG,MAJOR,Naming Conventions,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6397,CODE_SMELL,MAJOR,Regex Issues,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6481,CODE_SMELL,MAJOR,React Patterns,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6544,BUG,MAJOR,Logic Error,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6811,CODE_SMELL,MAJOR,Accessibility,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7732,CODE_SMELL,MINOR,Unmapped,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7760,CODE_SMELL,MAJOR,Unmapped,0,5,5,-5,5
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7761,CODE_SMELL,MAJOR,Unmapped,0,5,5,-5,5
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S101,CODE_SMELL,MINOR,Naming Conventions,0,5,5,-5,5
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5713,CODE_SMELL,MINOR,Error Handling,0,5,5,-5,5
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6395,CODE_SMELL,MAJOR,Regex Issues,0,5,5,-5,5
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S101,CODE_SMELL,MINOR,Naming Conventions,0,4,4,-4,4
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1128,CODE_SMELL,MINOR,Code Hygiene,0,4,4,-4,4
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7727,BUG,MAJOR,Unmapped,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1199,CODE_SMELL,MINOR,Code Style,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1764,BUG,MAJOR,Logic Error,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S2871,BUG,CRITICAL,Logic Error,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S6353,CODE_SMELL,MINOR,Regex Issues,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7721,CODE_SMELL,MAJOR,Unmapped,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S878,CODE_SMELL,MAJOR,Code Style,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S3358,CODE_SMELL,MAJOR,Code Complexity,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S8572,CODE_SMELL,MAJOR,Unmapped,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,rust:S3776,CODE_SMELL,CRITICAL,Unmapped,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6035,CODE_SMELL,MAJOR,Regex Issues,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6847,CODE_SMELL,MAJOR,Accessibility,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6861,CODE_SMELL,CRITICAL,Code Style,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7059,CODE_SMELL,CRITICAL,Concurrency,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7718,CODE_SMELL,MINOR,Unmapped,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7727,BUG,MAJOR,Unmapped,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7756,CODE_SMELL,MINOR,Unmapped,0,4,4,-4,4
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7769,CODE_SMELL,MINOR,Unmapped,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,docker:S6596,CODE_SMELL,MAJOR,Infrastructure,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6428,VULNERABILITY,MAJOR,Unmapped,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6865,VULNERABILITY,MAJOR,Security,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S108,CODE_SMELL,MAJOR,Error Handling,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1226,BUG,MINOR,Logic Error,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2068,VULNERABILITY,MAJOR,Unmapped,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6659,CODE_SMELL,MINOR,Code Style,0,4,4,-4,4
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S930,BUG,BLOCKER,Logic Error,0,4,4,-4,4
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1301,CODE_SMELL,MINOR,Code Style,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3516,CODE_SMELL,BLOCKER,Logic Error,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6035,CODE_SMELL,MAJOR,Regex Issues,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6324,BUG,MAJOR,Regex Issues,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7762,CODE_SMELL,MAJOR,Unmapped,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7784,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S1192,CODE_SMELL,CRITICAL,Code Complexity,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7483,CODE_SMELL,MAJOR,Unmapped,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7497,BUG,MAJOR,Unmapped,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7503,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,Web:PageWithoutTitleCheck,BUG,MAJOR,Accessibility,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,docker:S7031,CODE_SMELL,MINOR,Infrastructure,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1186,CODE_SMELL,CRITICAL,Empty/Incomplete Code,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1264,CODE_SMELL,MINOR,Code Style,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1854,CODE_SMELL,MAJOR,Code Hygiene,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1874,CODE_SMELL,MINOR,API Usage,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S2703,CODE_SMELL,BLOCKER,Code Style,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7741,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1940,CODE_SMELL,MINOR,Code Style,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S3516,CODE_SMELL,BLOCKER,Logic Error,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S3626,CODE_SMELL,MINOR,Code Hygiene,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S6887,CODE_SMELL,CRITICAL,API Usage,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S101,CODE_SMELL,MINOR,Naming Conventions,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2301,CODE_SMELL,MAJOR,Code Style,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2737,CODE_SMELL,MINOR,Error Handling,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6822,CODE_SMELL,MAJOR,Accessibility,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6836,CODE_SMELL,MAJOR,Code Style,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6842,CODE_SMELL,MAJOR,Accessibility,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7722,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7726,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7745,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7757,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7771,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+2,paper_like,treatment,PostHog/posthog,2025-04,xml:S125,CODE_SMELL,MAJOR,Code Hygiene,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,Web:S5254,BUG,MAJOR,Accessibility,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,java:S106,CODE_SMELL,MAJOR,OOP/Design,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,java:S1192,CODE_SMELL,CRITICAL,Code Complexity,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,javascript:S3504,CODE_SMELL,CRITICAL,Code Style,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,javascript:S7773,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1542,CODE_SMELL,MAJOR,Naming Conventions,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1656,BUG,MAJOR,Logic Error,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1700,CODE_SMELL,MAJOR,Naming Conventions,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2737,CODE_SMELL,MINOR,Error Handling,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S4487,CODE_SMELL,CRITICAL,Code Hygiene,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5443,VULNERABILITY,CRITICAL,Unmapped,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5850,BUG,MAJOR,Regex Issues,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7500,CODE_SMELL,MINOR,Unmapped,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,scala:S1192,CODE_SMELL,CRITICAL,Unmapped,0,3,3,-3,3
+3,paper_like,treatment,DataDog/integrations-core,2025-01,terraform:S6405,VULNERABILITY,MAJOR,Unmapped,0,3,3,-3,3
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,css:S7924,CODE_SMELL,MAJOR,Unmapped,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,docker:S7029,CODE_SMELL,MAJOR,Infrastructure,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1751,BUG,MAJOR,Logic Error,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2189,BUG,BLOCKER,Logic Error,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3696,CODE_SMELL,MAJOR,Error Handling,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3735,CODE_SMELL,CRITICAL,Code Style,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S5868,BUG,MAJOR,Regex Issues,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6671,CODE_SMELL,MAJOR,Logic Error,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7759,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7763,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7770,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S930,BUG,CRITICAL,Logic Error,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S3358,CODE_SMELL,MAJOR,Code Complexity,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7504,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,Web:S5254,BUG,MAJOR,Accessibility,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,css:S4649,BUG,MAJOR,CSS Issues,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S125,CODE_SMELL,MAJOR,Code Hygiene,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1871,CODE_SMELL,MAJOR,Logic Error,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S6397,CODE_SMELL,MAJOR,Regex Issues,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S6509,CODE_SMELL,MINOR,Code Style,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7759,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S905,BUG,MAJOR,Logic Error,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1066,CODE_SMELL,MAJOR,Code Style,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S116,CODE_SMELL,MINOR,Naming Conventions,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1186,CODE_SMELL,CRITICAL,Empty/Incomplete Code,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S4144,CODE_SMELL,MAJOR,Code Complexity,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S5754,CODE_SMELL,CRITICAL,Error Handling,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S5914,CODE_SMELL,MAJOR,Type Safety,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S6019,CODE_SMELL,MAJOR,Regex Issues,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S6035,CODE_SMELL,MAJOR,Regex Issues,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S7492,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S7519,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1125,CODE_SMELL,MINOR,Code Style,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1128,CODE_SMELL,MINOR,Code Hygiene,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1479,CODE_SMELL,MAJOR,Code Complexity,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1763,BUG,MAJOR,Logic Error,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3923,BUG,MAJOR,Logic Error,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4030,CODE_SMELL,MAJOR,Code Hygiene,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4123,CODE_SMELL,CRITICAL,Concurrency,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4165,CODE_SMELL,MAJOR,Code Hygiene,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4822,BUG,MAJOR,Logic Error,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S5148,VULNERABILITY,MINOR,Unmapped,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S5256,BUG,MAJOR,Accessibility,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6565,CODE_SMELL,MINOR,Type Safety,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6571,CODE_SMELL,MINOR,Type Safety,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6598,CODE_SMELL,MINOR,Type Safety,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6650,CODE_SMELL,MINOR,Code Style,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6770,CODE_SMELL,MINOR,React Patterns,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6841,CODE_SMELL,MAJOR,Accessibility,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6851,CODE_SMELL,MAJOR,Accessibility,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6959,BUG,MAJOR,Logic Error,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7752,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7787,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S878,CODE_SMELL,MAJOR,Code Style,0,2,2,-2,2
+2,paper_like,treatment,PostHog/posthog,2025-04,xml:S2068,VULNERABILITY,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,java:S5443,VULNERABILITY,CRITICAL,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,javascript:S2688,BUG,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S5849,VULNERABILITY,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6431,VULNERABILITY,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1244,BUG,MAJOR,Logic Error,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1764,BUG,MAJOR,Logic Error,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2876,BUG,BLOCKER,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S3923,BUG,MAJOR,Logic Error,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5655,CODE_SMELL,CRITICAL,Type Safety,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5795,CODE_SMELL,MAJOR,Logic Error,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5797,CODE_SMELL,CRITICAL,Logic Error,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5918,CODE_SMELL,MINOR,Code Style,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7498,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7505,CODE_SMELL,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7511,CODE_SMELL,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8500,CODE_SMELL,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8517,CODE_SMELL,MAJOR,Unmapped,0,2,2,-2,2
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8521,CODE_SMELL,MINOR,Unmapped,0,2,2,-2,2
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,docker:S7019,CODE_SMELL,MAJOR,Infrastructure,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,docker:S7020,CODE_SMELL,MINOR,Infrastructure,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S125,CODE_SMELL,MAJOR,Code Hygiene,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1515,CODE_SMELL,MAJOR,Logic Error,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2301,CODE_SMELL,MAJOR,Code Style,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2310,CODE_SMELL,MAJOR,Code Hygiene,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2814,CODE_SMELL,MAJOR,Code Style,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S4140,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S4275,BUG,CRITICAL,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S5850,BUG,MAJOR,Regex Issues,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6019,CODE_SMELL,MAJOR,Regex Issues,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6323,BUG,MAJOR,Regex Issues,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6325,CODE_SMELL,MINOR,Regex Issues,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6331,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6647,CODE_SMELL,MINOR,Code Style,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7729,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7736,BUG,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7737,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7745,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7752,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7757,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7760,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7771,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7772,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7776,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S1135,CODE_SMELL,INFO,Code Hygiene,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S5443,VULNERABILITY,CRITICAL,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S5857,CODE_SMELL,MINOR,Regex Issues,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7484,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7493,BUG,MAJOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7494,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S7500,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,python:S8415,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+1,paper_like,treatment,zauberzeug/nicegui,2025-04,text:S6389,VULNERABILITY,MAJOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,Web:S5725,VULNERABILITY,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,docker:S1135,CODE_SMELL,INFO,Code Hygiene,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,go:S107,CODE_SMELL,MAJOR,Code Complexity,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S108,CODE_SMELL,MAJOR,Error Handling,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1126,CODE_SMELL,MINOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S1763,BUG,MAJOR,Logic Error,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S2814,CODE_SMELL,MAJOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S3403,BUG,MAJOR,Logic Error,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S3696,CODE_SMELL,MAJOR,Error Handling,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S3699,BUG,MAJOR,Logic Error,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S5122,VULNERABILITY,MAJOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S5689,VULNERABILITY,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S5843,CODE_SMELL,MAJOR,Regex Issues,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S6035,CODE_SMELL,MAJOR,Regex Issues,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S6594,CODE_SMELL,MINOR,API Usage,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7723,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7726,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7734,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7750,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7751,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7758,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7766,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7770,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7771,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S108,CODE_SMELL,MAJOR,Error Handling,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1764,BUG,MAJOR,Logic Error,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S1854,CODE_SMELL,MAJOR,Code Hygiene,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S2638,CODE_SMELL,CRITICAL,OOP/Design,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S2772,CODE_SMELL,MINOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S2836,CODE_SMELL,MAJOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S4830,VULNERABILITY,CRITICAL,Security,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S5443,VULNERABILITY,CRITICAL,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S5890,CODE_SMELL,MAJOR,Type Safety,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S5918,CODE_SMELL,MINOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S6711,CODE_SMELL,MAJOR,Data Science,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S7504,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S8517,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,python:S8521,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1143,BUG,CRITICAL,Error Handling,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1444,CODE_SMELL,MINOR,OOP/Design,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1751,BUG,MAJOR,Logic Error,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2068,VULNERABILITY,MAJOR,Unmapped,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3696,CODE_SMELL,MAJOR,Error Handling,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6323,BUG,MAJOR,Regex Issues,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6324,BUG,MAJOR,Regex Issues,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6509,CODE_SMELL,MINOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6647,CODE_SMELL,MINOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6661,CODE_SMELL,MAJOR,Code Style,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6747,CODE_SMELL,MAJOR,React Patterns,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6757,BUG,MAJOR,React Patterns,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6807,CODE_SMELL,MAJOR,Accessibility,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6844,CODE_SMELL,MAJOR,Accessibility,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6845,CODE_SMELL,MAJOR,Accessibility,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6852,CODE_SMELL,MAJOR,Accessibility,0,1,1,-1,1
+2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7767,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,Web:DoctypePresenceCheck,BUG,MAJOR,HTML Structure,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,Web:PageWithoutTitleCheck,BUG,MAJOR,Accessibility,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,Web:S1827,CODE_SMELL,MAJOR,API Usage,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,css:S4666,CODE_SMELL,MAJOR,CSS Issues,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,docker:S6476,CODE_SMELL,MAJOR,Infrastructure,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,java:S112,CODE_SMELL,MAJOR,Error Handling,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,java:S5361,CODE_SMELL,CRITICAL,Code Style,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,javascript:S2251,BUG,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,javascript:S2259,BUG,MAJOR,Logic Error,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kotlin:S1186,CODE_SMELL,CRITICAL,Empty/Incomplete Code,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kotlin:S1862,BUG,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kotlin:S6511,CODE_SMELL,MAJOR,Code Style,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S1135,CODE_SMELL,INFO,Code Hygiene,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6430,VULNERABILITY,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,kubernetes:S6596,CODE_SMELL,MAJOR,Infrastructure,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,php:S1780,CODE_SMELL,MINOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1607,CODE_SMELL,MAJOR,OOP/Design,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2208,CODE_SMELL,CRITICAL,OOP/Design,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S2638,CODE_SMELL,CRITICAL,OOP/Design,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S3516,CODE_SMELL,BLOCKER,Logic Error,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5361,CODE_SMELL,CRITICAL,Code Style,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5720,CODE_SMELL,CRITICAL,Naming Conventions,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5727,CODE_SMELL,CRITICAL,Logic Error,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5747,CODE_SMELL,CRITICAL,Error Handling,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5842,BUG,MINOR,Regex Issues,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S5890,CODE_SMELL,MAJOR,Type Safety,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6002,BUG,CRITICAL,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6019,CODE_SMELL,MAJOR,Regex Issues,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S6396,CODE_SMELL,MAJOR,Regex Issues,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7512,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S7608,VULNERABILITY,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8493,BUG,BLOCKER,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8495,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S8572,CODE_SMELL,MAJOR,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S935,BUG,BLOCKER,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,secrets:S6694,VULNERABILITY,BLOCKER,Unmapped,0,1,1,-1,1
+3,paper_like,treatment,DataDog/integrations-core,2025-01,secrets:S6706,VULNERABILITY,BLOCKER,Security,0,1,1,-1,1
