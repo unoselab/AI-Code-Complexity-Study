@@ -1,0 +1,10 @@
+modified_rows,paper_rows,paper_duplicate_repo_month_rows,matched_rows,unmatched_rows,paper_extra_column,unmatched_rows,non_missing_count_in_modified_panel,missing_count_in_modified_panel
+1604.0,22096.0,153.0,1589.0,15.0,stars,15,0,15
+,,,,,issues,15,0,15
+,,,,,issue_comments,15,0,15
+,,,,,age,15,0,15
+,,,,,num_dependencies_total,15,0,15
+,,,,,num_vulnerable_dependencies,15,0,15
+,,,,,average_technical_lag,15,0,15
+,,,,,other_agents,15,0,15
+,,,,,high_confidence,15,0,15
