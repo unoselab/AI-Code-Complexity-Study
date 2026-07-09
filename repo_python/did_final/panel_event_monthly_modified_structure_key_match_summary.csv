@@ -1,0 +1,2 @@
+input_rows,paper_rows,output_rows,output_columns,paper_schema_columns,input_duplicate_repo_month_rows,paper_duplicate_repo_month_rows,repo_month_rows_matched_to_paper,repo_month_rows_not_matched_to_paper
+1604,22096,1604,42,42,0,153,1589,15

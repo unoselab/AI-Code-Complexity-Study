@@ -1,263 +1,134 @@
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ PANEL_VARIANT=strict SCAN_SUFFIX=pyv2 VARIANT=paper_like bash compare/run-py-2b13-compare-sonarqube-outlier-warning-categories.sh
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ bash compare/run-py-2b15-create-paper-structure-panel.sh
 ============================================================
-run-py-2b13: Compare SonarQube outlier warning categories
-Started:                   Wed Jul  8 03:14:31 PM CDT 2026
+run-py-2b15: Create paper-structure panel
+Started:                   Thu Jul  9 12:42:09 AM CDT 2026
 Project root:              /home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study
-Panel variant:             strict
-Scan suffix:               pyv2
-Variant:                   paper_like
-Python script:             compare/py/compare_sonarqube_outlier_warning_categories.py
-Output dir:                repo_python/sonarqube_compare_paper/strict_pyv2
-Paper warnings file:       data_baseline_backup/sonarqube_warnings.csv
-Paper definitions file:    data_baseline_backup/sonarqube_warning_definitions.csv
-Targets file:              repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_paper_like_sensitivity_targets.csv
-Plan file:                 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_paper_like_sensitivity_plan.csv
-Results file:              repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_paper_like_sensitivity_results.csv
-Max issues per project:    0
-Page size:                 500
-API sleep:                 0
-Top print:                 30
-Log file:                  logs/run-py-2b13_compare_sonarqube_outlier_warning_categories_20260708-151431.log
+Python script:             compare/py/create_paper_structure_panel_from_python_quality.py
+Input file:                repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+Paper panel file:          data/panel_event_monthly.csv
+Output file:               repo_python/did_final/panel_event_monthly_modified_structure.csv
+Fill from paper columns:   stars,issues,issue_comments,age,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,other_agents,high_confidence
+Metric compare columns:    ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
+Top print:                 20
+Log file:                  logs/run-py-2b15_create_paper_structure_panel_20260709-004209.log
 ============================================================
-
-** Syntax check
-------------------------------------------------------------
-Python syntax check: OK
-
-** Compare warning categories and rules
-------------------------------------------------------------
-Saved output directory: repo_python/sonarqube_compare_paper/strict_pyv2
-
-Warning comparison coverage:
-Targets: 3
-Plan rows: 3
-Paper warning rows: 1
-Our issue rows: 22058
-Paper unique rules: 1
-Our unique rules: 450
-
-Key outputs:
-repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_type_severity_comparison.csv
-repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_category_comparison.csv
-repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_rule_comparison.csv
-repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_component_path_comparison.csv
-repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_missing_paper_rules.csv
-repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_extra_our_rules.csv
-repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_category_notes.md
-
-Top paper-heavy missing rules:
-(No missing paper-heavy rules.)
-
-** Output file check
-------------------------------------------------------------
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_paper_enriched.csv
-2 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_paper_enriched.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_our_issues_enriched.csv
-22071 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_our_issues_enriched.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_type_severity_comparison.csv
-36 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_type_severity_comparison.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_category_comparison.csv
-65 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_category_comparison.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_rule_comparison.csv
-549 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_rule_comparison.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_component_path_comparison.csv
-2863 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_component_path_comparison.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_missing_paper_rules.csv
-1 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_missing_paper_rules.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_extra_our_rules.csv
-549 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_extra_our_rules.csv
-File: repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_category_notes.md
-127 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_category_notes.md
-
-** Quick preview
-------------------------------------------------------------
-Command: head -n 20 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_missing_paper_rules.csv
-target_id,variant,source_group,repo_name,time,rule,type,severity,category,paper_count,our_count,diff_our_minus_paper,paper_minus_our,abs_diff
-
-============================================================
-run-py-2b13 finished successfully
-Completed:  Wed Jul  8 03:14:39 PM CDT 2026
-Output dir: repo_python/sonarqube_compare_paper/strict_pyv2
-Log file:   logs/run-py-2b13_compare_sonarqube_outlier_warning_categories_20260708-151431.log
-============================================================
+Created paper-structure diagnostic panel
+Output file: repo_python/did_final/panel_event_monthly_modified_structure.csv
+Rows: 1604
+Columns: 42
+Column sources: repo_python/did_final/panel_event_monthly_modified_structure_column_sources.csv
+Key summary: repo_python/did_final/panel_event_monthly_modified_structure_key_match_summary.csv
+Metric comparison: repo_python/did_final/panel_event_monthly_modified_structure_metric_comparison.csv
+Notes: repo_python/did_final/panel_event_monthly_modified_structure_notes.md
+Top metric differences:
+  zauberzeug/nicegui,2025-04,ncloc,our=78118.0,paper=211510.0,diff=-133392.0
+  PostHog/posthog,2025-04,ncloc,our=1025455.0,paper=937017.0,diff=88438.0
+  PostHog/posthog,2025-08,ncloc,our=1313277.0,paper=1232071.0,diff=81206.0
+  PostHog/posthog,2025-07,ncloc,our=1224250.0,paper=1155675.0,diff=68575.0
+  PostHog/posthog,2025-06,ncloc,our=1143141.0,paper=1079135.0,diff=64006.0
+  zauberzeug/nicegui,2025-04,technical_debt,our=136099.0,paper=193776.0,diff=-57677.0
+  PostHog/posthog,2025-05,ncloc,our=1075854.0,paper=1021926.0,diff=53928.0
+  PostHog/posthog,2025-03,ncloc,our=981233.0,paper=936364.0,diff=44869.0
+  PostHog/posthog,2025-02,ncloc,our=933176.0,paper=896790.0,diff=36386.0
+  zauberzeug/nicegui,2025-02,technical_debt,our=228706.0,paper=193727.0,diff=34979.0
+  zauberzeug/nicegui,2025-03,technical_debt,our=228749.0,paper=193770.0,diff=34979.0
+  zauberzeug/nicegui,2025-01,technical_debt,our=228702.0,paper=193727.0,diff=34975.0
+  zauberzeug/nicegui,2024-12,technical_debt,our=228687.0,paper=193717.0,diff=34970.0
+  zauberzeug/nicegui,2024-11,technical_debt,our=228632.0,paper=193701.0,diff=34931.0
+  PostHog/posthog,2025-01,ncloc,our=870221.0,paper=837418.0,diff=32803.0
+  PostHog/posthog,2024-12,ncloc,our=832993.0,paper=802199.0,diff=30794.0
+  PostHog/posthog,2024-11,ncloc,our=806559.0,paper=776480.0,diff=30079.0
+  zauberzeug/nicegui,2025-04,cognitive_complexity,our=65372.0,paper=94814.0,diff=-29442.0
+  PostHog/posthog,2024-10,ncloc,our=774018.0,paper=748190.0,diff=25828.0
+  PostHog/posthog,2024-09,ncloc,our=748626.0,paper=725600.0,diff=23026.0
+OK: repo_python/did_final/panel_event_monthly_modified_structure.csv
+OK: repo_python/did_final/panel_event_monthly_modified_structure_column_sources.csv
+OK: repo_python/did_final/panel_event_monthly_modified_structure_key_match_summary.csv
+OK: repo_python/did_final/panel_event_monthly_modified_structure_metric_comparison.csv
+OK: repo_python/did_final/panel_event_monthly_modified_structure_notes.md
+Preview: output header
+repo_name,time,is_treatment,event,post_event,time_to_event,lead_6,lead_5,lead_4,lead_3,lead_2,lead_1,lag_0,lag_1,lag_2,lag_3,lag_4,lag_5,lag_6,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,dataset_source,other_agents,high_confidence
+Preview: key match summary
+input_rows,paper_rows,output_rows,output_columns,paper_schema_columns,input_duplicate_repo_month_rows,paper_duplicate_repo_month_rows,repo_month_rows_matched_to_paper,repo_month_rows_not_matched_to_paper
+1604,22096,1604,42,42,0,153,1589,15
+Finished: Thu Jul  9 12:42:10 AM CDT 2026
 (aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
 
 
-cat repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_category_notes.md
+
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ cat repo_python/did_final/panel_event_monthly_modified_structure_key_match_summary.csv
+input_rows,paper_rows,output_rows,output_columns,paper_schema_columns,input_duplicate_repo_month_rows,paper_duplicate_repo_month_rows,repo_month_rows_matched_to_paper,repo_month_rows_not_matched_to_paper
+1604,22096,1604,42,42,0,153,1589,15
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
 
 
-# SonarQube outlier warning category comparison
+
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -n 20 repo_python/did_final/panel_event_monthly_modified_structure_metric_comparison.csv
+repo_name,time,metric,our_modified_value,paper_value,diff_our_minus_paper,abs_diff
+zauberzeug/nicegui,2025-04,ncloc,78118.0,211510.0,-133392.0,133392.0
+PostHog/posthog,2025-04,ncloc,1025455.0,937017.0,88438.0,88438.0
+PostHog/posthog,2025-08,ncloc,1313277.0,1232071.0,81206.0,81206.0
+PostHog/posthog,2025-07,ncloc,1224250.0,1155675.0,68575.0,68575.0
+PostHog/posthog,2025-06,ncloc,1143141.0,1079135.0,64006.0,64006.0
+zauberzeug/nicegui,2025-04,technical_debt,136099.0,193776.0,-57677.0,57677.0
+PostHog/posthog,2025-05,ncloc,1075854.0,1021926.0,53928.0,53928.0
+PostHog/posthog,2025-03,ncloc,981233.0,936364.0,44869.0,44869.0
+PostHog/posthog,2025-02,ncloc,933176.0,896790.0,36386.0,36386.0
+zauberzeug/nicegui,2025-02,technical_debt,228706.0,193727.0,34979.0,34979.0
+zauberzeug/nicegui,2025-03,technical_debt,228749.0,193770.0,34979.0,34979.0
+zauberzeug/nicegui,2025-01,technical_debt,228702.0,193727.0,34975.0,34975.0
+zauberzeug/nicegui,2024-12,technical_debt,228687.0,193717.0,34970.0,34970.0
+zauberzeug/nicegui,2024-11,technical_debt,228632.0,193701.0,34931.0,34931.0
+PostHog/posthog,2025-01,ncloc,870221.0,837418.0,32803.0,32803.0
+PostHog/posthog,2024-12,ncloc,832993.0,802199.0,30794.0,30794.0
+PostHog/posthog,2024-11,ncloc,806559.0,776480.0,30079.0,30079.0
+zauberzeug/nicegui,2025-04,cognitive_complexity,65372.0,94814.0,-29442.0,29442.0
+PostHog/posthog,2024-10,ncloc,774018.0,748190.0,25828.0,25828.0
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
+
+
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ cat repo_python/did_final/panel_event_monthly_modified_structure_notes.md 
+
+# run-py-2b15 paper-structure panel notes
 
 ## Purpose
-Compare paper SonarQube warning rules/categories with issue-level warnings collected from the targeted 2b12 sensitivity scan.
+
+Create a diagnostic CSV with the same column order as the paper `data/panel_event_monthly.csv`.
+The regenerated Python quality metrics are preserved, while unavailable paper covariates are filled from the frozen paper panel when repo-month keys match.
 
 ## Inputs
-- paper_warnings_file: `data_baseline_backup/sonarqube_warnings.csv`
-- paper_definitions_file: `data_baseline_backup/sonarqube_warning_definitions.csv`
-- targets_file: `repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_paper_like_sensitivity_targets.csv`
-- plan_file: `repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_paper_like_sensitivity_plan.csv`
-- results_file: `repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_paper_like_sensitivity_results.csv`
-- variant: `paper_like`
 
-## Data coverage
-- selected targets: 3
-- selected plan rows: 3
-- paper warning rows for targets: 1
-- sensitivity-scan issue rows fetched: 22058
-- paper unique rules: 1
-- sensitivity unique rules: 450
+- Python quality input: `repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv`
+- Paper panel: `data/panel_event_monthly.csv`
 
-## Main interpretation guide
-- Many paper-heavy rules missing from the sensitivity scan suggest quality profile, active rules, or analyzer/plugin version differences.
-- Similar rules but different component/path distributions suggest source-scope or inclusion/exclusion differences.
-- Differences in both rule distribution and path distribution suggest combined source-scope and rule/profile effects.
+## Output
 
-## Top paper-heavy missing rules
-- No rows.
+- Modified structure panel: `repo_python/did_final/panel_event_monthly_modified_structure.csv`
 
-## Top sensitivity-heavy extra rules
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S878; type=CODE_SMELL; severity=MAJOR; category=Code Style; paper_count=0; our_count=2995; diff_our_minus_paper=2995
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S3504; type=CODE_SMELL; severity=CRITICAL; category=Code Style; paper_count=0; our_count=2056; diff_our_minus_paper=2056
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S2681; type=CODE_SMELL; severity=MAJOR; category=Logic Error; paper_count=0; our_count=1122; diff_our_minus_paper=1122
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S6759; type=CODE_SMELL; severity=MINOR; category=Type Safety; paper_count=0; our_count=995; diff_our_minus_paper=995
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S3358; type=CODE_SMELL; severity=MAJOR; category=Code Complexity; paper_count=0; our_count=801; diff_our_minus_paper=801
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S7735; type=CODE_SMELL; severity=MINOR; category=Unmapped; paper_count=0; our_count=712; diff_our_minus_paper=712
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S1121; type=CODE_SMELL; severity=MAJOR; category=Code Style; paper_count=0; our_count=661; diff_our_minus_paper=661
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S4325; type=CODE_SMELL; severity=MINOR; category=Type Safety; paper_count=0; our_count=551; diff_our_minus_paper=551
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=javascript:S7780; type=CODE_SMELL; severity=MINOR; category=Unmapped; paper_count=0; our_count=503; diff_our_minus_paper=503
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; rule=python:S3776; type=CODE_SMELL; severity=CRITICAL; category=Code Complexity; paper_count=0; our_count=453; diff_our_minus_paper=453
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S3358; type=CODE_SMELL; severity=MAJOR; category=Code Complexity; paper_count=0; our_count=428; diff_our_minus_paper=428
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S7748; type=CODE_SMELL; severity=MINOR; category=Unmapped; paper_count=0; our_count=426; diff_our_minus_paper=426
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S7764; type=CODE_SMELL; severity=MINOR; category=Unmapped; paper_count=0; our_count=359; diff_our_minus_paper=359
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S1135; type=CODE_SMELL; severity=INFO; category=Code Hygiene; paper_count=0; our_count=333; diff_our_minus_paper=333
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S7773; type=CODE_SMELL; severity=MINOR; category=Unmapped; paper_count=0; our_count=311; diff_our_minus_paper=311
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; rule=python:S1192; type=CODE_SMELL; severity=CRITICAL; category=Code Complexity; paper_count=0; our_count=303; diff_our_minus_paper=303
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S6861; type=CODE_SMELL; severity=CRITICAL; category=Code Style; paper_count=0; our_count=266; diff_our_minus_paper=266
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S3776; type=CODE_SMELL; severity=CRITICAL; category=Code Complexity; paper_count=0; our_count=260; diff_our_minus_paper=260
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S1763; type=BUG; severity=MAJOR; category=Logic Error; paper_count=0; our_count=245; diff_our_minus_paper=245
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S6582; type=CODE_SMELL; severity=MAJOR; category=Code Style; paper_count=0; our_count=214; diff_our_minus_paper=214
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S6749; type=CODE_SMELL; severity=MINOR; category=React Patterns; paper_count=0; our_count=196; diff_our_minus_paper=196
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S1874; type=CODE_SMELL; severity=MINOR; category=API Usage; paper_count=0; our_count=171; diff_our_minus_paper=171
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S3863; type=CODE_SMELL; severity=MINOR; category=Code Style; paper_count=0; our_count=170; diff_our_minus_paper=170
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S6479; type=CODE_SMELL; severity=MAJOR; category=React Patterns; paper_count=0; our_count=166; diff_our_minus_paper=166
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S7773; type=CODE_SMELL; severity=MINOR; category=Unmapped; paper_count=0; our_count=165; diff_our_minus_paper=165
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S2933; type=CODE_SMELL; severity=MAJOR; category=Code Style; paper_count=0; our_count=155; diff_our_minus_paper=155
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=typescript:S6767; type=CODE_SMELL; severity=MINOR; category=React Patterns; paper_count=0; our_count=138; diff_our_minus_paper=138
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; rule=css:S125; type=CODE_SMELL; severity=MAJOR; category=Code Hygiene; paper_count=0; our_count=133; diff_our_minus_paper=133
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S3776; type=CODE_SMELL; severity=CRITICAL; category=Code Complexity; paper_count=0; our_count=123; diff_our_minus_paper=123
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; rule=javascript:S2392; type=CODE_SMELL; severity=MAJOR; category=Naming Conventions; paper_count=0; our_count=122; diff_our_minus_paper=122
+## Key summary
 
-## Top type/severity differences
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=MINOR; paper_count=0; our_count=6134; diff_our_minus_paper=6134; abs_diff=6134
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=MAJOR; paper_count=0; our_count=5989; diff_our_minus_paper=5989; abs_diff=5989
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=CRITICAL; paper_count=0; our_count=2631; diff_our_minus_paper=2631; abs_diff=2631
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=MAJOR; paper_count=1; our_count=2630; diff_our_minus_paper=2629; abs_diff=2629
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=MINOR; paper_count=0; our_count=983; diff_our_minus_paper=983; abs_diff=983
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=CODE_SMELL; severity=CRITICAL; paper_count=0; our_count=853; diff_our_minus_paper=853; abs_diff=853
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=CODE_SMELL; severity=MAJOR; paper_count=0; our_count=524; diff_our_minus_paper=524; abs_diff=524
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=CRITICAL; paper_count=0; our_count=494; diff_our_minus_paper=494; abs_diff=494
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=INFO; paper_count=0; our_count=408; diff_our_minus_paper=408; abs_diff=408
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=CODE_SMELL; severity=MINOR; paper_count=0; our_count=349; diff_our_minus_paper=349; abs_diff=349
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=BUG; severity=MAJOR; paper_count=0; our_count=326; diff_our_minus_paper=326; abs_diff=326
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=BUG; severity=MAJOR; paper_count=0; our_count=152; diff_our_minus_paper=152; abs_diff=152
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=VULNERABILITY; severity=MAJOR; paper_count=0; our_count=124; diff_our_minus_paper=124; abs_diff=124
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=BUG; severity=MINOR; paper_count=0; our_count=103; diff_our_minus_paper=103; abs_diff=103
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=CODE_SMELL; severity=INFO; paper_count=0; our_count=94; diff_our_minus_paper=94; abs_diff=94
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=BUG; severity=MAJOR; paper_count=0; our_count=58; diff_our_minus_paper=58; abs_diff=58
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=BUG; severity=MINOR; paper_count=0; our_count=48; diff_our_minus_paper=48; abs_diff=48
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=VULNERABILITY; severity=BLOCKER; paper_count=0; our_count=37; diff_our_minus_paper=37; abs_diff=37
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=VULNERABILITY; severity=CRITICAL; paper_count=0; our_count=31; diff_our_minus_paper=31; abs_diff=31
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=BLOCKER; paper_count=0; our_count=15; diff_our_minus_paper=15; abs_diff=15
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=VULNERABILITY; severity=CRITICAL; paper_count=0; our_count=15; diff_our_minus_paper=15; abs_diff=15
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=BUG; severity=CRITICAL; paper_count=0; our_count=13; diff_our_minus_paper=13; abs_diff=13
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=CODE_SMELL; severity=BLOCKER; paper_count=0; our_count=9; diff_our_minus_paper=9; abs_diff=9
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=BUG; severity=BLOCKER; paper_count=0; our_count=8; diff_our_minus_paper=8; abs_diff=8
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=CODE_SMELL; severity=BLOCKER; paper_count=0; our_count=6; diff_our_minus_paper=6; abs_diff=6
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; type=BUG; severity=MINOR; paper_count=0; our_count=5; diff_our_minus_paper=5; abs_diff=5
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=VULNERABILITY; severity=MAJOR; paper_count=0; our_count=4; diff_our_minus_paper=4; abs_diff=4
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; type=VULNERABILITY; severity=MINOR; paper_count=0; our_count=4; diff_our_minus_paper=4; abs_diff=4
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=BUG; severity=CRITICAL; paper_count=0; our_count=3; diff_our_minus_paper=3; abs_diff=3
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; type=BUG; severity=BLOCKER; paper_count=0; our_count=2; diff_our_minus_paper=2; abs_diff=2
+- Output rows: 1604
+- Output columns: 42
+- Columns copied from Python input: 33
+- Columns filled from paper panel: 9
+- Columns set to NA: 0
+- Repo-month rows matched to paper panel: 1589
+- Repo-month rows not matched to paper panel: 15
 
-## Top category differences
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Code Style; type=CODE_SMELL; paper_count=0; our_count=6390; diff_our_minus_paper=6390; abs_diff=6390
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Unmapped; type=CODE_SMELL; paper_count=0; our_count=3452; diff_our_minus_paper=3452; abs_diff=3452
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Type Safety; type=CODE_SMELL; paper_count=0; our_count=1650; diff_our_minus_paper=1650; abs_diff=1650
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Code Complexity; type=CODE_SMELL; paper_count=0; our_count=1435; diff_our_minus_paper=1435; abs_diff=1435
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Logic Error; type=CODE_SMELL; paper_count=0; our_count=1218; diff_our_minus_paper=1218; abs_diff=1218
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Code Style; type=CODE_SMELL; paper_count=0; our_count=985; diff_our_minus_paper=985; abs_diff=985
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Unmapped; type=CODE_SMELL; paper_count=0; our_count=837; diff_our_minus_paper=837; abs_diff=837
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Code Complexity; type=CODE_SMELL; paper_count=0; our_count=778; diff_our_minus_paper=778; abs_diff=778
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Code Hygiene; type=CODE_SMELL; paper_count=0; our_count=648; diff_our_minus_paper=648; abs_diff=648
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Code Complexity; type=CODE_SMELL; paper_count=0; our_count=635; diff_our_minus_paper=635; abs_diff=635
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=React Patterns; type=CODE_SMELL; paper_count=0; our_count=616; diff_our_minus_paper=616; abs_diff=616
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Logic Error; type=BUG; paper_count=0; our_count=336; diff_our_minus_paper=336; abs_diff=336
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=API Usage; type=CODE_SMELL; paper_count=0; our_count=265; diff_our_minus_paper=265; abs_diff=265
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Code Hygiene; type=CODE_SMELL; paper_count=0; our_count=260; diff_our_minus_paper=260; abs_diff=260
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Naming Conventions; type=CODE_SMELL; paper_count=0; our_count=202; diff_our_minus_paper=202; abs_diff=202
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Infrastructure; type=CODE_SMELL; paper_count=0; our_count=167; diff_our_minus_paper=167; abs_diff=167
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Regex Issues; type=CODE_SMELL; paper_count=0; our_count=164; diff_our_minus_paper=164; abs_diff=164
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Accessibility; type=CODE_SMELL; paper_count=0; our_count=156; diff_our_minus_paper=156; abs_diff=156
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Naming Conventions; type=CODE_SMELL; paper_count=1; our_count=149; diff_our_minus_paper=148; abs_diff=148
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Naming Conventions; type=CODE_SMELL; paper_count=0; our_count=147; diff_our_minus_paper=147; abs_diff=147
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Error Handling; type=CODE_SMELL; paper_count=0; our_count=141; diff_our_minus_paper=141; abs_diff=141
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Error Handling; type=CODE_SMELL; paper_count=0; our_count=131; diff_our_minus_paper=131; abs_diff=131
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Security; type=VULNERABILITY; paper_count=0; our_count=115; diff_our_minus_paper=115; abs_diff=115
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Unmapped; type=CODE_SMELL; paper_count=0; our_count=113; diff_our_minus_paper=113; abs_diff=113
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Accessibility; type=BUG; paper_count=0; our_count=110; diff_our_minus_paper=110; abs_diff=110
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Regex Issues; type=CODE_SMELL; paper_count=0; our_count=103; diff_our_minus_paper=103; abs_diff=103
-- repo_name=DataDog/integrations-core; time=2025-01; variant=paper_like; category=Code Style; type=CODE_SMELL; paper_count=0; our_count=99; diff_our_minus_paper=99; abs_diff=99
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Logic Error; type=BUG; paper_count=0; our_count=93; diff_our_minus_paper=93; abs_diff=93
-- repo_name=zauberzeug/nicegui; time=2025-04; variant=paper_like; category=Code Hygiene; type=CODE_SMELL; paper_count=0; our_count=70; diff_our_minus_paper=70; abs_diff=70
-- repo_name=PostHog/posthog; time=2025-04; variant=paper_like; category=Logic Error; type=CODE_SMELL; paper_count=0; our_count=59; diff_our_minus_paper=59; abs_diff=59
+## Interpretation caution
 
-## Recommended next step
-Inspect the missing-paper-rules and extra-our-rules files first. If missing paper rules dominate, compare SonarQube quality profiles, active rules, and analyzer/plugin versions before attempting more source-scope rescans.
+This file is for schema and Rmd-compatibility diagnostics only.
+It mixes regenerated Python SonarQube metrics with selected frozen paper covariates, so it should not be presented as a full paper reproduction dataset.
 
+## Largest paper-vs-our metric differences
 
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -n 30 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_missing_paper_rules.csv
-target_id,variant,source_group,repo_name,time,rule,type,severity,category,paper_count,our_count,diff_our_minus_paper,paper_minus_our,abs_diff
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
-
-
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -n 30 repo_python/sonarqube_compare_paper/strict_pyv2/sonarqube_outlier_warning_rule_comparison.csv
-target_id,variant,source_group,repo_name,time,rule,type,severity,category,paper_count,our_count,diff_our_minus_paper,paper_minus_our,abs_diff
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S878,CODE_SMELL,MAJOR,Code Style,0,2995,2995,-2995,2995
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3504,CODE_SMELL,CRITICAL,Code Style,0,2056,2056,-2056,2056
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S2681,CODE_SMELL,MAJOR,Logic Error,0,1122,1122,-1122,1122
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6759,CODE_SMELL,MINOR,Type Safety,0,995,995,-995,995
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3358,CODE_SMELL,MAJOR,Code Complexity,0,801,801,-801,801
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7735,CODE_SMELL,MINOR,Unmapped,0,712,712,-712,712
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1121,CODE_SMELL,MAJOR,Code Style,0,661,661,-661,661
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S4325,CODE_SMELL,MINOR,Type Safety,0,551,551,-551,551
-2,paper_like,treatment,PostHog/posthog,2025-04,javascript:S7780,CODE_SMELL,MINOR,Unmapped,0,503,503,-503,503
-3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,453,453,-453,453
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3358,CODE_SMELL,MAJOR,Code Complexity,0,428,428,-428,428
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7748,CODE_SMELL,MINOR,Unmapped,0,426,426,-426,426
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7764,CODE_SMELL,MINOR,Unmapped,0,359,359,-359,359
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1135,CODE_SMELL,INFO,Code Hygiene,0,333,333,-333,333
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S7773,CODE_SMELL,MINOR,Unmapped,0,311,311,-311,311
-3,paper_like,treatment,DataDog/integrations-core,2025-01,python:S1192,CODE_SMELL,CRITICAL,Code Complexity,0,303,303,-303,303
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S6861,CODE_SMELL,CRITICAL,Code Style,0,266,266,-266,266
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,260,260,-260,260
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S1763,BUG,MAJOR,Logic Error,0,245,245,-245,245
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6582,CODE_SMELL,MAJOR,Code Style,0,214,214,-214,214
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6749,CODE_SMELL,MINOR,React Patterns,0,196,196,-196,196
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S1874,CODE_SMELL,MINOR,API Usage,0,171,171,-171,171
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S3863,CODE_SMELL,MINOR,Code Style,0,170,170,-170,170
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6479,CODE_SMELL,MAJOR,React Patterns,0,166,166,-166,166
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S7773,CODE_SMELL,MINOR,Unmapped,0,165,165,-165,165
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S2933,CODE_SMELL,MAJOR,Code Style,0,155,155,-155,155
-2,paper_like,treatment,PostHog/posthog,2025-04,typescript:S6767,CODE_SMELL,MINOR,React Patterns,0,138,138,-138,138
-2,paper_like,treatment,PostHog/posthog,2025-04,css:S125,CODE_SMELL,MAJOR,Code Hygiene,0,133,133,-133,133
-1,paper_like,treatment,zauberzeug/nicegui,2025-04,javascript:S3776,CODE_SMELL,CRITICAL,Code Complexity,0,123,123,-123,123
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
-
-
+- zauberzeug/nicegui 2025-04 ncloc: our=78118.0, paper=211510.0, diff=-133392.0
+- PostHog/posthog 2025-04 ncloc: our=1025455.0, paper=937017.0, diff=88438.0
+- PostHog/posthog 2025-08 ncloc: our=1313277.0, paper=1232071.0, diff=81206.0
+- PostHog/posthog 2025-07 ncloc: our=1224250.0, paper=1155675.0, diff=68575.0
+- PostHog/posthog 2025-06 ncloc: our=1143141.0, paper=1079135.0, diff=64006.0
+- zauberzeug/nicegui 2025-04 technical_debt: our=136099.0, paper=193776.0, diff=-57677.0
+- PostHog/posthog 2025-05 ncloc: our=1075854.0, paper=1021926.0, diff=53928.0
+- PostHog/posthog 2025-03 ncloc: our=981233.0, paper=936364.0, diff=44869.0
+- PostHog/posthog 2025-02 ncloc: our=933176.0, paper=896790.0, diff=36386.0
+- zauberzeug/nicegui 2025-02 technical_debt: our=228706.0, paper=193727.0, diff=34979.0
