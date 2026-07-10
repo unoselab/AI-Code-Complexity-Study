@@ -1,0 +1,17 @@
+check,value
+current_candidate_rows,128
+current_candidate_unique_repos,128
+current_candidate_duplicate_rows,0
+copied_status_rows_before_deduplication,128
+copied_status_rows_after_deduplication,128
+copied_status_unique_repos,128
+copied_status_duplicate_rows,0
+candidate_rows_matched_to_copied_status,128
+candidate_rows_missing_from_copied_status,0
+copied_status_rows_not_in_current_candidates,0
+verified_existing_git_repos,123
+missing_or_invalid_git_repos,5
+main_output_rows,128
+main_output_unique_repos,128
+row_count_preserved,1
+git_clone_executed,0
