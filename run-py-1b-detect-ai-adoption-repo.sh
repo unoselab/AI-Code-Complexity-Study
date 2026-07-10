@@ -94,7 +94,8 @@ EXISTING_ACTION="${EXISTING_ACTION:-skip}"
 # Clone log naming
 # ------------------------------------------------------------
 CLONE_LOG_PREFIX="${CLONE_LOG_PREFIX:-run-py-1b_treatment_clone_log}"
-CLONE_LOG_CSV="${TMP_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
+# CLONE_LOG_CSV="${TMP_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
+CLONE_LOG_CSV="${LOG_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
 
 # ------------------------------------------------------------
 # Clone-status report settings
