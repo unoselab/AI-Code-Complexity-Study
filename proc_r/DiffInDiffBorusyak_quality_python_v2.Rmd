@@ -29,6 +29,30 @@ resolve_project_path <- function(path_value) {
 panel_path <- resolve_project_path(Sys.getenv("PANEL_PATH", unset = ""))
 out_dir <- resolve_project_path(Sys.getenv("OUT_DIR", unset = ""))
 panel_label <- Sys.getenv("PANEL_LABEL", unset = "panel")
+covariate_mode_requested <- tolower(Sys.getenv("COVARIATE_MODE", unset = "auto"))
+paper_time_mode_requested <- tolower(
+  Sys.getenv("PAPER_TIME_MODE", unset = "original_yyyymm")
+)
+
+valid_covariate_modes <- c("auto", "paper", "python_v2")
+if (!(covariate_mode_requested %in% valid_covariate_modes)) {
+  stop(
+    "COVARIATE_MODE must be one of: ",
+    paste(valid_covariate_modes, collapse = ", "),
+    ". Got: ",
+    covariate_mode_requested
+  )
+}
+
+valid_paper_time_modes <- c("original_yyyymm", "calendar_month")
+if (!(paper_time_mode_requested %in% valid_paper_time_modes)) {
+  stop(
+    "PAPER_TIME_MODE must be one of: ",
+    paste(valid_paper_time_modes, collapse = ", "),
+    ". Got: ",
+    paper_time_mode_requested
+  )
+}
 
 if (panel_path == "") {
   stop("PANEL_PATH environment variable is required.")
@@ -49,7 +73,21 @@ dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 This notebook runs Borusyak imputation DiD analysis for Python SonarQube quality outcomes.
 
-The input files are complete-case quality DiD inputs produced by run-py-2e.
+It supports both input structures:
+
+1. The Python v2 complete-case quality panel.
+2. The paper-compatible `panel_event_monthly_quality_py.csv` panel produced by run-py-2e.
+
+When the paper-compatible columns are available, the default `auto` mode reproduces the original `DiffInDiffBorusyak.Rmd` preprocessing and estimator configuration:
+
+- `age`, `contributors`, `stars`, and `issues` are transformed with `log1p()`.
+- `ncloc` remains on its original scale.
+- `time` and `event` use numeric `YYYYMM` encoding, matching the original notebook.
+- The first-stage covariates are `age + ncloc + contributors + stars + issues`.
+
+For paper mode, `PAPER_TIME_MODE=original_yyyymm` reproduces the original notebook exactly. `PAPER_TIME_MODE=calendar_month` keeps the same paper covariate scaling but uses a sequential calendar-month index for a corrected sensitivity check.
+
+The `python_v2` mode retains the sequential calendar-month encoding and the existing `contributors_log + log_ncloc` first stage.
 
 # Load Packages and Helper Functions
 
@@ -66,48 +104,6 @@ if (!file.exists(helper_path)) {
 }
 
 source(helper_path)
-```
-
-# Load Quality Panel
-
-```{r load-panel}
-cat("Project root:", project_root, "\n")
-cat("Panel label:", panel_label, "\n")
-cat("Panel path:", panel_path, "\n")
-cat("Output dir:", out_dir, "\n")
-
-if (!file.exists(panel_path)) {
-  stop("Panel file not found: ", panel_path)
-}
-
-panel_raw <- fread(panel_path)
-
-required_cols <- c(
-  "repo_name",
-  "time",
-  "event",
-  "dataset_source",
-  "ever_treated",
-  "post_event",
-  "time_to_event",
-  "is_treatment",
-  "analysis_ready_quality_did",
-  "static_analysis_warnings",
-  "log_static_analysis_warnings",
-  "duplicate_line_density",
-  "code_complexity",
-  "log_code_complexity",
-  "ncloc"
-)
-
-missing_cols <- setdiff(required_cols, names(panel_raw))
-if (length(missing_cols) > 0) {
-  stop("Missing required columns: ", paste(missing_cols, collapse = ", "))
-}
-
-cat("Loaded rows:", nrow(panel_raw), "\n")
-cat("Loaded repos:", uniqueN(panel_raw$repo_name), "\n")
-cat("Months:", min(panel_raw$time), "to", max(panel_raw$time), "\n")
 ```
 
 # Utility Functions
@@ -130,6 +126,219 @@ yyyymm_to_month_id <- function(x) {
 
   out
 }
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+numeric_if_present <- function(data, columns) {
+  for (column_name in intersect(columns, names(data))) {
+    set(data, j = column_name, value = suppressWarnings(as.numeric(data[[column_name]])))
+  }
+
+  invisible(data)
+}
+
+count_nonmissing <- function(data, column_name) {
+  if (!(column_name %in% names(data))) {
+    return(NA_integer_)
+  }
+
+  sum(!is.na(data[[column_name]]))
+}
+
+sum_if_present <- function(data, column_name) {
+  if (!(column_name %in% names(data))) {
+    return(NA_real_)
+  }
+
+  sum(as.numeric(data[[column_name]]), na.rm = TRUE)
+}
+```
+
+# Load and Normalize Quality Panel
+
+```{r load-panel}
+cat("Project root:", project_root, "\n")
+cat("Panel label:", panel_label, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Output dir:", out_dir, "\n")
+cat("Requested covariate mode:", covariate_mode_requested, "\n")
+cat("Requested paper time mode:", paper_time_mode_requested, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+original_column_names <- names(panel_raw)
+
+base_required_cols <- c(
+  "repo_name",
+  "time",
+  "event",
+  "dataset_source",
+  "post_event",
+  "time_to_event",
+  "is_treatment",
+  "ncloc"
+)
+
+require_columns(panel_raw, base_required_cols, "Input panel")
+
+paper_schema_markers <- c(
+  "bugs",
+  "vulnerabilities",
+  "code_smells",
+  "duplicated_lines_density",
+  "cognitive_complexity",
+  "age",
+  "contributors",
+  "stars",
+  "issues"
+)
+
+input_schema <- if (all(paper_schema_markers %in% original_column_names)) {
+  "paper_same_column"
+} else {
+  "python_v2"
+}
+
+# Build the quality outcomes expected by this notebook when the input uses
+# the paper's panel_event_monthly.csv column structure.
+if (!("static_analysis_warnings" %in% names(panel_raw))) {
+  require_columns(
+    panel_raw,
+    c("bugs", "vulnerabilities", "code_smells"),
+    "Input panel for static analysis warnings"
+  )
+
+  numeric_if_present(panel_raw, c("bugs", "vulnerabilities", "code_smells"))
+  panel_raw[, static_analysis_warnings :=
+    bugs + vulnerabilities + code_smells]
+}
+
+if (!("duplicate_line_density" %in% names(panel_raw))) {
+  require_columns(
+    panel_raw,
+    "duplicated_lines_density",
+    "Input panel for duplicate line density"
+  )
+
+  panel_raw[, duplicate_line_density := duplicated_lines_density]
+}
+
+if (!("code_complexity" %in% names(panel_raw))) {
+  require_columns(
+    panel_raw,
+    "cognitive_complexity",
+    "Input panel for code complexity"
+  )
+
+  panel_raw[, code_complexity := cognitive_complexity]
+}
+
+numeric_if_present(
+  panel_raw,
+  c(
+    "static_analysis_warnings",
+    "duplicate_line_density",
+    "code_complexity",
+    "ncloc",
+    "contributors",
+    "age",
+    "stars",
+    "issues"
+  )
+)
+
+if (!("log_static_analysis_warnings" %in% names(panel_raw))) {
+  panel_raw[, log_static_analysis_warnings :=
+    fifelse(
+      !is.na(static_analysis_warnings) & static_analysis_warnings >= 0,
+      log1p(static_analysis_warnings),
+      NA_real_
+    )]
+}
+
+if (!("log_duplicate_line_density" %in% names(panel_raw))) {
+  panel_raw[, log_duplicate_line_density :=
+    fifelse(
+      !is.na(duplicate_line_density) & duplicate_line_density >= 0,
+      log1p(duplicate_line_density),
+      NA_real_
+    )]
+}
+
+if (!("log_code_complexity" %in% names(panel_raw))) {
+  panel_raw[, log_code_complexity :=
+    fifelse(
+      !is.na(code_complexity) & code_complexity >= 0,
+      log1p(code_complexity),
+      NA_real_
+    )]
+}
+
+if (!("log_ncloc" %in% names(panel_raw))) {
+  panel_raw[, log_ncloc :=
+    fifelse(!is.na(ncloc) & ncloc >= 0, log1p(ncloc), NA_real_)]
+}
+
+if (!("contributors_log" %in% names(panel_raw)) &&
+    "contributors" %in% names(panel_raw)) {
+  panel_raw[, contributors_log :=
+    fifelse(
+      !is.na(contributors) & contributors >= 0,
+      log1p(contributors),
+      NA_real_
+    )]
+}
+
+# In the paper panel, is_treatment is time-varying. A repository-level
+# ever-treated indicator must therefore be derived from dataset_source.
+if (!("ever_treated" %in% names(panel_raw))) {
+  panel_raw[, ever_treated := as.integer(dataset_source == "treatment")]
+}
+
+panel_raw[, ever_treated := as.integer(as.numeric(ever_treated) > 0)]
+panel_raw[, post_event := suppressWarnings(as.numeric(post_event))]
+panel_raw[, time_to_event := suppressWarnings(as.numeric(time_to_event))]
+panel_raw[, is_treatment := suppressWarnings(as.numeric(is_treatment))]
+
+core_quality_columns <- c(
+  "static_analysis_warnings",
+  "duplicate_line_density",
+  "code_complexity",
+  "log_static_analysis_warnings",
+  "log_duplicate_line_density",
+  "log_code_complexity"
+)
+
+require_columns(panel_raw, core_quality_columns, "Normalized quality panel")
+
+if (!("analysis_ready_quality_did" %in% names(panel_raw))) {
+  duplicate_key <- duplicated(
+    panel_raw,
+    by = c("repo_name", "time", "dataset_source")
+  )
+
+  panel_raw[, analysis_ready_quality_did := as.integer(
+    dataset_source %in% c("treatment", "control") &
+      !duplicate_key &
+      complete.cases(.SD)
+  ), .SDcols = core_quality_columns]
+}
+
+panel_raw[, analysis_ready_quality_did :=
+  as.integer(as.numeric(analysis_ready_quality_did) > 0)]
+
+cat("Detected input schema:", input_schema, "\n")
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repos:", uniqueN(panel_raw$repo_name), "\n")
+cat("Months:", min(panel_raw$time), "to", max(panel_raw$time), "\n")
 ```
 
 # Panel Sanity Checks
@@ -138,6 +347,8 @@ yyyymm_to_month_id <- function(x) {
 panel_checks <- data.frame(
   check = c(
     "panel_label",
+    "input_schema",
+    "covariate_mode_requested",
     "rows",
     "repos",
     "treatment_rows",
@@ -151,6 +362,11 @@ panel_checks <- data.frame(
     "static_analysis_warnings_nonmissing",
     "duplicate_line_density_nonmissing",
     "code_complexity_nonmissing",
+    "age_nonmissing",
+    "ncloc_nonmissing",
+    "contributors_nonmissing",
+    "stars_nonmissing",
+    "issues_nonmissing",
     "sonarqube_latest_commit_missing",
     "sonarqube_any_raw_metric_missing_sum",
     "sonarqube_all_raw_metrics_missing_sum",
@@ -159,6 +375,8 @@ panel_checks <- data.frame(
   ),
   value = c(
     panel_label,
+    input_schema,
+    covariate_mode_requested,
     nrow(panel_raw),
     uniqueN(panel_raw$repo_name),
     sum(panel_raw$dataset_source == "treatment", na.rm = TRUE),
@@ -174,15 +392,25 @@ panel_checks <- data.frame(
       na.rm = TRUE
     ),
     sum(panel_raw$analysis_ready_quality_did, na.rm = TRUE),
-    sum(!is.na(panel_raw$static_analysis_warnings)),
-    sum(!is.na(panel_raw$duplicate_line_density)),
-    sum(!is.na(panel_raw$code_complexity)),
-    if ("sonarqube_latest_commit" %in% names(panel_raw)) sum(is.na(panel_raw$sonarqube_latest_commit)) else NA,
-    if ("sonarqube_any_raw_metric_missing" %in% names(panel_raw)) sum(panel_raw$sonarqube_any_raw_metric_missing, na.rm = TRUE) else NA,
-    if ("sonarqube_all_raw_metrics_missing" %in% names(panel_raw)) sum(panel_raw$sonarqube_all_raw_metrics_missing, na.rm = TRUE) else NA,
-    if ("sonarqube_ncloc_zero" %in% names(panel_raw)) sum(panel_raw$sonarqube_ncloc_zero, na.rm = TRUE) else NA,
-    if ("sonarqube_quality_outcomes_complete" %in% names(panel_raw)) sum(panel_raw$sonarqube_quality_outcomes_complete, na.rm = TRUE) else NA
-  )
+    count_nonmissing(panel_raw, "static_analysis_warnings"),
+    count_nonmissing(panel_raw, "duplicate_line_density"),
+    count_nonmissing(panel_raw, "code_complexity"),
+    count_nonmissing(panel_raw, "age"),
+    count_nonmissing(panel_raw, "ncloc"),
+    count_nonmissing(panel_raw, "contributors"),
+    count_nonmissing(panel_raw, "stars"),
+    count_nonmissing(panel_raw, "issues"),
+    if ("sonarqube_latest_commit" %in% names(panel_raw)) {
+      sum(is.na(panel_raw$sonarqube_latest_commit))
+    } else {
+      NA
+    },
+    sum_if_present(panel_raw, "sonarqube_any_raw_metric_missing"),
+    sum_if_present(panel_raw, "sonarqube_all_raw_metrics_missing"),
+    sum_if_present(panel_raw, "sonarqube_ncloc_zero"),
+    sum_if_present(panel_raw, "sonarqube_quality_outcomes_complete")
+  ),
+  stringsAsFactors = FALSE
 )
 
 print(panel_checks)
@@ -197,7 +425,6 @@ fwrite(
 
 ```{r prepare-data}
 panel_data <- copy(panel_raw)
-
 panel_data <- panel_data[analysis_ready_quality_did == 1]
 
 panel_data[, time_yyyymm := normalize_yyyymm(time)]
@@ -206,69 +433,128 @@ event_yyyymm_raw <- normalize_yyyymm(panel_data$event)
 event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
 panel_data[, event_yyyymm := event_yyyymm_raw]
 
+# Match the original notebook's treatment-cohort restriction.
 panel_data <- panel_data[
   event_yyyymm == 0L |
     (event_yyyymm > 202407L & event_yyyymm <= 202503L)
 ]
 
-panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
-panel_data[, event_id := ifelse(event_yyyymm == 0L, 0L, yyyymm_to_month_id(event_yyyymm))]
+panel_data[, repo_name_str := repo_name]
+panel_data[, repo_id := as.integer(factor(repo_name_str))]
+
+numeric_if_present(
+  panel_data,
+  c(
+    "static_analysis_warnings",
+    "duplicate_line_density",
+    "code_complexity",
+    "log_static_analysis_warnings",
+    "log_duplicate_line_density",
+    "log_code_complexity",
+    "age",
+    "ncloc",
+    "contributors",
+    "stars",
+    "issues",
+    "issue_comments",
+    "contributors_log",
+    "log_ncloc"
+  )
+)
+
+paper_covariates <- c("age", "ncloc", "contributors", "stars", "issues")
+python_v2_covariates <- c("contributors_log", "log_ncloc")
+
+paper_covariates_available <- all(paper_covariates %in% names(panel_data))
+python_v2_covariates_available <- all(
+  python_v2_covariates %in% names(panel_data)
+)
+
+if (covariate_mode_requested == "auto") {
+  covariate_mode_used <- if (paper_covariates_available) {
+    "paper"
+  } else {
+    "python_v2"
+  }
+} else {
+  covariate_mode_used <- covariate_mode_requested
+}
+
+if (covariate_mode_used == "paper") {
+  require_columns(
+    panel_data,
+    paper_covariates,
+    "Paper covariate mode"
+  )
+
+  # Reproduce the original DiffInDiffBorusyak.Rmd covariate scaling.
+  # The original notebook overwrites these four columns with log1p values,
+  # while ncloc remains untransformed.
+  paper_log_covariates <- c("age", "contributors", "stars", "issues")
+  for (column_name in paper_log_covariates) {
+    x <- panel_data[[column_name]]
+    set(
+      panel_data,
+      j = column_name,
+      value = fifelse(!is.na(x) & x >= 0, log1p(x), NA_real_)
+    )
+  }
+
+  if ("issue_comments" %in% names(panel_data)) {
+    x <- panel_data[["issue_comments"]]
+    set(
+      panel_data,
+      j = "issue_comments",
+      value = fifelse(!is.na(x) & x >= 0, log1p(x), NA_real_)
+    )
+  }
+
+  if (paper_time_mode_requested == "original_yyyymm") {
+    # Reproduce the original notebook's numeric YYYYMM encoding exactly.
+    # This is intentionally different from a sequential calendar-month index.
+    panel_data[, time_id := time_yyyymm]
+    panel_data[, event_id := fifelse(event_yyyymm == 0L, 0L, event_yyyymm)]
+    time_encoding_used <- "paper_original_numeric_yyyymm"
+  } else {
+    # Sensitivity mode with a true sequential calendar-month index.
+    panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+    panel_data[, event_id := fifelse(
+      event_yyyymm == 0L,
+      0L,
+      yyyymm_to_month_id(event_yyyymm)
+    )]
+    time_encoding_used <- "sequential_calendar_month_id"
+  }
+
+  covariates <- paper_covariates
+  covariate_scaling_used <- paste(
+    "log1p(age, contributors, stars, issues);",
+    "raw ncloc"
+  )
+} else {
+  if (!python_v2_covariates_available) {
+    stop(
+      "Python v2 covariate mode requires: ",
+      paste(python_v2_covariates, collapse = ", ")
+    )
+  }
+
+  panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+  panel_data[, event_id := fifelse(
+    event_yyyymm == 0L,
+    0L,
+    yyyymm_to_month_id(event_yyyymm)
+  )]
+
+  covariates <- python_v2_covariates
+  time_encoding_used <- "sequential_calendar_month_id"
+  covariate_scaling_used <- "contributors_log + log_ncloc"
+}
 
 panel_data <- panel_data[!is.na(time_id)]
 panel_data <- panel_data[event_id == 0L | !is.na(event_id)]
+panel_data[, treated := as.integer(event_id > 0L)]
 
-panel_data[, repo_name_str := repo_name]
-panel_data[, repo_id := as.integer(factor(repo_name_str))]
-panel_data[, treated := ifelse(event_id > 0L, 1L, 0L)]
-
-panel_data[, static_analysis_warnings := as.numeric(static_analysis_warnings)]
-panel_data[, duplicate_line_density := as.numeric(duplicate_line_density)]
-panel_data[, code_complexity := as.numeric(code_complexity)]
-panel_data[, ncloc := as.numeric(ncloc)]
-
-if (!("log_static_analysis_warnings" %in% names(panel_data))) {
-  panel_data[, log_static_analysis_warnings := log1p(static_analysis_warnings)]
-}
-
-panel_data[, log_duplicate_line_density := log1p(duplicate_line_density)]
-
-if (!("log_code_complexity" %in% names(panel_data))) {
-  panel_data[, log_code_complexity := log1p(code_complexity)]
-}
-
-if (!("log_ncloc" %in% names(panel_data))) {
-  panel_data[, log_ncloc := log1p(ncloc)]
-}
-
-if ("contributors" %in% names(panel_data)) {
-  panel_data[, contributors_log := log1p(as.numeric(contributors))]
-}
-
-cat("Rows after readiness and cohort filtering:", nrow(panel_data), "\n")
-cat("Treated repos:", uniqueN(panel_data[treated == 1, repo_id]), "\n")
-cat("Control repos:", uniqueN(panel_data[treated == 0, repo_id]), "\n")
-cat("Time id range:", min(panel_data$time_id), "to", max(panel_data$time_id), "\n")
-
-quality_summary <- panel_data[, .(
-  rows = .N,
-  repos = uniqueN(repo_id),
-  mean_log_static_warnings = mean(log_static_analysis_warnings, na.rm = TRUE),
-  mean_log_duplicate_line_density = mean(log_duplicate_line_density, na.rm = TRUE),
-  mean_log_code_complexity = mean(log_code_complexity, na.rm = TRUE),
-  mean_log_ncloc = mean(log_ncloc, na.rm = TRUE)
-), by = dataset_source]
-
-print(quality_summary)
-
-fwrite(
-  quality_summary,
-  file.path(out_dir, "borusyak_quality_input_summary.csv")
-)
-```
-
-# Outcomes and First Stage
-
-```{r outcomes}
 outcome_vars <- c(
   "log_static_analysis_warnings",
   "log_duplicate_line_density",
@@ -281,30 +567,68 @@ outcome_names <- c(
   "Code Complexity"
 )
 
-covariates <- c()
+model_required_columns <- c(outcome_vars, covariates)
+rows_before_model_complete_filter <- nrow(panel_data)
+panel_data <- panel_data[complete.cases(panel_data[, ..model_required_columns])]
+rows_removed_by_model_complete_filter <-
+  rows_before_model_complete_filter - nrow(panel_data)
 
-if ("contributors_log" %in% names(panel_data)) {
-  covariates <- c(covariates, "contributors_log")
+if (nrow(panel_data) == 0) {
+  stop("No rows remain after outcome and covariate complete-case filtering.")
 }
 
-if ("log_ncloc" %in% names(panel_data)) {
-  covariates <- c(covariates, "log_ncloc")
-}
-
-if (length(covariates) == 0) {
-  first_stage_rhs <- "1"
-} else {
-  first_stage_rhs <- paste(covariates, collapse = " + ")
-}
-
+first_stage_rhs <- paste(covariates, collapse = " + ")
 first_stage_formula <- as.formula(
   paste0("~ ", first_stage_rhs, " | repo_id + time_id")
 )
 
+cat("Detected input schema:", input_schema, "\n")
+cat("Covariate mode used:", covariate_mode_used, "\n")
+cat("Paper time mode requested:", paper_time_mode_requested, "\n")
+cat("Covariate scaling:", covariate_scaling_used, "\n")
+cat("Time encoding:", time_encoding_used, "\n")
+cat("Rows before model complete-case filter:",
+    rows_before_model_complete_filter, "\n")
+cat("Rows removed by model complete-case filter:",
+    rows_removed_by_model_complete_filter, "\n")
+cat("Rows used by models:", nrow(panel_data), "\n")
+cat("Treated repos:", uniqueN(panel_data[treated == 1, repo_id]), "\n")
+cat("Control repos:", uniqueN(panel_data[treated == 0, repo_id]), "\n")
+cat("Time id range:", min(panel_data$time_id), "to", max(panel_data$time_id), "\n")
+cat("First-stage formula:\n")
+print(first_stage_formula)
+
+quality_summary <- panel_data[, .(
+  rows = .N,
+  repos = uniqueN(repo_id),
+  mean_log_static_warnings = mean(log_static_analysis_warnings, na.rm = TRUE),
+  mean_log_duplicate_line_density = mean(log_duplicate_line_density, na.rm = TRUE),
+  mean_log_code_complexity = mean(log_code_complexity, na.rm = TRUE),
+  mean_ncloc = mean(ncloc, na.rm = TRUE),
+  mean_age = if ("age" %in% names(panel_data)) mean(age, na.rm = TRUE) else NA_real_,
+  mean_contributors = if ("contributors" %in% names(panel_data)) mean(contributors, na.rm = TRUE) else NA_real_,
+  mean_stars = if ("stars" %in% names(panel_data)) mean(stars, na.rm = TRUE) else NA_real_,
+  mean_issues = if ("issues" %in% names(panel_data)) mean(issues, na.rm = TRUE) else NA_real_
+), by = dataset_source]
+
+print(quality_summary)
+
+fwrite(
+  quality_summary,
+  file.path(out_dir, "borusyak_quality_input_summary.csv")
+)
+
+```
+
+# Outcomes and First Stage
+
+```{r outcomes}
 cat("Outcomes:\n")
 print(data.frame(outcome = outcome_vars, label = outcome_names))
 
-cat("\nFirst-stage formula:\n")
+cat("\nCovariate mode requested:", covariate_mode_requested, "\n")
+cat("Covariate mode used:", covariate_mode_used, "\n")
+cat("First-stage formula:\n")
 print(first_stage_formula)
 ```
 
@@ -352,6 +676,7 @@ static_df <- bind_rows(lapply(outcome_vars, function(v) {
 
 static_df$outcome_label <- outcome_names[match(static_df$outcome, outcome_vars)]
 static_df$panel <- panel_label
+static_df$covariate_mode <- covariate_mode_used
 
 print(static_df)
 
@@ -363,6 +688,7 @@ fwrite(
 if (length(static_errors) > 0) {
   static_error_df <- data.frame(
     panel = panel_label,
+    covariate_mode = covariate_mode_used,
     outcome = names(static_errors),
     error = unlist(static_errors),
     row.names = NULL
@@ -422,6 +748,7 @@ dynamic_df <- bind_rows(lapply(seq_along(outcome_vars), function(i) {
 
 if (nrow(dynamic_df) > 0) {
   dynamic_df$panel <- panel_label
+  dynamic_df$covariate_mode <- covariate_mode_used
 }
 
 print(dynamic_df)
@@ -434,6 +761,7 @@ fwrite(
 if (length(dynamic_errors) > 0) {
   dynamic_error_df <- data.frame(
     panel = panel_label,
+    covariate_mode = covariate_mode_used,
     outcome = names(dynamic_errors),
     error = unlist(dynamic_errors),
     row.names = NULL
@@ -452,7 +780,10 @@ if (length(dynamic_errors) > 0) {
 
 ```{r dynamic-plot, fig.width=9, fig.height=3.5}
 if (nrow(dynamic_df) > 0) {
-  dynamic_df$outcome_label <- factor(dynamic_df$outcome_label, levels = outcome_names)
+  dynamic_df$outcome_label <- factor(
+    dynamic_df$outcome_label,
+    levels = outcome_names
+  )
 
   p <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
     geom_errorbar(
@@ -485,7 +816,11 @@ if (nrow(dynamic_df) > 0) {
     facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
     labs(
       title = paste("Borusyak Quality DiD:", panel_label),
-      subtitle = "Python quality DiD input from run-py-2e complete-case panel",
+      subtitle = paste(
+        "Mode:", covariate_mode_used,
+        "| Time:", time_encoding_used,
+        "| Covariates:", first_stage_rhs
+      ),
       x = "Months Relative to Cursor Adoption",
       y = "Treatment Effect",
       caption = "Filled dots: CI excludes 0. Hollow dots: CI includes 0."
@@ -519,10 +854,19 @@ metadata <- data.frame(
     "panel_label",
     "panel_path",
     "out_dir",
+    "input_schema",
+    "covariate_mode_requested",
+    "covariate_mode_used",
+    "paper_time_mode_requested",
     "outcomes",
     "covariates",
+    "first_stage_formula",
+    "rows_before_model_complete_filter",
+    "rows_removed_by_model_complete_filter",
+    "rows_used_by_models",
     "estimator",
     "time_encoding",
+    "covariate_scaling",
     "input_source",
     "interpretation_note"
   ),
@@ -532,13 +876,35 @@ metadata <- data.frame(
     panel_label,
     panel_path,
     out_dir,
+    input_schema,
+    covariate_mode_requested,
+    covariate_mode_used,
+    paper_time_mode_requested,
     paste(outcome_vars, collapse = ", "),
     first_stage_rhs,
+    paste(deparse(first_stage_formula), collapse = " "),
+    rows_before_model_complete_filter,
+    rows_removed_by_model_complete_filter,
+    nrow(panel_data),
     "Borusyak imputation via didimputation::did_imputation",
-    "YYYY-MM converted to month_id = year * 12 + month",
-    "run-py-2e complete-case quality DiD input",
-    "Use flexible as the sample-coverage panel and strict as the 1:3 matching-rule panel"
-  )
+    time_encoding_used,
+    covariate_scaling_used,
+    if (input_schema == "paper_same_column") {
+      "run-py-2e paper-compatible overlap panel with regenerated SonarQube outcomes"
+    } else {
+      "run-py-2e complete-case quality DiD input"
+    },
+    if (covariate_mode_used == "paper") {
+      paste(
+        "Original-Rmd-compatible first stage:",
+        "log1p(age, contributors, stars, issues) + raw ncloc;",
+        time_encoding_used
+      )
+    } else {
+      "Python v2 first stage: contributors_log + log_ncloc"
+    }
+  ),
+  stringsAsFactors = FALSE
 )
 
 print(metadata)
