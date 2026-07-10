@@ -22,7 +22,7 @@ set -euo pipefail
 #   repo_python/treatment_python_clone_usable_repos_with_event.csv
 #     - Usable cloned Python treatment repos with event metadata.
 #
-#   repo_python/treatment_python_clone_failed_repos.csv
+#   repo_python/tmp/run-py-1c/treatment_python_clone_failed_repos.csv
 #     - Failed Python treatment repos.
 #
 # Typical usage:
@@ -34,19 +34,22 @@ RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1c_create_treatment_usable_repos_${RUN_TS}.log}"
 
 OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_DIR}/tmp/run-py-1c}"
 
 CLONE_STATUS_FILE="${CLONE_STATUS_FILE:-${OUTPUT_DIR}/treatment_python_clone_status.csv}"
 PANEL_FILE="${PANEL_FILE:-data_baseline_backup/panel_event_monthly.csv}"
 
 OUTPUT_FILE="${OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_repos_with_event.csv}"
-FAILED_OUTPUT_FILE="${FAILED_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_failed_repos.csv}"
+# FAILED_OUTPUT_FILE="${FAILED_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_failed_repos.csv}"
+FAILED_OUTPUT_FILE="${FAILED_OUTPUT_FILE:-${TMP_DIR}/treatment_python_clone_failed_repos.csv}"
 
 DATASET_SOURCE="${DATASET_SOURCE:-treatment}"
 TOP_PRINT="${TOP_PRINT:-50}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/create_clone_usable_repos_with_event.py}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+# mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${TMP_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1c: create usable Python treatment repo list with event metadata" | tee -a "${LOG_FILE}"
@@ -54,6 +57,8 @@ echo "Timestamp:            ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Python script:        ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Clone status file:    ${CLONE_STATUS_FILE}" | tee -a "${LOG_FILE}"
 echo "Panel file:           ${PANEL_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir:      ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:     ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Output file:          ${OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Failed output file:   ${FAILED_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Dataset source:       ${DATASET_SOURCE}" | tee -a "${LOG_FILE}"
