@@ -1,134 +1,461 @@
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ bash compare/run-py-2b15-create-paper-structure-panel.sh
-============================================================
-run-py-2b15: Create paper-structure panel
-Started:                   Thu Jul  9 12:42:09 AM CDT 2026
-Project root:              /home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study
-Python script:             compare/py/create_paper_structure_panel_from_python_quality.py
-Input file:                repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
-Paper panel file:          data/panel_event_monthly.csv
-Output file:               repo_python/did_final/panel_event_monthly_modified_structure.csv
-Fill from paper columns:   stars,issues,issue_comments,age,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,other_agents,high_confidence
-Metric compare columns:    ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
-Top print:                 20
-Log file:                  logs/run-py-2b15_create_paper_structure_panel_20260709-004209.log
-============================================================
-Created paper-structure diagnostic panel
-Output file: repo_python/did_final/panel_event_monthly_modified_structure.csv
-Rows: 1604
-Columns: 42
-Column sources: repo_python/did_final/panel_event_monthly_modified_structure_column_sources.csv
-Key summary: repo_python/did_final/panel_event_monthly_modified_structure_key_match_summary.csv
-Metric comparison: repo_python/did_final/panel_event_monthly_modified_structure_metric_comparison.csv
-Notes: repo_python/did_final/panel_event_monthly_modified_structure_notes.md
-Top metric differences:
-  zauberzeug/nicegui,2025-04,ncloc,our=78118.0,paper=211510.0,diff=-133392.0
-  PostHog/posthog,2025-04,ncloc,our=1025455.0,paper=937017.0,diff=88438.0
-  PostHog/posthog,2025-08,ncloc,our=1313277.0,paper=1232071.0,diff=81206.0
-  PostHog/posthog,2025-07,ncloc,our=1224250.0,paper=1155675.0,diff=68575.0
-  PostHog/posthog,2025-06,ncloc,our=1143141.0,paper=1079135.0,diff=64006.0
-  zauberzeug/nicegui,2025-04,technical_debt,our=136099.0,paper=193776.0,diff=-57677.0
-  PostHog/posthog,2025-05,ncloc,our=1075854.0,paper=1021926.0,diff=53928.0
-  PostHog/posthog,2025-03,ncloc,our=981233.0,paper=936364.0,diff=44869.0
-  PostHog/posthog,2025-02,ncloc,our=933176.0,paper=896790.0,diff=36386.0
-  zauberzeug/nicegui,2025-02,technical_debt,our=228706.0,paper=193727.0,diff=34979.0
-  zauberzeug/nicegui,2025-03,technical_debt,our=228749.0,paper=193770.0,diff=34979.0
-  zauberzeug/nicegui,2025-01,technical_debt,our=228702.0,paper=193727.0,diff=34975.0
-  zauberzeug/nicegui,2024-12,technical_debt,our=228687.0,paper=193717.0,diff=34970.0
-  zauberzeug/nicegui,2024-11,technical_debt,our=228632.0,paper=193701.0,diff=34931.0
-  PostHog/posthog,2025-01,ncloc,our=870221.0,paper=837418.0,diff=32803.0
-  PostHog/posthog,2024-12,ncloc,our=832993.0,paper=802199.0,diff=30794.0
-  PostHog/posthog,2024-11,ncloc,our=806559.0,paper=776480.0,diff=30079.0
-  zauberzeug/nicegui,2025-04,cognitive_complexity,our=65372.0,paper=94814.0,diff=-29442.0
-  PostHog/posthog,2024-10,ncloc,our=774018.0,paper=748190.0,diff=25828.0
-  PostHog/posthog,2024-09,ncloc,our=748626.0,paper=725600.0,diff=23026.0
-OK: repo_python/did_final/panel_event_monthly_modified_structure.csv
-OK: repo_python/did_final/panel_event_monthly_modified_structure_column_sources.csv
-OK: repo_python/did_final/panel_event_monthly_modified_structure_key_match_summary.csv
-OK: repo_python/did_final/panel_event_monthly_modified_structure_metric_comparison.csv
-OK: repo_python/did_final/panel_event_monthly_modified_structure_notes.md
-Preview: output header
-repo_name,time,is_treatment,event,post_event,time_to_event,lead_6,lead_5,lead_4,lead_3,lead_2,lead_1,lag_0,lag_1,lag_2,lag_3,lag_4,lag_5,lag_6,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,dataset_source,other_agents,high_confidence
-Preview: key match summary
-input_rows,paper_rows,output_rows,output_columns,paper_schema_columns,input_duplicate_repo_month_rows,paper_duplicate_repo_month_rows,repo_month_rows_matched_to_paper,repo_month_rows_not_matched_to_paper
-1604,22096,1604,42,42,0,153,1589,15
-Finished: Thu Jul  9 12:42:10 AM CDT 2026
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
+repo_python
+├── _cleanup_20260705-160830
+│   ├── did_final-bak
+│   │   ├── _normalized_inputs_20260705-223825
+│   │   │   ├── control_ts_repos_monthly.csv
+│   │   │   └── treatment_ts_repos_monthly.csv
+│   │   ├── _normalized_inputs_20260705-233855
+│   │   │   ├── control_ts_repos_monthly.csv
+│   │   │   └── treatment_ts_repos_monthly.csv
+│   │   ├── panel_event_matched_flexible.csv
+│   │   ├── panel_event_matched_flexible_window_driven.csv
+│   │   ├── panel_event_matched_strict.csv
+│   │   ├── panel_event_matched_strict_window_driven.csv
+│   │   ├── panel_event_monthly_matched_final_clean_1to3_only_balanced.csv
+│   │   ├── panel_event_monthly_matched_final_clean_1to3_only.csv
+│   │   ├── panel_event_monthly_matched_final_clean_balanced.csv
+│   │   └── panel_event_monthly_matched_final_clean.csv
+│   ├── run-py-1e_cache_check_20260705-145103.txt
+│   ├── run-py-1e_missing_repos_20260705-145103.csv
+│   ├── treatment_python_clone_status_20260705-122503.csv
+│   ├── treatment_python_clone_status_20260705-124519.csv
+│   ├── treatment_python_did_smoke_20260705-143616
+│   │   ├── adoption_month_check.csv
+│   │   ├── ai_adoption_dates.csv
+│   │   ├── cursor_commits.csv
+│   │   ├── treatment_python_repos_smoke_20260705-143616.csv
+│   │   ├── ts_contributors_monthly.csv
+│   │   └── ts_repos_monthly.csv
+│   ├── treatment_python_did_smoke_20260705-143730
+│   │   ├── adoption_month_check.csv
+│   │   ├── ai_adoption_dates.csv
+│   │   ├── cursor_commits.csv
+│   │   ├── treatment_python_repos_smoke_20260705-143730.csv
+│   │   ├── ts_contributors_monthly.csv
+│   │   └── ts_repos_monthly.csv
+│   ├── treatment_python_sample_diagnostic_0.csv
+│   ├── treatment_python_sample_exact_match_118.csv
+│   ├── treatment_python_sample_main_118.csv
+│   └── treatment_python_sample_within1_month_118.csv
+├── control_clone_failed_repos_main.csv
+├── control_clone_status_main_20260705-161433.csv
+├── control_clone_status_main_20260705-161641.csv
+├── control_clone_status_main.csv
+├── control_clone_usable_repos_main.csv
+├── control_clone_usable_repos_main_final_clean.csv
+├── control_clone_usable_summary_main.csv
+├── control_did
+│   ├── ai_adoption_dates.csv
+│   ├── cursor_commits.csv
+│   ├── run-py-1j_analyzed_repos_manifest.csv
+│   ├── run-py-1j_cache_check_20260705-200441.txt
+│   ├── run-py-1j_missing_repos_20260705-200441.csv
+│   ├── ts_contributors_monthly.csv
+│   ├── ts_contributors_monthly_final_clean.csv
+│   ├── ts_repos_monthly.csv
+│   └── ts_repos_monthly_final_clean.csv
+├── control_did_smoke
+│   ├── ai_adoption_dates.csv
+│   ├── control_repos_smoke_max5.csv
+│   ├── cursor_commits.csv
+│   ├── run-py-1j_analyzed_repos_manifest.csv
+│   ├── run-py-1j_cache_check_20260705-200115.txt
+│   ├── run-py-1j_cache_check_20260705-200123.txt
+│   ├── run-py-1j_missing_repos_20260705-200115.csv
+│   ├── run-py-1j_missing_repos_20260705-200123.csv
+│   ├── ts_contributors_monthly.csv
+│   └── ts_repos_monthly.csv
+├── control_extract_summary_main.csv
+├── control_local_cursor_evidence_in_window.csv
+├── control_local_cursor_evidence_post_window.csv
+├── control_local_cursor_filter_summary_main.csv
+├── control_pair_coverage_main_clone_usable.csv
+├── control_pair_coverage_main_final_clean_1to3_only.csv
+├── control_pair_coverage_main_final_clean.csv
+├── control_repos_to_clone_main.csv
+├── control_repos_to_clone_main_overlap_repos.csv
+├── control_repos_to_clone_main_raw.csv
+├── did_final
+│   ├── _normalized_inputs_20260705-233939
+│   │   ├── control_ts_repos_monthly.csv
+│   │   └── treatment_ts_repos_monthly.csv
+│   ├── panel_event_matched_flexible.csv
+│   ├── panel_event_matched_flexible_window_driven.csv
+│   ├── panel_event_matched_strict.csv
+│   ├── panel_event_matched_strict_window_driven.csv
+│   ├── panel_event_matched_strict_with_sonarqube_check_summary.csv
+│   ├── panel_event_matched_strict_with_sonarqube.csv
+│   ├── panel_event_matched_strict_with_sonarqube_missing_analysis_outcomes.csv
+│   ├── panel_event_matched_strict_with_sonarqube_qc.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete_paper_same_column_overlap.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_missing_core_quality.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_qc.csv
+│   ├── panel_event_monthly_modified_structure_column_sources.csv
+│   ├── panel_event_monthly_modified_structure.csv
+│   ├── panel_event_monthly_modified_structure_key_match_summary.csv
+│   ├── panel_event_monthly_modified_structure_metric_comparison.csv
+│   ├── panel_event_monthly_modified_structure_notes.md
+│   ├── panel_event_monthly_modified_structure_unmatched_repo_months.csv
+│   ├── panel_event_monthly_modified_structure_unmatched_summary.csv
+│   ├── panel_event_monthly_quality_py.csv
+│   ├── panel_qc_attrition_summary.csv
+│   ├── panel_qc_by_source.csv
+│   ├── panel_qc_dropped_by_strict.csv
+│   ├── panel_qc_notes.md
+│   ├── panel_qc_paper_comparison.csv
+│   ├── panel_qc_summary.csv
+│   ├── quality_did_borusyak
+│   │   ├── borusyak_quality_dynamic_effects_all.csv
+│   │   ├── borusyak_quality_dynamic_effects_strict.csv
+│   │   ├── borusyak_quality_errors_all.csv
+│   │   ├── borusyak_quality_errors_strict.csv
+│   │   ├── borusyak_quality_input_summary_all.csv
+│   │   ├── borusyak_quality_input_summary_strict.csv
+│   │   ├── borusyak_quality_manifest_strict_20260706-233733.csv
+│   │   ├── borusyak_quality_manifest_strict_20260706-234340.csv
+│   │   ├── borusyak_quality_manifest_strict_20260706-234357.csv
+│   │   ├── borusyak_quality_manifest_strict_20260707-002532.csv
+│   │   ├── borusyak_quality_manifest_strict_20260707-201334.csv
+│   │   ├── borusyak_quality_panel_checks_all.csv
+│   │   ├── borusyak_quality_panel_checks_strict.csv
+│   │   ├── borusyak_quality_static_effects_all.csv
+│   │   ├── borusyak_quality_static_effects_strict.csv
+│   │   ├── strict
+│   │   │   ├── borusyak_quality_dynamic_effects.csv
+│   │   │   ├── borusyak_quality_input_summary.csv
+│   │   │   ├── borusyak_quality_metadata.csv
+│   │   │   ├── borusyak_quality_panel_checks.csv
+│   │   │   └── borusyak_quality_static_effects.csv
+│   │   └── summary
+│   │       ├── borusyak_quality_dynamic_effects_percent.csv
+│   │       ├── borusyak_quality_dynamic_effects_plot_ready.csv
+│   │       ├── borusyak_quality_input_summary_copy.csv
+│   │       ├── borusyak_quality_main_panel_table.csv
+│   │       ├── borusyak_quality_main_panel_table.md
+│   │       ├── borusyak_quality_panel_checks_copy.csv
+│   │       ├── borusyak_quality_static_effects_paper_ready.csv
+│   │       ├── borusyak_quality_static_effects_wide.csv
+│   │       └── borusyak_quality_summary_notes.txt
+│   ├── quality_did_input_manifest_strict_20260706-232431.csv
+│   ├── quality_did_input_manifest_strict_20260707-201317.csv
+│   ├── quality_did_input_manifest_strict_20260707-201323.csv
+│   ├── quality_did_input_manifest_strict_20260710-135346.csv
+│   ├── quality_did_input_manifest_strict_20260710-142850.csv
+│   ├── quality_did_input_qc_strict_long.csv
+│   ├── quality_did_input_qc_strict_wide.csv
+│   ├── sonarqube_panel_check_manifest_strict_20260706-231812.csv
+│   ├── sonarqube_panel_check_manifest_strict_20260707-201304.csv
+│   ├── sonarqube_panel_check_manifest_strict_20260707-201309.csv
+│   ├── sonarqube_panel_check_qc_strict.csv
+│   ├── sonarqube_panel_check_summary_strict.csv
+│   ├── sonarqube_panel_merge_summary_strict.csv
+│   └── velocity_did_borusyak
+│       ├── borusyak_velocity_dynamic_effects_all.csv
+│       ├── borusyak_velocity_input_summary_all.csv
+│       ├── borusyak_velocity_panel_checks_all.csv
+│       ├── borusyak_velocity_static_effects_all.csv
+│       ├── flexible
+│       │   ├── borusyak_velocity_covariate_availability.csv
+│       │   ├── borusyak_velocity_dynamic_effects.csv
+│       │   ├── borusyak_velocity_event_time_counts.csv
+│       │   ├── borusyak_velocity_flexible.html
+│       │   ├── borusyak_velocity_input_summary.csv
+│       │   ├── borusyak_velocity_metadata.csv
+│       │   ├── borusyak_velocity_panel_checks.csv
+│       │   ├── borusyak_velocity_panel_checks_pre_filter.csv
+│       │   ├── borusyak_velocity_static_effects.csv
+│       │   └── dynamic_effects_borusyak_velocity.pdf
+│       ├── strict
+│       │   ├── borusyak_velocity_covariate_availability.csv
+│       │   ├── borusyak_velocity_dynamic_effects.csv
+│       │   ├── borusyak_velocity_event_time_counts.csv
+│       │   ├── borusyak_velocity_input_summary.csv
+│       │   ├── borusyak_velocity_metadata.csv
+│       │   ├── borusyak_velocity_panel_checks.csv
+│       │   ├── borusyak_velocity_panel_checks_pre_filter.csv
+│       │   ├── borusyak_velocity_static_effects.csv
+│       │   ├── borusyak_velocity_strict.html
+│       │   └── dynamic_effects_borusyak_velocity.pdf
+│       └── summary
+│           ├── borusyak_velocity_dynamic_effects_percent.csv
+│           ├── borusyak_velocity_dynamic_effects_plot_ready.csv
+│           ├── borusyak_velocity_static_effects_paper_ready.csv
+│           ├── borusyak_velocity_static_effects_wide.csv
+│           └── borusyak_velocity_summary_notes.txt
+├── did_final_pyv2
+│   ├── panel_event_matched_strict.csv
+│   ├── panel_event_matched_strict_with_sonarqube_check_summary.csv
+│   ├── panel_event_matched_strict_with_sonarqube.csv
+│   ├── panel_event_matched_strict_with_sonarqube_missing_analysis_outcomes.csv
+│   ├── panel_event_matched_strict_with_sonarqube_qc.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_missing_core_quality.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_qc.csv
+│   ├── quality_did_borusyak
+│   │   ├── borusyak_quality_dynamic_effects_strict.csv
+│   │   ├── borusyak_quality_errors_strict.csv
+│   │   ├── borusyak_quality_input_summary_strict.csv
+│   │   ├── borusyak_quality_manifest_strict_20260707-201646.csv
+│   │   ├── borusyak_quality_panel_checks_strict.csv
+│   │   ├── borusyak_quality_static_effects_strict.csv
+│   │   └── strict
+│   │       ├── borusyak_quality_dynamic_effects.csv
+│   │       ├── borusyak_quality_input_summary.csv
+│   │       ├── borusyak_quality_metadata.csv
+│   │       ├── borusyak_quality_panel_checks.csv
+│   │       ├── borusyak_quality_static_effects.csv
+│   │       ├── borusyak_quality_strict.html
+│   │       └── dynamic_effects_borusyak_quality.pdf
+│   ├── quality_did_input_manifest_strict_20260707-201646.csv
+│   ├── quality_did_input_qc_strict_long.csv
+│   ├── quality_did_input_qc_strict_wide.csv
+│   ├── sonarqube_panel_check_manifest_strict_20260707-201645.csv
+│   ├── sonarqube_panel_check_qc_strict.csv
+│   ├── sonarqube_panel_check_summary_strict.csv
+│   └── sonarqube_panel_merge_summary_strict.csv
+├── did_final_pyv2_paper_overlap
+│   ├── panel_event_matched_strict.csv
+│   ├── panel_event_matched_strict_with_sonarqube_check_summary.csv
+│   ├── panel_event_matched_strict_with_sonarqube.csv
+│   ├── panel_event_matched_strict_with_sonarqube_missing_analysis_outcomes.csv
+│   ├── panel_event_matched_strict_with_sonarqube_qc.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_missing_core_quality.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_qc.csv
+│   ├── quality_did_borusyak
+│   │   ├── borusyak_quality_dynamic_effects_strict.csv
+│   │   ├── borusyak_quality_errors_strict.csv
+│   │   ├── borusyak_quality_input_summary_strict.csv
+│   │   ├── borusyak_quality_manifest_strict_20260708-000350.csv
+│   │   ├── borusyak_quality_manifest_strict_20260708-000536.csv
+│   │   ├── borusyak_quality_panel_checks_strict.csv
+│   │   ├── borusyak_quality_static_effects_strict.csv
+│   │   └── strict
+│   │       ├── borusyak_quality_dynamic_effects.csv
+│   │       ├── borusyak_quality_input_summary.csv
+│   │       ├── borusyak_quality_metadata.csv
+│   │       ├── borusyak_quality_panel_checks.csv
+│   │       ├── borusyak_quality_static_effects.csv
+│   │       ├── borusyak_quality_strict.html
+│   │       └── dynamic_effects_borusyak_quality.pdf
+│   ├── quality_did_input_manifest_strict_20260708-000349.csv
+│   ├── quality_did_input_manifest_strict_20260708-000535.csv
+│   ├── quality_did_input_qc_strict_long.csv
+│   ├── quality_did_input_qc_strict_wide.csv
+│   ├── sonarqube_panel_check_manifest_strict_20260708-000348.csv
+│   ├── sonarqube_panel_check_manifest_strict_20260708-000534.csv
+│   ├── sonarqube_panel_check_qc_strict.csv
+│   ├── sonarqube_panel_check_summary_strict.csv
+│   └── sonarqube_panel_merge_summary_strict.csv
+├── matched_control_pairs_main_clone_failed.csv
+├── matched_control_pairs_main_clone_usable.csv
+├── matched_control_pairs_main_coverage.csv
+├── matched_control_pairs_main.csv
+├── matched_control_pairs_main_final_clean_1to3_only.csv
+├── matched_control_pairs_main_final_clean.csv
+├── matched_control_pairs_main_local_cursor_dropped.csv
+├── matched_control_pairs_main_overlap_pairs.csv
+├── matched_control_pairs_main_raw.csv
+├── sonarqube_compare_paper
+│   └── strict_pyv2
+│       ├── final_did_rows_missing_in_paper.csv
+│       ├── final_did_rows_missing_in_scan.csv
+│       ├── final_did_rows_overlap_with_paper.csv
+│       ├── final_did_rows_overlap_with_scan.csv
+│       ├── final_extra_scan_rows_used.csv
+│       ├── paper_duplicate_repo_month_rows.csv
+│       ├── scan_rows_missing_in_paper_keys.csv
+│       ├── scan_rows_overlap_with_paper_keys.csv
+│       ├── sonarqube_commit_hash_compare_notes.md
+│       ├── sonarqube_commit_hash_comparison.csv
+│       ├── sonarqube_commit_hash_large_metric_differences.csv
+│       ├── sonarqube_commit_hash_match.csv
+│       ├── sonarqube_commit_hash_metric_differences_long.csv
+│       ├── sonarqube_commit_hash_mismatch.csv
+│       ├── sonarqube_commit_our_only_repo_months.csv
+│       ├── sonarqube_commit_overlap_summary.csv
+│       ├── sonarqube_commit_paper_only_repo_months.csv
+│       ├── sonarqube_compare_notes.md
+│       ├── sonarqube_difference_cause_classified_long.csv
+│       ├── sonarqube_difference_cause_negative_outliers.csv
+│       ├── sonarqube_difference_cause_notes.md
+│       ├── sonarqube_difference_cause_positive_outliers.csv
+│       ├── sonarqube_difference_cause_rule_config_signal.csv
+│       ├── sonarqube_difference_cause_summary_by_metric.csv
+│       ├── sonarqube_difference_cause_summary_by_source_group.csv
+│       ├── sonarqube_difference_cause_summary.csv
+│       ├── sonarqube_difference_cause_top_repos.csv
+│       ├── sonarqube_exact_commit_diagnosis_notes.md
+│       ├── sonarqube_exact_commit_diff_by_month.csv
+│       ├── sonarqube_exact_commit_diff_by_repo.csv
+│       ├── sonarqube_exact_commit_diff_by_source_group.csv
+│       ├── sonarqube_exact_commit_differences_long.csv
+│       ├── sonarqube_exact_commit_large_code_smell_diffs.csv
+│       ├── sonarqube_exact_commit_large_cognitive_complexity_diffs.csv
+│       ├── sonarqube_exact_commit_large_ncloc_diffs.csv
+│       ├── sonarqube_exact_commit_large_static_warning_diffs.csv
+│       ├── sonarqube_exact_commit_metric_summary_by_ncloc_status.csv
+│       ├── sonarqube_exact_commit_metric_summary.csv
+│       ├── sonarqube_exact_commit_row_classification.csv
+│       ├── sonarqube_main_difference_drivers_abs_outliers_final_did.csv
+│       ├── sonarqube_main_difference_drivers_all_rows_long.csv
+│       ├── sonarqube_main_difference_drivers_coverage_summary.csv
+│       ├── sonarqube_main_difference_drivers_final_did_by_cause.csv
+│       ├── sonarqube_main_difference_drivers_final_did_by_event_time.csv
+│       ├── sonarqube_main_difference_drivers_final_did_by_metric.csv
+│       ├── sonarqube_main_difference_drivers_final_did_by_treatment_post.csv
+│       ├── sonarqube_main_difference_drivers_final_did_rows_long.csv
+│       ├── sonarqube_main_difference_drivers_negative_outliers_final_did.csv
+│       ├── sonarqube_main_difference_drivers_notes.md
+│       ├── sonarqube_main_difference_drivers_overall_by_cause.csv
+│       ├── sonarqube_main_difference_drivers_overall_by_metric.csv
+│       ├── sonarqube_main_difference_drivers_positive_outliers_final_did.csv
+│       ├── sonarqube_main_difference_drivers_top_repos_final_did.csv
+│       ├── sonarqube_main_difference_drivers_warning_metrics_final_did.csv
+│       ├── sonarqube_main_difference_drivers_warning_metrics_overall.csv
+│       ├── sonarqube_metric_diff_by_commit_match_status.csv
+│       ├── sonarqube_metric_difference_by_group.csv
+│       ├── sonarqube_metric_difference_summary.csv
+│       ├── sonarqube_metric_large_differences.csv
+│       ├── sonarqube_metric_overlap_summary.csv
+│       ├── sonarqube_metric_row_level_comparison.csv
+│       ├── sonarqube_metric_wide_comparison.csv
+│       ├── sonarqube_missing_in_ours.csv
+│       ├── sonarqube_missing_in_paper.csv
+│       ├── sonarqube_outlier_repo_config_presence.csv
+│       ├── sonarqube_outlier_repo_config_snippets.md
+│       ├── sonarqube_outlier_repo_git_tree_summary.csv
+│       ├── sonarqube_outlier_repo_inspection_notes.md
+│       ├── sonarqube_outlier_repo_inspection_selected_rows.csv
+│       ├── sonarqube_outlier_repo_manual_commands.sh
+│       ├── sonarqube_outlier_repo_top_directories.csv
+│       ├── sonarqube_outlier_root_cause_by_metric.csv
+│       ├── sonarqube_outlier_root_cause_by_repo.csv
+│       ├── sonarqube_outlier_root_cause_evidence_table.csv
+│       ├── sonarqube_outlier_root_cause_notes.md
+│       ├── sonarqube_outlier_warning_category_comparison.csv
+│       ├── sonarqube_outlier_warning_category_notes.md
+│       ├── sonarqube_outlier_warning_component_path_comparison.csv
+│       ├── sonarqube_outlier_warning_extra_our_rules.csv
+│       ├── sonarqube_outlier_warning_missing_paper_rules.csv
+│       ├── sonarqube_outlier_warning_our_issues_enriched.csv
+│       ├── sonarqube_outlier_warning_paper_enriched.csv
+│       ├── sonarqube_outlier_warning_rule_comparison.csv
+│       ├── sonarqube_outlier_warning_type_severity_comparison.csv
+│       ├── sonarqube_paper_like_sensitivity_by_variant_metric.csv
+│       ├── sonarqube_paper_like_sensitivity_failures.csv
+│       ├── sonarqube_paper_like_sensitivity_metric_differences.csv
+│       ├── sonarqube_paper_like_sensitivity_notes.md
+│       ├── sonarqube_paper_like_sensitivity_plan.csv
+│       ├── sonarqube_paper_like_sensitivity_results.csv
+│       ├── sonarqube_paper_like_sensitivity_targets.csv
+│       ├── sonarqube_paper_overlap_usage_notes.md
+│       ├── sonarqube_paper_overlap_usage_summary.csv
+│       ├── sonarqube_rule_config_all_metric_summary.csv
+│       ├── sonarqube_rule_config_diagnosis_notes.md
+│       ├── sonarqube_rule_config_diff_by_month.csv
+│       ├── sonarqube_rule_config_diff_by_repo.csv
+│       ├── sonarqube_rule_config_diff_by_source_group.csv
+│       ├── sonarqube_rule_config_differences_long.csv
+│       ├── sonarqube_rule_config_large_bug_diffs.csv
+│       ├── sonarqube_rule_config_large_code_smell_diffs.csv
+│       ├── sonarqube_rule_config_large_code_smell_negative_diffs.csv
+│       ├── sonarqube_rule_config_large_code_smell_positive_diffs.csv
+│       ├── sonarqube_rule_config_large_static_warning_diffs.csv
+│       ├── sonarqube_rule_config_large_static_warning_negative_diffs.csv
+│       ├── sonarqube_rule_config_large_static_warning_positive_diffs.csv
+│       ├── sonarqube_rule_config_large_technical_debt_diffs.csv
+│       ├── sonarqube_rule_config_large_vulnerability_diffs.csv
+│       ├── sonarqube_rule_config_row_subset.csv
+│       ├── sonarqube_rule_config_signal_summary.csv
+│       ├── sonarqube_rule_config_warning_metric_summary.csv
+│       └── sonarqube_static_warning_comparison.csv
+├── sonarqube_input
+│   ├── flexible
+│   │   ├── control
+│   │   │   └── data
+│   │   │       └── ts_repos_monthly.csv
+│   │   ├── control_repos.txt
+│   │   ├── months.txt
+│   │   ├── sonarqube_input_summary.csv
+│   │   ├── treatment
+│   │   │   └── data
+│   │   │       └── ts_repos_monthly.csv
+│   │   └── treatment_repos.txt
+│   └── strict
+│       ├── control
+│       │   └── data
+│       │       ├── ts_repos_monthly.csv
+│       │       ├── ts_repos_monthly_scanned.csv
+│       │       ├── ts_repos_monthly_scanned_pyv2.csv
+│       │       └── ts_repos_monthly_scanned_pyv2_paper_overlap.csv
+│       ├── control_repos.txt
+│       ├── months.txt
+│       ├── sonarqube_input_summary.csv
+│       ├── treatment
+│       │   └── data
+│       │       ├── ts_repos_monthly.csv
+│       │       ├── ts_repos_monthly_scanned.csv
+│       │       ├── ts_repos_monthly_scanned_missing_metrics.csv
+│       │       ├── ts_repos_monthly_scanned_pyv2.csv
+│       │       └── ts_repos_monthly_scanned_pyv2_paper_overlap.csv
+│       └── treatment_repos.txt
+├── tmp
+│   ├── borusyak_quality_dynamic_effects_strict.csv
+│   ├── borusyak_quality_errors_strict.csv
+│   ├── borusyak_quality_input_summary_strict.csv
+│   ├── borusyak_quality_manifest_strict_20260710-145836.csv
+│   ├── borusyak_quality_manifest_strict_20260710-150613.csv
+│   ├── borusyak_quality_manifest_strict_20260710-150705.csv
+│   ├── borusyak_quality_manifest_strict_20260710-153022.csv
+│   ├── borusyak_quality_panel_checks_strict.csv
+│   ├── borusyak_quality_static_effects_strict.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete_paper_same_column_overlap_column_sources.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete_paper_same_column_overlap_key_match_summary.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete_paper_same_column_overlap_metric_comparison.csv
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete_paper_same_column_overlap_notes.md
+│   ├── panel_event_matched_strict_with_sonarqube_quality_did_input_complete_paper_same_column_overlap_unmatched_repo_months.csv
+│   ├── panel_event_monthly_quality_py_column_sources.csv
+│   ├── panel_event_monthly_quality_py_key_match_summary.csv
+│   ├── panel_event_monthly_quality_py_metric_comparison.csv
+│   ├── panel_event_monthly_quality_py_notes.md
+│   └── panel_event_monthly_quality_py_unmatched_repo_months.csv
+├── treatment_lost_all_controls_main.csv
+├── treatment_lost_all_controls_main_final_clean.csv
+├── treatment_missing_matching_main.csv
+├── treatment_python_clone_failed_repos.csv
+├── treatment_python_clone_status.csv
+├── treatment_python_clone_usable_missing_event_month.csv
+├── treatment_python_clone_usable_repos_with_event.csv
+├── treatment_python_clone_usable_repos_with_event_valid.csv
+├── treatment_python_did
+│   ├── adoption_month_check.csv
+│   ├── ai_adoption_dates.csv
+│   ├── cursor_commits.csv
+│   ├── run-py-1e_analyzed_repos_manifest.csv
+│   ├── ts_contributors_monthly.csv
+│   └── ts_repos_monthly.csv
+├── treatment_python_did_smoke
+│   ├── adoption_month_check.csv
+│   ├── ai_adoption_dates.csv
+│   ├── cursor_commits.csv
+│   ├── run-py-1e_analyzed_repos_manifest.csv
+│   ├── run-py-1e_cache_check_20260705-144634.txt
+│   ├── run-py-1e_cache_check_20260705-144727.txt
+│   ├── run-py-1e_missing_repos_20260705-144634.csv
+│   ├── run-py-1e_missing_repos_20260705-144727.csv
+│   ├── treatment_python_repos_smoke_max5.csv
+│   ├── ts_contributors_monthly.csv
+│   └── ts_repos_monthly.csv
+├── treatment_python_repos_bw6.csv
+├── treatment_python_repos.csv
+├── treatment_sample_diagnostic.csv
+├── treatment_sample_exact_match.csv
+├── treatment_sample_main.csv
+└── treatment_sample_within1_month.csv
 
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ cat repo_python/did_final/panel_event_monthly_modified_structure_key_match_summary.csv
-input_rows,paper_rows,output_rows,output_columns,paper_schema_columns,input_duplicate_repo_month_rows,paper_duplicate_repo_month_rows,repo_month_rows_matched_to_paper,repo_month_rows_not_matched_to_paper
-1604,22096,1604,42,42,0,153,1589,15
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
-
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -n 20 repo_python/did_final/panel_event_monthly_modified_structure_metric_comparison.csv
-repo_name,time,metric,our_modified_value,paper_value,diff_our_minus_paper,abs_diff
-zauberzeug/nicegui,2025-04,ncloc,78118.0,211510.0,-133392.0,133392.0
-PostHog/posthog,2025-04,ncloc,1025455.0,937017.0,88438.0,88438.0
-PostHog/posthog,2025-08,ncloc,1313277.0,1232071.0,81206.0,81206.0
-PostHog/posthog,2025-07,ncloc,1224250.0,1155675.0,68575.0,68575.0
-PostHog/posthog,2025-06,ncloc,1143141.0,1079135.0,64006.0,64006.0
-zauberzeug/nicegui,2025-04,technical_debt,136099.0,193776.0,-57677.0,57677.0
-PostHog/posthog,2025-05,ncloc,1075854.0,1021926.0,53928.0,53928.0
-PostHog/posthog,2025-03,ncloc,981233.0,936364.0,44869.0,44869.0
-PostHog/posthog,2025-02,ncloc,933176.0,896790.0,36386.0,36386.0
-zauberzeug/nicegui,2025-02,technical_debt,228706.0,193727.0,34979.0,34979.0
-zauberzeug/nicegui,2025-03,technical_debt,228749.0,193770.0,34979.0,34979.0
-zauberzeug/nicegui,2025-01,technical_debt,228702.0,193727.0,34975.0,34975.0
-zauberzeug/nicegui,2024-12,technical_debt,228687.0,193717.0,34970.0,34970.0
-zauberzeug/nicegui,2024-11,technical_debt,228632.0,193701.0,34931.0,34931.0
-PostHog/posthog,2025-01,ncloc,870221.0,837418.0,32803.0,32803.0
-PostHog/posthog,2024-12,ncloc,832993.0,802199.0,30794.0,30794.0
-PostHog/posthog,2024-11,ncloc,806559.0,776480.0,30079.0,30079.0
-zauberzeug/nicegui,2025-04,cognitive_complexity,65372.0,94814.0,-29442.0,29442.0
-PostHog/posthog,2024-10,ncloc,774018.0,748190.0,25828.0,25828.0
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ 
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ cat repo_python/did_final/panel_event_monthly_modified_structure_notes.md 
-
-# run-py-2b15 paper-structure panel notes
-
-## Purpose
-
-Create a diagnostic CSV with the same column order as the paper `data/panel_event_monthly.csv`.
-The regenerated Python quality metrics are preserved, while unavailable paper covariates are filled from the frozen paper panel when repo-month keys match.
-
-## Inputs
-
-- Python quality input: `repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv`
-- Paper panel: `data/panel_event_monthly.csv`
-
-## Output
-
-- Modified structure panel: `repo_python/did_final/panel_event_monthly_modified_structure.csv`
-
-## Key summary
-
-- Output rows: 1604
-- Output columns: 42
-- Columns copied from Python input: 33
-- Columns filled from paper panel: 9
-- Columns set to NA: 0
-- Repo-month rows matched to paper panel: 1589
-- Repo-month rows not matched to paper panel: 15
-
-## Interpretation caution
-
-This file is for schema and Rmd-compatibility diagnostics only.
-It mixes regenerated Python SonarQube metrics with selected frozen paper covariates, so it should not be presented as a full paper reproduction dataset.
-
-## Largest paper-vs-our metric differences
-
-- zauberzeug/nicegui 2025-04 ncloc: our=78118.0, paper=211510.0, diff=-133392.0
-- PostHog/posthog 2025-04 ncloc: our=1025455.0, paper=937017.0, diff=88438.0
-- PostHog/posthog 2025-08 ncloc: our=1313277.0, paper=1232071.0, diff=81206.0
-- PostHog/posthog 2025-07 ncloc: our=1224250.0, paper=1155675.0, diff=68575.0
-- PostHog/posthog 2025-06 ncloc: our=1143141.0, paper=1079135.0, diff=64006.0
-- zauberzeug/nicegui 2025-04 technical_debt: our=136099.0, paper=193776.0, diff=-57677.0
-- PostHog/posthog 2025-05 ncloc: our=1075854.0, paper=1021926.0, diff=53928.0
-- PostHog/posthog 2025-03 ncloc: our=981233.0, paper=936364.0, diff=44869.0
-- PostHog/posthog 2025-02 ncloc: our=933176.0, paper=896790.0, diff=36386.0
-- zauberzeug/nicegui 2025-02 technical_debt: our=228706.0, paper=193727.0, diff=34979.0
+39 directories, 419 files
