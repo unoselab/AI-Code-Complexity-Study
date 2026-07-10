@@ -1,0 +1,690 @@
+---
+title: "The Impact of Cursor Adoption on Velocity and Quality - Borusyak et al. (2021) DiD Approach"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(dev = 'CairoPNG', dpi = 160)
+options(bitmapType = 'cairo')
+utils::globalVariables(c(
+    "estimate", "is_significant", "conf.low", "conf.high",
+    "term", "setting", "outcome", "outcome_label", "time"
+))
+```
+
+## Loading Required Packages
+
+```{r load_packages}
+library(didimputation)
+library(tidyverse)
+library(ggplot2)
+library(data.table)
+library(modelsummary)
+library(fixest)
+library(gridExtra)
+library(Cairo)
+```
+
+## Loading and Preparing the Data
+
+```{r load_data}
+# panel_data <- fread("../data/panel_event_monthly.csv")
+panel_data <- fread("../repo_python/did_final/panel_event_monthly_quality_py.csv")
+
+# Load repo metrics data for cursor adoption percentages
+repo_metrics <- fread("../data/repo_metrics.csv")
+repos_data <- fread("../data/repos.csv")
+matching_data <- fread("../data/matching.csv")
+lang_map <- setNames(repos_data$repo_primary_language, repos_data$repo_name)
+
+# Build treatment-to-control mapping from matching data
+treatment_repos <- matching_data[matching_data$group == "treatment", ]
+get_matched_controls <- function(treat_repo_names) {
+    matched <- treatment_repos[treatment_repos$repo_name %in% treat_repo_names, ]
+    controls <- unique(c(matched$matched_control_1, matched$matched_control_2, matched$matched_control_3))
+    controls[!is.na(controls) & controls != ""]
+}
+
+# Convert variables to DiD required format
+# Keep original repo names (strings) for mapping
+panel_data$repo_name_str <- panel_data$repo_name
+panel_data$repo_name <- as.numeric(factor(panel_data$repo_name))
+
+panel_data$primary_language <- lang_map[panel_data$repo_name_str]
+panel_data$lang_group <- case_when(
+    panel_data$primary_language %in% c("JavaScript", "TypeScript") ~ "JavaScript/TypeScript",
+    panel_data$primary_language == "Python" ~ "Python",
+    panel_data$primary_language == "Go" ~ "Go",
+    panel_data$primary_language == "Rust" ~ "Rust",
+    TRUE ~ "Other"
+)
+
+panel_data$time <- as.numeric(gsub("-", "", panel_data$time))
+panel_data$event[!is.na(panel_data$event)] <- as.numeric(
+    gsub("-", "", panel_data$event[!is.na(panel_data$event)]))
+panel_data$event[is.na(panel_data$event)] <- 0
+panel_data <- panel_data[panel_data$event < 202401 # never treated
+        | (panel_data$event > 202407 & panel_data$event <= 202503)]
+panel_data$event <- as.integer(panel_data$event)
+panel_data$quality_warnings <- panel_data$code_smells + panel_data$vulnerabilities + panel_data$bugs
+
+# Log transform skewed variables
+panel_data$commits <- log(panel_data$commits + 1)
+panel_data$lines_added <- log(panel_data$lines_added + 1)
+panel_data$quality_warnings <- log(panel_data$quality_warnings + 1)
+panel_data$cognitive_complexity <- log(panel_data$cognitive_complexity + 1)
+panel_data$duplicated_lines_density <- log(panel_data$duplicated_lines_density + 1)
+panel_data$comment_lines_density <- log(panel_data$comment_lines_density + 1)
+panel_data$age <- log(panel_data$age + 1)
+panel_data$contributors <- log(panel_data$contributors + 1)
+panel_data$stars <- log(panel_data$stars + 1)
+panel_data$issues <- log(panel_data$issues + 1)
+panel_data$issue_comments <- log(panel_data$issue_comments + 1)
+
+# Create treatment indicator and time since treatment variables
+panel_data$treated <- ifelse(panel_data$event > 0, 1, 0)
+panel_data$time_since_treatment <- ifelse(panel_data$treated == 1,
+                                         panel_data$time - panel_data$event,
+                                         NA)
+
+# Build simple mapping: repo_name -> cursor adoption %
+adoption_pct <- setNames(repo_metrics$cursor_adoptor_percentage, repo_metrics$repo_name)
+
+glimpse(panel_data)
+```
+
+## DiD Analysis with DiD Imputation Package
+
+```{r did_analysis}
+# List of outcome variables
+outcome_vars <- c(
+    "commits",
+    "lines_added",
+    "quality_warnings",
+    "duplicated_lines_density",
+    "cognitive_complexity"
+)
+outcome_names <- c(
+    "Commits",
+    "Lines Added",
+    "Static Analysis Warnings",
+    "Duplicated Lines Density",
+    "Code Complexity"
+)
+```
+
+## Aggregate Treatment Effects
+
+```{r aggregate_effects}
+# Function to extract static treatment effects (overall effect)
+get_static_effects <- function(outcome_var, data) {
+    # Run static DiD (no horizon/pretrends specified)
+    static_result <- did_imputation(
+        data = data,
+        yname = outcome_var,
+        gname = "event",
+        tname = "time",
+        idname = "repo_name",
+        first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time
+    )
+
+    return(static_result)
+}
+
+# Calculate static effects for each outcome
+static_results <- list()
+for (var in outcome_vars) {
+    static_results[[var]] <- get_static_effects(var, panel_data)
+}
+
+# Create a dataframe with all static effects
+static_df <- data.frame(
+    Outcome = names(static_results),
+    Estimate = sapply(static_results, function(x) x$estimate[x$term == "treat"]),
+    SE = sapply(static_results, function(x) x$std.error[x$term == "treat"]),
+    CI_Lower = sapply(static_results, function(x) x$conf.low[x$term == "treat"]),
+    CI_Upper = sapply(static_results, function(x) x$conf.high[x$term == "treat"])
+)
+
+# Clean outcome names for display
+static_df$Outcome <- gsub("log\\((.+) \\+ 1\\)", "\\1", static_df$Outcome)
+static_df$Outcome <- gsub("_", " ", static_df$Outcome)
+static_df$Outcome <- tools::toTitleCase(static_df$Outcome)
+
+# Display static effects
+knitr::kable(static_df,
+    digits = 3,
+    caption = "Static Treatment Effects of Cursor Adoption (DiD Imputation)"
+)
+```
+
+## Dynamic Treatment Effects (Event Study)
+
+```{r dynamic_analysis}
+# Function to run dynamic analysis for a given outcome
+run_dynamic_analysis <- function(outcome_var, data) {
+    # Run didimputation with horizon parameter for -6 to 6 months
+    dynamic_result <- did_imputation(
+        data = data,
+        yname = outcome_var,
+        gname = "event",
+        tname = "time",
+        idname = "repo_name",
+        first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+        horizon = -6:6,
+        pretrends = -6:-2
+    )
+
+    return(dynamic_result)
+}
+
+# Run dynamic analysis for each outcome
+dynamic_results <- list()
+for (var in outcome_vars) {
+    cat("Running dynamic analysis for:", var, "\n")
+    dynamic_results[[var]] <- run_dynamic_analysis(var, panel_data)
+}
+```
+
+
+```{r reproduce_check}
+# Convert log(x+1) coefficient to percent change
+pct <- function(b) (exp(b) - 1) * 100
+
+# Helper to safely extract estimate/CI for one term
+grab <- function(df, trm) {
+  i <- which(df$term == as.character(trm))
+  if (length(i) == 0) return(c(est = NA, lo = NA, hi = NA))
+  c(est = df$estimate[i], lo = df$conf.low[i], hi = df$conf.high[i])
+}
+
+# Values reported in the paper, based on md 9-task1. Reference columns for comparison.
+paper <- data.frame(
+  outcome    = outcome_vars,
+  paper_avg  = c(NA,    NA,    30.3,  NA,   41.6),   # Overall average %
+  paper_m1   = c(55.4,  281.3, NA,    NA,   NA),     # First month after adoption %
+  paper_m2   = c(14.5,  48.4,  NA,    NA,   NA)      # Second month after adoption %
+)
+
+# (A) Overall average effect = static "treat" coefficient
+compare <- data.frame(
+  Outcome   = outcome_names,
+  my_avg_pct = round(sapply(outcome_vars, function(v)
+                  pct(grab(static_results[[v]], "treat")["est"])), 1),
+  my_m0_pct  = round(sapply(outcome_vars, function(v)
+                  pct(grab(dynamic_results[[v]], 0)["est"])), 1),   # Adoption month (h=0)
+  my_m1_pct  = round(sapply(outcome_vars, function(v)
+                  pct(grab(dynamic_results[[v]], 1)["est"])), 1),   # Following month (h=1)
+  paper_avg = paper$paper_avg,
+  paper_m1  = paper$paper_m1,
+  paper_m2  = paper$paper_m2
+)
+knitr::kable(compare, caption = "My reproduced values (%) vs. paper values (%) — converted using exp(b)-1")
+
+# (B) Pre-trend check: pre-adoption periods (-6 to -2) should be close to 0
+# It is OK if the CI includes 0.
+cat("\n=== Pre-trend check: pre-adoption estimates should be 0 ===\n")
+for (v in outcome_vars) {
+  cat("\n", v, ":\n", sep = "")
+  for (h in -6:-2) {
+    g <- grab(dynamic_results[[v]], h)
+    ok <- if (is.na(g["lo"])) "?" else if (g["lo"] <= 0 & g["hi"] >= 0) "OK: includes 0" else "!! excludes 0"
+    cat(sprintf("  h=%d  est=% .3f  CI[% .3f, % .3f]  %s\n",
+                h, g["est"], g["lo"], g["hi"], ok))
+  }
+}
+```
+
+
+```{r event_study, fig.width=11, fig.height=2.5}
+# Prepare data for all outcomes in a single faceted plot
+event_study_data <- list()
+for (i in seq_along(outcome_vars)) {
+    if (outcome_vars[i] %in% names(dynamic_results)) {
+        did_result <- dynamic_results[[outcome_vars[i]]]
+        # Filter for dynamic effects (exclude static "treat" term only)
+        dynamic_data <- did_result[did_result$term != "treat", ]
+
+        if (nrow(dynamic_data) > 0) {
+            # Create a data frame for this outcome
+            df <- data.frame(
+                time = as.numeric(dynamic_data$term),
+                estimate = dynamic_data$estimate,
+                conf.low = dynamic_data$conf.low,
+                conf.high = dynamic_data$conf.high,
+                is_significant = (dynamic_data$conf.low > 0) | (dynamic_data$conf.high < 0),
+                outcome = outcome_vars[i],
+                outcome_label = outcome_names[i]
+            )
+            event_study_data[[length(event_study_data) + 1]] <- df
+        }
+    }
+}
+
+# Combine all data
+plot_data <- dplyr::bind_rows(event_study_data)
+
+# Filter to exclude month 7 and remove NA outcomes
+plot_data <- plot_data[plot_data$time >= -6 & plot_data$time <= 6, ]
+plot_data <- plot_data[!is.na(plot_data$outcome_label), ]
+
+# Enforce facet order to match outcome_vars
+plot_data$outcome_label <- factor(plot_data$outcome_label, levels = outcome_names)
+
+# Create single faceted plot
+event_study_plot <- ggplot(plot_data, aes(x = time, y = estimate)) +
+    # Significant points (filled)
+    geom_point(data = subset(plot_data, is_significant),
+               size = 1.5, shape = 19) +
+    # Non-significant points (hollow)
+    geom_point(data = subset(plot_data, !is_significant),
+               size = 1.5, shape = 21, fill = "transparent") +
+    # Error bars for significant effects (solid)
+    geom_errorbar(data = subset(plot_data, is_significant),
+                  aes(ymin = conf.low, ymax = conf.high),
+                  width = 0.5, linetype = "solid") +
+    # Error bars for non-significant effects (dotted)
+    geom_errorbar(data = subset(plot_data, !is_significant),
+                  aes(ymin = conf.low, ymax = conf.high),
+                  width = 0.5, linetype = "dotted") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) +
+    labs(
+        x = "Months Relative to Cursor Adoption",
+        y = "Treatment Effect",
+        caption = "Filled dots: p < 0.05 (significant), Hollow dots: p ≥ 0.05 (non-significant)"
+    ) +
+    theme_minimal() +
+    theme(
+        plot.caption = element_text(hjust = 0.5, size = 10, margin = margin(t = 3)),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()
+    ) +
+    facet_wrap(~ outcome_label, scales = "free_y", nrow = 1)
+
+print(event_study_plot)
+
+ggsave("../proc_r/dynamic_effects_borusyak.pdf",
+  plot = event_study_plot, width = 11, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+## Summary Statistics for All Settings
+
+```{r summary_stats_table}
+# Helper function to filter treatment repos by condition and get matched controls
+filter_with_matched_controls <- function(dt, treat_condition) {
+    treat_subset <- dt[dt$treated == 1 & treat_condition, ]
+    treat_repo_names <- unique(treat_subset$repo_name_str)
+    matched_controls <- get_matched_controls(treat_repo_names)
+    dt[(dt$treated == 1 & dt$repo_name_str %in% treat_repo_names) |
+       (dt$treated == 0 & dt$repo_name_str %in% matched_controls), ]
+}
+
+# Build filtered variants directly from the already prepared `panel_data`
+build_setting_variant <- function(data, setting_label) {
+    dt <- data
+    if (setting_label == "Orginal") {
+        # No filtering
+    } else if (setting_label == "Active Months (>0 commits)") {
+        dt <- dt[dt$commits > 0, ]
+    } else if (setting_label == "Very Active (>=10 commits)") {
+        dt <- dt[dt$commits >= log(11), ]
+    } else if (setting_label == "Truncated to 2025-06") {
+        dt <- dt[dt$time <= 202506, ]
+    } else if (setting_label == "High Contributor Adoption") {
+        adoption_vec <- adoption_pct[dt$repo_name_str]
+        adoption_vec[is.na(adoption_vec)] <- 0
+        dt <- filter_with_matched_controls(dt, adoption_vec >= 80)
+    } else if (setting_label == "Cursor Configuration Changes") {
+        dt <- dt[dt$high_confidence == TRUE | is.na(dt$high_confidence), ]
+    } else if (setting_label == "Low Confidence") {
+        dt <- dt[dt$high_confidence == FALSE | is.na(dt$high_confidence), ]
+    } else if (setting_label == "Cursor and Others") {
+        # Repository-level: keep repos with at least one other_agents == TRUE
+        repos_with_others <- unique(dt$repo_name_str[dt$other_agents == TRUE & !is.na(dt$other_agents)])
+        dt <- filter_with_matched_controls(dt, dt$repo_name_str %in% repos_with_others)
+    } else if (setting_label == "Only Cursor") {
+        # Repository-level: keep repos with all other_agents == FALSE (no TRUE values)
+        repos_with_others <- unique(dt$repo_name_str[dt$other_agents == TRUE & !is.na(dt$other_agents)])
+        repos_only_cursor <- setdiff(unique(dt$repo_name_str[dt$treated == 1]), repos_with_others)
+        dt <- filter_with_matched_controls(dt, dt$repo_name_str %in% repos_only_cursor)
+    } else if (setting_label == "JavaScript/TypeScript") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "JavaScript/TypeScript")
+    } else if (setting_label == "Python") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "Python")
+    } else if (setting_label == "Go") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "Go")
+    } else if (setting_label == "Rust") {
+        dt <- filter_with_matched_controls(dt, dt$lang_group == "Rust")
+    } else if (setting_label == "Before Agent Release") {
+        # Adoption cohort <= 2024-11
+        dt <- filter_with_matched_controls(dt, dt$event <= 202411)
+    } else if (setting_label == "After Agent Release") {
+        # Adoption cohort >= 2024-12
+        dt <- filter_with_matched_controls(dt, dt$event >= 202412)
+    } else if (setting_label == "Agent Made Default") {
+        # Adoption cohort >= 2025-02
+        dt <- filter_with_matched_controls(dt, dt$event >= 202502)
+    }
+    dt
+}
+
+# Comprehensive function to calculate statistics for a setting
+calculate_setting_stats <- function(setting_name, data) {
+    data_s <- build_setting_variant(data, setting_name)
+
+    # Count unique treatment and control repos
+    n_treat <- length(unique(data_s$repo_name[data_s$event > 0]))
+    n_control <- length(unique(data_s$repo_name[data_s$event == 0]))
+
+    # Total observations
+    n_obs <- nrow(data_s)
+
+    # Post-treatment observations (time >= event for treated units)
+    post_treat_obs <- sum(data_s$treated == 1 & data_s$time >= data_s$event)
+
+    data.frame(
+        Setting = setting_name,
+        Treatment_Repos = n_treat,
+        Control_Repos = n_control,
+        Total_Observations = n_obs,
+        Post_Treatment_Obs = post_treat_obs,
+        stringsAsFactors = FALSE
+    )
+}
+
+# All settings from the notebook
+all_settings <- c(
+    "Orginal",
+    "High Contributor Adoption",
+    "Active Months (>0 commits)",
+    "Very Active (>=10 commits)",
+    "Cursor Configuration Changes",
+    "Low Confidence",
+    "Cursor and Others",
+    "Only Cursor",
+    "Before Agent Release",
+    "After Agent Release",
+    "Agent Made Default",
+    "JavaScript/TypeScript",
+    "Python",
+    "Go",
+    "Rust"
+)
+
+# Calculate stats for all settings
+stats_list <- lapply(all_settings, calculate_setting_stats, data = panel_data)
+stats_df <- dplyr::bind_rows(stats_list)
+
+# Format the table nicely
+knitr::kable(stats_df,
+    col.names = c("Setting", "# Treatment Repos", "# Control Repos",
+                  "# Total Observations", "# Post-Treatment Obs"),
+    format = "html",
+    caption = "Summary Statistics for All Analysis Settings",
+    align = c("l", "r", "r", "r", "r"),
+    format.args = list(big.mark = ",")
+) %>%
+    kableExtra::kable_styling(
+        bootstrap_options = c("striped", "hover", "condensed"),
+        full_width = FALSE,
+        position = "left"
+    ) %>%
+    kableExtra::row_spec(0, bold = TRUE) %>%
+    kableExtra::pack_rows("Main Settings", 1, 8) %>%
+    kableExtra::pack_rows("Adoption Cohort Settings", 9, 11) %>%
+    kableExtra::pack_rows("Language-Specific Settings", 12, 15)
+```
+
+## Compare Event Studies Across Settings
+
+```{r event_study_functions}
+# Run dynamic DiD for each outcome and each setting, collect results
+collect_dynamic_results <- function(outcomes, settings) {
+    results <- list()
+    for (s in settings) {
+        data_s <- build_setting_variant(panel_data, s)
+        for (y in outcomes) {
+            # Use shorter horizon for "Agent Made Default" due to limited pre-treatment data
+            if (s == "Agent Made Default") {
+                dyn <- didimputation::did_imputation(
+                    data = data_s,
+                    yname = y,
+                    gname = "event",
+                    tname = "time",
+                    idname = "repo_name",
+                    first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+                    horizon = -2:6,
+                    pretrends = NULL  # Skip pretrends due to insufficient pre-treatment data
+                )
+            } else {
+                dyn <- didimputation::did_imputation(
+                    data = data_s,
+                    yname = y,
+                    gname = "event",
+                    tname = "time",
+                    idname = "repo_name",
+                    first_stage = ~ age + ncloc + contributors + stars + issues | repo_name + time,
+                    horizon = -6:6,
+                    pretrends = -6:-2
+                )
+            }
+            dyn$setting <- s
+            dyn$outcome <- y
+            results[[length(results) + 1]] <- dyn
+        }
+    }
+    dplyr::bind_rows(results)
+}
+
+# Reusable function to create event study comparison plot
+create_event_study_plot <- function(settings, colors, legend_title = "Setting",
+                                    outcomes = outcome_vars, outcome_labels = outcome_names,
+                                    nrow = 1, show_caption = FALSE) {
+
+    # Collect dynamic results for all settings
+    dyn_all <- collect_dynamic_results(outcomes, settings)
+
+    # Prepare plot data
+    plot_dyn <- dyn_all[dyn_all$term != "treat", ]
+    plot_dyn$time <- as.numeric(plot_dyn$term)
+    plot_dyn <- plot_dyn[plot_dyn$time >= -6 & plot_dyn$time <= 6, ]
+
+    label_map <- setNames(outcome_labels, outcomes)
+    plot_dyn$outcome_label <- label_map[plot_dyn$outcome]
+    plot_dyn <- plot_dyn[!is.na(plot_dyn$outcome_label), ]
+    plot_dyn$outcome_label <- factor(plot_dyn$outcome_label, levels = outcome_labels)
+
+    # Enforce setting order
+    plot_dyn$setting <- factor(plot_dyn$setting, levels = settings, ordered = TRUE)
+    plot_dyn$significant <- (plot_dyn$conf.low > 0) | (plot_dyn$conf.high < 0)
+    plot_dyn$significant[is.na(plot_dyn$significant)] <- FALSE
+
+    pos <- position_dodge(width = 0.5)
+
+    # Caption text
+    caption_text <- if (show_caption) {
+        "Filled dots: p < 0.05 (significant), Hollow dots: p ≥ 0.05 (non-significant)"
+    } else {
+        NULL
+    }
+
+    # Create plot
+    p <- ggplot(plot_dyn, aes(x = time, y = estimate, color = setting, group = setting)) +
+        geom_errorbar(data = subset(plot_dyn, significant),
+                      aes(ymin = conf.low, ymax = conf.high),
+                      position = pos, width = 0.4, linetype = "solid") +
+        geom_errorbar(data = subset(plot_dyn, !significant),
+                      aes(ymin = conf.low, ymax = conf.high),
+                      position = pos, width = 0.4, linetype = "dotted") +
+        geom_point(aes(shape = significant),
+                   position = pos, size = 1.5) +
+        scale_shape_manual(values = c("TRUE" = 19, "FALSE" = 1), guide = "none") +
+        geom_hline(yintercept = 0, linetype = "dashed") +
+        geom_vline(xintercept = -0.5, linetype = "dashed") +
+        scale_x_continuous(breaks = -6:6) +
+        coord_cartesian(xlim = c(-6.5, 6.5)) +
+        scale_color_manual(values = setNames(colors, settings), drop = FALSE) +
+        labs(
+            x = "Months Relative to Cursor Adoption",
+            y = "Treatment Effect",
+            color = legend_title,
+            caption = caption_text
+        ) +
+        guides(color = guide_legend(nrow = 1)) +
+        theme_minimal(base_size = 15) +
+        theme(
+            legend.position = "bottom",
+            plot.caption = element_text(hjust = 0.5, size = 13, margin = margin(t = 3)),
+            legend.margin = margin(b = 3),
+            legend.box.margin = margin(t = -5),
+            panel.grid.major.x = element_blank(),
+            panel.grid.minor.x = element_blank(),
+            axis.title = element_text(size = 15),
+            axis.text = element_text(size = 13),
+            strip.text = element_text(size = 14),
+            legend.text = element_text(size = 13),
+            legend.title = element_text(size = 14)
+        ) +
+        facet_wrap(~ outcome_label, scales = "free_y", nrow = nrow)
+
+    return(p)
+}
+
+outcomes_all <- outcome_vars
+outcome_labels_all <- outcome_names
+```
+
+### Activity Settings
+
+```{r compare_activity_all, fig.width=16, fig.height=2.5, eval=FALSE}
+settings_activity <- c("Orginal", "Active Months (>0 commits)", "Very Active (>=10 commits)")
+colors_activity <- c("#000000", "#56B4E9", "#009E73")  # Black, Sky blue, Green
+
+plot_activity_all <- create_event_study_plot(
+    settings_activity, colors_activity, "Activity Level ",
+    outcomes_all, outcome_labels_all
+)
+print(plot_activity_all)
+
+ggsave("../proc_r/dynamic_effects_activity_all.pdf",
+  plot = plot_activity_all, width = 16, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+### Confidence Settings
+
+```{r compare_confidence_all, fig.width=16, fig.height=2.5, eval=FALSE}
+settings_confidence <- c("Orginal", "High Contributor Adoption", "Cursor Configuration Changes")
+colors_confidence <- c("#000000", "#0072B2", "#E69F00")
+
+plot_confidence_all <- create_event_study_plot(
+    settings_confidence, colors_confidence, "Adoption Confidence ",
+    outcomes_all, outcome_labels_all
+)
+print(plot_confidence_all)
+
+ggsave("../proc_r/dynamic_effects_confidence_all.pdf",
+  plot = plot_confidence_all, width = 16, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+### Other Tools Settings
+
+```{r compare_other_tools_all, fig.width=16, fig.height=2.5, eval=FALSE}
+settings_other_tools <- c("Orginal", "Cursor and Others", "Only Cursor")
+colors_other_tools <- c("#000000", "#CC79A7", "#999999")  # Black, Pink, Grey
+
+plot_other_tools_all <- create_event_study_plot(
+    settings_other_tools, colors_other_tools, "Other AI Tools ",
+    outcomes_all, outcome_labels_all
+)
+print(plot_other_tools_all)
+
+ggsave("../proc_r/dynamic_effects_other_tools_all.pdf",
+  plot = plot_other_tools_all, width = 16, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+### Adoption Cohort Settings (Pre-Agent vs Post-Agent)
+
+```{r compare_agent_cohort_all, fig.width=16, fig.height=2.5, eval=FALSE}
+# Note: "Agent Made Default" uses shorter horizon (-2:6) due to limited pre-treatment data
+settings_agent_cohort <- c("Orginal", "Before Agent Release", "After Agent Release", "Agent Made Default")
+colors_agent_cohort <- c("#000000", "#D55E00", "#0072B2", "#009E73")  # Black, Vermillion, Blue, Green
+
+plot_agent_cohort_all <- create_event_study_plot(
+    settings_agent_cohort, colors_agent_cohort, "Adoption Cohort ",
+    outcomes_all, outcome_labels_all
+)
+print(plot_agent_cohort_all)
+
+ggsave("../proc_r/dynamic_effects_agent_cohort_all.pdf",
+  plot = plot_agent_cohort_all, width = 16, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+## Compare Event Studies Across Programming Languages
+
+```{r compare_languages, fig.width=16, fig.height=2.5, eval=FALSE}
+lang_settings <- c("Orginal", "JavaScript/TypeScript", "Python", "Go")
+colors_lang <- c("#000000", "#E69F00", "#0072B2", "#009E73")  # Black, Orange, Blue, Green
+
+lang_plot <- create_event_study_plot(lang_settings, colors_lang, "Language Group")
+print(lang_plot)
+
+ggsave("../proc_r/dynamic_effects_languages.pdf",
+  plot = lang_plot, width = 16, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```
+
+
+```{r compare_python_focused, fig.width=16, fig.height=2.5}
+# Python-focused language plots
+# These plots reuse the existing create_event_study_plot() function.
+# They make the Python results easier to inspect by removing other language groups.
+
+# Option 1: Original vs Python
+# This keeps the overall result as a reference while making Python easier to see.
+# settings_python_vs_original <- c("Orginal", "Python")
+# colors_python_vs_original <- c("#000000", "#0072B2")  # Black, Blue
+
+# plot_python_vs_original <- create_event_study_plot(
+#     settings_python_vs_original,
+#     colors_python_vs_original,
+#     "Language Group",
+#     outcomes_all,
+#     outcome_labels_all
+# )
+
+# print(plot_python_vs_original)
+
+# ggsave("../proc_r/dynamic_effects_python_vs_original.pdf",
+#   plot = plot_python_vs_original, width = 16, height = 2.5,
+#   device = CairoPDF, family = "DejaVu Sans")
+
+
+# Option 2: Python only
+# This removes all language overlap and shows only Python estimates.
+settings_python_only <- c("Python")
+colors_python_only <- c("#0072B2")  # Blue
+
+plot_python_only <- create_event_study_plot(
+    settings_python_only,
+    colors_python_only,
+    "Language Group",
+    outcomes_all,
+    outcome_labels_all
+)
+
+print(plot_python_only)
+
+ggsave("../proc_r/dynamic_effects_python_only.pdf",
+  plot = plot_python_only, width = 16, height = 2.5,
+  device = CairoPDF, family = "DejaVu Sans")
+```

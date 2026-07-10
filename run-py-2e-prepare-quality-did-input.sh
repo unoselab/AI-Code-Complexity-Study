@@ -21,9 +21,7 @@ set -euo pipefail
 # Examples:
 #   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh
 #
-#   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh \
-#     --convert-paper-same-column TRUE \
-#     --keep-overlap-paper-same-column TRUE
+#   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
 #
 # Existing outputs for each panel variant:
 #   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input.csv
@@ -244,20 +242,17 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}" "${PAPER_AUDIT_DIR}"
     PAPER_KEY_SUMMARY_FILE=""
     PAPER_UNMATCHED_OUTPUT_FILE=""
 
+    #   if [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+    #     PAPER_SAME_COLUMN_OUTPUT_FILE="panel_event_monthly_quality_py.csv"
+    #   else
+    #     PAPER_SAME_COLUMN_OUTPUT_FILE="${COMPLETE_OUTPUT_FILE%.csv}_paper_same_column.csv"
+    #   fi
     if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
       if [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
         PAPER_SAME_COLUMN_OUTPUT_FILE="${DID_DIR}/panel_event_monthly_quality_py.csv"
       else
         PAPER_SAME_COLUMN_OUTPUT_FILE="${DID_DIR}/panel_event_monthly_quality_py_with_unmatched.csv"
       fi
-    fi
-    # if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-    #   if [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-    #     # PAPER_SAME_COLUMN_OUTPUT_FILE="${COMPLETE_OUTPUT_FILE%.csv}_paper_same_column_overlap.csv"
-    #     PAPER_SAME_COLUMN_OUTPUT_FILE="panel_event_monthly_quality_py.csv"
-    #   else
-    #     PAPER_SAME_COLUMN_OUTPUT_FILE="${COMPLETE_OUTPUT_FILE%.csv}_paper_same_column.csv"
-    #   fi
       PAPER_OUTPUT_STEM="$(basename "${PAPER_SAME_COLUMN_OUTPUT_FILE%.csv}")"
       PAPER_AUDIT_BASE="${PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
       PAPER_KEY_SUMMARY_FILE="${PAPER_AUDIT_BASE}_key_match_summary.csv"

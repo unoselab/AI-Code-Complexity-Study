@@ -1,0 +1,2 @@
+source_complete_rows,paper_rows,paper_same_column_output_rows,paper_same_column_output_columns,paper_schema_columns,source_duplicate_repo_month_rows,paper_duplicate_repo_month_rows,repo_month_rows_matched_to_paper,repo_month_rows_not_matched_to_paper,keep_overlap_paper_same_column
+1604,22096,1589,42,42,0,153,1589,15,1
