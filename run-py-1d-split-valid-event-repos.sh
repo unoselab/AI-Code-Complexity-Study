@@ -4,7 +4,10 @@ set -euo pipefail
 # ============================================================
 # run-py-1d: Split usable Python treatment repos by event_month
 # ============================================================
-#
+# 
+# Usage:
+#   bash run-py-1d-split-valid-event-repos.sh
+# 
 # Input:
 #   repo_python/treatment_python_clone_usable_repos_with_event.csv
 #     - Created by run-py-1c.
@@ -17,7 +20,7 @@ set -euo pipefail
 #     - This file should be used as the next treatment input for
 #       repository-history/adoption-month analysis.
 #
-#   repo_python/treatment_python_clone_usable_missing_event_month.csv
+#   repo_python/tmp/run-py-1d/treatment_python_clone_usable_missing_event_month.csv
 #     - Diagnostic file.
 #     - Repositories cloned successfully but missing event_month in
 #       the baseline panel.
@@ -33,17 +36,21 @@ RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1d_split_valid_event_repos_${RUN_TS}.log}"
 
 OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_DIR}/tmp/run-py-1d}"
 
 INPUT_FILE="${INPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_repos_with_event.csv}"
 VALID_OUTPUT_FILE="${VALID_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_repos_with_event_valid.csv}"
 MISSING_OUTPUT_FILE="${MISSING_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_missing_event_month.csv}"
+MISSING_OUTPUT_FILE="${MISSING_OUTPUT_FILE:-${TMP_DIR}/treatment_python_clone_usable_missing_event_month.csv}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${TMP_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1d: split usable Python treatment repos by event_month" | tee -a "${LOG_FILE}"
 echo "Timestamp:            ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Input file:           ${INPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir:      ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:     ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Valid output file:    ${VALID_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Missing output file:  ${MISSING_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Log file:             ${LOG_FILE}" | tee -a "${LOG_FILE}"
