@@ -7,18 +7,24 @@ set -euo pipefail
 # Purpose:
 #   Run Borusyak DiD estimation for Python quality outcomes.
 #
-# Main strict input:
-#   repo_python/did_final/panel_event_monthly_quality_py.csv
+# Inputs:
+#   strict:
+#     repo_python/run-py-2e/strict/panel_event_monthly_quality_py.csv
 #
-# Canonical strict presentation outputs:
-#   proc_r/DiffInDiffBorusyak_quality_python_v2.html
-#   proc_r/dynamic_effects_borusyak_quality_python_v2.pdf
+#   flexible:
+#     repo_python/run-py-2e/flexible/
+#       panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv
 #
-# Core strict analysis outputs:
-#   repo_python/did_final/quality_did_borusyak/strict/
+# Main presentation outputs:
+#   repo_python/run-py-2f/<variant>/DiffInDiffBorusyak_quality_python_v2.html
+#   repo_python/run-py-2f/<variant>/dynamic_effects_borusyak_quality_python_v2.pdf
 #
-# Extra diagnostic and combined outputs:
-#   repo_python/tmp/
+# Extra analysis outputs:
+#   repo_python/tmp/run-py-2f/<variant>/
+#
+# Temporary combined outputs:
+#   repo_python/tmp/run-py-2f/work_<timestamp>/
+#   Removed automatically after a successful run.
 #
 # Supported PANEL_VARIANT values:
 #   strict
@@ -32,6 +38,14 @@ set -euo pipefail
 #   This wrapper reuses the analysis flow of the existing run-py-2f
 #   implementation, but it is independent and does not call another wrapper.
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-${SCRIPT_DIR}}"
@@ -47,27 +61,32 @@ if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${P
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2f_did_borusyak_quality_${PANEL_VARIANT}_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_did_borusyak_quality_${PANEL_VARIANT}_${RUN_TS}.log}"
 
-DID_DIR="${DID_DIR:-repo_python/did_final}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_ROOT="${MAIN_OUTPUT_ROOT:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_ROOT="${TMP_ROOT:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+WORK_DIR="${WORK_DIR:-${TMP_ROOT}/work_${RUN_TS}}"
 PROC_R_DIR="${PROC_R_DIR:-proc_r}"
-TMP_DIR="${TMP_DIR:-repo_python/tmp}"
+
 RMD_FILE="${RMD_FILE:-${PROC_R_DIR}/DiffInDiffBorusyak_quality_python_v2.Rmd}"
 HELPER_FILE="${HELPER_FILE:-${PROC_R_DIR}/diff_in_diff_borusyak_helpers.R}"
-OUT_ROOT="${OUT_ROOT:-${DID_DIR}/quality_did_borusyak}"
+OUT_ROOT="${OUT_ROOT:-${TMP_ROOT}}"
 
-STRICT_PANEL_FILE="${STRICT_PANEL_FILE:-${DID_DIR}/panel_event_monthly_quality_py.csv}"
-FLEXIBLE_PANEL_FILE="${FLEXIBLE_PANEL_FILE:-${DID_DIR}/panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv}"
+STRICT_PANEL_FILE="${STRICT_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/strict/panel_event_monthly_quality_py.csv}"
+FLEXIBLE_PANEL_FILE="${FLEXIBLE_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/flexible/panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv}"
 
-STRICT_HTML_FILE="${STRICT_HTML_FILE:-${PROC_R_DIR}/DiffInDiffBorusyak_quality_python_v2.html}"
-STRICT_PDF_FILE="${STRICT_PDF_FILE:-${PROC_R_DIR}/dynamic_effects_borusyak_quality_python_v2.pdf}"
+STRICT_HTML_FILE="${STRICT_HTML_FILE:-${MAIN_OUTPUT_ROOT}/strict/DiffInDiffBorusyak_quality_python_v2.html}"
+STRICT_PDF_FILE="${STRICT_PDF_FILE:-${MAIN_OUTPUT_ROOT}/strict/dynamic_effects_borusyak_quality_python_v2.pdf}"
+FLEXIBLE_HTML_FILE="${FLEXIBLE_HTML_FILE:-${MAIN_OUTPUT_ROOT}/flexible/DiffInDiffBorusyak_quality_python_v2.html}"
+FLEXIBLE_PDF_FILE="${FLEXIBLE_PDF_FILE:-${MAIN_OUTPUT_ROOT}/flexible/dynamic_effects_borusyak_quality_python_v2.pdf}"
 
-MANIFEST_FILE="${TMP_DIR}/borusyak_quality_manifest_${PANEL_VARIANT}_${RUN_TS}.csv"
-COMBINED_STATIC="${TMP_DIR}/borusyak_quality_static_effects_${PANEL_VARIANT}.csv"
-COMBINED_DYNAMIC="${TMP_DIR}/borusyak_quality_dynamic_effects_${PANEL_VARIANT}.csv"
-COMBINED_CHECKS="${TMP_DIR}/borusyak_quality_panel_checks_${PANEL_VARIANT}.csv"
-COMBINED_INPUT_SUMMARY="${TMP_DIR}/borusyak_quality_input_summary_${PANEL_VARIANT}.csv"
-COMBINED_ERRORS="${TMP_DIR}/borusyak_quality_errors_${PANEL_VARIANT}.csv"
+MANIFEST_FILE="${WORK_DIR}/borusyak_quality_manifest_${PANEL_VARIANT}.csv"
+COMBINED_STATIC="${WORK_DIR}/borusyak_quality_static_effects_${PANEL_VARIANT}.csv"
+COMBINED_DYNAMIC="${WORK_DIR}/borusyak_quality_dynamic_effects_${PANEL_VARIANT}.csv"
+COMBINED_CHECKS="${WORK_DIR}/borusyak_quality_panel_checks_${PANEL_VARIANT}.csv"
+COMBINED_INPUT_SUMMARY="${WORK_DIR}/borusyak_quality_input_summary_${PANEL_VARIANT}.csv"
+COMBINED_ERRORS="${WORK_DIR}/borusyak_quality_errors_${PANEL_VARIANT}.csv"
 
 PANELS=()
 
@@ -79,28 +98,25 @@ if [[ "${PANEL_VARIANT}" == "flexible" || "${PANEL_VARIANT}" == "all" ]]; then
   PANELS+=("flexible|${FLEXIBLE_PANEL_FILE}")
 fi
 
-mkdir -p "${LOG_DIR}" "${OUT_ROOT}" "${TMP_DIR}" "${PROC_R_DIR}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_ROOT}" "${TMP_ROOT}" "${WORK_DIR}"
 
 {
   echo "============================================================"
-  echo "run-py-2f: Python Borusyak DiD for SonarQube quality outcomes"
+  echo "${RUN_PREFIX}: Python Borusyak DiD for SonarQube quality outcomes"
   echo "Started:                $(date)"
+  echo "Script name:            ${SCRIPT_NAME}"
+  echo "Run prefix:             ${RUN_PREFIX}"
   echo "Panel variant:          ${PANEL_VARIANT}"
   echo "Project root:           ${PROJECT_ROOT}"
   echo "Rmd file:               ${RMD_FILE}"
   echo "Helper file:            ${HELPER_FILE}"
   echo "Strict input:           ${STRICT_PANEL_FILE}"
   echo "Flexible input:         ${FLEXIBLE_PANEL_FILE}"
-  echo "Core output root:       ${OUT_ROOT}"
+  echo "Main output root:       ${MAIN_OUTPUT_ROOT}"
+  echo "Extra output root:      ${TMP_ROOT}"
+  echo "Temporary work dir:     ${WORK_DIR}"
   echo "Strict HTML:            ${STRICT_HTML_FILE}"
   echo "Strict PDF:             ${STRICT_PDF_FILE}"
-  echo "Extra output dir:       ${TMP_DIR}"
-  echo "Manifest:               ${MANIFEST_FILE}"
-  echo "Combined static:        ${COMBINED_STATIC}"
-  echo "Combined dynamic:       ${COMBINED_DYNAMIC}"
-  echo "Combined checks:        ${COMBINED_CHECKS}"
-  echo "Combined input summary: ${COMBINED_INPUT_SUMMARY}"
-  echo "Combined errors:        ${COMBINED_ERRORS}"
   echo "Log file:               ${LOG_FILE}"
   echo "============================================================"
   echo
@@ -139,6 +155,7 @@ mkdir -p "${LOG_DIR}" "${OUT_ROOT}" "${TMP_DIR}" "${PROC_R_DIR}"
       exit 1
     fi
 
+    rm -rf "${PANEL_OUT_DIR}"
     mkdir -p "${PANEL_OUT_DIR}"
 
     GENERATED_PDF_FILE="${PANEL_OUT_DIR}/dynamic_effects_borusyak_quality.pdf"
@@ -160,27 +177,27 @@ mkdir -p "${LOG_DIR}" "${OUT_ROOT}" "${TMP_DIR}" "${PROC_R_DIR}"
       PDF_FILE="${STRICT_PDF_FILE}"
       RENDER_OUTPUT_DIR="$(dirname "${HTML_FILE}")"
       RENDER_OUTPUT_FILE="$(basename "${HTML_FILE}")"
-      STATIC_ERRORS_FILE="${TMP_DIR}/borusyak_quality_static_errors_strict_${RUN_TS}.csv"
-      DYNAMIC_ERRORS_FILE="${TMP_DIR}/borusyak_quality_dynamic_errors_strict_${RUN_TS}.csv"
-      rm -f "${HTML_FILE}" "${PDF_FILE}" "${STATIC_ERRORS_FILE}" "${DYNAMIC_ERRORS_FILE}"
+      STATIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_errors_${RUN_TS}.csv"
+      DYNAMIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_errors_${RUN_TS}.csv"
     else
-      HTML_FILE="${PANEL_OUT_DIR}/borusyak_quality_${PANEL_LABEL}.html"
-      PDF_FILE="${GENERATED_PDF_FILE}"
-      RENDER_OUTPUT_DIR="${PANEL_OUT_DIR}"
+      HTML_FILE="${FLEXIBLE_HTML_FILE}"
+      PDF_FILE="${FLEXIBLE_PDF_FILE}"
+      RENDER_OUTPUT_DIR="$(dirname "${HTML_FILE}")"
       RENDER_OUTPUT_FILE="$(basename "${HTML_FILE}")"
-      STATIC_ERRORS_FILE="${TMP_DIR}/borusyak_quality_static_errors_${PANEL_LABEL}_${RUN_TS}.csv"
-      DYNAMIC_ERRORS_FILE="${TMP_DIR}/borusyak_quality_dynamic_errors_${PANEL_LABEL}_${RUN_TS}.csv"
-      rm -f "${HTML_FILE}" "${STATIC_ERRORS_FILE}" "${DYNAMIC_ERRORS_FILE}"
+      STATIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_errors_${RUN_TS}.csv"
+      DYNAMIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_errors_${RUN_TS}.csv"
     fi
+
+    mkdir -p "${RENDER_OUTPUT_DIR}" "$(dirname "${PDF_FILE}")"
+    rm -f "${HTML_FILE}" "${PDF_FILE}" "${STATIC_ERRORS_FILE}" "${DYNAMIC_ERRORS_FILE}"
 
     echo
     echo "============================================================"
     echo "Running panel: ${PANEL_LABEL}"
     echo "Input:         ${INPUT_FILE}"
-    echo "Core outputs:  ${PANEL_OUT_DIR}"
-    echo "HTML:          ${HTML_FILE}"
-    echo "PDF:           ${PDF_FILE}"
-    echo "Extra outputs: ${TMP_DIR}"
+    echo "Main HTML:     ${HTML_FILE}"
+    echo "Main PDF:      ${PDF_FILE}"
+    echo "Extra outputs: ${PANEL_OUT_DIR}"
     echo "============================================================"
 
     export PANEL_LABEL
@@ -218,13 +235,11 @@ RS
       exit 1
     fi
 
-    if [[ "${PANEL_LABEL}" == "strict" ]]; then
-      if [[ ! -f "${GENERATED_PDF_FILE}" ]]; then
-        echo "ERROR: Expected PDF output was not created: ${GENERATED_PDF_FILE}"
-        exit 1
-      fi
-      mv -f "${GENERATED_PDF_FILE}" "${PDF_FILE}"
+    if [[ ! -f "${GENERATED_PDF_FILE}" ]]; then
+      echo "ERROR: Expected PDF output was not created: ${GENERATED_PDF_FILE}"
+      exit 1
     fi
+    mv -f "${GENERATED_PDF_FILE}" "${PDF_FILE}"
 
     if [[ -f "${GENERATED_STATIC_ERRORS_FILE}" ]]; then
       mv -f "${GENERATED_STATIC_ERRORS_FILE}" "${STATIC_ERRORS_FILE}"
@@ -383,21 +398,18 @@ print("Saved combined input summary:", combined_input_summary_path)
 print("Saved combined errors:", combined_errors_path)
 PY
 
+  rm -rf "${WORK_DIR}"
+
   echo
   echo "============================================================"
-  echo "run-py-2f completed successfully."
+  echo "${RUN_PREFIX} completed successfully."
   echo "Completed:              $(date)"
   echo "Panel variant:          ${PANEL_VARIANT}"
   echo "Strict HTML:            ${STRICT_HTML_FILE}"
   echo "Strict PDF:             ${STRICT_PDF_FILE}"
-  echo "Core output root:       ${OUT_ROOT}"
-  echo "Extra output dir:       ${TMP_DIR}"
-  echo "Manifest:               ${MANIFEST_FILE}"
-  echo "Combined static:        ${COMBINED_STATIC}"
-  echo "Combined dynamic:       ${COMBINED_DYNAMIC}"
-  echo "Combined checks:        ${COMBINED_CHECKS}"
-  echo "Combined input summary: ${COMBINED_INPUT_SUMMARY}"
-  echo "Combined errors:        ${COMBINED_ERRORS}"
+  echo "Main output root:       ${MAIN_OUTPUT_ROOT}"
+  echo "Extra output root:      ${TMP_ROOT}"
+  echo "Temporary outputs:      removed"
   echo "Log file:               ${LOG_FILE}"
   echo "============================================================"
 
