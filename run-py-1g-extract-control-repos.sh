@@ -17,7 +17,7 @@ set -euo pipefail
 #   proc_scripts/extract_matched_control_repos.py
 #
 # Input:
-#   repo_python/treatment_python_sample_main_118.csv
+#   repo_python/run-py-1f/treatment_python_sample_main_118.csv
 #     - Primary Python treatment sample created by run-py-1f.
 #     - For the current Python run, main/exact/within1 are all identical,
 #       but main is the primary replication input.
@@ -30,21 +30,26 @@ set -euo pipefail
 #         matched_control_2
 #         matched_control_3
 #
-# Outputs:
-#   repo_python/python_matched_control_pairs_main_118.csv
+# Main outputs:
+#   repo_python/run-py-1g/python_control_repos_to_clone_main_118.csv
 #     - Clean treatment-control pair file after overlap removal.
 #
-#   repo_python/python_control_repos_to_clone_main_118.csv
+#   repo_python/run-py-1g/python_control_repos_to_clone_main_118.csv
 #     - Unique clean control repos to clone in the next step.
 #
-#   repo_python/python_treatment_missing_matching_main_118.csv
+# Extra outputs:
+#   repo_python/tmp/run-py-1g/python_treatment_missing_matching_main_118.csv
 #     - Treatment repos without matching rows.
 #
-#   repo_python/python_control_extract_summary_main_118.csv
+#   repo_python/tmp/run-py-1g/python_control_extract_summary_main_118.csv
 #     - Summary metrics for audit.
 #
-# Sidecar outputs:
-#   Raw pairs, raw controls, overlap diagnostics, and coverage files.
+#   Raw pairs, raw controls, overlap diagnostics, and coverage files
+#   are also stored under repo_python/tmp/run-py-1g.
+# 
+# Usage:
+#   bash run-py-1g-extract-control-repos.sh
+# 
 # ============================================================
 
 LOG_DIR="${LOG_DIR:-logs}"
@@ -53,21 +58,26 @@ LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1g_extract_control_repos_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/extract_matched_control_repos.py}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-1g}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/run-py-1g}"
 
-TREATMENT_SAMPLE_FILE="${TREATMENT_SAMPLE_FILE:-${OUTPUT_DIR}/treatment_sample_main.csv}"
+SAMPLE_NAME="${SAMPLE_NAME:-main_118}"
+
+TREATMENT_SAMPLE_FILE="${TREATMENT_SAMPLE_FILE:-${OUTPUT_BASE_DIR}/run-py-1f/treatment_python_sample_${SAMPLE_NAME}.csv}"
 MATCHING_FILE="${MATCHING_FILE:-data_baseline_backup/matching.csv}"
 
-PAIR_OUTPUT_FILE="${PAIR_OUTPUT_FILE:-${OUTPUT_DIR}/matched_control_pairs_main.csv}"
-CONTROL_CLONE_FILE="${CONTROL_CLONE_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main.csv}"
-MISSING_MATCH_FILE="${MISSING_MATCH_FILE:-${OUTPUT_DIR}/treatment_missing_matching_main.csv}"
-SUMMARY_FILE="${SUMMARY_FILE:-${OUTPUT_DIR}/control_extract_summary_main.csv}"
+PAIR_OUTPUT_FILE="${PAIR_OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/python_matched_control_pairs_${SAMPLE_NAME}.csv}"
+CONTROL_CLONE_FILE="${CONTROL_CLONE_FILE:-${MAIN_OUTPUT_DIR}/python_control_repos_to_clone_${SAMPLE_NAME}.csv}"
 
-RAW_PAIR_OUTPUT_FILE="${RAW_PAIR_OUTPUT_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_raw.csv}"
-RAW_CONTROL_CLONE_FILE="${RAW_CONTROL_CLONE_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main_raw.csv}"
-OVERLAP_PAIR_FILE="${OVERLAP_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_overlap_pairs.csv}"
-OVERLAP_REPO_FILE="${OVERLAP_REPO_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main_overlap_repos.csv}"
-COVERAGE_FILE="${COVERAGE_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_coverage.csv}"
+MISSING_MATCH_FILE="${MISSING_MATCH_FILE:-${TMP_DIR}/python_treatment_missing_matching_${SAMPLE_NAME}.csv}"
+SUMMARY_FILE="${SUMMARY_FILE:-${TMP_DIR}/python_control_extract_summary_${SAMPLE_NAME}.csv}"
+
+RAW_PAIR_OUTPUT_FILE="${RAW_PAIR_OUTPUT_FILE:-${TMP_DIR}/python_matched_control_pairs_${SAMPLE_NAME}_raw.csv}"
+RAW_CONTROL_CLONE_FILE="${RAW_CONTROL_CLONE_FILE:-${TMP_DIR}/python_control_repos_to_clone_${SAMPLE_NAME}_raw.csv}"
+OVERLAP_PAIR_FILE="${OVERLAP_PAIR_FILE:-${TMP_DIR}/python_matched_control_pairs_${SAMPLE_NAME}_overlap_pairs.csv}"
+OVERLAP_REPO_FILE="${OVERLAP_REPO_FILE:-${TMP_DIR}/python_control_repos_to_clone_${SAMPLE_NAME}_overlap_repos.csv}"
+COVERAGE_FILE="${COVERAGE_FILE:-${TMP_DIR}/python_matched_control_pairs_${SAMPLE_NAME}_coverage.csv}"
 
 FULL_ADOPTER_FILE="${FULL_ADOPTER_FILE:-data_baseline_backup/panel_event_monthly.csv}"
 FULL_ADOPTER_FILTER_COLUMN="${FULL_ADOPTER_FILTER_COLUMN:-is_treatment}"
@@ -75,7 +85,8 @@ FULL_ADOPTER_FILTER_VALUE="${FULL_ADOPTER_FILTER_VALUE:-1}"
 
 TOP_PRINT="${TOP_PRINT:-50}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}"
+
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1g: extract matched Python control repositories" | tee -a "${LOG_FILE}"
@@ -83,7 +94,9 @@ echo "Timestamp:                     ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Python script:                 ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Treatment sample file:         ${TREATMENT_SAMPLE_FILE}" | tee -a "${LOG_FILE}"
 echo "Matching file:                 ${MATCHING_FILE}" | tee -a "${LOG_FILE}"
-echo "Output dir:                    ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Sample name:                   ${SAMPLE_NAME}" | tee -a "${LOG_FILE}"
+echo "Main output dir:               ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:              ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Pair output file:              ${PAIR_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Control clone file:            ${CONTROL_CLONE_FILE}" | tee -a "${LOG_FILE}"
 echo "Missing match file:            ${MISSING_MATCH_FILE}" | tee -a "${LOG_FILE}"
@@ -205,6 +218,8 @@ echo "run-py-1g completed successfully." | tee -a "${LOG_FILE}"
 echo "Pair output file: ${PAIR_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Control clone file: ${CONTROL_CLONE_FILE}" | tee -a "${LOG_FILE}"
 echo "Missing match file: ${MISSING_MATCH_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir: ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Summary file: ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
