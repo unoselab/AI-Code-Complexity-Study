@@ -1,0 +1,1068 @@
+#!/usr/bin/env python3
+"""
+Script to run SonarQube scanner on the latest commits of each week or month.
+
+This script:
+1. Reads the time series repository stats from ts_repos_weekly.csv or ts_repos_monthly.csv
+2. Optionally builds a one-row target input from REPO_NAME,MONTH,LATEST_COMMIT
+3. For each repository and time period, runs SonarQube scanner on the latest commit
+4. Collects and stores the analysis results
+
+NOTE: Sometimes the analysis results are not immediately available in database,
+so you may have to run this script twice in order to fetch all available metrics
+"""
+
+import argparse
+import time
+import re
+import logging
+import multiprocessing as mp
+import os
+import subprocess
+import sys
+from pathlib import Path
+from typing import Dict, Optional
+
+import git
+import pandas as pd
+import requests
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(override=True)
+
+# Constants
+SONAR_PATH = os.getenv("SONAR_PATH") or os.getenv("SONAR_SCANNER_PATH")
+SONAR_TOKEN = os.getenv("SONAR_TOKEN")
+SONAR_HOST = os.getenv("SONAR_HOST")
+
+# Time key in the time series dataframe
+TIME_KEY = None
+
+# Fixed start date for data collection, 2024-01-01 determined by adoption time analysis
+START_DATE = "2024-01-01"
+END_DATE = "2025-08-31"
+
+# Metrics to collect from SonarQube
+METRICS_OF_INTEREST = [
+    "ncloc",
+    "bugs",
+    "vulnerabilities",
+    "code_smells",
+    "duplicated_lines_density",
+    "comment_lines_density",
+    "cognitive_complexity",
+    "software_quality_maintainability_remediation_effort",  # technical debt
+]
+
+# Paths
+SCRIPT_DIR = Path(__file__).parent
+DATA_DIR = SCRIPT_DIR.parent / "tmp_sonar_batch" / "data"
+CLONE_DIR = SCRIPT_DIR.parent.parent / "CursorRepos"
+CONTROL_CLONE_DIR = SCRIPT_DIR.parent.parent / "ControlRepos"
+
+# Number of processes to use for parallel processing
+NUM_PROCESSES = 1  # small-batch smoke test
+
+# Taking too long to analyze
+REPO_IGNORE = [
+    "meshery/meshery",
+    "swc-project/swc",
+    "djmonkeyuk/nms-base-builder",
+    "Azure/azure-rest-api-specs-examples",
+]
+
+
+def check_analysis_exists(project_key: str, version: str) -> bool:
+    """
+    Check if SonarQube analysis already exists for a project and version.
+
+    Args:
+        project_key: SonarQube project key
+        version: Version identifier of the analysis
+
+    Returns:
+        bool: True if analysis exists, False otherwise
+    """
+    try:
+        page = 1
+        while True:
+            url = f"{SONAR_HOST}/api/project_analyses/search"
+            auth = (SONAR_TOKEN, "")
+            params = {
+                "project": project_key,
+                "category": "VERSION",
+                "p": page,
+                "ps": 100,  # Page size of 100 analyses
+            }
+
+            response = requests.get(url, auth=auth, params=params)
+            response.raise_for_status()
+
+            data = response.json()
+            if "analyses" not in data or not data["analyses"]:
+                # No more analyses to check
+                break
+
+            for analysis in data["analyses"]:
+                if analysis.get("projectVersion") == version:
+                    logging.info(
+                        "Analysis already exists for %s version %s",
+                        project_key,
+                        version,
+                    )
+                    return True
+
+            # Check if we've reached the last page
+            if len(data["analyses"]) < 100:
+                break
+
+            page += 1
+
+        return False
+
+    except requests.exceptions.RequestException as e:
+        logging.error(
+            "Failed to check existing analysis for %s: %s", project_key, str(e)
+        )
+        return False
+
+
+def build_language_specific_sonar_args(language_profile: str) -> list[str]:
+    """Return language-specific SonarScanner CLI arguments.
+
+    Keep this function conservative because run_sonarqube_v2.py is used for
+    multiple programming languages.
+    """
+    profile = (language_profile or "generic").strip().lower()
+
+    common_args = [
+        "-Dsonar.sourceEncoding=UTF-8",
+        (
+            "-Dsonar.exclusions="
+            "**/.git/**,"
+            "**/__pycache__/**,"
+            "**/.venv/**,"
+            "**/venv/**,"
+            "**/env/**,"
+            "**/node_modules/**,"
+            "**/dist/**,"
+            "**/build/**,"
+            "**/.tox/**,"
+            "**/.mypy_cache/**,"
+            "**/.pytest_cache/**,"
+            "**/coverage/**,"
+            "**/.next/**,"
+            "**/.nuxt/**"
+        ),
+    ]
+
+    if profile in {"generic", "auto"}:
+        return common_args
+
+    if profile in {"python", "py"}:
+        return common_args + [
+            "-Dsonar.python.version=3.11",
+        ]
+
+    if profile in {"python-only", "py-only"}:
+        return common_args + [
+            "-Dsonar.python.version=3.11",
+            "-Dsonar.inclusions=**/*.py",
+        ]
+
+    if profile in {"javascript", "typescript", "js", "ts", "js-ts", "jsts"}:
+        return common_args + [
+            # Keep JS/TS settings conservative. The scanner can usually find
+            # tsconfig.json files automatically.
+            # "-Dsonar.javascript.maxFileSize=1000",
+        ]
+
+    raise ValueError(
+        f"Unsupported language profile: {language_profile}. "
+        "Use one of: generic, python, python-only, js-ts."
+    )
+
+
+# def run_sonar_scan(
+#     repo_path: Path, commit_hash: str, version: str, project_key: str
+# ) -> bool:
+def run_sonar_scan(
+    repo_path: Path, commit_hash: str, version: str, project_key: str, language_profile: str = "generic",
+) -> bool:
+    """
+    Run SonarQube scanner on a specific commit.
+
+    Args:
+        repo_path: Path to the repository
+        commit_hash: Git commit hash to analyze
+        version: Version identifier for the analysis
+        project_key: SonarQube project key
+
+    Returns:
+        bool: True if scan was successful, False otherwise
+    """
+    try:
+        # Checkout the specific commit
+        repo = git.Repo(str(repo_path))
+        current = repo.head.commit
+
+        # Force checkout and clean the working directory
+        repo.git.reset("--hard")
+        repo.git.clean("-fd")
+        repo.git.checkout(commit_hash, force=True)
+
+        try:
+            # Run sonar-scanner
+            # cmd = [
+            #     SONAR_PATH,
+            #     f"-Dsonar.projectKey={project_key}",
+            #     f"-Dsonar.projectName={project_key}",
+            #     f"-Dsonar.projectVersion={version}",
+            #     "-Dsonar.sources=.",
+            #     f"-Dsonar.java.binaries=.",  # Fix Java errors, hopefully we find some .class here
+            #     f"-Dsonar.host.url={SONAR_HOST}",
+            #     f"-Dsonar.token={SONAR_TOKEN}",
+            #     "-Dsonar.scm.disabled=true",  # Disable SCM to speed up analysis
+            # ]
+            cmd = [
+                SONAR_PATH,
+                f"-Dsonar.projectKey={project_key}",
+                f"-Dsonar.projectName={project_key}",
+                f"-Dsonar.projectVersion={version}",
+                "-Dsonar.sources=.",
+                *build_language_specific_sonar_args(language_profile),
+                "-Dsonar.java.binaries=.",
+                f"-Dsonar.host.url={SONAR_HOST}",
+                f"-Dsonar.token={SONAR_TOKEN}",
+                "-Dsonar.scm.disabled=true",
+            ]
+
+            subprocess.run(
+                cmd, cwd=repo_path, capture_output=True, text=True, check=True
+            )
+            logging.info("SonarQube scan completed for %s at %s", project_key, version)
+            return True
+
+        finally:
+            # Always return to original commit
+            repo.git.checkout(current)
+
+    except subprocess.CalledProcessError as e:
+        logging.error(
+            "SonarQube scan failed for %s at %s: %s", project_key, version, e.stderr
+        )
+        return False
+    except Exception as e:
+        logging.error("Error during scan of %s at %s: %s", project_key, version, str(e))
+        return False
+
+
+def _find_analysis_date(project_key: str, version: str) -> Optional[str]:
+    """
+    Find the analysis date for a project's VERSION analysis.
+
+    Args:
+        project_key: SonarQube project key
+        version: Version identifier of the analysis
+
+    Returns:
+        str: Analysis date if found, None otherwise
+    """
+    analysis_date = None
+    page = 1
+
+    while analysis_date is None:
+        url = f"{SONAR_HOST}/api/project_analyses/search"
+        auth = (SONAR_TOKEN, "")
+        params = {
+            "project": project_key,
+            "category": "VERSION",
+            "ps": 100,  # Page size
+            "p": page,  # Page number
+        }
+
+        response = requests.get(url, auth=auth, params=params)
+        response.raise_for_status()
+
+        data = response.json()
+
+        logging.info("Found %d analyses for %s", len(data["analyses"]), project_key)
+
+        # Find the analysis with matching version to get its date
+        if "analyses" in data and data["analyses"]:
+            for analysis in data["analyses"]:
+                if analysis.get("projectVersion") == version:
+                    analysis_date = analysis.get("date")
+                    break
+
+            # If we haven't found the analysis and there are more pages, continue to the next page
+            if analysis_date is None and len(data["analyses"]) == 100:
+                page += 1
+            else:
+                break  # No more results or found the analysis
+        else:
+            break  # No analyses returned
+
+    return analysis_date
+
+
+def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
+    """
+    Get metrics from SonarQube API for a project and specific version.
+
+    Only fetches the metrics listed in METRICS_OF_INTEREST. Use
+    get_all_sonar_metrics() to fetch every metric available on the
+    SonarQube instance instead.
+
+    Args:
+        project_key: SonarQube project key
+        version: Version identifier of the analysis
+
+    Returns:
+        dict: Metrics data or None if request failed
+    """
+    try:
+        analysis_date = _find_analysis_date(project_key, version)
+
+        if not analysis_date:
+            logging.warning("No analysis found for %s version %s", project_key, version)
+            return None
+
+        # Now get the measures for this specific date using search_history
+        auth = (SONAR_TOKEN, "")
+        url = f"{SONAR_HOST}/api/measures/search_history"
+        params = {
+            "component": project_key,
+            "metrics": ",".join(METRICS_OF_INTEREST),
+            "from": analysis_date,
+            "to": analysis_date,
+        }
+
+        response = requests.get(url, auth=auth, params=params)
+        response.raise_for_status()
+
+        data = response.json()
+        metrics = {}
+
+        if "measures" in data:
+            for measure in data["measures"]:
+                if (
+                    measure["history"]
+                    and len(measure["history"]) > 0
+                    and "value" in measure["history"][0]
+                ):
+                    metrics[measure["metric"]] = float(measure["history"][0]["value"])
+
+        return metrics if metrics else None
+
+    except requests.exceptions.RequestException as e:
+        logging.error(
+            "Failed to get metrics for %s version %s: %s", project_key, version, str(e)
+        )
+        return None
+
+
+def get_all_metric_keys() -> list[str]:
+    """
+    Fetch the keys of every metric defined on this SonarQube instance.
+
+    Returns:
+        list[str]: Metric keys (empty list if the request failed).
+    """
+    metric_keys: list[str] = []
+    page = 1
+
+    try:
+        while True:
+            url = f"{SONAR_HOST}/api/metrics/search"
+            auth = (SONAR_TOKEN, "")
+            params = {"ps": 500, "p": page}  # Max page size for this endpoint
+
+            response = requests.get(url, auth=auth, params=params)
+            response.raise_for_status()
+
+            data = response.json()
+            page_metrics = data.get("metrics", [])
+            metric_keys.extend(m["key"] for m in page_metrics if "key" in m)
+
+            total = data.get("total", len(metric_keys))
+            if not page_metrics or len(metric_keys) >= total:
+                break
+            page += 1
+
+        return metric_keys
+
+    except requests.exceptions.RequestException as e:
+        logging.error("Failed to fetch SonarQube metric definitions: %s", str(e))
+        return []
+
+
+def get_all_sonar_metrics(
+    project_key: str, version: str, batch_size: int = 15
+) -> Optional[Dict]:
+    """
+    Get ALL available metrics from SonarQube API for a project and version,
+    regardless of METRICS_OF_INTEREST.
+
+    Unlike get_sonar_metrics(), this discovers every metric key defined on
+    the SonarQube instance (via /api/metrics/search) and fetches all of
+    them. The measures/search_history endpoint only accepts a limited
+    number of metric keys per request, so the keys are fetched in batches
+    and merged into a single result.
+
+    Args:
+        project_key: SonarQube project key
+        version: Version identifier of the analysis
+        batch_size: Max number of metric keys to request per API call.
+            Keep conservative since search_history limits how many metrics
+            can be requested at once.
+
+    Returns:
+        dict: Metrics data (metric key -> value) or None if no metrics
+        could be retrieved. Non-numeric metric values (e.g. rating letters
+        or alert statuses) are kept as their raw string values.
+    """
+    try:
+        analysis_date = _find_analysis_date(project_key, version)
+
+        if not analysis_date:
+            logging.warning("No analysis found for %s version %s", project_key, version)
+            return None
+
+        metric_keys = get_all_metric_keys()       
+        logging.info( "metric_keys (%d):\n%s", len(metric_keys), "\n".join(f"  - {k}" for k in metric_keys), )
+        
+        if not metric_keys:
+            logging.warning("No metric definitions found on %s", SONAR_HOST)
+            return None
+
+        auth = (SONAR_TOKEN, "")
+        url = f"{SONAR_HOST}/api/measures/search_history"
+        metrics: Dict = {}
+
+        for i in range(0, len(metric_keys), batch_size):
+            batch = metric_keys[i : i + batch_size]
+            params = {
+                "component": project_key,
+                "metrics": ",".join(batch),
+                "from": analysis_date,
+                "to": analysis_date,
+            }
+
+            try:
+                response = requests.get(url, auth=auth, params=params)
+                response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                logging.error(
+                    "Failed to get metrics batch %s for %s version %s: %s",
+                    batch,
+                    project_key,
+                    version,
+                    str(e),
+                )
+                continue
+
+            data = response.json()
+
+            if "measures" in data:
+                for measure in data["measures"]:
+                    if (
+                        measure["history"]
+                        and len(measure["history"]) > 0
+                        and "value" in measure["history"][0]
+                    ):
+                        raw_value = measure["history"][0]["value"]
+                        try:
+                            metrics[measure["metric"]] = float(raw_value)
+                        except (TypeError, ValueError):
+                            # Some metrics (e.g. alert_status, ratings) aren't numeric.
+                            metrics[measure["metric"]] = raw_value
+
+        return metrics if metrics else None
+
+    except requests.exceptions.RequestException as e:
+        logging.error(
+            "Failed to get all metrics for %s version %s: %s", project_key, version, str(e)
+        )
+        return None
+
+
+def wait_for_analysis_ready(
+    project_key: str,
+    version: str,
+    timeout_seconds: int = 120,
+    poll_interval_seconds: int = 5,
+) -> bool:
+    """Wait until a SonarQube VERSION analysis appears for the given project/version."""
+    deadline = time.monotonic() + timeout_seconds
+
+    while time.monotonic() < deadline:
+        if check_analysis_exists(project_key, version):
+            logging.info(
+                "SonarQube analysis is ready for %s version %s",
+                project_key,
+                version,
+            )
+            return True
+
+        logging.info(
+            "Waiting for SonarQube analysis for %s version %s...",
+            project_key,
+            version,
+        )
+        time.sleep(poll_interval_seconds)
+
+    logging.warning(
+        "Timed out waiting for SonarQube analysis for %s version %s",
+        project_key,
+        version,
+    )
+    return False
+
+
+def process_repository(
+    ts_df: pd.DataFrame,
+    repo_name: str,
+    aggregation: str,
+    clone_dir: Path,
+    language_profile: str = "generic",
+    project_key_prefix: str = "",
+    analysis_again: bool = False,
+    all_metrics: bool = False,
+) -> pd.DataFrame:
+    """
+    Process a single repository's SonarQube analysis.
+
+    Args:
+        ts_df: Time series dataframe.
+        repo_name: Name of the repository to process.
+        aggregation: Either "week" or "month".
+        clone_dir: Directory containing cloned repositories.
+        analysis_again: If True, re-run the scan even if an analysis already
+            exists for the project/version, and refresh stored metrics.
+        all_metrics: If True, fetch every metric available on the SonarQube
+            instance (via get_all_sonar_metrics) instead of only the
+            METRICS_OF_INTEREST subset (via get_sonar_metrics).
+
+    Returns:
+        pd.DataFrame: Updated time series dataframe for this repository.
+    """
+    # Setup repository info and data.
+    base_project_key = repo_name.replace("/", "_")
+    project_key = f"{project_key_prefix}{base_project_key}"
+    repo_path = Path(clone_dir) / base_project_key
+
+    if not repo_path.exists():
+        logging.warning("Repository %s not found at %s", repo_name, repo_path)
+        return ts_df[ts_df["repo_name"] == repo_name]
+
+    # Get repository-specific rows.
+    repo_df = ts_df[ts_df["repo_name"] == repo_name].copy()
+
+    # Use a single date format string based on aggregation.
+    date_format = "%Y-W%W" if aggregation == "week" else "%Y-%m"
+
+    # Get start and end times using the same format.
+    start_time = pd.Timestamp(START_DATE).strftime(date_format)
+    end_time = pd.Timestamp(END_DATE).strftime(date_format)
+
+    logging.info("Processing %s from %s to %s", repo_name, start_time, end_time)
+
+    # Process each time period's latest commit in chronological order.
+    time_periods = sorted(
+        repo_df[
+            (repo_df[TIME_KEY].astype(str) >= start_time)
+            & (repo_df[TIME_KEY].astype(str) <= end_time)
+        ][TIME_KEY].unique()
+    )
+
+    for time_period in time_periods:
+        row_idx = repo_df[repo_df[TIME_KEY] == time_period].index[0]
+        commit_hash = repo_df.loc[row_idx, "latest_commit"]
+
+        # Handle missing or invalid commit hashes robustly.
+        if pd.isna(commit_hash) or not str(commit_hash).strip():
+            logging.warning("No commit hash for %s at %s", repo_name, time_period)
+            continue
+
+        commit_hash = str(commit_hash).strip()
+        time_period = str(time_period).strip()
+
+        analysis_exists = check_analysis_exists(project_key, time_period)
+
+        if analysis_exists and analysis_again:
+            logging.info(
+                "Analysis already exists for %s at %s, but --analysis-again was "
+                "set; re-running scan.",
+                repo_name,
+                time_period,
+            )
+            analysis_exists = False
+
+        if not analysis_exists:
+            logging.info("%s at %s (%s)", repo_name, time_period, commit_hash[:8])
+
+            scan_result = run_sonar_scan(
+                repo_path, commit_hash, time_period, project_key, language_profile,
+            )
+
+            # Some versions of run_sonar_scan may return None on success.
+            # Treat only explicit False as failure.
+            if scan_result is False:
+                logging.warning(
+                    "Skipping metrics because SonarQube scan failed for %s at %s",
+                    repo_name,
+                    time_period,
+                )
+                continue
+
+            # SonarScanner returns after uploading the report, but SonarQube's
+            # Compute Engine may need time before the VERSION analysis appears.
+            ready = wait_for_analysis_ready(
+                project_key=project_key,
+                version=time_period,
+                timeout_seconds=120,
+                poll_interval_seconds=5,
+            )
+
+            if not ready:
+                logging.warning(
+                    "Skipping metrics because analysis was not ready for %s at %s",
+                    repo_name,
+                    time_period,
+                )
+                continue
+
+        # Get and store metrics.
+        # Use get_all_sonar_metrics() when the caller wants every metric
+        # available on the SonarQube instance; otherwise fall back to the
+        # METRICS_OF_INTEREST-only get_sonar_metrics().
+        if all_metrics:
+            metrics = get_all_sonar_metrics(project_key, time_period)
+        else:
+            metrics = get_sonar_metrics(project_key, time_period)
+
+        if metrics:
+            for metric, value in metrics.items():
+                # New columns (e.g. metrics outside METRICS_OF_INTEREST) are
+                # created automatically on assignment if they don't exist yet.
+                repo_df.loc[row_idx, metric] = value
+
+            logging.info("Metrics for %s at %s: %s", repo_name, time_period, metrics)
+        else:
+            logging.warning("No metrics returned for %s at %s", repo_name, time_period)
+
+    return repo_df
+
+
+
+def infer_date_range_from_input(ts_df: pd.DataFrame, time_key: str) -> tuple[str, str]:
+    """Infer START_DATE and END_DATE from the input time-series file."""
+    if time_key not in ts_df.columns:
+        raise ValueError(f"Missing time column: {time_key}")
+
+    values = (
+        ts_df[time_key]
+        .dropna()
+        .astype(str)
+        .str.strip()
+    )
+
+    if values.empty:
+        raise ValueError(f"No valid values found in time column: {time_key}")
+
+    # Accept both YYYY-MM and YYYYMM formats, but normalize to YYYY-MM.
+    normalized = []
+    for value in values:
+        if re.fullmatch(r"\d{6}", value):
+            normalized.append(f"{value[:4]}-{value[4:]}")
+        elif re.fullmatch(r"\d{4}-\d{2}", value):
+            normalized.append(value)
+        else:
+            raise ValueError(
+                f"Unsupported time value format in {time_key}: {value}. "
+                "Expected YYYY-MM or YYYYMM."
+            )
+
+    return min(normalized), max(normalized)
+
+
+
+def build_target_timeseries_input(
+    target_spec: str,
+    aggregation: str,
+) -> pd.DataFrame:
+    """Build a one-row SonarQube input from a CLI target specification.
+
+    The target format is REPO_NAME,MONTH,LATEST_COMMIT. Repository names may
+    use either OWNER/REPO or the local clone-directory form OWNER_REPO. The
+    slash form is recommended because it matches the pipeline CSV convention.
+    """
+    if aggregation != "month":
+        raise ValueError(
+            "Target mode currently supports monthly analysis only. "
+            "Use --aggregation month."
+        )
+
+    parts = [part.strip() for part in str(target_spec).split(",", 2)]
+    if len(parts) != 3 or any(not part for part in parts):
+        raise ValueError(
+            "Invalid --target value. Expected "
+            "REPO_NAME,MONTH,LATEST_COMMIT."
+        )
+
+    repo_name, month, latest_commit = parts
+
+    if re.fullmatch(r"\d{6}", month):
+        month = f"{month[:4]}-{month[4:]}"
+
+    if not re.fullmatch(r"\d{4}-\d{2}", month):
+        raise ValueError(
+            f"Invalid target month: {month}. Expected YYYY-MM or YYYYMM."
+        )
+
+    try:
+        parsed_month = pd.Period(month, freq="M")
+    except ValueError as exc:
+        raise ValueError(f"Invalid target month: {month}.") from exc
+
+    normalized_month = str(parsed_month)
+
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", latest_commit):
+        raise ValueError(
+            "Invalid target commit. Expected a full 40-character Git SHA."
+        )
+
+    return pd.DataFrame(
+        [
+            {
+                "repo_name": repo_name,
+                "month": normalized_month,
+                "latest_commit": latest_commit.lower(),
+            }
+        ]
+    )
+
+
+def save_progress(
+    full_df: pd.DataFrame,
+    processed_results: list[pd.DataFrame],
+    output_file: Path,
+    time_key: str,
+) -> None:
+    """Save partial SonarQube metrics after completed repositories.
+
+    The saved file contains all original rows. Rows for completed repositories
+    are replaced with their updated metric values; rows for unprocessed
+    repositories remain present with missing metric values.
+    """
+    if processed_results:
+        processed_df = pd.concat(processed_results, ignore_index=True)
+        processed_repos = set(processed_df["repo_name"].unique())
+        remaining_df = full_df[~full_df["repo_name"].isin(processed_repos)].copy()
+        save_df = pd.concat([processed_df, remaining_df], ignore_index=True)
+    else:
+        save_df = full_df.copy()
+
+    if "technical_debt" in save_df.columns:
+        save_df.drop(columns=["technical_debt"], inplace=True)
+
+    save_df.rename(
+        columns={
+            "software_quality_maintainability_remediation_effort": "technical_debt"
+        },
+        inplace=True,
+    )
+
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    save_df.sort_values(by=["repo_name", time_key]).to_csv(output_file, index=False)
+    logging.info("Progress saved to %s", output_file)
+
+
+
+def main() -> None:
+    """Main function to run SonarQube analysis on repositories."""
+    global TIME_KEY
+    parser = argparse.ArgumentParser(
+        description="Run SonarQube analysis on repository commits with weekly or monthly aggregation."
+    )
+    parser.add_argument(
+        "--aggregation",
+        choices=["week", "month"],
+        default="week",
+        help="Aggregate data by week or month (default: week)",
+    )
+    parser.add_argument(
+        "--control",
+        action="store_true",
+        help="Run analysis on control repositories instead of experimental ones",
+    )
+
+    parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=DATA_DIR,
+        help=(
+            "Directory containing ts_repos_monthly.csv or ts_repos_weekly.csv. "
+            "Default: %(default)s"
+        ),
+    )
+    parser.add_argument(
+        "--input-file",
+        type=Path,
+        default=None,
+        help=(
+            "Explicit input time-series CSV. "
+            "If provided, this overrides --data-dir and --control file-name selection."
+        ),
+    )
+    parser.add_argument(
+        "--output-file",
+        type=Path,
+        default=None,
+        help=(
+            "Output CSV path. Default: overwrite the selected input file."
+        ),
+    )
+    parser.add_argument(
+        "--clone-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Directory containing cloned repositories. "
+            "Default: treatment clone dir, or control clone dir when --control is used."
+        ),
+    )
+    parser.add_argument(
+        "--num-processes",
+        type=int,
+        default=NUM_PROCESSES,
+        help="Number of worker processes. Default: %(default)s",
+    )
+    parser.add_argument(
+        "--incremental-save",
+        action="store_true",
+        help=(
+            "Save the output CSV after each completed repository. "
+            "Recommended for long full scans."
+        ),
+    )
+    parser.add_argument(
+        "--analysis-again",
+        action="store_true",
+        help=(
+            "Run the SonarQube scan again even if an analysis already exists "
+            "for the project/version, and refresh the stored metrics."
+        ),
+    )
+    parser.add_argument(
+        "--analysis-all-metrics",
+        action="store_true",
+        help=("Run the SonarQube scan to get all metrics."),
+    )
+    parser.add_argument(
+        "--language-profile",
+        choices=[
+            "generic",
+            "auto",
+            "python",
+            "py",
+            "python-only",
+            "py-only",
+            "js-ts",
+            "jsts",
+            "javascript",
+            "typescript",
+            "js",
+            "ts",
+        ],
+        default="generic",
+        help=(
+            "Language-specific SonarQube scanner settings. "
+            "Use 'python-only' to scan only **/*.py files, 'python' for the "
+            "existing Python-primary whole-repository behavior, 'js-ts' for "
+            "JavaScript/TypeScript repos, or 'generic' for language-neutral scans."
+        ),
+    )
+
+    parser.add_argument(
+        "--target",
+        default=None,
+        metavar="REPO_NAME,MONTH,LATEST_COMMIT",
+        help=(
+            "Analyze one monthly repo-commit target without an input CSV. "
+            "Example: Anemll/Anemll,2025-02,"
+            "d3b2e3660c0657ab643b68a0513b4b5ab443c04c. "
+            "Target mode uses Python-only scanning and requires --output-file."
+        ),
+    )
+
+    parser.add_argument(
+        "--project-key-prefix",
+        default="",
+        help=(
+            "Optional prefix added to SonarQube project keys. "
+            "Use this for from-scratch rescans without deleting existing SonarQube projects, "
+            "for example: pyv2_."
+        ),
+    )
+
+    args = parser.parse_args()
+
+    if args.target is not None:
+        if args.aggregation != "month":
+            parser.error("--target requires --aggregation month.")
+        if args.input_file is not None:
+            parser.error("--target cannot be combined with --input-file.")
+        if args.output_file is None:
+            parser.error("--target requires --output-file.")
+        if args.language_profile in {"js-ts", "jsts", "javascript", "typescript", "js", "ts"}:
+            parser.error("--target is reserved for Python-only validation.")
+
+        # Keep the previous whole-repository Python profile unchanged.
+        args.language_profile = "python-only"
+
+        # Avoid reusing an existing whole-repository project/version analysis.
+        if not args.project_key_prefix:
+            args.project_key_prefix = "pyonly_"
+
+    TIME_KEY = "week" if args.aggregation == "week" else "month"
+
+    logging.basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        level=logging.INFO,
+        handlers=[logging.StreamHandler(sys.stdout)],
+    )
+
+    if not SONAR_PATH or not SONAR_TOKEN:
+        logging.error("SONAR_PATH and SONAR_TOKEN must be set in .env file")
+        return
+
+    # Set input/output file paths.
+    data_dir = Path(args.data_dir).expanduser().resolve()
+
+    if args.clone_dir is not None:
+        clone_dir = Path(args.clone_dir).expanduser().resolve()
+    else:
+        clone_dir = CONTROL_CLONE_DIR if args.control else CLONE_DIR
+
+    if args.target is not None:
+        ts_repos_file = None
+        output_file = Path(args.output_file).expanduser().resolve()
+        try:
+            ts_df = build_target_timeseries_input(args.target, args.aggregation)
+        except ValueError as exc:
+            parser.error(str(exc))
+    else:
+        logging.info("Using data directory: %s", data_dir)
+
+        if args.input_file is not None:
+            ts_repos_file = Path(args.input_file).expanduser().resolve()
+        else:
+            file_prefix = "ts_repos_control_" if args.control else "ts_repos_"
+            ts_repos_file = data_dir / f"{file_prefix}{args.aggregation}ly.csv"
+
+        if args.output_file is not None:
+            output_file = Path(args.output_file).expanduser().resolve()
+        else:
+            output_file = ts_repos_file
+
+        try:
+            ts_df = pd.read_csv(ts_repos_file)
+        except FileNotFoundError as exc:
+            logging.error("Required file not found: %s", exc)
+            return
+
+    global START_DATE, END_DATE
+    START_DATE, END_DATE = infer_date_range_from_input(ts_df, TIME_KEY)
+
+    if ts_repos_file is not None:
+        logging.info("Using input file: %s", ts_repos_file)
+    else:
+        logging.info("Using target specification: %s", args.target)
+
+    logging.info("Using output file: %s", output_file)
+    logging.info("Using clone directory: %s", clone_dir)
+    logging.info("Using num processes: %s", args.num_processes)
+    logging.info("Using language profile: %s", args.language_profile)
+    logging.info("Using project key prefix: %s", args.project_key_prefix)
+    logging.info("Re-run existing analyses: %s", args.analysis_again)
+    logging.info("Fetch all metrics (ignore METRICS_OF_INTEREST): %s", args.analysis_all_metrics)
+    logging.info("Using input-derived date range: %s to %s", START_DATE, END_DATE)
+
+    # Create columns for metrics if they don't exist
+    for col in METRICS_OF_INTEREST:
+        if col not in ts_df.columns:
+            ts_df[col] = None
+
+    # Get unique repository names.
+    repo_names = sorted(set(ts_df["repo_name"].unique()) - set(REPO_IGNORE))
+
+    args_list = [
+        (
+            ts_df,
+            repo_name,
+            args.aggregation,
+            clone_dir,
+            args.language_profile,
+            args.project_key_prefix,
+            args.analysis_again,
+            args.analysis_all_metrics,
+        )
+        for repo_name in repo_names
+    ]
+
+    results: list[pd.DataFrame] = []
+
+    if args.incremental_save or args.num_processes == 1:
+        logging.info("Using repo-level incremental save mode")
+
+        try:
+            for i, repo_args in enumerate(args_list, start=1):
+                repo_name = repo_args[1]
+                logging.info(
+                    "Incremental progress: repository %d/%d: %s",
+                    i,
+                    len(args_list),
+                    repo_name,
+                )
+
+                repo_result = process_repository(*repo_args)
+                results.append(repo_result)
+
+                save_progress(
+                    full_df=ts_df,
+                    processed_results=results,
+                    output_file=output_file,
+                    time_key=TIME_KEY,
+                )
+
+        except KeyboardInterrupt:
+            logging.warning("Interrupted by user; saving partial progress")
+            save_progress(
+                full_df=ts_df,
+                processed_results=results,
+                output_file=output_file,
+                time_key=TIME_KEY,
+            )
+            raise
+
+    else:
+        logging.info("Using multiprocessing mode without incremental save")
+
+        with mp.Pool(args.num_processes) as pool:
+            results = pool.starmap(process_repository, args_list, chunksize=1)
+
+        save_progress(
+            full_df=ts_df,
+            processed_results=results,
+            output_file=output_file,
+            time_key=TIME_KEY,
+        )
+
+    logging.info("Updated metrics saved to %s", output_file)
+
+
+if __name__ == "__main__":
+    main()
