@@ -1,0 +1,5 @@
+panel,file,rows,repos,treated_repos,control_repos,treatment_rows,control_rows,post_treatment_rows,avg_rows_per_repo,time_col,time_min,time_max
+flexible,repo_python/run-py-1l/panel_event_matched_flexible.csv,1706,232,110,122,917,789,471,7.3534,time,2024-01,2025-08
+strict,repo_python/run-py-1l/panel_event_matched_strict.csv,1633,220,100,120,853,780,432,7.4227,time,2024-01,2025-08
+flexible_window_driven,repo_python/run-py-1l/panel_event_matched_flexible_window_driven.csv,3804,263,110,153,1384,2420,829,14.4639,time,2024-01,2025-08
+strict_window_driven,repo_python/run-py-1l/panel_event_matched_strict_window_driven.csv,3663,251,100,151,1264,2399,736,14.5936,time,2024-01,2025-08

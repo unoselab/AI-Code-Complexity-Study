@@ -1,0 +1,3 @@
+panel,comparison_focus,paper_treatment_repos,current_treatment_repos,treatment_repo_difference,paper_control_repos,current_control_repos,control_repo_difference,paper_total_observations,current_total_observations,total_observation_difference,paper_post_treatment_observations,current_post_treatment_observations,post_treatment_observation_difference
+flexible,sample_size,121,110,-11,127,122,-5,2461,1706,-755,582,471,-111
+strict,matching_rule,121,100,-21,127,120,-7,2461,1633,-828,582,432,-150
