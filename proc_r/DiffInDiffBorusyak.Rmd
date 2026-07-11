@@ -1,6 +1,8 @@
 ---
 title: "The Impact of Cursor Adoption on Velocity and Quality - Borusyak et al. (2021) DiD Approach"
 output: html_document
+params:
+  panel_file: "../repo_python/did_final/panel_event_monthly_quality_py.csv"
 ---
 
 ```{r setup, include=FALSE}
@@ -30,7 +32,7 @@ library(Cairo)
 
 ```{r load_data}
 # panel_data <- fread("../data/panel_event_monthly.csv")
-panel_data <- fread("../repo_python/did_final/panel_event_monthly_quality_py.csv")
+panel_data <- fread(params$panel_file)
 
 # Load repo metrics data for cursor adoption percentages
 repo_metrics <- fread("../data/repo_metrics.csv")

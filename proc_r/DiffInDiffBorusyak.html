@@ -592,7 +592,7 @@ library(Cairo)</code></pre>
 <div id="loading-and-preparing-the-data" class="section level2">
 <h2>Loading and Preparing the Data</h2>
 <pre class="r"><code># panel_data &lt;- fread(&quot;../data/panel_event_monthly.csv&quot;)
-panel_data &lt;- fread(&quot;../repo_python/did_final/panel_event_monthly_quality_py.csv&quot;)
+panel_data &lt;- fread(params$panel_file)
 
 # Load repo metrics data for cursor adoption percentages
 repo_metrics &lt;- fread(&quot;../data/repo_metrics.csv&quot;)
