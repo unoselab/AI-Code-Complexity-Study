@@ -9,24 +9,25 @@ set -euo pipefail
 #   Create treatment/control SonarQube scan input files from the
 #   final Python matched DiD panels.
 #
-# Current naming convention:
+# Panel inputs:
 #   flexible:
-#     repo_python/did_final/panel_event_matched_flexible.csv
+#     repo_python/run-py-1l/panel_event_matched_flexible.csv
 #
 #   strict:
-#     repo_python/did_final/panel_event_matched_strict.csv
+#     repo_python/run-py-1l/panel_event_matched_strict.csv
 #
-# Primary focus:
-#   PANEL_VARIANT=flexible
-#   PANEL_VARIANT=strict
+# Full-run main outputs:
+#   repo_python/run-py-2a/<variant>/treatment/data/ts_repos_monthly.csv
+#   repo_python/run-py-2a/<variant>/control/data/ts_repos_monthly.csv
 #
-# Outputs:
-#   repo_python/sonarqube_input/<variant>/treatment/data/ts_repos_monthly.csv
-#   repo_python/sonarqube_input/<variant>/control/data/ts_repos_monthly.csv
-#   repo_python/sonarqube_input/<variant>/months.txt
-#   repo_python/sonarqube_input/<variant>/treatment_repos.txt
-#   repo_python/sonarqube_input/<variant>/control_repos.txt
-#   repo_python/sonarqube_input/<variant>/sonarqube_input_summary.csv
+# Full-run extra outputs:
+#   repo_python/tmp/run-py-2a/<variant>/months.txt
+#   repo_python/tmp/run-py-2a/<variant>/treatment_repos.txt
+#   repo_python/tmp/run-py-2a/<variant>/control_repos.txt
+#   repo_python/tmp/run-py-2a/<variant>/sonarqube_input_summary.csv
+#
+# Smoke outputs:
+#   repo_python/tmp/run-py-2a/smoke/<variant>/
 #
 # Usage:
 #   Smoke:
@@ -38,13 +39,25 @@ set -euo pipefail
 #     PANEL_VARIANT=strict   MAX_TREATMENT_REPOS=0 MAX_CONTROL_REPOS=0 bash run-py-2a-create-sonarqube-input.sh
 # ============================================================
 
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/prepare_sonarqube_input.py}"
 HISTORY_SCRIPT="${HISTORY_SCRIPT:-proc_scripts/create_tmp_repo_timeseries_history.py}"
 
-DID_DIR="${DID_DIR:-repo_python/did_final}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+
+DID_DIR="${DID_DIR:-${OUTPUT_BASE_DIR}/run-py-1l}"
 PANEL_VARIANT="${PANEL_VARIANT:-flexible}"
 
 case "${PANEL_VARIANT}" in
@@ -61,40 +74,58 @@ case "${PANEL_VARIANT}" in
     ;;
 esac
 
-SONAR_ROOT="${SONAR_ROOT:-repo_python/sonarqube_input/${PANEL_VARIANT}}"
-
 TREATMENT_CLONE_ROOT="${TREATMENT_CLONE_ROOT:-../treatment-repos}"
 CONTROL_CLONE_ROOT="${CONTROL_CLONE_ROOT:-../control-repos}"
-
-TREATMENT_TS_FILE="${TREATMENT_TS_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly.csv}"
-CONTROL_TS_FILE="${CONTROL_TS_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly.csv}"
-
-MONTHS_FILE="${MONTHS_FILE:-${SONAR_ROOT}/months.txt}"
-TREATMENT_REPOS_FILE="${TREATMENT_REPOS_FILE:-${SONAR_ROOT}/treatment_repos.txt}"
-CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${SONAR_ROOT}/control_repos.txt}"
-SUMMARY_FILE="${SUMMARY_FILE:-${SONAR_ROOT}/sonarqube_input_summary.csv}"
 
 MAX_TREATMENT_REPOS="${MAX_TREATMENT_REPOS:-0}"
 MAX_CONTROL_REPOS="${MAX_CONTROL_REPOS:-0}"
 ALLOW_MISSING_LATEST_COMMIT="${ALLOW_MISSING_LATEST_COMMIT:-false}"
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2a_create_sonarqube_input_${PANEL_VARIANT}_${RUN_TS}.log}"
+if [[ "${MAX_TREATMENT_REPOS}" -gt 0 || "${MAX_CONTROL_REPOS}" -gt 0 ]]; then
+  RUN_MODE="smoke"
+  DEFAULT_SONAR_ROOT="${TMP_DIR}/smoke/${PANEL_VARIANT}"
+  DEFAULT_META_DIR="${DEFAULT_SONAR_ROOT}/meta"
+else
+  RUN_MODE="full"
+  DEFAULT_SONAR_ROOT="${MAIN_OUTPUT_DIR}/${PANEL_VARIANT}"
+  DEFAULT_META_DIR="${TMP_DIR}/${PANEL_VARIANT}"
+fi
+
+SONAR_ROOT="${SONAR_ROOT:-${DEFAULT_SONAR_ROOT}}"
+META_DIR="${META_DIR:-${DEFAULT_META_DIR}}"
+
+TREATMENT_TS_FILE="${TREATMENT_TS_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly.csv}"
+CONTROL_TS_FILE="${CONTROL_TS_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly.csv}"
+
+MONTHS_FILE="${MONTHS_FILE:-${META_DIR}/months.txt}"
+TREATMENT_REPOS_FILE="${TREATMENT_REPOS_FILE:-${META_DIR}/treatment_repos.txt}"
+CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${META_DIR}/control_repos.txt}"
+SUMMARY_FILE="${SUMMARY_FILE:-${META_DIR}/sonarqube_input_summary.csv}"
+
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_create_sonarqube_input_${PANEL_VARIANT}_${RUN_TS}.log}"
 
 mkdir -p \
   "${LOG_DIR}" \
   "${SONAR_ROOT}" \
+  "${META_DIR}" \
   "$(dirname "${TREATMENT_TS_FILE}")" \
   "$(dirname "${CONTROL_TS_FILE}")"
 
 {
   echo "============================================================"
-  echo "run-py-2a: create Python SonarQube scan inputs"
+  echo "${RUN_PREFIX}: create Python SonarQube scan inputs"
   echo "Timestamp:                    ${RUN_TS}"
+  echo "Script name:                  ${SCRIPT_NAME}"
+  echo "Run prefix:                   ${RUN_PREFIX}"
+  echo "Run mode:                     ${RUN_MODE}"
   echo "Panel variant:                ${PANEL_VARIANT}"
   echo "Python script:                ${PY_SCRIPT}"
   echo "History script:               ${HISTORY_SCRIPT}"
   echo "Panel file:                   ${PANEL_FILE}"
   echo "Sonar root:                   ${SONAR_ROOT}"
+  echo "Metadata dir:                 ${META_DIR}"
+  echo "Main output dir:              ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:             ${TMP_DIR}"
   echo "Treatment clone root:         ${TREATMENT_CLONE_ROOT}"
   echo "Control clone root:           ${CONTROL_CLONE_ROOT}"
   echo "Treatment output:             ${TREATMENT_TS_FILE}"
@@ -208,11 +239,14 @@ PY
 
   echo
   echo "============================================================"
-  echo "run-py-2a completed successfully."
+  echo "${RUN_PREFIX} completed successfully."
+  echo "Run mode:        ${RUN_MODE}"
   echo "Panel variant:   ${PANEL_VARIANT}"
   echo "Treatment input: ${TREATMENT_TS_FILE}"
   echo "Control input:   ${CONTROL_TS_FILE}"
   echo "Summary file:    ${SUMMARY_FILE}"
+  echo "Main output dir: ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:${TMP_DIR}"
   echo "Log file:        ${LOG_FILE}"
   echo "============================================================"
 
