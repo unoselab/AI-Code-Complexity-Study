@@ -9,11 +9,13 @@ set -euo pipefail
 # but it does NOT call the existing JS/TS shell wrapper.
 #
 # Input:
-#   repo_python/control_repos_to_clone_main.csv
+#   repo_python/run-py-1g/python_control_repos_to_clone_main_118.csv
 #
-# Outputs:
-#   repo_python/control_clone_status_main.csv
-#   repo_python/control_clone_status_main_<timestamp>.csv
+# Main output:
+#   repo_python/run-py-1h/python_control_clone_status_main_118.csv
+#
+# Extra output:
+#   repo_python/tmp/run-py-1h/python_control_clone_status_main_118_<timestamp>.csv
 #
 # Clone root:
 #   ../control-repos
@@ -28,33 +30,50 @@ set -euo pipefail
 
 export GIT_TERMINAL_PROMPT=0
 
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1h_clone_control_repos_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_clone_control_repos_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/clone_repos_v2.py}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
-CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main.csv}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+
+SAMPLE_NAME="${SAMPLE_NAME:-main_118}"
+CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${OUTPUT_BASE_DIR}/run-py-1g/python_control_repos_to_clone_${SAMPLE_NAME}.csv}"
 
 CLONE_ROOT="${CLONE_ROOT:-../control-repos}"
 
 MAX_CLONES="${MAX_CLONES:-10}"
 EXISTING_ACTION="${EXISTING_ACTION:-skip}"
 
-CLONE_LOG_PREFIX="${CLONE_LOG_PREFIX:-run-py-1h_control_clone_log}"
+CLONE_LOG_PREFIX="${CLONE_LOG_PREFIX:-${RUN_PREFIX}_control_clone_log}"
 CLONE_LOG_CSV="${LOG_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
 
-CHECK_OUTPUT_FILE="${CHECK_OUTPUT_FILE:-${OUTPUT_DIR}/control_clone_status_main.csv}"
-CHECK_OUTPUT_BACKUP="${CHECK_OUTPUT_BACKUP:-${CHECK_OUTPUT_FILE%.csv}_${RUN_TS}.csv}"
-
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CLONE_ROOT}"
+CHECK_OUTPUT_FILE="${CHECK_OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/python_control_clone_status_${SAMPLE_NAME}.csv}"
+CHECK_OUTPUT_BACKUP="${CHECK_OUTPUT_BACKUP:-${TMP_DIR}/python_control_clone_status_${SAMPLE_NAME}_${RUN_TS}.csv}"
+ 
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${CLONE_ROOT}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1h: clone matched control repositories" | tee -a "${LOG_FILE}"
 echo "Timestamp:             ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Script name:           ${SCRIPT_NAME}" | tee -a "${LOG_FILE}"
+echo "Run prefix:            ${RUN_PREFIX}" | tee -a "${LOG_FILE}"
 echo "Python script:         ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Control repos file:    ${CONTROL_REPOS_FILE}" | tee -a "${LOG_FILE}"
+echo "Sample name:           ${SAMPLE_NAME}" | tee -a "${LOG_FILE}"
+echo "Main output dir:       ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:      ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Clone root:            ${CLONE_ROOT}" | tee -a "${LOG_FILE}"
 echo "Max clones:            ${MAX_CLONES}" | tee -a "${LOG_FILE}"
 echo "Existing action:       ${EXISTING_ACTION}" | tee -a "${LOG_FILE}"
@@ -171,6 +190,8 @@ echo "============================================================" | tee -a "${
 echo "run-py-1h completed successfully." | tee -a "${LOG_FILE}"
 echo "Clone status file:   ${CHECK_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Clone status backup: ${CHECK_OUTPUT_BACKUP}" | tee -a "${LOG_FILE}"
+echo "Main output dir:     ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:    ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Control clone root:  ${CLONE_ROOT}" | tee -a "${LOG_FILE}"
 echo "Log file:            ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
