@@ -7,4 +7,5 @@ set -euo pipefail
 #    PANEL_VARIANT=strict   NUM_PROCESSES=1 bash run-py-2b1-sonarqube-treatment.sh
 #    PANEL_VARIANT=flexible NUM_PROCESSES=1 bash run-py-2b1-sonarqube-treatment.sh
 
-LANGUAGE_PROFILE=python TARGET=treatment bash ./run-py-2b-sonarqube-scan.sh
+PANEL_VARIANT=strict NUM_PROCESSES=1 LANGUAGE_PROFILE=python TARGET=treatment bash ./run-py-2b-sonarqube-scan.sh
+PANEL_VARIANT=flexible NUM_PROCESSES=1 LANGUAGE_PROFILE=python TARGET=treatment bash ./run-py-2b-sonarqube-scan.sh
