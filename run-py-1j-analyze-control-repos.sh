@@ -9,20 +9,22 @@ set -euo pipefail
 #   Analyze git history for clone-usable Python matched control repos.
 #
 # Input:
-#   repo_python/control_clone_usable_repos_main.csv
+#   repo_python/run-py-1i/python_control_clone_usable_repos_main.csv
 #
 # Clone dir:
 #   ../control-repos
 #
-# Full-run outputs:
-#   repo_python/control_did/ts_repos_monthly.csv
-#   repo_python/control_did/ts_contributors_monthly.csv
-#   repo_python/control_did/cursor_commits.csv
-#   repo_python/control_did/ai_adoption_dates.csv
-#   repo_python/control_did/run-py-1j_analyzed_repos_manifest.csv
+# Full-run main outputs:
+#   repo_python/run-py-1j/ts_repos_monthly.csv
+#   repo_python/run-py-1j/ts_contributors_monthly.csv
+#   repo_python/run-py-1j/cursor_commits.csv
+#   repo_python/run-py-1j/ai_adoption_dates.csv
+#
+# Full-run extra outputs:
+#   repo_python/tmp/run-py-1j/full/
 #
 # Smoke-run outputs:
-#   repo_python/control_did_smoke/
+#   repo_python/tmp/run-py-1j/smoke/
 #
 # Usage:
 #   Smoke test:
@@ -31,21 +33,31 @@ set -euo pipefail
 #   Full run:
 #     MAX_REPOS=0 NUM_PROCESSES=2 bash run-py-1j-analyze-control-repos.sh
 # ============================================================
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1j_analyze_control_repos_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_analyze_control_repos_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/analyze_repos_v2.py}"
 CACHE_CHECK_SCRIPT="${CACHE_CHECK_SCRIPT:-proc_scripts/check_cache_control_repos.py}"
 
-OUTPUT_ROOT="${OUTPUT_ROOT:-repo_python}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
 
-REPOS_FILE="${REPOS_FILE:-${OUTPUT_ROOT}/control_clone_usable_repos_main.csv}"
+REPOS_FILE="${REPOS_FILE:-${OUTPUT_BASE_DIR}/run-py-1i/python_control_clone_usable_repos_main.csv}"
 CLONE_DIR="${CLONE_DIR:-../control-repos}"
 
-FULL_OUTPUT_DIR="${FULL_OUTPUT_DIR:-${OUTPUT_ROOT}/control_did}"
-SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${OUTPUT_ROOT}/control_did_smoke}"
+FULL_OUTPUT_DIR="${FULL_OUTPUT_DIR:-${MAIN_OUTPUT_DIR}}"
+SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${TMP_DIR}/smoke/output}"
 
 AGGREGATION="${AGGREGATION:-month}"
 NUM_PROCESSES="${NUM_PROCESSES:-2}"
@@ -56,30 +68,36 @@ INCREMENTAL_IF_PARTIAL="${INCREMENTAL_IF_PARTIAL:-true}"
 FORCE_RERUN="${FORCE_RERUN:-false}"
 
 if [[ "${MAX_REPOS}" -gt 0 ]]; then
-  OUTPUT_DIR="${SMOKE_OUTPUT_DIR}"
+  OUTPUT_DIR="${OUTPUT_DIR:-${SMOKE_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_DIR}/smoke}"
 else
-  OUTPUT_DIR="${FULL_OUTPUT_DIR}"
+  OUTPUT_DIR="${OUTPUT_DIR:-${FULL_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_DIR}/full}"
 fi
 
 REPO_TS_FILE="${OUTPUT_DIR}/ts_repos_${AGGREGATION}ly.csv"
 CONTRIB_TS_FILE="${OUTPUT_DIR}/ts_contributors_${AGGREGATION}ly.csv"
 CURSOR_COMMITS_FILE="${OUTPUT_DIR}/cursor_commits.csv"
 ADOPTION_FILE="${OUTPUT_DIR}/ai_adoption_dates.csv"
-MANIFEST_FILE="${OUTPUT_DIR}/run-py-1j_analyzed_repos_manifest.csv"
+MANIFEST_FILE="${MANIFEST_FILE:-${EXTRA_DIR}/${RUN_PREFIX}_analyzed_repos_manifest.csv}"
 
-MISSING_REPOS_FILE="${OUTPUT_DIR}/run-py-1j_missing_repos_${RUN_TS}.csv"
-TMP_OUTPUT_DIR="${OUTPUT_DIR}/_incremental_${RUN_TS}"
-
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+MISSING_REPOS_FILE="${MISSING_REPOS_FILE:-${EXTRA_DIR}/${RUN_PREFIX}_missing_repos_${RUN_TS}.csv}"
+TMP_OUTPUT_DIR="${TMP_OUTPUT_DIR:-${EXTRA_DIR}/incremental_${RUN_TS}}"
+CACHE_REPORT="${CACHE_REPORT:-${EXTRA_DIR}/${RUN_PREFIX}_cache_check_${RUN_TS}.txt}"
+ 
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${EXTRA_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
-echo "run-py-1j: analyze clone-usable control repositories" | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX}: analyze clone-usable control repositories" | tee -a "${LOG_FILE}"
 echo "Timestamp:              ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Script name:            ${SCRIPT_NAME}" | tee -a "${LOG_FILE}"
+echo "Run prefix:             ${RUN_PREFIX}" | tee -a "${LOG_FILE}"
 echo "Python script:          ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Cache check script:     ${CACHE_CHECK_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Repos file:             ${REPOS_FILE}" | tee -a "${LOG_FILE}"
 echo "Clone dir:              ${CLONE_DIR}" | tee -a "${LOG_FILE}"
-echo "Output dir:             ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Analysis output dir:    ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:       ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Aggregation:            ${AGGREGATION}" | tee -a "${LOG_FILE}"
 echo "Num processes:          ${NUM_PROCESSES}" | tee -a "${LOG_FILE}"
 echo "Max repos:              ${MAX_REPOS}" | tee -a "${LOG_FILE}"
@@ -138,7 +156,7 @@ RUN_MAX_REPOS="${MAX_REPOS}"
 CACHE_STATUS="run_full"
 
 if [[ "${MAX_REPOS}" -gt 0 ]]; then
-  RUN_REPOS_FILE="${OUTPUT_DIR}/control_repos_smoke_max${MAX_REPOS}.csv"
+  RUN_REPOS_FILE="${EXTRA_DIR}/control_repos_smoke_max${MAX_REPOS}.csv"
   RUN_MAX_REPOS="0"
 
   echo | tee -a "${LOG_FILE}"
@@ -178,9 +196,9 @@ if [[ "${FORCE_RERUN}" != "true" && "${SKIP_IF_COMPLETE}" == "true" ]]; then
     "${ADOPTION_FILE}" \
     "${MANIFEST_FILE}" \
     "${MISSING_REPOS_FILE}" \
-    2>&1 | tee "${OUTPUT_DIR}/run-py-1j_cache_check_${RUN_TS}.txt" | tee -a "${LOG_FILE}"
+    2>&1 | tee "${CACHE_REPORT}" | tee -a "${LOG_FILE}"
 
-  CACHE_STATUS="$(grep '^CACHE_STATUS=' "${OUTPUT_DIR}/run-py-1j_cache_check_${RUN_TS}.txt" | tail -1 | cut -d= -f2 || true)"
+  CACHE_STATUS="$(grep '^CACHE_STATUS=' "${CACHE_REPORT}" | tail -1 | cut -d= -f2 || true)"
 
   if [[ "${CACHE_STATUS}" == "complete" ]]; then
     echo | tee -a "${LOG_FILE}"
@@ -328,9 +346,10 @@ done
 
 echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
-echo "run-py-1j completed successfully." | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX} completed successfully." | tee -a "${LOG_FILE}"
 echo "Requested repos file: ${RUN_REPOS_FILE}" | tee -a "${LOG_FILE}"
-echo "Output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Analysis output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 #
