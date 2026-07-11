@@ -31,8 +31,8 @@ set -euo pipefail
 #   PANEL_VARIANT=flexible TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 #   PANEL_VARIANT=flexible TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 # 
-#   SKIP_SCAN=true PANEL_VARIANT=strict   TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
-#   SKIP_SCAN=true PANEL_VARIANT=strict   TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   SKIP_SCAN=true PANEL_VARIANT=strict TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   SKIP_SCAN=true PANEL_VARIANT=strict TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 #   SKIP_SCAN=true PANEL_VARIANT=flexible TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 #   SKIP_SCAN=true PANEL_VARIANT=flexible TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 # ============================================================
@@ -182,18 +182,19 @@ output_path = Path("${OUTPUT_FILE}")
 input_df = pd.read_csv(input_path)
 output_df = pd.read_csv(output_path)
 
-key_cols = ["repo_name", "month"]
-required_input = set(key_cols + ["latest_commit"])
+repo_month_cols = ["repo_name", "month"]
+match_cols = ["repo_name", "month", "latest_commit"]
+required_input = set(match_cols)
 missing_input_cols = required_input - set(input_df.columns)
 if missing_input_cols:
     raise SystemExit(
         f"ERROR: input missing required columns: {sorted(missing_input_cols)}"
     )
 
-missing_output_cols = set(key_cols) - set(output_df.columns)
+missing_output_cols = set(match_cols) - set(output_df.columns)
 if missing_output_cols:
     raise SystemExit(
-        f"ERROR: reused output missing key columns: {sorted(missing_output_cols)}"
+        f"ERROR: reused output missing matching columns: {sorted(missing_output_cols)}"
     )
 
 metric_candidates = {
@@ -211,31 +212,31 @@ metric_candidates = {
 if not metric_candidates.intersection(output_df.columns):
     raise SystemExit("ERROR: reused output contains no SonarQube metric columns.")
 
-input_keys = input_df[key_cols].drop_duplicates()
-output_keys = output_df[key_cols].drop_duplicates()
+input_keys = input_df[match_cols].drop_duplicates()
+output_keys = output_df[match_cols].drop_duplicates()
 
 missing_keys = (
-    input_keys.merge(output_keys, on=key_cols, how="left", indicator=True)
+    input_keys.merge(output_keys, on=match_cols, how="left", indicator=True)
     .query("_merge == 'left_only'")
 )
 extra_keys = (
-    output_keys.merge(input_keys, on=key_cols, how="left", indicator=True)
+    output_keys.merge(input_keys, on=match_cols, how="left", indicator=True)
     .query("_merge == 'left_only'")
 )
 
-duplicate_output_keys = int(output_df.duplicated(key_cols).sum())
+duplicate_output_keys = int(output_df.duplicated(repo_month_cols).sum())
 
 print("Input rows:", len(input_df))
 print("Output rows:", len(output_df))
-print("Input unique repo-month keys:", len(input_keys))
-print("Output unique repo-month keys:", len(output_keys))
-print("Missing input keys in output:", len(missing_keys))
-print("Extra output keys:", len(extra_keys))
+print("Input unique repo-month-commit keys:", len(input_keys))
+print("Output unique repo-month-commit keys:", len(output_keys))
+print("Missing input repo-month-commit keys in output:", len(missing_keys))
+print("Extra output repo-month-commit keys:", len(extra_keys))
 print("Duplicate output repo-month rows:", duplicate_output_keys)
 
 if len(missing_keys) > 0 or len(extra_keys) > 0 or duplicate_output_keys > 0:
     raise SystemExit(
-        "ERROR: reused output does not exactly match the current scan input."
+        "ERROR: reused output does not exactly match the current repo-month-commit input."
     )
 
 print("Existing scanned output is complete for the current input.")
