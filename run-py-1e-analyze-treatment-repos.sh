@@ -43,6 +43,7 @@ PY_ADOPTION_CHECK="${PY_ADOPTION_CHECK:-proc_scripts/check_time_of_event_and_ado
 CACHE_CHECK_SCRIPT="${CACHE_CHECK_SCRIPT:-proc_scripts/check_cache_control_repos.py}"
 
 OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+TMP_BASE_DIR="${TMP_BASE_DIR:-${OUTPUT_BASE_DIR}/tmp/run-py-1e}"
 
 REPOS_FILE="${REPOS_FILE:-${OUTPUT_BASE_DIR}/treatment_python_clone_usable_repos_with_event_valid.csv}"
 CLONE_DIR="${CLONE_DIR:-../treatment-repos}"
@@ -54,17 +55,23 @@ NUM_PROCESSES="${NUM_PROCESSES:-1}"
 MAX_REPOS="${MAX_REPOS:-5}"
 
 # Fixed output directories:
-#   - Smoke tests reuse repo_python/treatment_python_did_smoke
-#   - Full run uses repo_python/treatment_python_did
+#   - Full-run main outputs use repo_python/treatment_python_did
+#   - Smoke-test outputs use repo_python/tmp/run-py-1e/smoke/output
+#   - Cache, manifest, missing-repo, and incremental files use
+#     repo_python/tmp/run-py-1e
 #
 # This is important because timestamped smoke directories cannot use cache.
 FULL_OUTPUT_DIR="${FULL_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/treatment_python_did}"
-SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/treatment_python_did_smoke}"
+# SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/treatment_python_did_smoke}"
+SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${TMP_BASE_DIR}/smoke/output}"
+
 
 if [[ "${MAX_REPOS}" == "0" ]]; then
   OUTPUT_DIR="${OUTPUT_DIR:-${FULL_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_BASE_DIR}/full}"
 else
   OUTPUT_DIR="${OUTPUT_DIR:-${SMOKE_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_BASE_DIR}/smoke}"
 fi
 
 REQUIRE_EVENT_MONTH="${REQUIRE_EVENT_MONTH:-true}"
@@ -81,13 +88,17 @@ CURSOR_COMMITS_FILE="${OUTPUT_DIR}/cursor_commits.csv"
 ADOPTION_FILE="${ADOPTION_FILE:-${OUTPUT_DIR}/ai_adoption_dates.csv}"
 ADOPTION_MATCH_FILE="${ADOPTION_MATCH_FILE:-${OUTPUT_DIR}/adoption_month_check.csv}"
 
-MANIFEST_FILE="${OUTPUT_DIR}/run-py-1e_analyzed_repos_manifest.csv"
+# MANIFEST_FILE="${OUTPUT_DIR}/run-py-1e_analyzed_repos_manifest.csv"
+MANIFEST_FILE="${EXTRA_DIR}/run-py-1e_analyzed_repos_manifest.csv"
 
-SMOKE_REPOS_FILE="${OUTPUT_DIR}/treatment_python_repos_smoke_max${MAX_REPOS}.csv"
-MISSING_REPOS_FILE="${OUTPUT_DIR}/run-py-1e_missing_repos_${RUN_TS}.csv"
-TMP_OUTPUT_DIR="${OUTPUT_DIR}/_incremental_${RUN_TS}"
+# SMOKE_REPOS_FILE="${OUTPUT_DIR}/treatment_python_repos_smoke_max${MAX_REPOS}.csv"
+# MISSING_REPOS_FILE="${OUTPUT_DIR}/run-py-1e_missing_repos_${RUN_TS}.csv"
+# TMP_OUTPUT_DIR="${OUTPUT_DIR}/_incremental_${RUN_TS}"
+SMOKE_REPOS_FILE="${EXTRA_DIR}/treatment_python_repos_smoke_max${MAX_REPOS}.csv"
+MISSING_REPOS_FILE="${EXTRA_DIR}/run-py-1e_missing_repos_${RUN_TS}.csv"
+TMP_OUTPUT_DIR="${EXTRA_DIR}/incremental_${RUN_TS}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${EXTRA_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1e: analyze Python treatment repos and validate adoption month" | tee -a "${LOG_FILE}"
@@ -97,7 +108,8 @@ echo "Adoption check script:     ${PY_ADOPTION_CHECK}" | tee -a "${LOG_FILE}"
 echo "Cache check script:        ${CACHE_CHECK_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Repos file:                ${REPOS_FILE}" | tee -a "${LOG_FILE}"
 echo "Clone dir:                 ${CLONE_DIR}" | tee -a "${LOG_FILE}"
-echo "Output dir:                ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Main output dir:           ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:          ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Aggregation:               ${AGGREGATION}" | tee -a "${LOG_FILE}"
 echo "Num processes:             ${NUM_PROCESSES}" | tee -a "${LOG_FILE}"
 echo "Max repos:                 ${MAX_REPOS}" | tee -a "${LOG_FILE}"
@@ -245,7 +257,8 @@ if [[ "${SKIP_HISTORY_ANALYSIS}" != "true" && "${FORCE_RERUN}" != "true" ]]; the
   echo "** Step 1: Cache check for existing repository analysis outputs" | tee -a "${LOG_FILE}"
   echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
-  CACHE_REPORT="${OUTPUT_DIR}/run-py-1e_cache_check_${RUN_TS}.txt"
+  # CACHE_REPORT="${OUTPUT_DIR}/run-py-1e_cache_check_${RUN_TS}.txt"
+  CACHE_REPORT="${EXTRA_DIR}/run-py-1e_cache_check_${RUN_TS}.txt"
 
   python "${CACHE_CHECK_SCRIPT}" \
     "${REQUESTED_REPOS_FILE}" \
@@ -485,7 +498,9 @@ echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 echo "run-py-1e completed successfully." | tee -a "${LOG_FILE}"
 echo "Requested repos file: ${REQUESTED_REPOS_FILE}" | tee -a "${LOG_FILE}"
-echo "Output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+# echo "Output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Main output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 #
