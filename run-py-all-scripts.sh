@@ -1,5 +1,5 @@
 #!/bin/bash
-# Consolidated execution script generated on Tue Jul  7 12:12:05 PM CDT 2026
+# Consolidated execution script generated on Sat Jul 11 02:28:01 PM CDT 2026
 
 ###############################################################################
 # FILE: run-py-1a-count-repo.sh
@@ -11,185 +11,166 @@ set -euo pipefail
 # ============================================================
 # run-py-1a: Count Python Cursor-adopting treatment repositories
 # ============================================================
-# This wrapper is the Python version of run7a-count-repo.sh.
 #
 # Goal:
 #   Prepare the first Python treatment-repository input file for
 #   reproducing the paper's language-specific Appendix result.
 #
-# Main purpose:
-#   1. Read the paper baseline panel and repository metadata.
-#   2. Count treatment repositories by primary language.
-#   3. Extract Python treatment repositories.
-#   4. Save the full Python treatment sample for the unbalanced-panel pipeline.
-#   5. Also save a balanced-window >= K subset for diagnostics/robustness only.
+# Main output policy:
+#   repo_python/
+#     - Keep only the analysis input needed by later pipeline steps.
 #
-# Why main sample is primary:
-#   The paper uses an unbalanced panel. Therefore, the full Python
-#   treatment sample should be used as the primary sample. The bw6
-#   output is stricter and should be used only as a diagnostic or
-#   robustness sample.
+# Extra output policy:
+#   repo_python/tmp/
+#     - Keep diagnostic subsets, logs, and verification artifacts.
 #
-# Paper-replication logic:
-#   - Primary language: Python
-#   - Dataset source: treatment
-#   - Main sample: all Python treatment repos found in the baseline panel
-#   - Diagnostic sample: Python treatment repos with balanced_window >= 6
-#
-# Required input files:
-#   DATA_DIR/panel_event_monthly.csv
-#     - Monthly panel file from the paper-replication dataset.
-#     - Used to identify treatment repositories and event-window coverage.
-#
-#   DATA_DIR/repos.csv
-#     - Repository metadata file.
-#     - Used to attach repo_primary_language and other repo-level metadata.
-#
-# Output files:
+# Main output:
 #   repo_python/treatment_python_repos.csv
-#     - Primary Python treatment repository file.
-#     - This should be used for the unbalanced-panel Python replication.
 #
-#   repo_python/treatment_python_repos_bw6.csv
-#     - Diagnostic/robustness Python treatment repository file.
-#     - Includes only repos with balanced_window >= MIN_BALANCED_WINDOW.
-#     - Do not use this as the primary paper-replication sample.
+# Extra outputs:
+#   repo_python/tmp/treatment_python_repos_bw6.csv
+#   repo_python/tmp/run-py-1a_count_repo_<timestamp>.log
+#
+# Important:
+#   This step reads the frozen baseline data and does not require Git cloning
+#   or SonarQube scanning. Expensive cached artifacts under bak/repo_python
+#   are not needed for run-py-1a and will be reused by later wrappers.
 #
 # Typical usage:
 #   bash run-py-1a-count-repo.sh
 #
-# Optional override examples:
+# Optional overrides:
 #   MIN_BALANCED_WINDOW=5 bash run-py-1a-count-repo.sh
-#
-#   OUTPUT_DIR=repo_python_test \
-#   bash run-py-1a-count-repo.sh
+#   OUTPUT_DIR=repo_python_test bash run-py-1a-count-repo.sh
 # ============================================================
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${PROJECT_ROOT:-${SCRIPT_DIR}}"
+cd "${PROJECT_ROOT}"
+
 # ------------------------------------------------------------
-# Input dataset location
+# Inputs and executable
 # ------------------------------------------------------------
-# DATA_DIR should contain:
-#   - panel_event_monthly.csv
-#   - repos.csv
-#
-# In this project, data_baseline_backup is safer than data because it
-# preserves the original baseline files used for replication.
 DATA_DIR="${DATA_DIR:-data_baseline_backup}"
+PY_SCRIPT="${PY_SCRIPT:-proc_scripts/count_repo_lang.py}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
 
-# We are extracting Cursor-adopting repositories, so dataset_source
-# should be treatment.
 DATASET_SOURCE="${DATASET_SOURCE:-treatment}"
-
-# Human-readable group name printed by count_repo_lang.py.
 GROUP_NAME="${GROUP_NAME:-Python}"
+LANGUAGE="${LANGUAGE:-Python}"
 
 # ------------------------------------------------------------
-# Output file locations
+# Output directories
 # ------------------------------------------------------------
-# All Python-specific repository selection outputs are stored here.
 OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_DIR}/tmp}"
 
-# Primary output:
-#   Full Python treatment sample.
-#   Use this file for the main unbalanced-panel replication pipeline.
-OUTPUT_FILE="${OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_repos.csv}"
-
-# Diagnostic output:
-#   Python treatment sample restricted by balanced_window >= K.
-#   Use this only for diagnostics or robustness checks.
-WINDOW_OUTPUT_FILE="${WINDOW_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_repos_bw6.csv}"
-
-# ------------------------------------------------------------
-# Event-window diagnostic setting
-# ------------------------------------------------------------
-# balanced_window is the minimum of available pre-event and post-event
-# monthly observations. A value of 6 means the repo has at least 6 months
-# before and 6 months after the event month in the panel.
-#
-# This should not define the primary sample because the paper uses an
-# unbalanced panel.
 MIN_BALANCED_WINDOW="${MIN_BALANCED_WINDOW:-6}"
-
-# Number of rows printed by the Python script for quick inspection.
 TOP_PRINT="${TOP_PRINT:-30}"
 
-mkdir -p "${OUTPUT_DIR}"
+# Keep the main pipeline input in repo_python/.
+OUTPUT_FILE="${OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_repos.csv}"
 
-echo "============================================================"
-echo "run-py-1a: count Python Cursor-adopting treatment repositories"
-echo "Data dir:                    ${DATA_DIR}"
-echo "Dataset source:              ${DATASET_SOURCE}"
-echo "Group name:                  ${GROUP_NAME}"
-echo "Output dir:                  ${OUTPUT_DIR}"
-echo "Primary output file:         ${OUTPUT_FILE}"
-echo "BW${MIN_BALANCED_WINDOW} diagnostic output: ${WINDOW_OUTPUT_FILE}"
-echo "Min balanced window:         ${MIN_BALANCED_WINDOW}"
-echo "Top print:                   ${TOP_PRINT}"
-echo "============================================================"
-echo
+# Keep the balanced-window diagnostic subset in repo_python/tmp/.
+WINDOW_OUTPUT_FILE="${WINDOW_OUTPUT_FILE:-${TMP_DIR}/treatment_python_repos_bw${MIN_BALANCED_WINDOW}.csv}"
 
-# ------------------------------------------------------------
-# Run language filtering and event-window summarization
-# ------------------------------------------------------------
-# count_repo_lang.py will:
-#   1. Read DATA_DIR/panel_event_monthly.csv.
-#   2. Extract unique treatment repositories.
-#   3. Join repository metadata from DATA_DIR/repos.csv.
-#   4. Filter repositories whose repo_primary_language is Python.
-#   5. Save the full Python treatment file.
-#   6. Save the balanced-window diagnostic subset.
-python proc_scripts/count_repo_lang.py \
-  --data-dir "${DATA_DIR}" \
-  --dataset-source "${DATASET_SOURCE}" \
-  --language Python \
-  --group-name "${GROUP_NAME}" \
-  --output-file "${OUTPUT_FILE}" \
-  --window-output-file "${WINDOW_OUTPUT_FILE}" \
-  --min-balanced-window "${MIN_BALANCED_WINDOW}" \
-  --top-print "${TOP_PRINT}"
+RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
+LOG_DIR="${LOG_DIR:-logs}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1a_count_repo_${RUN_TS}.log}"
 
-echo
-echo "============================================================"
-echo "run-py-1a output check"
-echo "============================================================"
+PANEL_FILE="${PANEL_FILE:-${DATA_DIR}/panel_event_monthly.csv}"
+REPOS_FILE="${REPOS_FILE:-${DATA_DIR}/repos.csv}"
 
-# ------------------------------------------------------------
-# Check primary Python treatment file
-# ------------------------------------------------------------
-# wc -l includes the CSV header. Therefore:
-#   actual repo rows = wc -l output - 1
-echo
-echo "===== Main Python treatment file ====="
-echo "File: ${OUTPUT_FILE}"
-echo "Command: wc -l ${OUTPUT_FILE}"
-wc -l "${OUTPUT_FILE}"
-echo
-echo "Command: head ${OUTPUT_FILE}"
-head "${OUTPUT_FILE}"
+mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
 
-# ------------------------------------------------------------
-# Check balanced-window diagnostic file
-# ------------------------------------------------------------
-# This file is useful to understand how many Python repos have enough
-# symmetric pre/post observations, but it should not replace the main
-# unbalanced-panel sample.
-echo
-echo "===== Balanced-window diagnostic Python file ====="
-echo "File: ${WINDOW_OUTPUT_FILE}"
-echo "Command: wc -l ${WINDOW_OUTPUT_FILE}"
-wc -l "${WINDOW_OUTPUT_FILE}"
-echo
-echo "Command: head ${WINDOW_OUTPUT_FILE}"
-head "${WINDOW_OUTPUT_FILE}"
+# Remove stale files so a failed run cannot be mistaken for a fresh result.
+rm -f "${OUTPUT_FILE}" "${WINDOW_OUTPUT_FILE}"
 
-echo
-echo "============================================================"
-echo "run-py-1a completed successfully."
-echo "Primary file for Python unbalanced-panel pipeline:"
-echo "  ${OUTPUT_FILE}"
-echo "Diagnostic bw${MIN_BALANCED_WINDOW} file:"
-echo "  ${WINDOW_OUTPUT_FILE}"
-echo "============================================================"
+{
+  echo "============================================================"
+  echo "run-py-1a: Count Python Cursor-adopting treatment repositories"
+  echo "Started:                    $(date)"
+  echo "Project root:               ${PROJECT_ROOT}"
+  echo "Python script:              ${PY_SCRIPT}"
+  echo "Baseline panel:             ${PANEL_FILE}"
+  echo "Repository metadata:        ${REPOS_FILE}"
+  echo "Dataset source:             ${DATASET_SOURCE}"
+  echo "Language:                   ${LANGUAGE}"
+  echo "Group name:                 ${GROUP_NAME}"
+  echo "Main output directory:      ${OUTPUT_DIR}"
+  echo "Extra output directory:     ${TMP_DIR}"
+  echo "Main output:                ${OUTPUT_FILE}"
+  echo "Balanced-window diagnostic: ${WINDOW_OUTPUT_FILE}"
+  echo "Minimum balanced window:    ${MIN_BALANCED_WINDOW}"
+  echo "Top print:                  ${TOP_PRINT}"
+  echo "Log file:                   ${LOG_FILE}"
+  echo "============================================================"
+  echo
+
+  if [[ ! -f "${PY_SCRIPT}" ]]; then
+    echo "ERROR: Python script not found: ${PY_SCRIPT}"
+    exit 1
+  fi
+
+  if [[ ! -f "${PANEL_FILE}" ]]; then
+    echo "ERROR: Baseline panel not found: ${PANEL_FILE}"
+    exit 1
+  fi
+
+  if [[ ! -f "${REPOS_FILE}" ]]; then
+    echo "ERROR: Repository metadata not found: ${REPOS_FILE}"
+    exit 1
+  fi
+
+  "${PYTHON_BIN}" -m py_compile "${PY_SCRIPT}"
+
+  "${PYTHON_BIN}" "${PY_SCRIPT}" \
+    --data-dir "${DATA_DIR}" \
+    --panel-file "${PANEL_FILE}" \
+    --repos-file "${REPOS_FILE}" \
+    --dataset-source "${DATASET_SOURCE}" \
+    --language "${LANGUAGE}" \
+    --group-name "${GROUP_NAME}" \
+    --output-file "${OUTPUT_FILE}" \
+    --window-output-file "${WINDOW_OUTPUT_FILE}" \
+    --min-balanced-window "${MIN_BALANCED_WINDOW}" \
+    --top-print "${TOP_PRINT}"
+
+  for expected_file in "${OUTPUT_FILE}" "${WINDOW_OUTPUT_FILE}"; do
+    if [[ ! -s "${expected_file}" ]]; then
+      echo "ERROR: Missing or empty expected output: ${expected_file}"
+      exit 1
+    fi
+  done
+
+  MAIN_ROWS=$(( $(wc -l < "${OUTPUT_FILE}") - 1 ))
+  WINDOW_ROWS=$(( $(wc -l < "${WINDOW_OUTPUT_FILE}") - 1 ))
+
+  echo
+  echo "============================================================"
+  echo "run-py-1a output verification"
+  echo "============================================================"
+  echo "Main output:                ${OUTPUT_FILE}"
+  echo "Main repository rows:       ${MAIN_ROWS}"
+  echo "Diagnostic output:          ${WINDOW_OUTPUT_FILE}"
+  echo "Diagnostic repository rows: ${WINDOW_ROWS}"
+  echo
+  echo "Main output preview:"
+  head "${OUTPUT_FILE}"
+  echo
+  echo "Diagnostic output preview:"
+  head "${WINDOW_OUTPUT_FILE}"
+  echo
+  echo "============================================================"
+  echo "run-py-1a completed successfully."
+  echo "Completed:                  $(date)"
+  echo "Main pipeline input:        ${OUTPUT_FILE}"
+  echo "Extra diagnostic output:    ${WINDOW_OUTPUT_FILE}"
+  echo "============================================================"
+} 2>&1 | tee "${LOG_FILE}"
+# 
+# This wrapper is the Python version of run7a-count-repo.sh.
+# It reuses the original selection logic without calling the old wrapper.
 
 
 ###############################################################################
@@ -262,13 +243,14 @@ LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1b_detect_ai_adoption_repo_${RUN_TS}.log
 # Python experiment naming convention
 # ------------------------------------------------------------
 OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_DIR}/tmp/run-py-1b}"
 
 # Input candidate file from run-py-1a.
 TREATMENT_REPOS_FILE="${TREATMENT_REPOS_FILE:-${OUTPUT_DIR}/treatment_python_repos.csv}"
 
 # Primary clone-status output used by the next step.
 CLONE_STATUS_FILE="${CLONE_STATUS_FILE:-${OUTPUT_DIR}/treatment_python_clone_status.csv}"
-CLONE_STATUS_BACKUP="${CLONE_STATUS_BACKUP:-${CLONE_STATUS_FILE%.csv}_${RUN_TS}.csv}"
+CLONE_STATUS_BACKUP="${CLONE_STATUS_BACKUP:-${TMP_DIR}/treatment_python_clone_status_${RUN_TS}.csv}"
 
 # ------------------------------------------------------------
 # Clone settings
@@ -291,6 +273,7 @@ EXISTING_ACTION="${EXISTING_ACTION:-skip}"
 # Clone log naming
 # ------------------------------------------------------------
 CLONE_LOG_PREFIX="${CLONE_LOG_PREFIX:-run-py-1b_treatment_clone_log}"
+# CLONE_LOG_CSV="${TMP_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
 CLONE_LOG_CSV="${LOG_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
 
 # ------------------------------------------------------------
@@ -299,12 +282,13 @@ CLONE_LOG_CSV="${LOG_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
 CHECK_LANGUAGES_CSV="${CHECK_LANGUAGES_CSV:-Python}"
 CHECK_TOP_PRINT="${CHECK_TOP_PRINT:-80}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CLONE_ROOT}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${TMP_DIR}" "${CLONE_ROOT}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1b: clone Python Cursor-adopting treatment repositories" | tee -a "${LOG_FILE}"
 echo "Timestamp:                  ${RUN_TS}" | tee -a "${LOG_FILE}"
-echo "Output dir:                 ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Main output dir:            ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:           ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Treatment repos file:       ${TREATMENT_REPOS_FILE}" | tee -a "${LOG_FILE}"
 echo "Clone root:                 ${CLONE_ROOT}" | tee -a "${LOG_FILE}"
 echo "Max clones:                 ${MAX_CLONES}" | tee -a "${LOG_FILE}"
@@ -549,7 +533,7 @@ set -euo pipefail
 #   repo_python/treatment_python_clone_usable_repos_with_event.csv
 #     - Usable cloned Python treatment repos with event metadata.
 #
-#   repo_python/treatment_python_clone_failed_repos.csv
+#   repo_python/tmp/run-py-1c/treatment_python_clone_failed_repos.csv
 #     - Failed Python treatment repos.
 #
 # Typical usage:
@@ -561,19 +545,22 @@ RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1c_create_treatment_usable_repos_${RUN_TS}.log}"
 
 OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_DIR}/tmp/run-py-1c}"
 
 CLONE_STATUS_FILE="${CLONE_STATUS_FILE:-${OUTPUT_DIR}/treatment_python_clone_status.csv}"
 PANEL_FILE="${PANEL_FILE:-data_baseline_backup/panel_event_monthly.csv}"
 
 OUTPUT_FILE="${OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_repos_with_event.csv}"
-FAILED_OUTPUT_FILE="${FAILED_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_failed_repos.csv}"
+# FAILED_OUTPUT_FILE="${FAILED_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_failed_repos.csv}"
+FAILED_OUTPUT_FILE="${FAILED_OUTPUT_FILE:-${TMP_DIR}/treatment_python_clone_failed_repos.csv}"
 
 DATASET_SOURCE="${DATASET_SOURCE:-treatment}"
 TOP_PRINT="${TOP_PRINT:-50}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/create_clone_usable_repos_with_event.py}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+# mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${TMP_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1c: create usable Python treatment repo list with event metadata" | tee -a "${LOG_FILE}"
@@ -581,6 +568,8 @@ echo "Timestamp:            ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Python script:        ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Clone status file:    ${CLONE_STATUS_FILE}" | tee -a "${LOG_FILE}"
 echo "Panel file:           ${PANEL_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir:      ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:     ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Output file:          ${OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Failed output file:   ${FAILED_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Dataset source:       ${DATASET_SOURCE}" | tee -a "${LOG_FILE}"
@@ -693,7 +682,10 @@ set -euo pipefail
 # ============================================================
 # run-py-1d: Split usable Python treatment repos by event_month
 # ============================================================
-#
+# 
+# Usage:
+#   bash run-py-1d-split-valid-event-repos.sh
+# 
 # Input:
 #   repo_python/treatment_python_clone_usable_repos_with_event.csv
 #     - Created by run-py-1c.
@@ -706,7 +698,7 @@ set -euo pipefail
 #     - This file should be used as the next treatment input for
 #       repository-history/adoption-month analysis.
 #
-#   repo_python/treatment_python_clone_usable_missing_event_month.csv
+#   repo_python/tmp/run-py-1d/treatment_python_clone_usable_missing_event_month.csv
 #     - Diagnostic file.
 #     - Repositories cloned successfully but missing event_month in
 #       the baseline panel.
@@ -722,17 +714,21 @@ RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1d_split_valid_event_repos_${RUN_TS}.log}"
 
 OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_DIR}/tmp/run-py-1d}"
 
 INPUT_FILE="${INPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_repos_with_event.csv}"
 VALID_OUTPUT_FILE="${VALID_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_repos_with_event_valid.csv}"
 MISSING_OUTPUT_FILE="${MISSING_OUTPUT_FILE:-${OUTPUT_DIR}/treatment_python_clone_usable_missing_event_month.csv}"
+MISSING_OUTPUT_FILE="${MISSING_OUTPUT_FILE:-${TMP_DIR}/treatment_python_clone_usable_missing_event_month.csv}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${TMP_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1d: split usable Python treatment repos by event_month" | tee -a "${LOG_FILE}"
 echo "Timestamp:            ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Input file:           ${INPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir:      ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:     ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Valid output file:    ${VALID_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Missing output file:  ${MISSING_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Log file:             ${LOG_FILE}" | tee -a "${LOG_FILE}"
@@ -916,6 +912,7 @@ PY_ADOPTION_CHECK="${PY_ADOPTION_CHECK:-proc_scripts/check_time_of_event_and_ado
 CACHE_CHECK_SCRIPT="${CACHE_CHECK_SCRIPT:-proc_scripts/check_cache_control_repos.py}"
 
 OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+TMP_BASE_DIR="${TMP_BASE_DIR:-${OUTPUT_BASE_DIR}/tmp/run-py-1e}"
 
 REPOS_FILE="${REPOS_FILE:-${OUTPUT_BASE_DIR}/treatment_python_clone_usable_repos_with_event_valid.csv}"
 CLONE_DIR="${CLONE_DIR:-../treatment-repos}"
@@ -927,17 +924,23 @@ NUM_PROCESSES="${NUM_PROCESSES:-1}"
 MAX_REPOS="${MAX_REPOS:-5}"
 
 # Fixed output directories:
-#   - Smoke tests reuse repo_python/treatment_python_did_smoke
-#   - Full run uses repo_python/treatment_python_did
+#   - Full-run main outputs use repo_python/treatment_python_did
+#   - Smoke-test outputs use repo_python/tmp/run-py-1e/smoke/output
+#   - Cache, manifest, missing-repo, and incremental files use
+#     repo_python/tmp/run-py-1e
 #
 # This is important because timestamped smoke directories cannot use cache.
 FULL_OUTPUT_DIR="${FULL_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/treatment_python_did}"
-SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/treatment_python_did_smoke}"
+# SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/treatment_python_did_smoke}"
+SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${TMP_BASE_DIR}/smoke/output}"
+
 
 if [[ "${MAX_REPOS}" == "0" ]]; then
   OUTPUT_DIR="${OUTPUT_DIR:-${FULL_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_BASE_DIR}/full}"
 else
   OUTPUT_DIR="${OUTPUT_DIR:-${SMOKE_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_BASE_DIR}/smoke}"
 fi
 
 REQUIRE_EVENT_MONTH="${REQUIRE_EVENT_MONTH:-true}"
@@ -954,13 +957,17 @@ CURSOR_COMMITS_FILE="${OUTPUT_DIR}/cursor_commits.csv"
 ADOPTION_FILE="${ADOPTION_FILE:-${OUTPUT_DIR}/ai_adoption_dates.csv}"
 ADOPTION_MATCH_FILE="${ADOPTION_MATCH_FILE:-${OUTPUT_DIR}/adoption_month_check.csv}"
 
-MANIFEST_FILE="${OUTPUT_DIR}/run-py-1e_analyzed_repos_manifest.csv"
+# MANIFEST_FILE="${OUTPUT_DIR}/run-py-1e_analyzed_repos_manifest.csv"
+MANIFEST_FILE="${EXTRA_DIR}/run-py-1e_analyzed_repos_manifest.csv"
 
-SMOKE_REPOS_FILE="${OUTPUT_DIR}/treatment_python_repos_smoke_max${MAX_REPOS}.csv"
-MISSING_REPOS_FILE="${OUTPUT_DIR}/run-py-1e_missing_repos_${RUN_TS}.csv"
-TMP_OUTPUT_DIR="${OUTPUT_DIR}/_incremental_${RUN_TS}"
+# SMOKE_REPOS_FILE="${OUTPUT_DIR}/treatment_python_repos_smoke_max${MAX_REPOS}.csv"
+# MISSING_REPOS_FILE="${OUTPUT_DIR}/run-py-1e_missing_repos_${RUN_TS}.csv"
+# TMP_OUTPUT_DIR="${OUTPUT_DIR}/_incremental_${RUN_TS}"
+SMOKE_REPOS_FILE="${EXTRA_DIR}/treatment_python_repos_smoke_max${MAX_REPOS}.csv"
+MISSING_REPOS_FILE="${EXTRA_DIR}/run-py-1e_missing_repos_${RUN_TS}.csv"
+TMP_OUTPUT_DIR="${EXTRA_DIR}/incremental_${RUN_TS}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${EXTRA_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1e: analyze Python treatment repos and validate adoption month" | tee -a "${LOG_FILE}"
@@ -970,7 +977,8 @@ echo "Adoption check script:     ${PY_ADOPTION_CHECK}" | tee -a "${LOG_FILE}"
 echo "Cache check script:        ${CACHE_CHECK_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Repos file:                ${REPOS_FILE}" | tee -a "${LOG_FILE}"
 echo "Clone dir:                 ${CLONE_DIR}" | tee -a "${LOG_FILE}"
-echo "Output dir:                ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Main output dir:           ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:          ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Aggregation:               ${AGGREGATION}" | tee -a "${LOG_FILE}"
 echo "Num processes:             ${NUM_PROCESSES}" | tee -a "${LOG_FILE}"
 echo "Max repos:                 ${MAX_REPOS}" | tee -a "${LOG_FILE}"
@@ -1118,7 +1126,8 @@ if [[ "${SKIP_HISTORY_ANALYSIS}" != "true" && "${FORCE_RERUN}" != "true" ]]; the
   echo "** Step 1: Cache check for existing repository analysis outputs" | tee -a "${LOG_FILE}"
   echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
-  CACHE_REPORT="${OUTPUT_DIR}/run-py-1e_cache_check_${RUN_TS}.txt"
+  # CACHE_REPORT="${OUTPUT_DIR}/run-py-1e_cache_check_${RUN_TS}.txt"
+  CACHE_REPORT="${EXTRA_DIR}/run-py-1e_cache_check_${RUN_TS}.txt"
 
   python "${CACHE_CHECK_SCRIPT}" \
     "${REQUESTED_REPOS_FILE}" \
@@ -1358,7 +1367,9 @@ echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 echo "run-py-1e completed successfully." | tee -a "${LOG_FILE}"
 echo "Requested repos file: ${REQUESTED_REPOS_FILE}" | tee -a "${LOG_FILE}"
-echo "Output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+# echo "Output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Main output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 #
@@ -1386,16 +1397,22 @@ set -euo pipefail
 #   repo_python/treatment_python_did/adoption_month_check.csv
 #
 # Outputs:
-#   repo_python/treatment_python_sample_main_<N>.csv
-#   repo_python/treatment_python_sample_exact_match_<N>.csv
-#   repo_python/treatment_python_sample_within1_month_<N>.csv
-#   repo_python/treatment_python_sample_diagnostic_<N>.csv
+#   repo_python/run-py-1f/treatment_python_sample_main_<N>.csv
+#     - Primary treatment sample used by run-py-1g.
+#
+#   repo_python/tmp/run-py-1f/treatment_python_sample_exact_match_<N>.csv
+#   repo_python/tmp/run-py-1f/treatment_python_sample_within1_month_<N>.csv
+#   repo_python/tmp/run-py-1f/treatment_python_sample_diagnostic_<N>.csv
+#     - Alternative and diagnostic treatment samples.
 #
 # Expected current Python result:
 #   main       = 118
 #   exact      = 118
 #   within1    = 118
 #   diagnostic = 0
+# 
+# Usage:
+#   bash run-py-1f-save-treatment-options.sh
 # ============================================================
 
 LOG_DIR="${LOG_DIR:-logs}"
@@ -1404,19 +1421,26 @@ LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1f_save_treatment_options_${RUN_TS}.log}
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/save_treatment_options.py}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
-CHECK_FILE="${CHECK_FILE:-${OUTPUT_DIR}/treatment_python_did/adoption_month_check.csv}"
+# OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+# TMP_DIR="${TMP_DIR:-${OUTPUT_DIR}/tmp/run-py-1f}"
+# CHECK_FILE="${CHECK_FILE:-${OUTPUT_DIR}/treatment_python_did/adoption_month_check.csv}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+OUTPUT_DIR="${OUTPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-1f}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/run-py-1f}"
+CHECK_FILE="${CHECK_FILE:-${OUTPUT_BASE_DIR}/treatment_python_did/adoption_month_check.csv}"
+
 PREFIX="${PREFIX:-treatment_python_sample}"
 TOP_PRINT="${TOP_PRINT:-50}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${TMP_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1f: save Python treatment sample options" | tee -a "${LOG_FILE}"
 echo "Timestamp:        ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Python script:    ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Check file:       ${CHECK_FILE}" | tee -a "${LOG_FILE}"
-echo "Output dir:       ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Main output dir:  ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Prefix:           ${PREFIX}" | tee -a "${LOG_FILE}"
 echo "Top print:        ${TOP_PRINT}" | tee -a "${LOG_FILE}"
 echo "Log file:         ${LOG_FILE}" | tee -a "${LOG_FILE}"
@@ -1437,10 +1461,17 @@ fi
 echo "** Save treatment sample options" | tee -a "${LOG_FILE}"
 echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
+# Remove stale option files from the extra-output directory.
+find "${TMP_DIR}" \
+  -maxdepth 1 \
+  -type f \
+  -name "${PREFIX}_*.csv" \
+  -delete
+
 set +e
 python "${PY_SCRIPT}" \
   --check-file "${CHECK_FILE}" \
-  --output-dir "${OUTPUT_DIR}" \
+  --output-dir "${TMP_DIR}" \
   --prefix "${PREFIX}" \
   --top-print "${TOP_PRINT}" \
   2>&1 | tee -a "${LOG_FILE}"
@@ -1453,11 +1484,49 @@ if [[ "${run_status}" -ne 0 ]]; then
   exit "${run_status}"
 fi
 
+
+# Move the primary treatment sample into the main output directory.
+MAIN_SAMPLE_FILE="$(
+  find "${TMP_DIR}" \
+    -maxdepth 1 \
+    -type f \
+    -name "${PREFIX}_main_*.csv" \
+    -print
+)"
+
+if [[ -z "${MAIN_SAMPLE_FILE}" ]]; then
+  echo "ERROR: primary treatment sample was not generated in ${TMP_DIR}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+MAIN_SAMPLE_COUNT="$(printf '%s\n' "${MAIN_SAMPLE_FILE}" | sed '/^$/d' | wc -l)"
+if [[ "${MAIN_SAMPLE_COUNT}" -ne 1 ]]; then
+  echo "ERROR: expected one primary treatment sample, found ${MAIN_SAMPLE_COUNT}" | tee -a "${LOG_FILE}"
+  printf '%s\n' "${MAIN_SAMPLE_FILE}" | tee -a "${LOG_FILE}"
+  exit 1
+fi
+
+MAIN_OUTPUT_FILE="${OUTPUT_DIR}/$(basename "${MAIN_SAMPLE_FILE}")"
+mv -f "${MAIN_SAMPLE_FILE}" "${MAIN_OUTPUT_FILE}"
+
+# Remove stale primary files with a different row-count suffix.
+find "${OUTPUT_DIR}" \
+  -maxdepth 1 \
+  -type f \
+  -name "${PREFIX}_main_*.csv" \
+  ! -name "$(basename "${MAIN_OUTPUT_FILE}")" \
+  -delete
+
+echo "Primary treatment sample: ${MAIN_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
+
 echo | tee -a "${LOG_FILE}"
 echo "** Output file check" | tee -a "${LOG_FILE}"
 echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
-for f in "${OUTPUT_DIR}"/"${PREFIX}"_*.csv; do
+for f in \
+  "${OUTPUT_DIR}"/"${PREFIX}"_main_*.csv \
+  "${TMP_DIR}"/"${PREFIX}"_*.csv
+do
   if [[ -f "${f}" ]]; then
     echo "Command: wc -l ${f}" | tee -a "${LOG_FILE}"
     wc -l "${f}" | tee -a "${LOG_FILE}"
@@ -1467,7 +1536,8 @@ done
 echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 echo "run-py-1f completed successfully." | tee -a "${LOG_FILE}"
-echo "Output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Main output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 #
@@ -1503,7 +1573,7 @@ set -euo pipefail
 #   proc_scripts/extract_matched_control_repos.py
 #
 # Input:
-#   repo_python/treatment_python_sample_main_118.csv
+#   repo_python/run-py-1f/treatment_python_sample_main_118.csv
 #     - Primary Python treatment sample created by run-py-1f.
 #     - For the current Python run, main/exact/within1 are all identical,
 #       but main is the primary replication input.
@@ -1516,21 +1586,26 @@ set -euo pipefail
 #         matched_control_2
 #         matched_control_3
 #
-# Outputs:
-#   repo_python/python_matched_control_pairs_main_118.csv
+# Main outputs:
+#   repo_python/run-py-1g/python_control_repos_to_clone_main_118.csv
 #     - Clean treatment-control pair file after overlap removal.
 #
-#   repo_python/python_control_repos_to_clone_main_118.csv
+#   repo_python/run-py-1g/python_control_repos_to_clone_main_118.csv
 #     - Unique clean control repos to clone in the next step.
 #
-#   repo_python/python_treatment_missing_matching_main_118.csv
+# Extra outputs:
+#   repo_python/tmp/run-py-1g/python_treatment_missing_matching_main_118.csv
 #     - Treatment repos without matching rows.
 #
-#   repo_python/python_control_extract_summary_main_118.csv
+#   repo_python/tmp/run-py-1g/python_control_extract_summary_main_118.csv
 #     - Summary metrics for audit.
 #
-# Sidecar outputs:
-#   Raw pairs, raw controls, overlap diagnostics, and coverage files.
+#   Raw pairs, raw controls, overlap diagnostics, and coverage files
+#   are also stored under repo_python/tmp/run-py-1g.
+# 
+# Usage:
+#   bash run-py-1g-extract-control-repos.sh
+# 
 # ============================================================
 
 LOG_DIR="${LOG_DIR:-logs}"
@@ -1539,21 +1614,26 @@ LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1g_extract_control_repos_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/extract_matched_control_repos.py}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-1g}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/run-py-1g}"
 
-TREATMENT_SAMPLE_FILE="${TREATMENT_SAMPLE_FILE:-${OUTPUT_DIR}/treatment_sample_main.csv}"
+SAMPLE_NAME="${SAMPLE_NAME:-main_118}"
+
+TREATMENT_SAMPLE_FILE="${TREATMENT_SAMPLE_FILE:-${OUTPUT_BASE_DIR}/run-py-1f/treatment_python_sample_${SAMPLE_NAME}.csv}"
 MATCHING_FILE="${MATCHING_FILE:-data_baseline_backup/matching.csv}"
 
-PAIR_OUTPUT_FILE="${PAIR_OUTPUT_FILE:-${OUTPUT_DIR}/matched_control_pairs_main.csv}"
-CONTROL_CLONE_FILE="${CONTROL_CLONE_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main.csv}"
-MISSING_MATCH_FILE="${MISSING_MATCH_FILE:-${OUTPUT_DIR}/treatment_missing_matching_main.csv}"
-SUMMARY_FILE="${SUMMARY_FILE:-${OUTPUT_DIR}/control_extract_summary_main.csv}"
+PAIR_OUTPUT_FILE="${PAIR_OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/python_matched_control_pairs_${SAMPLE_NAME}.csv}"
+CONTROL_CLONE_FILE="${CONTROL_CLONE_FILE:-${MAIN_OUTPUT_DIR}/python_control_repos_to_clone_${SAMPLE_NAME}.csv}"
 
-RAW_PAIR_OUTPUT_FILE="${RAW_PAIR_OUTPUT_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_raw.csv}"
-RAW_CONTROL_CLONE_FILE="${RAW_CONTROL_CLONE_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main_raw.csv}"
-OVERLAP_PAIR_FILE="${OVERLAP_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_overlap_pairs.csv}"
-OVERLAP_REPO_FILE="${OVERLAP_REPO_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main_overlap_repos.csv}"
-COVERAGE_FILE="${COVERAGE_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_coverage.csv}"
+MISSING_MATCH_FILE="${MISSING_MATCH_FILE:-${TMP_DIR}/python_treatment_missing_matching_${SAMPLE_NAME}.csv}"
+SUMMARY_FILE="${SUMMARY_FILE:-${TMP_DIR}/python_control_extract_summary_${SAMPLE_NAME}.csv}"
+
+RAW_PAIR_OUTPUT_FILE="${RAW_PAIR_OUTPUT_FILE:-${TMP_DIR}/python_matched_control_pairs_${SAMPLE_NAME}_raw.csv}"
+RAW_CONTROL_CLONE_FILE="${RAW_CONTROL_CLONE_FILE:-${TMP_DIR}/python_control_repos_to_clone_${SAMPLE_NAME}_raw.csv}"
+OVERLAP_PAIR_FILE="${OVERLAP_PAIR_FILE:-${TMP_DIR}/python_matched_control_pairs_${SAMPLE_NAME}_overlap_pairs.csv}"
+OVERLAP_REPO_FILE="${OVERLAP_REPO_FILE:-${TMP_DIR}/python_control_repos_to_clone_${SAMPLE_NAME}_overlap_repos.csv}"
+COVERAGE_FILE="${COVERAGE_FILE:-${TMP_DIR}/python_matched_control_pairs_${SAMPLE_NAME}_coverage.csv}"
 
 FULL_ADOPTER_FILE="${FULL_ADOPTER_FILE:-data_baseline_backup/panel_event_monthly.csv}"
 FULL_ADOPTER_FILTER_COLUMN="${FULL_ADOPTER_FILTER_COLUMN:-is_treatment}"
@@ -1561,7 +1641,8 @@ FULL_ADOPTER_FILTER_VALUE="${FULL_ADOPTER_FILTER_VALUE:-1}"
 
 TOP_PRINT="${TOP_PRINT:-50}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}"
+
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1g: extract matched Python control repositories" | tee -a "${LOG_FILE}"
@@ -1569,7 +1650,9 @@ echo "Timestamp:                     ${RUN_TS}" | tee -a "${LOG_FILE}"
 echo "Python script:                 ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Treatment sample file:         ${TREATMENT_SAMPLE_FILE}" | tee -a "${LOG_FILE}"
 echo "Matching file:                 ${MATCHING_FILE}" | tee -a "${LOG_FILE}"
-echo "Output dir:                    ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Sample name:                   ${SAMPLE_NAME}" | tee -a "${LOG_FILE}"
+echo "Main output dir:               ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:              ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Pair output file:              ${PAIR_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Control clone file:            ${CONTROL_CLONE_FILE}" | tee -a "${LOG_FILE}"
 echo "Missing match file:            ${MISSING_MATCH_FILE}" | tee -a "${LOG_FILE}"
@@ -1691,6 +1774,8 @@ echo "run-py-1g completed successfully." | tee -a "${LOG_FILE}"
 echo "Pair output file: ${PAIR_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Control clone file: ${CONTROL_CLONE_FILE}" | tee -a "${LOG_FILE}"
 echo "Missing match file: ${MISSING_MATCH_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir: ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Summary file: ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
@@ -1711,11 +1796,13 @@ set -euo pipefail
 # but it does NOT call the existing JS/TS shell wrapper.
 #
 # Input:
-#   repo_python/control_repos_to_clone_main.csv
+#   repo_python/run-py-1g/python_control_repos_to_clone_main_118.csv
 #
-# Outputs:
-#   repo_python/control_clone_status_main.csv
-#   repo_python/control_clone_status_main_<timestamp>.csv
+# Main output:
+#   repo_python/run-py-1h/python_control_clone_status_main_118.csv
+#
+# Extra output:
+#   repo_python/tmp/run-py-1h/python_control_clone_status_main_118_<timestamp>.csv
 #
 # Clone root:
 #   ../control-repos
@@ -1730,33 +1817,50 @@ set -euo pipefail
 
 export GIT_TERMINAL_PROMPT=0
 
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1h_clone_control_repos_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_clone_control_repos_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/clone_repos_v2.py}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
-CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main.csv}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+
+SAMPLE_NAME="${SAMPLE_NAME:-main_118}"
+CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${OUTPUT_BASE_DIR}/run-py-1g/python_control_repos_to_clone_${SAMPLE_NAME}.csv}"
 
 CLONE_ROOT="${CLONE_ROOT:-../control-repos}"
 
 MAX_CLONES="${MAX_CLONES:-10}"
 EXISTING_ACTION="${EXISTING_ACTION:-skip}"
 
-CLONE_LOG_PREFIX="${CLONE_LOG_PREFIX:-run-py-1h_control_clone_log}"
+CLONE_LOG_PREFIX="${CLONE_LOG_PREFIX:-${RUN_PREFIX}_control_clone_log}"
 CLONE_LOG_CSV="${LOG_DIR}/${CLONE_LOG_PREFIX}_${RUN_TS}.csv"
 
-CHECK_OUTPUT_FILE="${CHECK_OUTPUT_FILE:-${OUTPUT_DIR}/control_clone_status_main.csv}"
-CHECK_OUTPUT_BACKUP="${CHECK_OUTPUT_BACKUP:-${CHECK_OUTPUT_FILE%.csv}_${RUN_TS}.csv}"
-
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CLONE_ROOT}"
+CHECK_OUTPUT_FILE="${CHECK_OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/python_control_clone_status_${SAMPLE_NAME}.csv}"
+CHECK_OUTPUT_BACKUP="${CHECK_OUTPUT_BACKUP:-${TMP_DIR}/python_control_clone_status_${SAMPLE_NAME}_${RUN_TS}.csv}"
+ 
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${CLONE_ROOT}"
 
 echo "============================================================" | tee "${LOG_FILE}"
 echo "run-py-1h: clone matched control repositories" | tee -a "${LOG_FILE}"
 echo "Timestamp:             ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Script name:           ${SCRIPT_NAME}" | tee -a "${LOG_FILE}"
+echo "Run prefix:            ${RUN_PREFIX}" | tee -a "${LOG_FILE}"
 echo "Python script:         ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Control repos file:    ${CONTROL_REPOS_FILE}" | tee -a "${LOG_FILE}"
+echo "Sample name:           ${SAMPLE_NAME}" | tee -a "${LOG_FILE}"
+echo "Main output dir:       ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:      ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Clone root:            ${CLONE_ROOT}" | tee -a "${LOG_FILE}"
 echo "Max clones:            ${MAX_CLONES}" | tee -a "${LOG_FILE}"
 echo "Existing action:       ${EXISTING_ACTION}" | tee -a "${LOG_FILE}"
@@ -1873,6 +1977,8 @@ echo "============================================================" | tee -a "${
 echo "run-py-1h completed successfully." | tee -a "${LOG_FILE}"
 echo "Clone status file:   ${CHECK_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
 echo "Clone status backup: ${CHECK_OUTPUT_BACKUP}" | tee -a "${LOG_FILE}"
+echo "Main output dir:     ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:    ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Control clone root:  ${CLONE_ROOT}" | tee -a "${LOG_FILE}"
 echo "Log file:            ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
@@ -1889,50 +1995,93 @@ set -euo pipefail
 # run-py-1i: Create clone-usable control repository sample
 # ============================================================
 #
-# Input:
-#   repo_python/control_clone_status_main.csv
-#   repo_python/matched_control_pairs_main.csv
-#   repo_python/control_repos_to_clone_main.csv
+#   repo_python/run-py-1h/python_control_clone_status_main_<N>.csv
+#   repo_python/run-py-1g/python_matched_control_pairs_main_<N>.csv
+#   repo_python/run-py-1g/python_control_repos_to_clone_main_<N>.csv
 #
-# Outputs:
-#   repo_python/control_clone_usable_repos_main.csv
-#   repo_python/control_clone_failed_repos_main.csv
-#   repo_python/matched_control_pairs_main_clone_usable.csv
-#   repo_python/matched_control_pairs_main_clone_failed.csv
-#   repo_python/control_pair_coverage_main_clone_usable.csv
-#   repo_python/treatment_lost_all_controls_main.csv
-#   repo_python/control_clone_usable_summary_main.csv
+# Main outputs:
+#   repo_python/run-py-1i/python_control_clone_usable_repos_main.csv
+#   repo_python/run-py-1i/python_matched_control_pairs_main_clone_usable.csv
+#
+# Extra outputs:
+#   repo_python/tmp/run-py-1i/python_control_clone_failed_repos_main.csv
+#   repo_python/tmp/run-py-1i/python_matched_control_pairs_main_clone_failed.csv
+#   repo_python/tmp/run-py-1i/python_control_pair_coverage_main_clone_usable.csv
+#   repo_python/tmp/run-py-1i/python_treatment_lost_all_controls_main.csv
+#   repo_python/tmp/run-py-1i/python_control_clone_usable_summary_main.csv
+# 
+# Usage:
+#   bash run-py-1i-create-control-usable-repos.sh
 # ============================================================
+ 
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1i_create_control_usable_repos_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_create_control_usable_repos_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/create_control_usable_repos.py}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+SAMPLE_VARIANT="${SAMPLE_VARIANT:-main}"
 
-CLONE_STATUS_FILE="${CLONE_STATUS_FILE:-${OUTPUT_DIR}/control_clone_status_main.csv}"
-PAIR_FILE="${PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main.csv}"
-CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${OUTPUT_DIR}/control_repos_to_clone_main.csv}"
+resolve_single_input() {
+  local pattern="$1"
+  local label="$2"
+  local matches=()
+  mapfile -t matches < <(compgen -G "${pattern}" | sort)
 
-USABLE_CONTROL_FILE="${USABLE_CONTROL_FILE:-${OUTPUT_DIR}/control_clone_usable_repos_main.csv}"
-FAILED_CONTROL_FILE="${FAILED_CONTROL_FILE:-${OUTPUT_DIR}/control_clone_failed_repos_main.csv}"
-USABLE_PAIR_FILE="${USABLE_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_clone_usable.csv}"
-DROPPED_PAIR_FILE="${DROPPED_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_clone_failed.csv}"
-COVERAGE_FILE="${COVERAGE_FILE:-${OUTPUT_DIR}/control_pair_coverage_main_clone_usable.csv}"
-ZERO_CONTROL_TREATMENT_FILE="${ZERO_CONTROL_TREATMENT_FILE:-${OUTPUT_DIR}/treatment_lost_all_controls_main.csv}"
-SUMMARY_FILE="${SUMMARY_FILE:-${OUTPUT_DIR}/control_clone_usable_summary_main.csv}"
+  if [[ "${#matches[@]}" -ne 1 ]]; then
+    echo "ERROR: expected exactly one ${label} matching: ${pattern}" >&2
+    if [[ "${#matches[@]}" -gt 0 ]]; then
+      printf '  %s\n' "${matches[@]}" >&2
+    fi
+    exit 1
+  fi
+
+  printf '%s\n' "${matches[0]}"
+}
+
+CLONE_STATUS_PATTERN="${OUTPUT_BASE_DIR}/run-py-1h/python_control_clone_status_${SAMPLE_VARIANT}_[0-9]*.csv"
+PAIR_FILE_PATTERN="${OUTPUT_BASE_DIR}/run-py-1g/python_matched_control_pairs_${SAMPLE_VARIANT}_[0-9]*.csv"
+CONTROL_REPOS_PATTERN="${OUTPUT_BASE_DIR}/run-py-1g/python_control_repos_to_clone_${SAMPLE_VARIANT}_[0-9]*.csv"
+
+CLONE_STATUS_FILE="${CLONE_STATUS_FILE:-$(resolve_single_input "${CLONE_STATUS_PATTERN}" "clone-status file")}"
+PAIR_FILE="${PAIR_FILE:-$(resolve_single_input "${PAIR_FILE_PATTERN}" "matched-pair file")}"
+CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-$(resolve_single_input "${CONTROL_REPOS_PATTERN}" "control-repository file")}"
+
+USABLE_CONTROL_FILE="${USABLE_CONTROL_FILE:-${MAIN_OUTPUT_DIR}/python_control_clone_usable_repos_${SAMPLE_VARIANT}.csv}"
+USABLE_PAIR_FILE="${USABLE_PAIR_FILE:-${MAIN_OUTPUT_DIR}/python_matched_control_pairs_${SAMPLE_VARIANT}_clone_usable.csv}"
+
+FAILED_CONTROL_FILE="${FAILED_CONTROL_FILE:-${TMP_DIR}/python_control_clone_failed_repos_${SAMPLE_VARIANT}.csv}"
+DROPPED_PAIR_FILE="${DROPPED_PAIR_FILE:-${TMP_DIR}/python_matched_control_pairs_${SAMPLE_VARIANT}_clone_failed.csv}"
+COVERAGE_FILE="${COVERAGE_FILE:-${TMP_DIR}/python_control_pair_coverage_${SAMPLE_VARIANT}_clone_usable.csv}"
+ZERO_CONTROL_TREATMENT_FILE="${ZERO_CONTROL_TREATMENT_FILE:-${TMP_DIR}/python_treatment_lost_all_controls_${SAMPLE_VARIANT}.csv}"
+SUMMARY_FILE="${SUMMARY_FILE:-${TMP_DIR}/python_control_clone_usable_summary_${SAMPLE_VARIANT}.csv}"
 
 USABLE_STATUSES="${USABLE_STATUSES:-cloned,skipped_existing,updated_existing}"
 FAIL_IF_ZERO_CONTROL="${FAIL_IF_ZERO_CONTROL:-true}"
 
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
-echo "run-py-1i: create clone-usable control repository sample" | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX}: create clone-usable control repository sample" | tee -a "${LOG_FILE}"
 echo "Timestamp:                    ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Script name:                  ${SCRIPT_NAME}" | tee -a "${LOG_FILE}"
+echo "Run prefix:                   ${RUN_PREFIX}" | tee -a "${LOG_FILE}"
 echo "Python script:                ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
+echo "Sample variant:               ${SAMPLE_VARIANT}" | tee -a "${LOG_FILE}"
+echo "Main output dir:              ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:             ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Clone status file:            ${CLONE_STATUS_FILE}" | tee -a "${LOG_FILE}"
 echo "Pair file:                    ${PAIR_FILE}" | tee -a "${LOG_FILE}"
 echo "Control repos file:           ${CONTROL_REPOS_FILE}" | tee -a "${LOG_FILE}"
@@ -2005,11 +2154,13 @@ done
 
 echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
-echo "run-py-1i completed successfully." | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX} completed successfully." | tee -a "${LOG_FILE}"
 echo "Usable control file: ${USABLE_CONTROL_FILE}" | tee -a "${LOG_FILE}"
 echo "Usable pair file:    ${USABLE_PAIR_FILE}" | tee -a "${LOG_FILE}"
 echo "Coverage file:       ${COVERAGE_FILE}" | tee -a "${LOG_FILE}"
 echo "Summary file:        ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir:     ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:    ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Log file:            ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 #
@@ -2032,20 +2183,22 @@ set -euo pipefail
 #   Analyze git history for clone-usable Python matched control repos.
 #
 # Input:
-#   repo_python/control_clone_usable_repos_main.csv
+#   repo_python/run-py-1i/python_control_clone_usable_repos_main.csv
 #
 # Clone dir:
 #   ../control-repos
 #
-# Full-run outputs:
-#   repo_python/control_did/ts_repos_monthly.csv
-#   repo_python/control_did/ts_contributors_monthly.csv
-#   repo_python/control_did/cursor_commits.csv
-#   repo_python/control_did/ai_adoption_dates.csv
-#   repo_python/control_did/run-py-1j_analyzed_repos_manifest.csv
+# Full-run main outputs:
+#   repo_python/run-py-1j/ts_repos_monthly.csv
+#   repo_python/run-py-1j/ts_contributors_monthly.csv
+#   repo_python/run-py-1j/cursor_commits.csv
+#   repo_python/run-py-1j/ai_adoption_dates.csv
+#
+# Full-run extra outputs:
+#   repo_python/tmp/run-py-1j/full/
 #
 # Smoke-run outputs:
-#   repo_python/control_did_smoke/
+#   repo_python/tmp/run-py-1j/smoke/
 #
 # Usage:
 #   Smoke test:
@@ -2054,21 +2207,31 @@ set -euo pipefail
 #   Full run:
 #     MAX_REPOS=0 NUM_PROCESSES=2 bash run-py-1j-analyze-control-repos.sh
 # ============================================================
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1j_analyze_control_repos_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_analyze_control_repos_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/analyze_repos_v2.py}"
 CACHE_CHECK_SCRIPT="${CACHE_CHECK_SCRIPT:-proc_scripts/check_cache_control_repos.py}"
 
-OUTPUT_ROOT="${OUTPUT_ROOT:-repo_python}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
 
-REPOS_FILE="${REPOS_FILE:-${OUTPUT_ROOT}/control_clone_usable_repos_main.csv}"
+REPOS_FILE="${REPOS_FILE:-${OUTPUT_BASE_DIR}/run-py-1i/python_control_clone_usable_repos_main.csv}"
 CLONE_DIR="${CLONE_DIR:-../control-repos}"
 
-FULL_OUTPUT_DIR="${FULL_OUTPUT_DIR:-${OUTPUT_ROOT}/control_did}"
-SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${OUTPUT_ROOT}/control_did_smoke}"
+FULL_OUTPUT_DIR="${FULL_OUTPUT_DIR:-${MAIN_OUTPUT_DIR}}"
+SMOKE_OUTPUT_DIR="${SMOKE_OUTPUT_DIR:-${TMP_DIR}/smoke/output}"
 
 AGGREGATION="${AGGREGATION:-month}"
 NUM_PROCESSES="${NUM_PROCESSES:-2}"
@@ -2079,30 +2242,36 @@ INCREMENTAL_IF_PARTIAL="${INCREMENTAL_IF_PARTIAL:-true}"
 FORCE_RERUN="${FORCE_RERUN:-false}"
 
 if [[ "${MAX_REPOS}" -gt 0 ]]; then
-  OUTPUT_DIR="${SMOKE_OUTPUT_DIR}"
+  OUTPUT_DIR="${OUTPUT_DIR:-${SMOKE_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_DIR}/smoke}"
 else
-  OUTPUT_DIR="${FULL_OUTPUT_DIR}"
+  OUTPUT_DIR="${OUTPUT_DIR:-${FULL_OUTPUT_DIR}}"
+  EXTRA_DIR="${EXTRA_DIR:-${TMP_DIR}/full}"
 fi
 
 REPO_TS_FILE="${OUTPUT_DIR}/ts_repos_${AGGREGATION}ly.csv"
 CONTRIB_TS_FILE="${OUTPUT_DIR}/ts_contributors_${AGGREGATION}ly.csv"
 CURSOR_COMMITS_FILE="${OUTPUT_DIR}/cursor_commits.csv"
 ADOPTION_FILE="${OUTPUT_DIR}/ai_adoption_dates.csv"
-MANIFEST_FILE="${OUTPUT_DIR}/run-py-1j_analyzed_repos_manifest.csv"
+MANIFEST_FILE="${MANIFEST_FILE:-${EXTRA_DIR}/${RUN_PREFIX}_analyzed_repos_manifest.csv}"
 
-MISSING_REPOS_FILE="${OUTPUT_DIR}/run-py-1j_missing_repos_${RUN_TS}.csv"
-TMP_OUTPUT_DIR="${OUTPUT_DIR}/_incremental_${RUN_TS}"
-
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+MISSING_REPOS_FILE="${MISSING_REPOS_FILE:-${EXTRA_DIR}/${RUN_PREFIX}_missing_repos_${RUN_TS}.csv}"
+TMP_OUTPUT_DIR="${TMP_OUTPUT_DIR:-${EXTRA_DIR}/incremental_${RUN_TS}}"
+CACHE_REPORT="${CACHE_REPORT:-${EXTRA_DIR}/${RUN_PREFIX}_cache_check_${RUN_TS}.txt}"
+ 
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${EXTRA_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
-echo "run-py-1j: analyze clone-usable control repositories" | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX}: analyze clone-usable control repositories" | tee -a "${LOG_FILE}"
 echo "Timestamp:              ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Script name:            ${SCRIPT_NAME}" | tee -a "${LOG_FILE}"
+echo "Run prefix:             ${RUN_PREFIX}" | tee -a "${LOG_FILE}"
 echo "Python script:          ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Cache check script:     ${CACHE_CHECK_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Repos file:             ${REPOS_FILE}" | tee -a "${LOG_FILE}"
 echo "Clone dir:              ${CLONE_DIR}" | tee -a "${LOG_FILE}"
-echo "Output dir:             ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Analysis output dir:    ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:       ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Aggregation:            ${AGGREGATION}" | tee -a "${LOG_FILE}"
 echo "Num processes:          ${NUM_PROCESSES}" | tee -a "${LOG_FILE}"
 echo "Max repos:              ${MAX_REPOS}" | tee -a "${LOG_FILE}"
@@ -2161,7 +2330,7 @@ RUN_MAX_REPOS="${MAX_REPOS}"
 CACHE_STATUS="run_full"
 
 if [[ "${MAX_REPOS}" -gt 0 ]]; then
-  RUN_REPOS_FILE="${OUTPUT_DIR}/control_repos_smoke_max${MAX_REPOS}.csv"
+  RUN_REPOS_FILE="${EXTRA_DIR}/control_repos_smoke_max${MAX_REPOS}.csv"
   RUN_MAX_REPOS="0"
 
   echo | tee -a "${LOG_FILE}"
@@ -2201,9 +2370,9 @@ if [[ "${FORCE_RERUN}" != "true" && "${SKIP_IF_COMPLETE}" == "true" ]]; then
     "${ADOPTION_FILE}" \
     "${MANIFEST_FILE}" \
     "${MISSING_REPOS_FILE}" \
-    2>&1 | tee "${OUTPUT_DIR}/run-py-1j_cache_check_${RUN_TS}.txt" | tee -a "${LOG_FILE}"
+    2>&1 | tee "${CACHE_REPORT}" | tee -a "${LOG_FILE}"
 
-  CACHE_STATUS="$(grep '^CACHE_STATUS=' "${OUTPUT_DIR}/run-py-1j_cache_check_${RUN_TS}.txt" | tail -1 | cut -d= -f2 || true)"
+  CACHE_STATUS="$(grep '^CACHE_STATUS=' "${CACHE_REPORT}" | tail -1 | cut -d= -f2 || true)"
 
   if [[ "${CACHE_STATUS}" == "complete" ]]; then
     echo | tee -a "${LOG_FILE}"
@@ -2351,9 +2520,10 @@ done
 
 echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
-echo "run-py-1j completed successfully." | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX} completed successfully." | tee -a "${LOG_FILE}"
 echo "Requested repos file: ${RUN_REPOS_FILE}" | tee -a "${LOG_FILE}"
-echo "Output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Analysis output dir: ${OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${EXTRA_DIR}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 #
@@ -2377,71 +2547,88 @@ set -euo pipefail
 #   evidence within the analysis window and recompute final matched
 #   control-pair coverage.
 #
-# Input:
-#   repo_python/control_clone_usable_repos_main.csv
-#   repo_python/matched_control_pairs_main_clone_usable.csv
-#   repo_python/control_did/ai_adoption_dates.csv
-#   repo_python/control_did/ts_repos_monthly.csv
-#   repo_python/control_did/ts_contributors_monthly.csv
+# Inputs:
+#   repo_python/run-py-1i/python_control_clone_usable_repos_main.csv
+#   repo_python/run-py-1i/python_matched_control_pairs_main_clone_usable.csv
+#   repo_python/run-py-1j/ai_adoption_dates.csv
+#   repo_python/run-py-1j/ts_repos_monthly.csv
+#   repo_python/run-py-1j/ts_contributors_monthly.csv
 #
-# Outputs:
-#   repo_python/control_local_cursor_evidence_in_window.csv
-#   repo_python/control_local_cursor_evidence_post_window.csv
-#   repo_python/control_clone_usable_repos_main_final_clean.csv
-#   repo_python/matched_control_pairs_main_final_clean.csv
-#   repo_python/matched_control_pairs_main_local_cursor_dropped.csv
-#   repo_python/control_pair_coverage_main_final_clean.csv
-#   repo_python/treatment_lost_all_controls_main_final_clean.csv
-#   repo_python/control_local_cursor_filter_summary_main.csv
-#   repo_python/matched_control_pairs_main_final_clean_1to3_only.csv
-#   repo_python/control_pair_coverage_main_final_clean_1to3_only.csv
-#   repo_python/control_did/ts_repos_monthly_final_clean.csv
-#   repo_python/control_did/ts_contributors_monthly_final_clean.csv
+# Main outputs:
+#   repo_python/run-py-1k/python_control_clone_usable_repos_main_final_clean.csv
+#   repo_python/run-py-1k/python_matched_control_pairs_main_final_clean.csv
+#   repo_python/run-py-1k/python_matched_control_pairs_main_final_clean_1to3_only.csv
+#   repo_python/run-py-1k/ts_repos_monthly_final_clean.csv
+#   repo_python/run-py-1k/ts_contributors_monthly_final_clean.csv
+#
+# Extra outputs:
+#   repo_python/tmp/run-py-1k/python_control_local_cursor_evidence_in_window.csv
+#   repo_python/tmp/run-py-1k/python_control_local_cursor_evidence_post_window.csv
+#   repo_python/tmp/run-py-1k/python_matched_control_pairs_main_local_cursor_dropped.csv
+#   repo_python/tmp/run-py-1k/python_control_pair_coverage_main_final_clean.csv
+#   repo_python/tmp/run-py-1k/python_treatment_lost_all_controls_main_final_clean.csv
+#   repo_python/tmp/run-py-1k/python_control_local_cursor_filter_summary_main.csv
+#   repo_python/tmp/run-py-1k/python_control_pair_coverage_main_final_clean_1to3_only.csv
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1k_filter_local_cursor_controls_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_filter_local_cursor_controls_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/filter_controls_by_local_cursor_evidence.py}"
 
 ANALYSIS_END="${ANALYSIS_END:-2025-08}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
-CONTROL_OUTPUT_DIR="${CONTROL_OUTPUT_DIR:-${OUTPUT_DIR}/control_did}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
 
-CONTROL_FILE="${CONTROL_FILE:-${OUTPUT_DIR}/control_clone_usable_repos_main.csv}"
-PAIR_FILE="${PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_clone_usable.csv}"
-ADOPTION_FILE="${ADOPTION_FILE:-${CONTROL_OUTPUT_DIR}/ai_adoption_dates.csv}"
+CONTROL_ANALYSIS_DIR="${CONTROL_ANALYSIS_DIR:-${OUTPUT_BASE_DIR}/run-py-1j}"
+CONTROL_FILE="${CONTROL_FILE:-${OUTPUT_BASE_DIR}/run-py-1i/python_control_clone_usable_repos_main.csv}"
+PAIR_FILE="${PAIR_FILE:-${OUTPUT_BASE_DIR}/run-py-1i/python_matched_control_pairs_main_clone_usable.csv}"
+ADOPTION_FILE="${ADOPTION_FILE:-${CONTROL_ANALYSIS_DIR}/ai_adoption_dates.csv}"
 
-CONTROL_TS_REPOS_FILE="${CONTROL_TS_REPOS_FILE:-${CONTROL_OUTPUT_DIR}/ts_repos_monthly.csv}"
-CONTROL_TS_CONTRIBUTORS_FILE="${CONTROL_TS_CONTRIBUTORS_FILE:-${CONTROL_OUTPUT_DIR}/ts_contributors_monthly.csv}"
+CONTROL_TS_REPOS_FILE="${CONTROL_TS_REPOS_FILE:-${CONTROL_ANALYSIS_DIR}/ts_repos_monthly.csv}"
+CONTROL_TS_CONTRIBUTORS_FILE="${CONTROL_TS_CONTRIBUTORS_FILE:-${CONTROL_ANALYSIS_DIR}/ts_contributors_monthly.csv}"
 
-IN_WINDOW_EVIDENCE_FILE="${IN_WINDOW_EVIDENCE_FILE:-${OUTPUT_DIR}/control_local_cursor_evidence_in_window.csv}"
-POST_WINDOW_EVIDENCE_FILE="${POST_WINDOW_EVIDENCE_FILE:-${OUTPUT_DIR}/control_local_cursor_evidence_post_window.csv}"
+IN_WINDOW_EVIDENCE_FILE="${IN_WINDOW_EVIDENCE_FILE:-${TMP_DIR}/python_control_local_cursor_evidence_in_window.csv}"
+POST_WINDOW_EVIDENCE_FILE="${POST_WINDOW_EVIDENCE_FILE:-${TMP_DIR}/python_control_local_cursor_evidence_post_window.csv}"
 
-FINAL_CONTROL_FILE="${FINAL_CONTROL_FILE:-${OUTPUT_DIR}/control_clone_usable_repos_main_final_clean.csv}"
-FINAL_PAIR_FILE="${FINAL_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_final_clean.csv}"
-DROPPED_PAIR_FILE="${DROPPED_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_local_cursor_dropped.csv}"
-COVERAGE_FILE="${COVERAGE_FILE:-${OUTPUT_DIR}/control_pair_coverage_main_final_clean.csv}"
-ZERO_CONTROL_TREATMENT_FILE="${ZERO_CONTROL_TREATMENT_FILE:-${OUTPUT_DIR}/treatment_lost_all_controls_main_final_clean.csv}"
-SUMMARY_FILE="${SUMMARY_FILE:-${OUTPUT_DIR}/control_local_cursor_filter_summary_main.csv}"
+FINAL_CONTROL_FILE="${FINAL_CONTROL_FILE:-${MAIN_OUTPUT_DIR}/python_control_clone_usable_repos_main_final_clean.csv}"
+FINAL_PAIR_FILE="${FINAL_PAIR_FILE:-${MAIN_OUTPUT_DIR}/python_matched_control_pairs_main_final_clean.csv}"
 
-STRICT_1TO3_PAIR_FILE="${STRICT_1TO3_PAIR_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_final_clean_1to3_only.csv}"
-STRICT_1TO3_COVERAGE_FILE="${STRICT_1TO3_COVERAGE_FILE:-${OUTPUT_DIR}/control_pair_coverage_main_final_clean_1to3_only.csv}"
+DROPPED_PAIR_FILE="${DROPPED_PAIR_FILE:-${TMP_DIR}/python_matched_control_pairs_main_local_cursor_dropped.csv}"
+COVERAGE_FILE="${COVERAGE_FILE:-${TMP_DIR}/python_control_pair_coverage_main_final_clean.csv}"
+ZERO_CONTROL_TREATMENT_FILE="${ZERO_CONTROL_TREATMENT_FILE:-${TMP_DIR}/python_treatment_lost_all_controls_main_final_clean.csv}"
+SUMMARY_FILE="${SUMMARY_FILE:-${TMP_DIR}/python_control_local_cursor_filter_summary_main.csv}"
 
-FINAL_CONTROL_TS_REPOS_FILE="${FINAL_CONTROL_TS_REPOS_FILE:-${CONTROL_OUTPUT_DIR}/ts_repos_monthly_final_clean.csv}"
-FINAL_CONTROL_TS_CONTRIBUTORS_FILE="${FINAL_CONTROL_TS_CONTRIBUTORS_FILE:-${CONTROL_OUTPUT_DIR}/ts_contributors_monthly_final_clean.csv}"
+STRICT_1TO3_PAIR_FILE="${STRICT_1TO3_PAIR_FILE:-${MAIN_OUTPUT_DIR}/python_matched_control_pairs_main_final_clean_1to3_only.csv}"
+STRICT_1TO3_COVERAGE_FILE="${STRICT_1TO3_COVERAGE_FILE:-${TMP_DIR}/python_control_pair_coverage_main_final_clean_1to3_only.csv}"
 
+FINAL_CONTROL_TS_REPOS_FILE="${FINAL_CONTROL_TS_REPOS_FILE:-${MAIN_OUTPUT_DIR}/ts_repos_monthly_final_clean.csv}"
+FINAL_CONTROL_TS_CONTRIBUTORS_FILE="${FINAL_CONTROL_TS_CONTRIBUTORS_FILE:-${MAIN_OUTPUT_DIR}/ts_contributors_monthly_final_clean.csv}"
+ 
 FAIL_IF_ZERO_CONTROL="${FAIL_IF_ZERO_CONTROL:-true}"
-
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CONTROL_OUTPUT_DIR}"
+ 
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
-echo "run-py-1k: filter controls with local Cursor evidence" | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX}: filter controls with local Cursor evidence" | tee -a "${LOG_FILE}"
 echo "Timestamp:                         ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Script name:                       ${SCRIPT_NAME}" | tee -a "${LOG_FILE}"
+echo "Run prefix:                        ${RUN_PREFIX}" | tee -a "${LOG_FILE}"
 echo "Python script:                     ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
 echo "Analysis end:                      ${ANALYSIS_END}" | tee -a "${LOG_FILE}"
+echo "Main output dir:                   ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir:                  ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Control file:                      ${CONTROL_FILE}" | tee -a "${LOG_FILE}"
 echo "Pair file:                         ${PAIR_FILE}" | tee -a "${LOG_FILE}"
 echo "Adoption file:                     ${ADOPTION_FILE}" | tee -a "${LOG_FILE}"
@@ -2535,13 +2722,16 @@ done
 
 echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
-echo "run-py-1k completed successfully." | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX} completed successfully." | tee -a "${LOG_FILE}"
 echo "Final control file: ${FINAL_CONTROL_FILE}" | tee -a "${LOG_FILE}"
 echo "Final pair file: ${FINAL_PAIR_FILE}" | tee -a "${LOG_FILE}"
 echo "Final coverage file: ${COVERAGE_FILE}" | tee -a "${LOG_FILE}"
 echo "Summary file: ${SUMMARY_FILE}" | tee -a "${LOG_FILE}"
+echo "Main output dir: ${MAIN_OUTPUT_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra output dir: ${TMP_DIR}" | tee -a "${LOG_FILE}"
 echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
+# 
 # This wrapper is adapted from the logic of run8d2-filter-local-cursor-controls.sh,
 # but it does NOT call the existing JS/TS shell wrapper.
 #
@@ -2555,104 +2745,162 @@ echo "============================================================" | tee -a "${
 set -euo pipefail
 
 # ============================================================
-# run-py-1l: Build final matched Python DiD event panels
+# run-py-1l: Build and summarize final matched Python DiD panels
 # ============================================================
 #
 # Purpose:
-#   Build final matched DiD panels for the Python experiment.
+#   1. Build flexible and strict matched Python DiD panels.
+#   2. Build window-driven versions of both panels.
+#   3. Summarize the panels and compare them with paper counts.
 #
-# Reused Python script:
+# Reused Python scripts:
 #   proc_scripts/prepare_panel_event_v2.py
+#   proc_scripts/summarize_matched_panels.py
 #
-# Inputs:
-#   1. Treatment metadata with event_month:
-#        repo_python/treatment_sample_main.csv
+# Main outputs:
+#   repo_python/run-py-1l/panel_event_matched_flexible.csv
+#   repo_python/run-py-1l/panel_event_matched_flexible_window_driven.csv
+#   repo_python/run-py-1l/panel_event_matched_strict.csv
+#   repo_python/run-py-1l/panel_event_matched_strict_window_driven.csv
 #
-#   2. Final clean treatment-control matched pairs:
-#        repo_python/matched_control_pairs_main_final_clean.csv
-#
-#   3. Strict 1:3 final clean treatment-control matched pairs:
-#        repo_python/matched_control_pairs_main_final_clean_1to3_only.csv
-#
-#   4. Treatment monthly git-history time series:
-#        repo_python/treatment_python_did/ts_repos_monthly.csv
-#
-#   5. Final clean control monthly git-history time series:
-#        repo_python/control_did/ts_repos_monthly_final_clean.csv
-#
-# Outputs:
-#   Main final-clean panels:
-#        repo_python/did_final/panel_event_matched_flexible.csv
-#        repo_python/did_final/panel_event_matched_flexible_window_driven.csv
-#
-#   Strict 1:3 final-clean panels:
-#        repo_python/did_final/panel_event_matched_strict.csv
-#        repo_python/did_final/panel_event_matched_strict_window_driven.csv
+# Extra QC outputs:
+#   repo_python/tmp/run-py-1l/qc/panel_qc_summary.csv
+#   repo_python/tmp/run-py-1l/qc/panel_qc_by_source.csv
+#   repo_python/tmp/run-py-1l/qc/panel_qc_paper_comparison.csv
+#   repo_python/tmp/run-py-1l/qc/panel_qc_attrition_summary.csv
+#   repo_python/tmp/run-py-1l/qc/panel_qc_dropped_by_strict.csv
+#   repo_python/tmp/run-py-1l/qc/panel_qc_notes.md
 #
 # Notes:
 #   - Controls remain never-treated units with event=NA.
 #   - PSM pairs are kept as provenance, not as pseudo-event assignments.
-#   - The balanced panel is window-completed by the panel builder.
-#   - This wrapper normalizes time-series columns if the analyzer writes
-#     "time" instead of "month".
+#   - Normalized time-series inputs are removed after the run by default.
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1l_build_matched_panel_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_build_and_summarize_matched_panels_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/prepare_panel_event_v2.py}"
+SUMMARY_SCRIPT="${SUMMARY_SCRIPT:-proc_scripts/summarize_matched_panels.py}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_python}"
-DID_DIR="${DID_DIR:-${OUTPUT_DIR}/did_final}"
-NORMALIZED_DIR="${NORMALIZED_DIR:-${DID_DIR}/_normalized_inputs_${RUN_TS}}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+QC_TMP_DIR="${QC_TMP_DIR:-${TMP_DIR}/qc}"
+DID_DIR="${DID_DIR:-${MAIN_OUTPUT_DIR}}"
+NORMALIZED_DIR="${NORMALIZED_DIR:-${TMP_DIR}/normalized_inputs_${RUN_TS}}"
+KEEP_NORMALIZED_INPUTS="${KEEP_NORMALIZED_INPUTS:-false}"
 
-TREATMENT_META="${TREATMENT_META:-${OUTPUT_DIR}/treatment_sample_main.csv}"
+resolve_single_input() {
+  local pattern="$1"
+  local label="$2"
+  local matches=()
 
-MAIN_PAIRS_FILE="${MAIN_PAIRS_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_final_clean.csv}"
-STRICT_PAIRS_FILE="${STRICT_PAIRS_FILE:-${OUTPUT_DIR}/matched_control_pairs_main_final_clean_1to3_only.csv}"
+  mapfile -t matches < <(compgen -G "${pattern}" | sort)
 
-TREATMENT_TS_RAW="${TREATMENT_TS_RAW:-${OUTPUT_DIR}/treatment_python_did/ts_repos_monthly.csv}"
-CONTROL_TS_RAW="${CONTROL_TS_RAW:-${OUTPUT_DIR}/control_did/ts_repos_monthly_final_clean.csv}"
+  if [[ "${#matches[@]}" -ne 1 ]]; then
+    echo "ERROR: expected exactly one ${label} matching: ${pattern}" >&2
+    if [[ "${#matches[@]}" -gt 0 ]]; then
+      printf '  %s\n' "${matches[@]}" >&2
+    fi
+    exit 1
+  fi
+
+  printf '%s\n' "${matches[0]}"
+}
+
+TREATMENT_META_PATTERN="${OUTPUT_BASE_DIR}/run-py-1f/treatment_python_sample_main_[0-9]*.csv"
+TREATMENT_MISSING_MATCHING_PATTERN="${OUTPUT_BASE_DIR}/tmp/run-py-1g/python_treatment_missing_matching_main_[0-9]*.csv"
+
+TREATMENT_META="${TREATMENT_META:-$(resolve_single_input "${TREATMENT_META_PATTERN}" "treatment metadata file")}"
+TREATMENT_MISSING_MATCHING="${TREATMENT_MISSING_MATCHING:-$(resolve_single_input "${TREATMENT_MISSING_MATCHING_PATTERN}" "missing-matching file")}"
+
+MAIN_PAIRS_FILE="${MAIN_PAIRS_FILE:-${OUTPUT_BASE_DIR}/run-py-1k/python_matched_control_pairs_main_final_clean.csv}"
+STRICT_PAIRS_FILE="${STRICT_PAIRS_FILE:-${OUTPUT_BASE_DIR}/run-py-1k/python_matched_control_pairs_main_final_clean_1to3_only.csv}"
+
+TREATMENT_TS_RAW="${TREATMENT_TS_RAW:-${OUTPUT_BASE_DIR}/treatment_python_did/ts_repos_monthly.csv}"
+CONTROL_TS_RAW="${CONTROL_TS_RAW:-${OUTPUT_BASE_DIR}/run-py-1k/ts_repos_monthly_final_clean.csv}"
 
 TREATMENT_TS="${TREATMENT_TS:-${NORMALIZED_DIR}/treatment_ts_repos_monthly.csv}"
 CONTROL_TS="${CONTROL_TS:-${NORMALIZED_DIR}/control_ts_repos_monthly.csv}"
 
 MAIN_OUTPUT_FILE="${MAIN_OUTPUT_FILE:-${DID_DIR}/panel_event_matched_flexible.csv}"
 MAIN_BALANCED_OUTPUT_FILE="${MAIN_BALANCED_OUTPUT_FILE:-${DID_DIR}/panel_event_matched_flexible_window_driven.csv}"
-
 STRICT_OUTPUT_FILE="${STRICT_OUTPUT_FILE:-${DID_DIR}/panel_event_matched_strict.csv}"
 STRICT_BALANCED_OUTPUT_FILE="${STRICT_BALANCED_OUTPUT_FILE:-${DID_DIR}/panel_event_matched_strict_window_driven.csv}"
 
-mkdir -p "${LOG_DIR}" "${DID_DIR}" "${NORMALIZED_DIR}"
+OUTPUT_SUMMARY="${OUTPUT_SUMMARY:-${QC_TMP_DIR}/panel_qc_summary.csv}"
+OUTPUT_BY_SOURCE="${OUTPUT_BY_SOURCE:-${QC_TMP_DIR}/panel_qc_by_source.csv}"
+OUTPUT_PAPER_COMPARISON="${OUTPUT_PAPER_COMPARISON:-${QC_TMP_DIR}/panel_qc_paper_comparison.csv}"
+OUTPUT_ATTRITION="${OUTPUT_ATTRITION:-${QC_TMP_DIR}/panel_qc_attrition_summary.csv}"
+OUTPUT_DROPPED_BY_STRICT="${OUTPUT_DROPPED_BY_STRICT:-${QC_TMP_DIR}/panel_qc_dropped_by_strict.csv}"
+OUTPUT_NOTES="${OUTPUT_NOTES:-${QC_TMP_DIR}/panel_qc_notes.md}"
+
+FINAL_COVERAGE="${FINAL_COVERAGE:-${OUTPUT_BASE_DIR}/tmp/run-py-1k/python_control_pair_coverage_main_final_clean.csv}"
+STRICT_COVERAGE="${STRICT_COVERAGE:-${OUTPUT_BASE_DIR}/tmp/run-py-1k/python_control_pair_coverage_main_final_clean_1to3_only.csv}"
+FINAL_CONTROLS="${FINAL_CONTROLS:-${OUTPUT_BASE_DIR}/run-py-1k/python_control_clone_usable_repos_main_final_clean.csv}"
+
+PAPER_TREATMENT_REPOS="${PAPER_TREATMENT_REPOS:-121}"
+PAPER_CONTROL_REPOS="${PAPER_CONTROL_REPOS:-127}"
+PAPER_TOTAL_OBSERVATIONS="${PAPER_TOTAL_OBSERVATIONS:-2461}"
+PAPER_POST_TREATMENT_OBSERVATIONS="${PAPER_POST_TREATMENT_OBSERVATIONS:-582}"
+
+cleanup_normalized_inputs() {
+  if [[ "${KEEP_NORMALIZED_INPUTS}" != "true" ]]; then
+    rm -rf "${NORMALIZED_DIR}"
+  fi
+}
+trap cleanup_normalized_inputs EXIT
+
+mkdir -p "${LOG_DIR}" "${DID_DIR}" "${QC_TMP_DIR}" "${NORMALIZED_DIR}"
 
 echo "============================================================" | tee "${LOG_FILE}"
-echo "run-py-1l: build final matched Python DiD event panels" | tee -a "${LOG_FILE}"
-echo "Timestamp:                    ${RUN_TS}" | tee -a "${LOG_FILE}"
-echo "Python script:                ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
-echo "Treatment metadata:           ${TREATMENT_META}" | tee -a "${LOG_FILE}"
-echo "Main pairs file:              ${MAIN_PAIRS_FILE}" | tee -a "${LOG_FILE}"
-echo "Strict 1:3 pairs file:        ${STRICT_PAIRS_FILE}" | tee -a "${LOG_FILE}"
-echo "Treatment time series raw:    ${TREATMENT_TS_RAW}" | tee -a "${LOG_FILE}"
-echo "Control time series raw:      ${CONTROL_TS_RAW}" | tee -a "${LOG_FILE}"
-echo "Treatment time series norm:   ${TREATMENT_TS}" | tee -a "${LOG_FILE}"
-echo "Control time series norm:     ${CONTROL_TS}" | tee -a "${LOG_FILE}"
-echo "DID output dir:               ${DID_DIR}" | tee -a "${LOG_FILE}"
-echo "Main output:                  ${MAIN_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Main balanced output:         ${MAIN_BALANCED_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Strict output:                ${STRICT_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Strict balanced output:       ${STRICT_BALANCED_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Log file:                     ${LOG_FILE}" | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX}: build and summarize final matched Python DiD panels" | tee -a "${LOG_FILE}"
+echo "Timestamp:                         ${RUN_TS}" | tee -a "${LOG_FILE}"
+echo "Script name:                       ${SCRIPT_NAME}" | tee -a "${LOG_FILE}"
+echo "Run prefix:                        ${RUN_PREFIX}" | tee -a "${LOG_FILE}"
+echo "Panel script:                      ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
+echo "Summary script:                    ${SUMMARY_SCRIPT}" | tee -a "${LOG_FILE}"
+echo "Main output dir:                   ${DID_DIR}" | tee -a "${LOG_FILE}"
+echo "Extra QC dir:                      ${QC_TMP_DIR}" | tee -a "${LOG_FILE}"
+echo "Treatment metadata:                ${TREATMENT_META}" | tee -a "${LOG_FILE}"
+echo "Treatment missing matching:        ${TREATMENT_MISSING_MATCHING}" | tee -a "${LOG_FILE}"
+echo "Main pairs file:                   ${MAIN_PAIRS_FILE}" | tee -a "${LOG_FILE}"
+echo "Strict 1:3 pairs file:             ${STRICT_PAIRS_FILE}" | tee -a "${LOG_FILE}"
+echo "Treatment time series raw:         ${TREATMENT_TS_RAW}" | tee -a "${LOG_FILE}"
+echo "Control time series raw:           ${CONTROL_TS_RAW}" | tee -a "${LOG_FILE}"
+echo "Flexible panel:                    ${MAIN_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "Strict panel:                      ${STRICT_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "QC output dir:                     ${QC_TMP_DIR}" | tee -a "${LOG_FILE}"
+echo "QC summary:                        ${OUTPUT_SUMMARY}" | tee -a "${LOG_FILE}"
+echo "Paper comparison:                  ${OUTPUT_PAPER_COMPARISON}" | tee -a "${LOG_FILE}"
+echo "QC notes:                          ${OUTPUT_NOTES}" | tee -a "${LOG_FILE}"
+echo "Keep normalized inputs:            ${KEEP_NORMALIZED_INPUTS}" | tee -a "${LOG_FILE}"
+echo "Log file:                          ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 echo | tee -a "${LOG_FILE}"
 
 for f in \
   "${PY_SCRIPT}" \
+  "${SUMMARY_SCRIPT}" \
   "${TREATMENT_META}" \
+  "${TREATMENT_MISSING_MATCHING}" \
   "${MAIN_PAIRS_FILE}" \
   "${STRICT_PAIRS_FILE}" \
   "${TREATMENT_TS_RAW}" \
-  "${CONTROL_TS_RAW}"
+  "${CONTROL_TS_RAW}" \
+  "${FINAL_COVERAGE}" \
+  "${STRICT_COVERAGE}" \
+  "${FINAL_CONTROLS}"
 do
   if [[ ! -f "${f}" ]]; then
     echo "ERROR: required file not found: ${f}" | tee -a "${LOG_FILE}"
@@ -2660,7 +2908,12 @@ do
   fi
 done
 
-echo "** Step 0: Normalize time-series input columns" | tee -a "${LOG_FILE}"
+echo "** Step 0: Compile Python scripts" | tee -a "${LOG_FILE}"
+echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
+python -m py_compile "${PY_SCRIPT}" "${SUMMARY_SCRIPT}" 2>&1 | tee -a "${LOG_FILE}"
+
+echo | tee -a "${LOG_FILE}"
+echo "** Step 1: Normalize time-series input columns" | tee -a "${LOG_FILE}"
 echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
 python - <<PY 2>&1 | tee -a "${LOG_FILE}"
@@ -2705,7 +2958,8 @@ normalize_ts("${TREATMENT_TS_RAW}", "${TREATMENT_TS}", "treatment_ts")
 normalize_ts("${CONTROL_TS_RAW}", "${CONTROL_TS}", "control_ts")
 PY
 
-echo "** Step 1: Check input schemas" | tee -a "${LOG_FILE}"
+echo | tee -a "${LOG_FILE}"
+echo "** Step 2: Check input schemas" | tee -a "${LOG_FILE}"
 echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
 python - <<PY 2>&1 | tee -a "${LOG_FILE}"
@@ -2749,7 +3003,7 @@ run_panel_builder() {
   local balanced_output_file="$4"
 
   echo | tee -a "${LOG_FILE}"
-  echo "** Step 2: Build ${label} panel" | tee -a "${LOG_FILE}"
+  echo "** Step 3: Build ${label} panel" | tee -a "${LOG_FILE}"
   echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
   CMD=(
@@ -2781,205 +3035,22 @@ run_panel_builder \
   "${STRICT_BALANCED_OUTPUT_FILE}"
 
 echo | tee -a "${LOG_FILE}"
-echo "** Output summary" | tee -a "${LOG_FILE}"
+echo "** Step 4: Summarize matched panels" | tee -a "${LOG_FILE}"
 echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
-python - <<PY 2>&1 | tee -a "${LOG_FILE}"
-import pandas as pd
-from pathlib import Path
-
-outputs = [
-    ("main_unbalanced", Path("${MAIN_OUTPUT_FILE}")),
-    ("main_balanced", Path("${MAIN_BALANCED_OUTPUT_FILE}")),
-    ("strict_1to3_unbalanced", Path("${STRICT_OUTPUT_FILE}")),
-    ("strict_1to3_balanced", Path("${STRICT_BALANCED_OUTPUT_FILE}")),
-]
-
-for label, path in outputs:
-    if not path.exists():
-        print(f"MISSING: {label}: {path}")
-        continue
-
-    df = pd.read_csv(path)
-
-    print(f"{label}: {path}")
-    print("  rows:", len(df))
-    print("  repos:", df["repo_name"].nunique() if "repo_name" in df.columns else "(missing repo_name)")
-
-    if "ever_treated" in df.columns:
-        print("  treated repos:", df.loc[df["ever_treated"].eq(1), "repo_name"].nunique())
-        print("  control repos:", df.loc[df["ever_treated"].eq(0), "repo_name"].nunique())
-
-    if "dataset_source" in df.columns:
-        print("  dataset_source counts:")
-        print(df["dataset_source"].value_counts(dropna=False).to_string())
-
-    if "time" in df.columns:
-        print("  time range:", df["time"].min(), "to", df["time"].max())
-    elif "month" in df.columns:
-        print("  month range:", df["month"].min(), "to", df["month"].max())
-
-    print()
-PY
-
-echo | tee -a "${LOG_FILE}"
-echo "============================================================" | tee -a "${LOG_FILE}"
-echo "run-py-1l completed successfully." | tee -a "${LOG_FILE}"
-echo "DID output dir: ${DID_DIR}" | tee -a "${LOG_FILE}"
-echo "Main output: ${MAIN_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Main balanced output: ${MAIN_BALANCED_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Strict output: ${STRICT_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Strict balanced output: ${STRICT_BALANCED_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
-echo "Log file: ${LOG_FILE}" | tee -a "${LOG_FILE}"
-echo "============================================================" | tee -a "${LOG_FILE}"
-#
-# This wrapper is adapted from the logic of run8e-build-jsts-matched-panel.sh,
-# but it does NOT call the existing JS/TS shell wrapper.
-#
-
-
-###############################################################################
-# FILE: run-py-1m-summarize-matched-panels.sh
-###############################################################################
-
-#!/usr/bin/env bash
-set -euo pipefail
-
-# ============================================================
-# run-py-1m: Summarize final Python matched DiD panels
-# ============================================================
-#
-# Purpose:
-#   Summarize the final Python matched DiD panels generated by run-py-1l.
-#
-# Current naming convention:
-#   1. flexible
-#      - Keeps treatments with 2 or 3 final controls.
-#      - Uses observed repo-month rows only.
-#
-#   2. strict
-#      - Keeps only treatments with exactly 3 final controls.
-#      - Uses observed repo-month rows only.
-#
-#   3. flexible_window_driven
-#      - Uses the flexible matched sample.
-#      - Completes the Jan 2024-Aug 2025 window.
-#
-#   4. strict_window_driven
-#      - Uses the strict matched sample.
-#      - Completes the Jan 2024-Aug 2025 window.
-#
-# Primary focus:
-#   repo_python/did_final/panel_event_matched_flexible.csv
-#   repo_python/did_final/panel_event_matched_strict.csv
-#
-# Diagnostic / downstream focus:
-#   repo_python/did_final/panel_event_matched_flexible_window_driven.csv
-#   repo_python/did_final/panel_event_matched_strict_window_driven.csv
-#
-# Outputs:
-#   repo_python/did_final/panel_qc_summary.csv
-#   repo_python/did_final/panel_qc_by_source.csv
-#   repo_python/did_final/panel_qc_paper_comparison.csv
-#   repo_python/did_final/panel_qc_attrition_summary.csv
-#   repo_python/did_final/panel_qc_dropped_by_strict.csv
-#   repo_python/did_final/panel_qc_notes.md
-# ============================================================
-
-LOG_DIR="${LOG_DIR:-logs}"
-RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-1m_summarize_matched_panels_${RUN_TS}.log}"
-
-PY_SCRIPT="${PY_SCRIPT:-proc_scripts/summarize_matched_panels.py}"
-
-DID_DIR="${DID_DIR:-repo_python/did_final}"
-
-FLEXIBLE_PANEL="${FLEXIBLE_PANEL:-${DID_DIR}/panel_event_matched_flexible.csv}"
-STRICT_PANEL="${STRICT_PANEL:-${DID_DIR}/panel_event_matched_strict.csv}"
-FLEXIBLE_WINDOW_DRIVEN_PANEL="${FLEXIBLE_WINDOW_DRIVEN_PANEL:-${DID_DIR}/panel_event_matched_flexible_window_driven.csv}"
-STRICT_WINDOW_DRIVEN_PANEL="${STRICT_WINDOW_DRIVEN_PANEL:-${DID_DIR}/panel_event_matched_strict_window_driven.csv}"
-
-OUTPUT_SUMMARY="${OUTPUT_SUMMARY:-${DID_DIR}/panel_qc_summary.csv}"
-OUTPUT_BY_SOURCE="${OUTPUT_BY_SOURCE:-${DID_DIR}/panel_qc_by_source.csv}"
-OUTPUT_PAPER_COMPARISON="${OUTPUT_PAPER_COMPARISON:-${DID_DIR}/panel_qc_paper_comparison.csv}"
-OUTPUT_ATTRITION="${OUTPUT_ATTRITION:-${DID_DIR}/panel_qc_attrition_summary.csv}"
-OUTPUT_DROPPED_BY_STRICT="${OUTPUT_DROPPED_BY_STRICT:-${DID_DIR}/panel_qc_dropped_by_strict.csv}"
-OUTPUT_NOTES="${OUTPUT_NOTES:-${DID_DIR}/panel_qc_notes.md}"
-
-TREATMENT_SAMPLE="${TREATMENT_SAMPLE:-repo_python/treatment_sample_main.csv}"
-TREATMENT_MISSING_MATCHING="${TREATMENT_MISSING_MATCHING:-repo_python/treatment_missing_matching_main.csv}"
-FINAL_COVERAGE="${FINAL_COVERAGE:-repo_python/control_pair_coverage_main_final_clean.csv}"
-STRICT_COVERAGE="${STRICT_COVERAGE:-repo_python/control_pair_coverage_main_final_clean_1to3_only.csv}"
-FINAL_CONTROLS="${FINAL_CONTROLS:-repo_python/control_clone_usable_repos_main_final_clean.csv}"
-
-PAPER_TREATMENT_REPOS="${PAPER_TREATMENT_REPOS:-121}"
-PAPER_CONTROL_REPOS="${PAPER_CONTROL_REPOS:-127}"
-PAPER_TOTAL_OBSERVATIONS="${PAPER_TOTAL_OBSERVATIONS:-2461}"
-PAPER_POST_TREATMENT_OBSERVATIONS="${PAPER_POST_TREATMENT_OBSERVATIONS:-582}"
-
-mkdir -p "${LOG_DIR}" "${DID_DIR}"
-
-echo "============================================================" | tee "${LOG_FILE}"
-echo "run-py-1m: summarize final Python matched DiD panels" | tee -a "${LOG_FILE}"
-echo "Timestamp:                         ${RUN_TS}" | tee -a "${LOG_FILE}"
-echo "Python script:                     ${PY_SCRIPT}" | tee -a "${LOG_FILE}"
-echo "DID dir:                           ${DID_DIR}" | tee -a "${LOG_FILE}"
-echo "Flexible panel:                    ${FLEXIBLE_PANEL}" | tee -a "${LOG_FILE}"
-echo "Strict panel:                      ${STRICT_PANEL}" | tee -a "${LOG_FILE}"
-echo "Flexible window-driven panel:      ${FLEXIBLE_WINDOW_DRIVEN_PANEL}" | tee -a "${LOG_FILE}"
-echo "Strict window-driven panel:        ${STRICT_WINDOW_DRIVEN_PANEL}" | tee -a "${LOG_FILE}"
-echo "Output summary:                    ${OUTPUT_SUMMARY}" | tee -a "${LOG_FILE}"
-echo "Output by-source:                  ${OUTPUT_BY_SOURCE}" | tee -a "${LOG_FILE}"
-echo "Output paper comparison:           ${OUTPUT_PAPER_COMPARISON}" | tee -a "${LOG_FILE}"
-echo "Output attrition:                  ${OUTPUT_ATTRITION}" | tee -a "${LOG_FILE}"
-echo "Output dropped by strict:          ${OUTPUT_DROPPED_BY_STRICT}" | tee -a "${LOG_FILE}"
-echo "Output notes:                      ${OUTPUT_NOTES}" | tee -a "${LOG_FILE}"
-echo "Paper treatment repos:             ${PAPER_TREATMENT_REPOS}" | tee -a "${LOG_FILE}"
-echo "Paper control repos:               ${PAPER_CONTROL_REPOS}" | tee -a "${LOG_FILE}"
-echo "Paper total observations:          ${PAPER_TOTAL_OBSERVATIONS}" | tee -a "${LOG_FILE}"
-echo "Paper post-treatment observations: ${PAPER_POST_TREATMENT_OBSERVATIONS}" | tee -a "${LOG_FILE}"
-echo "Log file:                          ${LOG_FILE}" | tee -a "${LOG_FILE}"
-echo "============================================================" | tee -a "${LOG_FILE}"
-echo | tee -a "${LOG_FILE}"
-
-for f in \
-  "${PY_SCRIPT}" \
-  "${FLEXIBLE_PANEL}" \
-  "${STRICT_PANEL}" \
-  "${FLEXIBLE_WINDOW_DRIVEN_PANEL}" \
-  "${STRICT_WINDOW_DRIVEN_PANEL}" \
-  "${TREATMENT_SAMPLE}" \
-  "${FINAL_COVERAGE}" \
-  "${STRICT_COVERAGE}" \
-  "${FINAL_CONTROLS}"
-do
-  if [[ ! -f "${f}" ]]; then
-    echo "ERROR: required file not found: ${f}" | tee -a "${LOG_FILE}"
-    exit 1
-  fi
-done
-
-echo "** Compile Python script" | tee -a "${LOG_FILE}"
-echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
-python -m py_compile "${PY_SCRIPT}" 2>&1 | tee -a "${LOG_FILE}"
-
-echo | tee -a "${LOG_FILE}"
-echo "** Run panel summarizer" | tee -a "${LOG_FILE}"
-echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
-
-CMD=(
-  python "${PY_SCRIPT}"
-  --flexible-panel "${FLEXIBLE_PANEL}"
-  --strict-panel "${STRICT_PANEL}"
-  --flexible-window-driven-panel "${FLEXIBLE_WINDOW_DRIVEN_PANEL}"
-  --strict-window-driven-panel "${STRICT_WINDOW_DRIVEN_PANEL}"
+SUMMARY_CMD=(
+  python "${SUMMARY_SCRIPT}"
+  --flexible-panel "${MAIN_OUTPUT_FILE}"
+  --strict-panel "${STRICT_OUTPUT_FILE}"
+  --flexible-window-driven-panel "${MAIN_BALANCED_OUTPUT_FILE}"
+  --strict-window-driven-panel "${STRICT_BALANCED_OUTPUT_FILE}"
   --output-summary "${OUTPUT_SUMMARY}"
   --output-by-source "${OUTPUT_BY_SOURCE}"
   --output-paper-comparison "${OUTPUT_PAPER_COMPARISON}"
   --output-attrition "${OUTPUT_ATTRITION}"
   --output-dropped-by-strict "${OUTPUT_DROPPED_BY_STRICT}"
   --output-notes "${OUTPUT_NOTES}"
-  --treatment-sample "${TREATMENT_SAMPLE}"
+  --treatment-sample "${TREATMENT_META}"
   --treatment-missing-matching "${TREATMENT_MISSING_MATCHING}"
   --final-coverage "${FINAL_COVERAGE}"
   --strict-coverage "${STRICT_COVERAGE}"
@@ -2990,22 +3061,25 @@ CMD=(
   --paper-post-treatment-observations "${PAPER_POST_TREATMENT_OBSERVATIONS}"
 )
 
-echo "${CMD[*]}" | tee -a "${LOG_FILE}"
+echo "${SUMMARY_CMD[*]}" | tee -a "${LOG_FILE}"
 echo | tee -a "${LOG_FILE}"
-
-"${CMD[@]}" 2>&1 | tee -a "${LOG_FILE}"
+"${SUMMARY_CMD[@]}" 2>&1 | tee -a "${LOG_FILE}"
 
 echo | tee -a "${LOG_FILE}"
-echo "** Output file check" | tee -a "${LOG_FILE}"
+echo "** Step 5: Output file check" | tee -a "${LOG_FILE}"
 echo "------------------------------------------------------------" | tee -a "${LOG_FILE}"
 
 for f in \
+  "${MAIN_OUTPUT_FILE}" \
+  "${MAIN_BALANCED_OUTPUT_FILE}" \
+  "${STRICT_OUTPUT_FILE}" \
+  "${STRICT_BALANCED_OUTPUT_FILE}" \
   "${OUTPUT_SUMMARY}" \
-  "${OUTPUT_BY_SOURCE}" \
   "${OUTPUT_PAPER_COMPARISON}" \
+  "${OUTPUT_NOTES}" \
+  "${OUTPUT_BY_SOURCE}" \
   "${OUTPUT_ATTRITION}" \
-  "${OUTPUT_DROPPED_BY_STRICT}" \
-  "${OUTPUT_NOTES}"
+  "${OUTPUT_DROPPED_BY_STRICT}"
 do
   if [[ -f "${f}" ]]; then
     echo "Command: wc -l ${f}" | tee -a "${LOG_FILE}"
@@ -3017,14 +3091,19 @@ done
 
 echo | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
-echo "run-py-1m completed successfully." | tee -a "${LOG_FILE}"
-echo "Summary file:          ${OUTPUT_SUMMARY}" | tee -a "${LOG_FILE}"
-echo "Paper comparison file: ${OUTPUT_PAPER_COMPARISON}" | tee -a "${LOG_FILE}"
-echo "Notes file:            ${OUTPUT_NOTES}" | tee -a "${LOG_FILE}"
-echo "Log file:              ${LOG_FILE}" | tee -a "${LOG_FILE}"
+echo "${RUN_PREFIX} completed successfully." | tee -a "${LOG_FILE}"
+echo "Flexible panel:   ${MAIN_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "Strict panel:     ${STRICT_OUTPUT_FILE}" | tee -a "${LOG_FILE}"
+echo "QC summary:       ${OUTPUT_SUMMARY}" | tee -a "${LOG_FILE}"
+echo "Paper comparison: ${OUTPUT_PAPER_COMPARISON}" | tee -a "${LOG_FILE}"
+echo "QC notes:         ${OUTPUT_NOTES}" | tee -a "${LOG_FILE}"
+echo "Main output dir:  ${DID_DIR}" | tee -a "${LOG_FILE}"
+echo "QC output dir:    ${QC_TMP_DIR}" | tee -a "${LOG_FILE}"
+echo "Log file:         ${LOG_FILE}" | tee -a "${LOG_FILE}"
 echo "============================================================" | tee -a "${LOG_FILE}"
 #
-# This wrapper is adapted from the logic of run8e2-summarize-jsts-panels.sh,
+# This wrapper is adapted from the logic of run8e-build-jsts-matched-panel.sh,
+# and run8e2-summarize-jsts-panels.sh,
 # but it does NOT call the existing JS/TS shell wrapper.
 
 
@@ -3043,24 +3122,25 @@ set -euo pipefail
 #   Create treatment/control SonarQube scan input files from the
 #   final Python matched DiD panels.
 #
-# Current naming convention:
+# Panel inputs:
 #   flexible:
-#     repo_python/did_final/panel_event_matched_flexible.csv
+#     repo_python/run-py-1l/panel_event_matched_flexible.csv
 #
 #   strict:
-#     repo_python/did_final/panel_event_matched_strict.csv
+#     repo_python/run-py-1l/panel_event_matched_strict.csv
 #
-# Primary focus:
-#   PANEL_VARIANT=flexible
-#   PANEL_VARIANT=strict
+# Full-run main outputs:
+#   repo_python/run-py-2a/<variant>/treatment/data/ts_repos_monthly.csv
+#   repo_python/run-py-2a/<variant>/control/data/ts_repos_monthly.csv
 #
-# Outputs:
-#   repo_python/sonarqube_input/<variant>/treatment/data/ts_repos_monthly.csv
-#   repo_python/sonarqube_input/<variant>/control/data/ts_repos_monthly.csv
-#   repo_python/sonarqube_input/<variant>/months.txt
-#   repo_python/sonarqube_input/<variant>/treatment_repos.txt
-#   repo_python/sonarqube_input/<variant>/control_repos.txt
-#   repo_python/sonarqube_input/<variant>/sonarqube_input_summary.csv
+# Full-run extra outputs:
+#   repo_python/tmp/run-py-2a/<variant>/months.txt
+#   repo_python/tmp/run-py-2a/<variant>/treatment_repos.txt
+#   repo_python/tmp/run-py-2a/<variant>/control_repos.txt
+#   repo_python/tmp/run-py-2a/<variant>/sonarqube_input_summary.csv
+#
+# Smoke outputs:
+#   repo_python/tmp/run-py-2a/smoke/<variant>/
 #
 # Usage:
 #   Smoke:
@@ -3072,13 +3152,25 @@ set -euo pipefail
 #     PANEL_VARIANT=strict   MAX_TREATMENT_REPOS=0 MAX_CONTROL_REPOS=0 bash run-py-2a-create-sonarqube-input.sh
 # ============================================================
 
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/prepare_sonarqube_input.py}"
 HISTORY_SCRIPT="${HISTORY_SCRIPT:-proc_scripts/create_tmp_repo_timeseries_history.py}"
 
-DID_DIR="${DID_DIR:-repo_python/did_final}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+
+DID_DIR="${DID_DIR:-${OUTPUT_BASE_DIR}/run-py-1l}"
 PANEL_VARIANT="${PANEL_VARIANT:-flexible}"
 
 case "${PANEL_VARIANT}" in
@@ -3095,40 +3187,58 @@ case "${PANEL_VARIANT}" in
     ;;
 esac
 
-SONAR_ROOT="${SONAR_ROOT:-repo_python/sonarqube_input/${PANEL_VARIANT}}"
-
 TREATMENT_CLONE_ROOT="${TREATMENT_CLONE_ROOT:-../treatment-repos}"
 CONTROL_CLONE_ROOT="${CONTROL_CLONE_ROOT:-../control-repos}"
-
-TREATMENT_TS_FILE="${TREATMENT_TS_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly.csv}"
-CONTROL_TS_FILE="${CONTROL_TS_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly.csv}"
-
-MONTHS_FILE="${MONTHS_FILE:-${SONAR_ROOT}/months.txt}"
-TREATMENT_REPOS_FILE="${TREATMENT_REPOS_FILE:-${SONAR_ROOT}/treatment_repos.txt}"
-CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${SONAR_ROOT}/control_repos.txt}"
-SUMMARY_FILE="${SUMMARY_FILE:-${SONAR_ROOT}/sonarqube_input_summary.csv}"
 
 MAX_TREATMENT_REPOS="${MAX_TREATMENT_REPOS:-0}"
 MAX_CONTROL_REPOS="${MAX_CONTROL_REPOS:-0}"
 ALLOW_MISSING_LATEST_COMMIT="${ALLOW_MISSING_LATEST_COMMIT:-false}"
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2a_create_sonarqube_input_${PANEL_VARIANT}_${RUN_TS}.log}"
+if [[ "${MAX_TREATMENT_REPOS}" -gt 0 || "${MAX_CONTROL_REPOS}" -gt 0 ]]; then
+  RUN_MODE="smoke"
+  DEFAULT_SONAR_ROOT="${TMP_DIR}/smoke/${PANEL_VARIANT}"
+  DEFAULT_META_DIR="${DEFAULT_SONAR_ROOT}/meta"
+else
+  RUN_MODE="full"
+  DEFAULT_SONAR_ROOT="${MAIN_OUTPUT_DIR}/${PANEL_VARIANT}"
+  DEFAULT_META_DIR="${TMP_DIR}/${PANEL_VARIANT}"
+fi
+
+SONAR_ROOT="${SONAR_ROOT:-${DEFAULT_SONAR_ROOT}}"
+META_DIR="${META_DIR:-${DEFAULT_META_DIR}}"
+
+TREATMENT_TS_FILE="${TREATMENT_TS_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly.csv}"
+CONTROL_TS_FILE="${CONTROL_TS_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly.csv}"
+
+MONTHS_FILE="${MONTHS_FILE:-${META_DIR}/months.txt}"
+TREATMENT_REPOS_FILE="${TREATMENT_REPOS_FILE:-${META_DIR}/treatment_repos.txt}"
+CONTROL_REPOS_FILE="${CONTROL_REPOS_FILE:-${META_DIR}/control_repos.txt}"
+SUMMARY_FILE="${SUMMARY_FILE:-${META_DIR}/sonarqube_input_summary.csv}"
+
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_create_sonarqube_input_${PANEL_VARIANT}_${RUN_TS}.log}"
 
 mkdir -p \
   "${LOG_DIR}" \
   "${SONAR_ROOT}" \
+  "${META_DIR}" \
   "$(dirname "${TREATMENT_TS_FILE}")" \
   "$(dirname "${CONTROL_TS_FILE}")"
 
 {
   echo "============================================================"
-  echo "run-py-2a: create Python SonarQube scan inputs"
+  echo "${RUN_PREFIX}: create Python SonarQube scan inputs"
   echo "Timestamp:                    ${RUN_TS}"
+  echo "Script name:                  ${SCRIPT_NAME}"
+  echo "Run prefix:                   ${RUN_PREFIX}"
+  echo "Run mode:                     ${RUN_MODE}"
   echo "Panel variant:                ${PANEL_VARIANT}"
   echo "Python script:                ${PY_SCRIPT}"
   echo "History script:               ${HISTORY_SCRIPT}"
   echo "Panel file:                   ${PANEL_FILE}"
   echo "Sonar root:                   ${SONAR_ROOT}"
+  echo "Metadata dir:                 ${META_DIR}"
+  echo "Main output dir:              ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:             ${TMP_DIR}"
   echo "Treatment clone root:         ${TREATMENT_CLONE_ROOT}"
   echo "Control clone root:           ${CONTROL_CLONE_ROOT}"
   echo "Treatment output:             ${TREATMENT_TS_FILE}"
@@ -3242,11 +3352,14 @@ PY
 
   echo
   echo "============================================================"
-  echo "run-py-2a completed successfully."
+  echo "${RUN_PREFIX} completed successfully."
+  echo "Run mode:        ${RUN_MODE}"
   echo "Panel variant:   ${PANEL_VARIANT}"
   echo "Treatment input: ${TREATMENT_TS_FILE}"
   echo "Control input:   ${CONTROL_TS_FILE}"
   echo "Summary file:    ${SUMMARY_FILE}"
+  echo "Main output dir: ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:${TMP_DIR}"
   echo "Log file:        ${LOG_FILE}"
   echo "============================================================"
 
@@ -3254,38 +3367,6 @@ PY
 #
 # This wrapper is adapted from the logic of run9a-create-jsts-sonarqube-input.sh,
 # but it does NOT call the existing JS/TS shell wrapper.
-
-
-###############################################################################
-# FILE: run-py-2b1-sonarqube-treatment.sh
-###############################################################################
-
-#!/usr/bin/env bash
-set -euo pipefail
-
-# Run Python SonarQube scan for treatment repo-month inputs.
-# Use PANEL_VARIANT=flexible or PANEL_VARIANT=strict.
-# Usage:
-#    PANEL_VARIANT=strict   NUM_PROCESSES=1 bash run-py-2b1-sonarqube-treatment.sh
-#    PANEL_VARIANT=flexible NUM_PROCESSES=1 bash run-py-2b1-sonarqube-treatment.sh
-
-LANGUAGE_PROFILE=python TARGET=treatment bash ./run-py-2b-sonarqube-scan.sh
-
-
-###############################################################################
-# FILE: run-py-2b2-sonarqube-control.sh
-###############################################################################
-
-#!/usr/bin/env bash
-set -euo pipefail
-
-# Run Python SonarQube scan for control repo-month inputs.
-# Use PANEL_VARIANT=flexible or PANEL_VARIANT=strict.
-# Usage:
-#       PANEL_VARIANT=strict    NUM_PROCESSES=1 bash run-py-2b2-sonarqube-control.sh
-#       PANEL_VARIANT=flexible  NUM_PROCESSES=1 bash run-py-2b2-sonarqube-control.sh
-# 
-LANGUAGE_PROFILE=python TARGET=control bash ./run-py-2b-sonarqube-scan.sh
 
 
 ###############################################################################
@@ -3303,27 +3384,32 @@ set -euo pipefail
 #   Run SonarQube scans for Python treatment/control repo-month
 #   input files generated by run-py-2a-create-sonarqube-input.sh.
 #
-# Current naming convention:
-#   PANEL_VARIANT=flexible
-#     repo_python/sonarqube_input/flexible/
-#
-#   PANEL_VARIANT=strict
-#     repo_python/sonarqube_input/strict/
+# Inputs:
+#   repo_python/run-py-2a/<variant>/<target>/data/ts_repos_monthly.csv
 #
 # Target:
 #   TARGET=treatment
 #   TARGET=control
 #
-# Outputs:
-#   repo_python/sonarqube_input/<variant>/<target>/data/ts_repos_monthly_scanned.csv
+# Main output:
+#   repo_python/run-py-2b/<variant>/<target>/ts_repos_monthly_scanned.csv
+#
+# Reuse:
+#   Copy a previously verified scanned CSV to the main output path,
+#   then run with SKIP_SCAN=true to validate and reuse it.
 #
 # Usage:
 #   Smoke or full depends on the input generated by run-py-2a.
 #
-#   PANEL_VARIANT=flexible TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
-#   PANEL_VARIANT=flexible TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 #   PANEL_VARIANT=strict   TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 #   PANEL_VARIANT=strict   TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   PANEL_VARIANT=flexible TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   PANEL_VARIANT=flexible TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+# 
+#   SKIP_SCAN=true PANEL_VARIANT=strict TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   SKIP_SCAN=true PANEL_VARIANT=strict TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   SKIP_SCAN=true PANEL_VARIANT=flexible TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   SKIP_SCAN=true PANEL_VARIANT=flexible TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 # ============================================================
 
 TARGET="${TARGET:-treatment}"
@@ -3331,6 +3417,15 @@ PANEL_VARIANT="${PANEL_VARIANT:-flexible}"
 LANGUAGE_PROFILE="${LANGUAGE_PROFILE:-python}"
 PROJECT_KEY_PREFIX="${PROJECT_KEY_PREFIX:-}"
 OUTPUT_SUFFIX="${OUTPUT_SUFFIX:-}"
+SKIP_SCAN="${SKIP_SCAN:-false}"
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
 
 if [[ "${TARGET}" != "treatment" && "${TARGET}" != "control" ]]; then
   echo "ERROR: TARGET must be either 'treatment' or 'control'. Got: ${TARGET}"
@@ -3342,76 +3437,61 @@ if [[ "${PANEL_VARIANT}" != "flexible" && "${PANEL_VARIANT}" != "strict" ]]; the
   exit 1
 fi
 
+if [[ "${SKIP_SCAN}" != "true" && "${SKIP_SCAN}" != "false" ]]; then
+  echo "ERROR: SKIP_SCAN must be true or false. Got: ${SKIP_SCAN}"
+  exit 1
+fi
+
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2b_sonarqube_${PANEL_VARIANT}_${TARGET}_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_sonarqube_${PANEL_VARIANT}_${TARGET}_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/run_sonarqube_v2.py}"
 
-SONAR_ROOT="${SONAR_ROOT:-repo_python/sonarqube_input/${PANEL_VARIANT}}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+INPUT_ROOT="${INPUT_ROOT:-${OUTPUT_BASE_DIR}/run-py-2a/${PANEL_VARIANT}}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}/${PANEL_VARIANT}/${TARGET}}"
 
 NUM_PROCESSES="${NUM_PROCESSES:-1}"
 AGGREGATION="${AGGREGATION:-month}"
 
+INPUT_FILE="${INPUT_FILE:-${INPUT_ROOT}/${TARGET}/data/ts_repos_monthly.csv}"
+
+if [[ -n "${OUTPUT_SUFFIX}" ]]; then
+  OUTPUT_FILE="${OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/ts_repos_monthly_scanned_${OUTPUT_SUFFIX}.csv}"
+else
+  OUTPUT_FILE="${OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/ts_repos_monthly_scanned.csv}"
+fi
+
 if [[ "${TARGET}" == "treatment" ]]; then
-  INPUT_FILE="${INPUT_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly.csv}"
-  if [[ -n "${OUTPUT_SUFFIX}" ]]; then
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly_scanned_${OUTPUT_SUFFIX}.csv}"
-  else
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/treatment/data/ts_repos_monthly_scanned.csv}"
-  fi
   CLONE_DIR="${CLONE_DIR:-../treatment-repos}"
 else
-  INPUT_FILE="${INPUT_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly.csv}"
-  if [[ -n "${OUTPUT_SUFFIX}" ]]; then
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly_scanned_${OUTPUT_SUFFIX}.csv}"
-  else
-    OUTPUT_FILE="${OUTPUT_FILE:-${SONAR_ROOT}/control/data/ts_repos_monthly_scanned.csv}"
-  fi
   CLONE_DIR="${CLONE_DIR:-../control-repos}"
 fi
 
-mkdir -p "${LOG_DIR}" "$(dirname "${OUTPUT_FILE}")"
-
-# Load SonarQube configuration from .env when available.
-# run_sonarqube_v2.py expects SONAR_PATH and SONAR_TOKEN.
-# For backward compatibility, map SONAR_SCANNER_PATH to SONAR_PATH.
-if [[ -f ".env" ]]; then
-  set -a
-  source ".env"
-  set +a
-fi
-
-if [[ -z "${SONAR_PATH:-}" && -n "${SONAR_SCANNER_PATH:-}" ]]; then
-  export SONAR_PATH="${SONAR_SCANNER_PATH}"
-fi
-
-# If SONAR_PATH points to the scanner installation directory,
-# normalize it to the sonar-scanner executable.
-if [[ -n "${SONAR_PATH:-}" && -d "${SONAR_PATH}" && -x "${SONAR_PATH}/bin/sonar-scanner" ]]; then
-  export SONAR_PATH="${SONAR_PATH}/bin/sonar-scanner"
-fi
-
-# Keep both variable names synchronized because older/newer scripts may read either one.
-export SONAR_PATH
-export SONAR_SCANNER_PATH="${SONAR_PATH}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}"
 
 {
   echo "============================================================"
-  echo "run-py-2b: Python SonarQube scan"
-  echo "Started:       $(date)"
-  echo "Panel variant: ${PANEL_VARIANT}"
-  echo "Target:        ${TARGET}"
-  echo "Python script: ${PY_SCRIPT}"
-  echo "Aggregation:   ${AGGREGATION}"
-  echo "Input file:    ${INPUT_FILE}"
-  echo "Output file:   ${OUTPUT_FILE}"
-  echo "Clone dir:     ${CLONE_DIR}"
-  echo "Language:      ${LANGUAGE_PROFILE}"
-  echo "Project prefix:${PROJECT_KEY_PREFIX}"
-  echo "Output suffix: ${OUTPUT_SUFFIX}"
-  echo "Num processes: ${NUM_PROCESSES}"
-  echo "Log file:      ${LOG_FILE}"
+  echo "${RUN_PREFIX}: Python SonarQube scan"
+  echo "Started:         $(date)"
+  echo "Script name:     ${SCRIPT_NAME}"
+  echo "Run prefix:      ${RUN_PREFIX}"
+  echo "Panel variant:   ${PANEL_VARIANT}"
+  echo "Target:          ${TARGET}"
+  echo "Python script:   ${PY_SCRIPT}"
+  echo "Aggregation:     ${AGGREGATION}"
+  echo "Input root:      ${INPUT_ROOT}"
+  echo "Input file:      ${INPUT_FILE}"
+  echo "Main output dir: ${MAIN_OUTPUT_DIR}"
+  echo "Output file:     ${OUTPUT_FILE}"
+  echo "Clone dir:       ${CLONE_DIR}"
+  echo "Language:        ${LANGUAGE_PROFILE}"
+  echo "Project prefix:  ${PROJECT_KEY_PREFIX}"
+  echo "Output suffix:   ${OUTPUT_SUFFIX}"
+  echo "Skip scan:       ${SKIP_SCAN}"
+  echo "Num processes:   ${NUM_PROCESSES}"
+  echo "Log file:        ${LOG_FILE}"
   echo "============================================================"
   echo
 
@@ -3429,29 +3509,6 @@ export SONAR_SCANNER_PATH="${SONAR_PATH}"
     echo "ERROR: clone dir not found: ${CLONE_DIR}"
     exit 1
   fi
-
-  if [[ -z "${SONAR_PATH:-}" ]]; then
-    echo "ERROR: SONAR_PATH is not set."
-    echo "       Add SONAR_PATH=/path/to/sonar-scanner to .env,"
-    echo "       or set SONAR_SCANNER_PATH and let this wrapper map it to SONAR_PATH."
-    exit 1
-  fi
-
-  if [[ -z "${SONAR_TOKEN:-}" ]]; then
-    echo "ERROR: SONAR_TOKEN is not set."
-    echo "       Add SONAR_TOKEN to .env or export it in the shell."
-    exit 1
-  fi
-
-  if [[ ! -x "${SONAR_PATH}" ]]; then
-    echo "ERROR: SONAR_PATH is not executable: ${SONAR_PATH}"
-    echo "       It should point to the sonar-scanner executable, for example:"
-    echo "       /path/to/sonar-scanner/bin/sonar-scanner"
-    exit 1
-  fi
-
-  echo "Sonar scanner: ${SONAR_PATH}"
-  echo "Sonar token:   set"
 
   echo "** Compile Python script"
   echo "------------------------------------------------------------"
@@ -3481,25 +3538,141 @@ print("duplicate repo-month rows:", df.duplicated(["repo_name", "month"]).sum())
 PY
 
   echo
-  echo "** Running SonarQube scanner"
-  echo "------------------------------------------------------------"
+  if [[ "${SKIP_SCAN}" == "true" ]]; then
+    echo "** Validate and reuse existing scanned output"
+    echo "------------------------------------------------------------"
 
-  CMD=(
-    python "${PY_SCRIPT}"
-    --aggregation "${AGGREGATION}"
-    --input-file "${INPUT_FILE}"
-    --output-file "${OUTPUT_FILE}"
-    --clone-dir "${CLONE_DIR}"
-    --num-processes "${NUM_PROCESSES}"
-    --language-profile "${LANGUAGE_PROFILE}"
-    --project-key-prefix "${PROJECT_KEY_PREFIX}"
-    --incremental-save
-  )
+    if [[ ! -f "${OUTPUT_FILE}" ]]; then
+      echo "ERROR: SKIP_SCAN=true but output file not found: ${OUTPUT_FILE}"
+      exit 1
+    fi
 
-  echo "${CMD[*]}"
-  echo
+    python - <<PY
+import pandas as pd
+from pathlib import Path
 
-  "${CMD[@]}"
+input_path = Path("${INPUT_FILE}")
+output_path = Path("${OUTPUT_FILE}")
+
+input_df = pd.read_csv(input_path)
+output_df = pd.read_csv(output_path)
+
+repo_month_cols = ["repo_name", "month"]
+match_cols = ["repo_name", "month", "latest_commit"]
+required_input = set(match_cols)
+missing_input_cols = required_input - set(input_df.columns)
+if missing_input_cols:
+    raise SystemExit(
+        f"ERROR: input missing required columns: {sorted(missing_input_cols)}"
+    )
+
+missing_output_cols = set(match_cols) - set(output_df.columns)
+if missing_output_cols:
+    raise SystemExit(
+        f"ERROR: reused output missing matching columns: {sorted(missing_output_cols)}"
+    )
+
+metric_candidates = {
+    "ncloc",
+    "bugs",
+    "vulnerabilities",
+    "code_smells",
+    "duplicated_lines_density",
+    "comment_lines_density",
+    "cognitive_complexity",
+    "technical_debt",
+    "software_quality_maintainability_remediation_effort",
+}
+
+if not metric_candidates.intersection(output_df.columns):
+    raise SystemExit("ERROR: reused output contains no SonarQube metric columns.")
+
+input_keys = input_df[match_cols].drop_duplicates()
+output_keys = output_df[match_cols].drop_duplicates()
+
+missing_keys = (
+    input_keys.merge(output_keys, on=match_cols, how="left", indicator=True)
+    .query("_merge == 'left_only'")
+)
+extra_keys = (
+    output_keys.merge(input_keys, on=match_cols, how="left", indicator=True)
+    .query("_merge == 'left_only'")
+)
+
+duplicate_output_keys = int(output_df.duplicated(repo_month_cols).sum())
+
+print("Input rows:", len(input_df))
+print("Output rows:", len(output_df))
+print("Input unique repo-month-commit keys:", len(input_keys))
+print("Output unique repo-month-commit keys:", len(output_keys))
+print("Missing input repo-month-commit keys in output:", len(missing_keys))
+print("Extra output repo-month-commit keys:", len(extra_keys))
+print("Duplicate output repo-month rows:", duplicate_output_keys)
+
+if len(missing_keys) > 0 or len(extra_keys) > 0 or duplicate_output_keys > 0:
+    raise SystemExit(
+        "ERROR: reused output does not exactly match the current repo-month-commit input."
+    )
+
+print("Existing scanned output is complete for the current input.")
+PY
+
+  else
+    # Load SonarQube configuration only when an actual scan/API run is needed.
+    if [[ -f ".env" ]]; then
+      set -a
+      source ".env"
+      set +a
+    fi
+
+    if [[ -z "${SONAR_PATH:-}" && -n "${SONAR_SCANNER_PATH:-}" ]]; then
+      export SONAR_PATH="${SONAR_SCANNER_PATH}"
+    fi
+
+    if [[ -n "${SONAR_PATH:-}" && -d "${SONAR_PATH}" && -x "${SONAR_PATH}/bin/sonar-scanner" ]]; then
+      export SONAR_PATH="${SONAR_PATH}/bin/sonar-scanner"
+    fi
+
+    if [[ -z "${SONAR_PATH:-}" ]]; then
+      echo "ERROR: SONAR_PATH is not set."
+      exit 1
+    fi
+
+    if [[ -z "${SONAR_TOKEN:-}" ]]; then
+      echo "ERROR: SONAR_TOKEN is not set."
+      exit 1
+    fi
+
+    if [[ ! -x "${SONAR_PATH}" ]]; then
+      echo "ERROR: SONAR_PATH is not executable: ${SONAR_PATH}"
+      exit 1
+    fi
+
+    export SONAR_PATH
+    export SONAR_SCANNER_PATH="${SONAR_PATH}"
+
+    echo "Sonar scanner: ${SONAR_PATH}"
+    echo "Sonar token:   set"
+    echo
+    echo "** Running SonarQube scanner"
+    echo "------------------------------------------------------------"
+
+    CMD=(
+      python "${PY_SCRIPT}"
+      --aggregation "${AGGREGATION}"
+      --input-file "${INPUT_FILE}"
+      --output-file "${OUTPUT_FILE}"
+      --clone-dir "${CLONE_DIR}"
+      --num-processes "${NUM_PROCESSES}"
+      --language-profile "${LANGUAGE_PROFILE}"
+      --project-key-prefix "${PROJECT_KEY_PREFIX}"
+      --incremental-save
+    )
+
+    echo "${CMD[*]}"
+    echo
+    "${CMD[@]}"
+  fi
 
   echo
   echo "** Output metric coverage"
@@ -3542,12 +3715,14 @@ PY
 
   echo
   echo "============================================================"
-  echo "run-py-2b completed successfully."
-  echo "Completed:     $(date)"
-  echo "Panel variant: ${PANEL_VARIANT}"
-  echo "Target:        ${TARGET}"
-  echo "Output file:   ${OUTPUT_FILE}"
-  echo "Log file:      ${LOG_FILE}"
+  echo "${RUN_PREFIX} completed successfully."
+  echo "Completed:       $(date)"
+  echo "Panel variant:   ${PANEL_VARIANT}"
+  echo "Target:          ${TARGET}"
+  echo "Skip scan:       ${SKIP_SCAN}"
+  echo "Output file:     ${OUTPUT_FILE}"
+  echo "Main output dir: ${MAIN_OUTPUT_DIR}"
+  echo "Log file:        ${LOG_FILE}"
   echo "============================================================"
 
 } 2>&1 | tee "${LOG_FILE}"
@@ -3571,31 +3746,29 @@ set -euo pipefail
 #   Merge treatment/control SonarQube metrics generated by run-py-2b
 #   into the final Python matched event panels generated by run-py-1l.
 #
-# Current naming convention:
-#   flexible:
-#     repo_python/did_final/panel_event_matched_flexible.csv
-#     repo_python/sonarqube_input/flexible/
+# Inputs:
+#   repo_python/run-py-1l/panel_event_matched_<variant>.csv
+#   repo_python/run-py-2b/<variant>/treatment/ts_repos_monthly_scanned.csv
+#   repo_python/run-py-2b/<variant>/control/ts_repos_monthly_scanned.csv
 #
-#   strict:
-#     repo_python/did_final/panel_event_matched_strict.csv
-#     repo_python/sonarqube_input/strict/
+# Main output:
+#   repo_python/run-py-2c/<variant>/panel_event_matched_<variant>_with_sonarqube.csv
 #
-# Primary focus:
-#   PANEL_VARIANT=strict
-#   PANEL_VARIANT=flexible
-#
-# Outputs:
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_qc.csv
-#   repo_python/did_final/sonarqube_panel_merge_summary_<variant>.csv
+# Extra QC output:
+#   repo_python/tmp/run-py-2c/<variant>/panel_event_matched_<variant>_with_sonarqube_qc.csv
 #
 # Usage:
-#   Strict, now available:
-#     PANEL_VARIANT=strict bash run-py-2c-merge-sonarqube-panel.sh
-#
-#   Flexible, after scanned files are available:
-#     PANEL_VARIANT=flexible bash run-py-2c-merge-sonarqube-panel.sh
+#   PANEL_VARIANT=strict bash run-py-2c-merge-sonarqube-panel.sh
+#   PANEL_VARIANT=flexible bash run-py-2c-merge-sonarqube-panel.sh
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
@@ -3607,39 +3780,43 @@ if [[ "${PANEL_VARIANT}" != "flexible" && "${PANEL_VARIANT}" != "strict" ]]; the
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2c_merge_sonarqube_panel_${PANEL_VARIANT}_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_merge_sonarqube_panel_${PANEL_VARIANT}_${RUN_TS}.log}"
 
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/merge_sonarqube_panel_v2.py}"
 
-DID_DIR="${DID_DIR:-repo_python/did_final}"
-SONAR_ROOT="${SONAR_ROOT:-repo_python/sonarqube_input/${PANEL_VARIANT}}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+PANEL_INPUT_DIR="${PANEL_INPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-1l}"
+SONAR_ROOT="${SONAR_ROOT:-${OUTPUT_BASE_DIR}/run-py-2b/${PANEL_VARIANT}}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}/${PANEL_VARIANT}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}/${PANEL_VARIANT}}"
 
-PANEL_FILE="${PANEL_FILE:-${DID_DIR}/panel_event_matched_${PANEL_VARIANT}.csv}"
+PANEL_FILE="${PANEL_FILE:-${PANEL_INPUT_DIR}/panel_event_matched_${PANEL_VARIANT}.csv}"
 
-TREATMENT_METRICS="${TREATMENT_METRICS:-${SONAR_ROOT}/treatment/data/ts_repos_monthly_scanned.csv}"
-CONTROL_METRICS="${CONTROL_METRICS:-${SONAR_ROOT}/control/data/ts_repos_monthly_scanned.csv}"
+TREATMENT_METRICS="${TREATMENT_METRICS:-${SONAR_ROOT}/treatment/ts_repos_monthly_scanned.csv}"
+CONTROL_METRICS="${CONTROL_METRICS:-${SONAR_ROOT}/control/ts_repos_monthly_scanned.csv}"
 
-OUTPUT_FILE="${OUTPUT_FILE:-${DID_DIR}/panel_event_matched_${PANEL_VARIANT}_with_sonarqube.csv}"
-QC_OUTPUT_FILE="${QC_OUTPUT_FILE:-${DID_DIR}/panel_event_matched_${PANEL_VARIANT}_with_sonarqube_qc.csv}"
+OUTPUT_FILE="${OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/panel_event_matched_${PANEL_VARIANT}_with_sonarqube.csv}"
+QC_OUTPUT_FILE="${QC_OUTPUT_FILE:-${TMP_DIR}/panel_event_matched_${PANEL_VARIANT}_with_sonarqube_qc.csv}"
 
-MERGE_SUMMARY="${MERGE_SUMMARY:-${DID_DIR}/sonarqube_panel_merge_summary_${PANEL_VARIANT}.csv}"
-
-mkdir -p "${LOG_DIR}" "${DID_DIR}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}"
 
 {
   echo "============================================================"
-  echo "run-py-2c: merge Python SonarQube metrics into matched panel"
+  echo "${RUN_PREFIX}: merge Python SonarQube metrics into matched panel"
   echo "Started:           $(date)"
+  echo "Script name:       ${SCRIPT_NAME}"
+  echo "Run prefix:        ${RUN_PREFIX}"
   echo "Panel variant:     ${PANEL_VARIANT}"
   echo "Python script:     ${PY_SCRIPT}"
-  echo "DID dir:           ${DID_DIR}"
+  echo "Panel input dir:   ${PANEL_INPUT_DIR}"
   echo "Sonar root:        ${SONAR_ROOT}"
+  echo "Main output dir:   ${MAIN_OUTPUT_DIR}"
+  echo "Extra QC dir:      ${TMP_DIR}"
   echo "Panel file:        ${PANEL_FILE}"
   echo "Treatment metrics: ${TREATMENT_METRICS}"
   echo "Control metrics:   ${CONTROL_METRICS}"
   echo "Output file:       ${OUTPUT_FILE}"
   echo "QC output file:    ${QC_OUTPUT_FILE}"
-  echo "Merge summary:     ${MERGE_SUMMARY}"
   echo "Log file:          ${LOG_FILE}"
   echo "============================================================"
   echo
@@ -3648,8 +3825,8 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}"
     if [[ ! -f "${f}" ]]; then
       echo "ERROR: required file not found: ${f}"
       echo
-      echo "If PANEL_VARIANT=flexible, make sure flexible treatment/control scans are complete"
-      echo "and copied into repo_python/sonarqube_input/flexible/ first."
+      echo "Make sure run-py-1l and both run-py-2b scans are complete"
+      echo "for PANEL_VARIANT=${PANEL_VARIANT}."
       exit 1
     fi
   done
@@ -3712,7 +3889,6 @@ from pathlib import Path
 
 output = Path("${OUTPUT_FILE}")
 qc_output = Path("${QC_OUTPUT_FILE}")
-summary_output = Path("${MERGE_SUMMARY}")
 panel_variant = "${PANEL_VARIANT}"
 
 df = pd.read_csv(output)
@@ -3776,60 +3952,22 @@ qc = qc[~qc["check"].isin(new_checks["check"])]
 qc = pd.concat([qc, new_checks], ignore_index=True)
 qc.to_csv(qc_output, index=False)
 
-metric_cols = [
-    "ncloc",
-    "bugs",
-    "vulnerabilities",
-    "code_smells",
-    "duplicated_lines_density",
-    "comment_lines_density",
-    "cognitive_complexity",
-    "technical_debt",
-    "static_analysis_warnings",
-]
-
-summary = {
-    "panel": panel_variant,
-    "file": str(output),
-    "rows": len(df),
-    "repos": df["repo_name"].nunique(),
-    "treatment_rows": int((df["dataset_source"] == "treatment").sum()),
-    "control_rows": int((df["dataset_source"] == "control").sum()),
-    "treatment_repos": df.loc[df["dataset_source"] == "treatment", "repo_name"].nunique(),
-    "control_repos": df.loc[df["dataset_source"] == "control", "repo_name"].nunique(),
-    "months_min": df["time"].min(),
-    "months_max": df["time"].max(),
-    "all_raw_metrics_missing_rows": int(df["sonarqube_all_raw_metrics_missing"].sum()),
-    "ncloc_zero_rows": int(df["sonarqube_ncloc_zero"].sum()),
-    "quality_outcomes_complete_rows": int(df["sonarqube_quality_outcomes_complete"].sum()),
-}
-
-for col in metric_cols:
-    if col in df.columns:
-        summary[f"{col}_nonmissing"] = int(df[col].notna().sum())
-
-summary_df = pd.DataFrame([summary])
-summary_output.parent.mkdir(parents=True, exist_ok=True)
-summary_df.to_csv(summary_output, index=False)
-
 print("Updated output:", output)
 print("Updated QC:", qc_output)
-print("Saved summary:", summary_output)
-print()
-print(summary_df.to_string(index=False))
 print()
 print(new_checks.to_string(index=False))
 PY
 
   echo
   echo "============================================================"
-  echo "run-py-2c completed successfully."
-  echo "Completed:      $(date)"
-  echo "Panel variant:  ${PANEL_VARIANT}"
-  echo "Output file:    ${OUTPUT_FILE}"
-  echo "QC output file: ${QC_OUTPUT_FILE}"
-  echo "Merge summary:  ${MERGE_SUMMARY}"
-  echo "Log file:       ${LOG_FILE}"
+  echo "${RUN_PREFIX} completed successfully."
+  echo "Completed:       $(date)"
+  echo "Panel variant:   ${PANEL_VARIANT}"
+  echo "Output file:     ${OUTPUT_FILE}"
+  echo "QC output file:  ${QC_OUTPUT_FILE}"
+  echo "Main output dir: ${MAIN_OUTPUT_DIR}"
+  echo "Extra QC dir:    ${TMP_DIR}"
+  echo "Log file:        ${LOG_FILE}"
   echo "============================================================"
 
 } 2>&1 | tee "${LOG_FILE}"
@@ -3852,12 +3990,12 @@ set -euo pipefail
 # Purpose:
 #   Check merged Python SonarQube panels created by run-py-2c.
 #
-# Current naming convention:
+# Inputs:
 #   strict:
-#     repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+#     repo_python/run-py-2c/strict/panel_event_matched_strict_with_sonarqube.csv
 #
 #   flexible:
-#     repo_python/did_final/panel_event_matched_flexible_with_sonarqube.csv
+#     repo_python/run-py-2c/flexible/panel_event_matched_flexible_with_sonarqube.csv
 #
 # Supported PANEL_VARIANT values:
 #   strict
@@ -3867,15 +4005,24 @@ set -euo pipefail
 # Usage:
 #   PANEL_VARIANT=strict bash run-py-2d-check-sonarqube-panels.sh
 #   PANEL_VARIANT=flexible bash run-py-2d-check-sonarqube-panels.sh
-#   PANEL_VARIANT=all      bash run-py-2d-check-sonarqube-panels.sh
+#   PANEL_VARIANT=all bash run-py-2d-check-sonarqube-panels.sh
 #
-# Outputs:
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_check_summary.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_missing_analysis_outcomes.csv
-#   repo_python/did_final/sonarqube_panel_check_manifest_<variant>_<timestamp>.csv
-#   repo_python/did_final/sonarqube_panel_check_summary_<variant>.csv
-#   repo_python/did_final/sonarqube_panel_check_qc_<variant>.csv
+# Persistent output:
+#   logs/run-py-2d_check_sonarqube_panels_<variant>_<timestamp>.log
+#
+# Temporary outputs:
+#   check_sonarqube_panel.py requires summary and missing-row files.
+#   They are created under repo_python/tmp/run-py-2d during validation
+#   and removed automatically when the wrapper exits.
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
@@ -3887,37 +4034,44 @@ if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${P
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2d_check_sonarqube_panels_${PANEL_VARIANT}_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_check_sonarqube_panels_${PANEL_VARIANT}_${RUN_TS}.log}"
 
-DID_DIR="${DID_DIR:-repo_python/did_final}"
 CHECK_SCRIPT="${CHECK_SCRIPT:-proc_scripts/check_sonarqube_panel.py}"
 
-MANIFEST_FILE="${DID_DIR}/sonarqube_panel_check_manifest_${PANEL_VARIANT}_${RUN_TS}.csv"
-COMBINED_SUMMARY="${DID_DIR}/sonarqube_panel_check_summary_${PANEL_VARIANT}.csv"
-COMBINED_QC="${DID_DIR}/sonarqube_panel_check_qc_${PANEL_VARIANT}.csv"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+PANEL_INPUT_DIR="${PANEL_INPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-2c}"
+TMP_PARENT_DIR="${TMP_PARENT_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+TMP_WORK_DIR="${TMP_WORK_DIR:-${TMP_PARENT_DIR}/${PANEL_VARIANT}_${RUN_TS}}"
 
 PANELS=()
 
 if [[ "${PANEL_VARIANT}" == "strict" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("strict|${DID_DIR}/panel_event_matched_strict_with_sonarqube.csv")
+  PANELS+=("strict|${PANEL_INPUT_DIR}/strict/panel_event_matched_strict_with_sonarqube.csv")
 fi
 
 if [[ "${PANEL_VARIANT}" == "flexible" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("flexible|${DID_DIR}/panel_event_matched_flexible_with_sonarqube.csv")
+  PANELS+=("flexible|${PANEL_INPUT_DIR}/flexible/panel_event_matched_flexible_with_sonarqube.csv")
 fi
 
-mkdir -p "${LOG_DIR}" "${DID_DIR}"
+cleanup_tmp_work_dir() {
+  rm -rf "${TMP_WORK_DIR}"
+  rmdir "${TMP_PARENT_DIR}" 2>/dev/null || true
+}
+trap cleanup_tmp_work_dir EXIT
+
+mkdir -p "${LOG_DIR}" "${TMP_WORK_DIR}"
 
 {
   echo "============================================================"
-  echo "run-py-2d: check Python merged SonarQube panels"
+  echo "${RUN_PREFIX}: check Python merged SonarQube panels"
   echo "Started:          $(date)"
+  echo "Script name:      ${SCRIPT_NAME}"
+  echo "Run prefix:       ${RUN_PREFIX}"
   echo "Panel variant:    ${PANEL_VARIANT}"
   echo "Checker script:   ${CHECK_SCRIPT}"
-  echo "DID dir:          ${DID_DIR}"
-  echo "Manifest:         ${MANIFEST_FILE}"
-  echo "Combined summary: ${COMBINED_SUMMARY}"
-  echo "Combined QC:      ${COMBINED_QC}"
+  echo "Panel input dir:  ${PANEL_INPUT_DIR}"
+  echo "Temporary dir:    ${TMP_WORK_DIR}"
+  echo "Persistent files: log only"
   echo "Log file:         ${LOG_FILE}"
   echo "============================================================"
   echo
@@ -3929,8 +4083,6 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}"
 
   python -m py_compile "${CHECK_SCRIPT}"
 
-  echo "panel,input,summary,missing" > "${MANIFEST_FILE}"
-
   for entry in "${PANELS[@]}"; do
     PANEL_LABEL="${entry%%|*}"
     INPUT_FILE="${entry#*|}"
@@ -3938,22 +4090,19 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}"
     if [[ ! -f "${INPUT_FILE}" ]]; then
       echo "ERROR: input panel not found for ${PANEL_LABEL}: ${INPUT_FILE}"
       echo
-      echo "If this is flexible, first finish:"
-      echo "  1. flexible treatment/control SonarQube scan"
-      echo "  2. PANEL_VARIANT=flexible bash run-py-2c-merge-sonarqube-panel.sh"
+      echo "Complete run-py-2c first for PANEL_VARIANT=${PANEL_LABEL}."
       exit 1
     fi
 
-    BASE_FILE="${INPUT_FILE%.csv}"
-    SUMMARY_OUTPUT="${BASE_FILE}_check_summary.csv"
-    MISSING_OUTPUT="${BASE_FILE}_missing_analysis_outcomes.csv"
+    SUMMARY_OUTPUT="${TMP_WORK_DIR}/${PANEL_LABEL}_check_summary.csv"
+    MISSING_OUTPUT="${TMP_WORK_DIR}/${PANEL_LABEL}_missing_analysis_outcomes.csv"
 
     echo
     echo "============================================================"
     echo "Checking panel: ${PANEL_LABEL}"
     echo "Input:          ${INPUT_FILE}"
-    echo "Summary output: ${SUMMARY_OUTPUT}"
-    echo "Missing output: ${MISSING_OUTPUT}"
+    echo "Temporary summary: ${SUMMARY_OUTPUT}"
+    echo "Temporary missing: ${MISSING_OUTPUT}"
     echo "============================================================"
 
     python "${CHECK_SCRIPT}" \
@@ -3961,94 +4110,18 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}"
       --summary-output "${SUMMARY_OUTPUT}" \
       --missing-output "${MISSING_OUTPUT}"
 
-    printf '%s,%s,%s,%s\n' \
-      "${PANEL_LABEL}" \
-      "${INPUT_FILE}" \
-      "${SUMMARY_OUTPUT}" \
-      "${MISSING_OUTPUT}" >> "${MANIFEST_FILE}"
+    echo
+    echo "Validation completed for ${PANEL_LABEL}."
+    echo "Temporary checker outputs will be removed when the wrapper exits."
   done
 
   echo
-  echo "** Building combined run-py-2d summaries"
-  echo "------------------------------------------------------------"
-
-  python - <<PY
-from pathlib import Path
-import pandas as pd
-
-manifest_path = Path("${MANIFEST_FILE}")
-combined_summary_path = Path("${COMBINED_SUMMARY}")
-combined_qc_path = Path("${COMBINED_QC}")
-
-manifest = pd.read_csv(manifest_path)
-
-summary_frames = []
-qc_rows = []
-
-def read_csv_if_possible(path):
-    path = Path(path)
-    if not path.exists() or path.stat().st_size == 0:
-        return pd.DataFrame()
-    try:
-        return pd.read_csv(path)
-    except pd.errors.EmptyDataError:
-        return pd.DataFrame()
-
-for _, row in manifest.iterrows():
-    panel = row["panel"]
-    input_file = Path(row["input"])
-    summary_file = Path(row["summary"])
-    missing_file = Path(row["missing"])
-
-    summary = read_csv_if_possible(summary_file)
-    if not summary.empty:
-        summary.insert(0, "panel", panel)
-        summary_frames.append(summary)
-
-    missing = read_csv_if_possible(missing_file)
-
-    input_df = pd.read_csv(input_file)
-    qc_rows.append({
-        "panel": panel,
-        "input_file": str(input_file),
-        "rows": len(input_df),
-        "repos": input_df["repo_name"].nunique() if "repo_name" in input_df.columns else None,
-        "treatment_rows": int((input_df["dataset_source"] == "treatment").sum()) if "dataset_source" in input_df.columns else None,
-        "control_rows": int((input_df["dataset_source"] == "control").sum()) if "dataset_source" in input_df.columns else None,
-        "missing_analysis_rows": len(missing),
-        "missing_analysis_repos": missing["repo_name"].nunique() if "repo_name" in missing.columns else 0,
-        "missing_output_file": str(missing_file),
-    })
-
-if summary_frames:
-    combined_summary = pd.concat(summary_frames, ignore_index=True)
-else:
-    combined_summary = pd.DataFrame()
-
-combined_qc = pd.DataFrame(qc_rows)
-
-combined_summary_path.parent.mkdir(parents=True, exist_ok=True)
-combined_qc_path.parent.mkdir(parents=True, exist_ok=True)
-
-combined_summary.to_csv(combined_summary_path, index=False)
-combined_qc.to_csv(combined_qc_path, index=False)
-
-print("Saved combined summary:", combined_summary_path)
-print("Saved combined QC:", combined_qc_path)
-print()
-print("Combined QC:")
-print(combined_qc.to_string(index=False))
-PY
-
-  echo
   echo "============================================================"
-  echo "run-py-2d completed successfully."
-  echo "Completed:        $(date)"
-  echo "Panel variant:    ${PANEL_VARIANT}"
-  echo "Manifest:         ${MANIFEST_FILE}"
-  echo "Combined summary: ${COMBINED_SUMMARY}"
-  echo "Combined QC:      ${COMBINED_QC}"
-  echo "Log file:         ${LOG_FILE}"
+  echo "${RUN_PREFIX} completed successfully."
+  echo "Completed:         $(date)"
+  echo "Panel variant:     ${PANEL_VARIANT}"
+  echo "Persistent output: ${LOG_FILE}"
+  echo "Temporary outputs: removed automatically"
   echo "============================================================"
 
 } 2>&1 | tee "${LOG_FILE}"
@@ -4068,79 +4141,215 @@ set -euo pipefail
 # run-py-2e: Prepare Python quality DiD input
 # ============================================================
 # Purpose:
-#   Convert merged Python SonarQube panels into quality DiD input files.
+#   Convert merged Python SonarQube panels into quality DiD inputs.
+#   Optionally create a paper-schema diagnostic output without calling
+#   compare/run-py-2b15-create-paper-structure-panel.sh.
 #
-# Current naming convention:
-#   strict:
-#     repo_python/did_final/panel_event_matched_strict_with_sonarqube.csv
+# Input:
+#   repo_python/run-py-2c/<variant>/panel_event_matched_<variant>_with_sonarqube.csv
 #
-#   flexible:
-#     repo_python/did_final/panel_event_matched_flexible_with_sonarqube.csv
+# Main output for the strict paper-overlap run:
+#   repo_python/run-py-2e/strict/panel_event_monthly_quality_py.csv
 #
-# Supported PANEL_VARIANT values:
-#   strict
-#   flexible
-#   all
+# Main output for flexible or non-paper runs:
+#   repo_python/run-py-2e/<variant>/
+#     panel_event_matched_<variant>_with_sonarqube_quality_did_input_complete.csv
 #
-# Usage:
-#   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh
-#   PANEL_VARIANT=flexible bash run-py-2e-prepare-quality-did-input.sh
-#   PANEL_VARIANT=all      bash run-py-2e-prepare-quality-did-input.sh
+# Extra outputs:
+#   repo_python/tmp/run-py-2e/<variant>/quality_did_input_qc.csv
+#   repo_python/tmp/run-py-2e/<variant>/paper_audit/
 #
-# Outputs for each variant:
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input_complete.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input_qc.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input_missing_core_quality.csv
+# Temporary outputs:
+#   Full inputs, missing-row outputs, manifest, and combined QC files are
+#   created under a timestamped work directory and removed after success.
 #
-# Combined outputs:
-#   repo_python/did_final/quality_did_input_manifest_<variant>_<timestamp>.csv
-#   repo_python/did_final/quality_did_input_qc_<variant>_long.csv
-#   repo_python/did_final/quality_did_input_qc_<variant>_wide.csv
+# Paper-comparable strict run:
+#   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
+#
+# Important:
+#   The paper-schema output preserves regenerated Python SonarQube metrics.
+#   Selected unavailable covariates are filled from the frozen paper panel
+#   only on exact repo-month matches.
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
+usage() {
+  cat <<'EOF'
+Usage:
+  PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh [options]
+
+Options:
+  --convert-paper-same-column TRUE|FALSE
+  --keep-overlap-paper-same-column TRUE|FALSE
+  --paper-panel-file PATH
+  --paper-audit-dir PATH
+  --fill-from-paper-columns CSV_LIST
+  --metric-compare-columns CSV_LIST
+  --top-print INTEGER
+  --help
+EOF
+}
+
+normalize_bool() {
+  local value
+  value="$(printf '%s' "$1" | tr '[:lower:]' '[:upper:]')"
+  case "${value}" in
+    TRUE|FALSE)
+      printf '%s' "${value}"
+      ;;
+    *)
+      echo "ERROR: expected TRUE or FALSE, got: $1" >&2
+      exit 1
+      ;;
+  esac
+}
+
+require_option_value() {
+  local option_name="$1"
+  local option_value="${2:-}"
+  if [[ -z "${option_value}" ]]; then
+    echo "ERROR: ${option_name} requires a value." >&2
+    exit 1
+  fi
+}
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-
 PANEL_VARIANT="${PANEL_VARIANT:-strict}"
+PY_SCRIPT="${PY_SCRIPT:-proc_scripts/prepare_quality_did_input_v2.py}"
+
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+PANEL_INPUT_DIR="${PANEL_INPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-2c}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+WORK_ROOT="${WORK_ROOT:-${TMP_DIR}/work_${RUN_TS}}"
+
+CONVERT_PAPER_SAME_COLUMN="${CONVERT_PAPER_SAME_COLUMN:-FALSE}"
+KEEP_OVERLAP_PAPER_SAME_COLUMN="${KEEP_OVERLAP_PAPER_SAME_COLUMN:-FALSE}"
+PAPER_PANEL_FILE="${PAPER_PANEL_FILE:-data/panel_event_monthly.csv}"
+PAPER_AUDIT_DIR="${PAPER_AUDIT_DIR:-${TMP_DIR}}"
+FILL_FROM_PAPER_COLUMNS="${FILL_FROM_PAPER_COLUMNS:-stars,issues,issue_comments,age,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,other_agents,high_confidence}"
+METRIC_COMPARE_COLUMNS="${METRIC_COMPARE_COLUMNS:-ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt}"
+TOP_PRINT="${TOP_PRINT:-20}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --convert-paper-same-column)
+      require_option_value "$1" "${2:-}"
+      CONVERT_PAPER_SAME_COLUMN="$2"
+      shift 2
+      ;;
+    --keep-overlap-paper-same-column)
+      require_option_value "$1" "${2:-}"
+      KEEP_OVERLAP_PAPER_SAME_COLUMN="$2"
+      shift 2
+      ;;
+    --paper-panel-file)
+      require_option_value "$1" "${2:-}"
+      PAPER_PANEL_FILE="$2"
+      shift 2
+      ;;
+    --paper-audit-dir)
+      require_option_value "$1" "${2:-}"
+      PAPER_AUDIT_DIR="$2"
+      shift 2
+      ;;
+    --fill-from-paper-columns)
+      require_option_value "$1" "${2:-}"
+      FILL_FROM_PAPER_COLUMNS="$2"
+      shift 2
+      ;;
+    --metric-compare-columns)
+      require_option_value "$1" "${2:-}"
+      METRIC_COMPARE_COLUMNS="$2"
+      shift 2
+      ;;
+    --top-print)
+      require_option_value "$1" "${2:-}"
+      TOP_PRINT="$2"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "ERROR: unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+CONVERT_PAPER_SAME_COLUMN="$(normalize_bool "${CONVERT_PAPER_SAME_COLUMN}")"
+KEEP_OVERLAP_PAPER_SAME_COLUMN="$(normalize_bool "${KEEP_OVERLAP_PAPER_SAME_COLUMN}")"
+
+if [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" && "${CONVERT_PAPER_SAME_COLUMN}" != "TRUE" ]]; then
+  echo "ERROR: --keep-overlap-paper-same-column TRUE requires --convert-paper-same-column TRUE."
+  exit 1
+fi
 
 if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${PANEL_VARIANT}" != "all" ]]; then
   echo "ERROR: PANEL_VARIANT must be strict, flexible, or all. Got: ${PANEL_VARIANT}"
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2e_prepare_quality_did_input_${PANEL_VARIANT}_${RUN_TS}.log}"
+if ! [[ "${TOP_PRINT}" =~ ^[0-9]+$ ]]; then
+  echo "ERROR: --top-print must be a non-negative integer. Got: ${TOP_PRINT}"
+  exit 1
+fi
 
-DID_DIR="${DID_DIR:-repo_python/did_final}"
-PY_SCRIPT="${PY_SCRIPT:-proc_scripts/prepare_quality_did_input_v2.py}"
+if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" && ! -f "${PAPER_PANEL_FILE}" ]]; then
+  echo "ERROR: paper panel file not found: ${PAPER_PANEL_FILE}"
+  exit 1
+fi
 
-MANIFEST_FILE="${DID_DIR}/quality_did_input_manifest_${PANEL_VARIANT}_${RUN_TS}.csv"
-COMBINED_QC_LONG="${DID_DIR}/quality_did_input_qc_${PANEL_VARIANT}_long.csv"
-COMBINED_QC_WIDE="${DID_DIR}/quality_did_input_qc_${PANEL_VARIANT}_wide.csv"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_prepare_quality_did_input_${PANEL_VARIANT}_${RUN_TS}.log}"
+MANIFEST_FILE="${WORK_ROOT}/quality_did_input_manifest_${PANEL_VARIANT}.csv"
+COMBINED_QC_LONG="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}_long.csv"
+COMBINED_QC_WIDE="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}_wide.csv"
 
 PANELS=()
 
 if [[ "${PANEL_VARIANT}" == "strict" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("strict|${DID_DIR}/panel_event_matched_strict_with_sonarqube.csv")
+  PANELS+=("strict|${PANEL_INPUT_DIR}/strict/panel_event_matched_strict_with_sonarqube.csv")
 fi
 
 if [[ "${PANEL_VARIANT}" == "flexible" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("flexible|${DID_DIR}/panel_event_matched_flexible_with_sonarqube.csv")
+  PANELS+=("flexible|${PANEL_INPUT_DIR}/flexible/panel_event_matched_flexible_with_sonarqube.csv")
 fi
 
-mkdir -p "${LOG_DIR}" "${DID_DIR}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${WORK_ROOT}"
 
 {
   echo "============================================================"
-  echo "run-py-2e: prepare Python quality DiD input"
-  echo "Started:          $(date)"
-  echo "Panel variant:    ${PANEL_VARIANT}"
-  echo "Python script:    ${PY_SCRIPT}"
-  echo "DID dir:          ${DID_DIR}"
-  echo "Manifest:         ${MANIFEST_FILE}"
-  echo "Combined QC long: ${COMBINED_QC_LONG}"
-  echo "Combined QC wide: ${COMBINED_QC_WIDE}"
-  echo "Log file:         ${LOG_FILE}"
+  echo "${RUN_PREFIX}: prepare Python quality DiD input"
+  echo "Started:                           $(date)"
+  echo "Script name:                       ${SCRIPT_NAME}"
+  echo "Run prefix:                        ${RUN_PREFIX}"
+  echo "Panel variant:                     ${PANEL_VARIANT}"
+  echo "Python script:                     ${PY_SCRIPT}"
+  echo "Panel input dir:                   ${PANEL_INPUT_DIR}"
+  echo "Main output dir:                   ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:                  ${TMP_DIR}"
+  echo "Convert paper same column:         ${CONVERT_PAPER_SAME_COLUMN}"
+  echo "Keep overlap paper same column:    ${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
+  echo "Paper panel file:                  ${PAPER_PANEL_FILE}"
+  echo "Paper audit root:                   ${PAPER_AUDIT_DIR}"
+  echo "Fill from paper columns:           ${FILL_FROM_PAPER_COLUMNS}"
+  echo "Metric compare columns:            ${METRIC_COMPARE_COLUMNS}"
+  echo "Top print:                         ${TOP_PRINT}"
+  echo "Temporary manifest:                ${MANIFEST_FILE}"
+  echo "Temporary combined QC long:        ${COMBINED_QC_LONG}"
+  echo "Temporary combined QC wide:        ${COMBINED_QC_WIDE}"
+  echo "Log file:                          ${LOG_FILE}"
   echo "============================================================"
   echo
 
@@ -4151,7 +4360,7 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}"
 
   python -m py_compile "${PY_SCRIPT}"
 
-  echo "panel,input,output,complete_output,qc_output,missing_output" > "${MANIFEST_FILE}"
+  echo "panel,input,output,complete_output,qc_output,missing_output,paper_same_column_output,paper_key_summary,paper_unmatched_output" > "${MANIFEST_FILE}"
 
   for entry in "${PANELS[@]}"; do
     PANEL_LABEL="${entry%%|*}"
@@ -4167,37 +4376,118 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}"
       exit 1
     fi
 
-    BASE_FILE="${INPUT_FILE%.csv}"
-    OUTPUT_FILE="${BASE_FILE}_quality_did_input.csv"
-    COMPLETE_OUTPUT_FILE="${BASE_FILE}_quality_did_input_complete.csv"
-    QC_OUTPUT_FILE="${BASE_FILE}_quality_did_input_qc.csv"
-    MISSING_OUTPUT_FILE="${BASE_FILE}_quality_did_input_missing_core_quality.csv"
+    PANEL_MAIN_DIR="${MAIN_OUTPUT_DIR}/${PANEL_LABEL}"
+    PANEL_TMP_DIR="${TMP_DIR}/${PANEL_LABEL}"
+    PANEL_WORK_DIR="${WORK_ROOT}/${PANEL_LABEL}"
+    CURRENT_PAPER_AUDIT_DIR="${PAPER_AUDIT_DIR}/${PANEL_LABEL}/paper_audit"
+
+    mkdir -p "${PANEL_MAIN_DIR}" "${PANEL_TMP_DIR}" "${PANEL_WORK_DIR}" "${CURRENT_PAPER_AUDIT_DIR}"
+
+    OUTPUT_FILE="${PANEL_WORK_DIR}/quality_did_input_full.csv"
+    MISSING_OUTPUT_FILE="${PANEL_WORK_DIR}/missing_core_quality.csv"
+    QC_OUTPUT_FILE="${PANEL_TMP_DIR}/quality_did_input_qc.csv"
+
+    if [[ "${PANEL_LABEL}" == "strict" && "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" && "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+      COMPLETE_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv"
+    else
+      COMPLETE_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_matched_${PANEL_LABEL}_with_sonarqube_quality_did_input_complete.csv"
+    fi
+
+    PAPER_SAME_COLUMN_OUTPUT_FILE=""
+    PAPER_KEY_SUMMARY_FILE=""
+    PAPER_UNMATCHED_OUTPUT_FILE=""
+
+    if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+      if [[ "${PANEL_LABEL}" == "strict" && "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_monthly_quality_py.csv"
+      elif [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}.csv"
+      else
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}_with_unmatched.csv"
+      fi
+      PAPER_OUTPUT_STEM="$(basename "${PAPER_SAME_COLUMN_OUTPUT_FILE%.csv}")"
+      PAPER_AUDIT_BASE="${CURRENT_PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
+      PAPER_KEY_SUMMARY_FILE="${PAPER_AUDIT_BASE}_key_match_summary.csv"
+      PAPER_UNMATCHED_OUTPUT_FILE="${PAPER_AUDIT_BASE}_unmatched_repo_months.csv"
+    fi
 
     echo
     echo "============================================================"
     echo "Preparing quality DiD input for panel: ${PANEL_LABEL}"
-    echo "Input:           ${INPUT_FILE}"
-    echo "Output:          ${OUTPUT_FILE}"
-    echo "Complete output: ${COMPLETE_OUTPUT_FILE}"
-    echo "QC output:       ${QC_OUTPUT_FILE}"
-    echo "Missing output:  ${MISSING_OUTPUT_FILE}"
+    echo "Input:                         ${INPUT_FILE}"
+    echo "Output:                        ${OUTPUT_FILE}"
+    echo "Complete output:               ${COMPLETE_OUTPUT_FILE}"
+    echo "QC output:                     ${QC_OUTPUT_FILE}"
+    echo "Missing output:                ${MISSING_OUTPUT_FILE}"
+    echo "Paper same-column output:      ${PAPER_SAME_COLUMN_OUTPUT_FILE:-<disabled>}"
+    echo "Paper audit directory:         ${CURRENT_PAPER_AUDIT_DIR}"
+    echo "Paper overlap-only:            ${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
     echo "============================================================"
 
-    python "${PY_SCRIPT}" \
-      --panel-label "${PANEL_LABEL}" \
-      --input "${INPUT_FILE}" \
-      --output "${OUTPUT_FILE}" \
-      --complete-output "${COMPLETE_OUTPUT_FILE}" \
-      --qc-output "${QC_OUTPUT_FILE}" \
+    PY_ARGS=(
+      --panel-label "${PANEL_LABEL}"
+      --input "${INPUT_FILE}"
+      --output "${OUTPUT_FILE}"
+      --complete-output "${COMPLETE_OUTPUT_FILE}"
+      --qc-output "${QC_OUTPUT_FILE}"
       --missing-output "${MISSING_OUTPUT_FILE}"
+      --convert-paper-same-column "${CONVERT_PAPER_SAME_COLUMN}"
+      --keep-overlap-paper-same-column "${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
+      --paper-panel-file "${PAPER_PANEL_FILE}"
+      --paper-audit-dir "${CURRENT_PAPER_AUDIT_DIR}"
+      --fill-from-paper-columns "${FILL_FROM_PAPER_COLUMNS}"
+      --metric-compare-columns "${METRIC_COMPARE_COLUMNS}"
+      --top-print "${TOP_PRINT}"
+    )
 
-    printf '%s,%s,%s,%s,%s,%s\n' \
+    if [[ -n "${PAPER_SAME_COLUMN_OUTPUT_FILE}" ]]; then
+      PY_ARGS+=(--paper-same-column-output "${PAPER_SAME_COLUMN_OUTPUT_FILE}")
+    fi
+
+    python "${PY_SCRIPT}" "${PY_ARGS[@]}"
+
+    for expected_file in \
+      "${OUTPUT_FILE}" \
+      "${COMPLETE_OUTPUT_FILE}" \
+      "${QC_OUTPUT_FILE}" \
+      "${MISSING_OUTPUT_FILE}"; do
+      if [[ ! -f "${expected_file}" ]]; then
+        echo "ERROR: missing expected output: ${expected_file}"
+        exit 1
+      fi
+    done
+
+    if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+      PAPER_OUTPUT_STEM="$(basename "${PAPER_SAME_COLUMN_OUTPUT_FILE%.csv}")"
+      PAPER_AUDIT_BASE="${CURRENT_PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
+      for expected_file in \
+        "${PAPER_SAME_COLUMN_OUTPUT_FILE}" \
+        "${PAPER_AUDIT_BASE}_column_sources.csv" \
+        "${PAPER_AUDIT_BASE}_key_match_summary.csv" \
+        "${PAPER_AUDIT_BASE}_metric_comparison.csv" \
+        "${PAPER_AUDIT_BASE}_unmatched_repo_months.csv" \
+        "${PAPER_AUDIT_BASE}_notes.md"; do
+        if [[ ! -f "${expected_file}" ]]; then
+          echo "ERROR: missing expected paper-schema output: ${expected_file}"
+          exit 1
+        fi
+      done
+
+      echo "Paper-schema key match summary:"
+      cat "${PAPER_KEY_SUMMARY_FILE}"
+      rm -f "${PAPER_AUDIT_BASE}_notes.md"
+    fi
+
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' \
       "${PANEL_LABEL}" \
       "${INPUT_FILE}" \
       "${OUTPUT_FILE}" \
       "${COMPLETE_OUTPUT_FILE}" \
       "${QC_OUTPUT_FILE}" \
-      "${MISSING_OUTPUT_FILE}" >> "${MANIFEST_FILE}"
+      "${MISSING_OUTPUT_FILE}" \
+      "${PAPER_SAME_COLUMN_OUTPUT_FILE}" \
+      "${PAPER_KEY_SUMMARY_FILE}" \
+      "${PAPER_UNMATCHED_OUTPUT_FILE}" >> "${MANIFEST_FILE}"
   done
 
   echo
@@ -4212,13 +4502,15 @@ manifest_path = Path("${MANIFEST_FILE}")
 combined_long_path = Path("${COMBINED_QC_LONG}")
 combined_wide_path = Path("${COMBINED_QC_WIDE}")
 
-manifest = pd.read_csv(manifest_path)
+manifest = pd.read_csv(manifest_path).fillna("")
 
 qc_frames = []
 wide_rows = []
 
-def read_csv_if_possible(path):
-    path = Path(path)
+def read_csv_if_possible(path_value):
+    if not path_value:
+        return pd.DataFrame()
+    path = Path(path_value)
     if not path.exists() or path.stat().st_size == 0:
         return pd.DataFrame()
     try:
@@ -4228,38 +4520,51 @@ def read_csv_if_possible(path):
 
 for _, row in manifest.iterrows():
     panel = row["panel"]
-    qc_file = Path(row["qc_output"])
-    missing_file = Path(row["missing_output"])
-    output_file = Path(row["output"])
-    complete_file = Path(row["complete_output"])
-
-    qc = read_csv_if_possible(qc_file)
+    qc = read_csv_if_possible(row["qc_output"])
     if not qc.empty:
         qc.insert(0, "panel", panel)
         qc_frames.append(qc)
 
-    output_df = pd.read_csv(output_file) if output_file.exists() else pd.DataFrame()
-    complete_df = pd.read_csv(complete_file) if complete_file.exists() else pd.DataFrame()
-    missing_df = read_csv_if_possible(missing_file)
+    output_df = read_csv_if_possible(row["output"])
+    complete_df = read_csv_if_possible(row["complete_output"])
+    missing_df = read_csv_if_possible(row["missing_output"])
+    paper_df = read_csv_if_possible(row["paper_same_column_output"])
+    paper_key_summary = read_csv_if_possible(row["paper_key_summary"])
 
-    wide_rows.append({
+    wide_row = {
         "panel": panel,
-        "output_file": str(output_file),
-        "complete_output_file": str(complete_file),
-        "missing_output_file": str(missing_file),
+        "output_file": row["output"],
+        "complete_output_file": row["complete_output"],
+        "missing_output_file": row["missing_output"],
+        "paper_same_column_output_file": row["paper_same_column_output"],
         "output_rows": len(output_df),
         "complete_rows": len(complete_df),
         "missing_core_quality_rows": len(missing_df),
+        "paper_same_column_output_rows": len(paper_df) if row["paper_same_column_output"] else None,
         "output_repos": output_df["repo_name"].nunique() if "repo_name" in output_df.columns else None,
         "complete_repos": complete_df["repo_name"].nunique() if "repo_name" in complete_df.columns else None,
-        "missing_core_quality_repos": missing_df["repo_name"].nunique() if "repo_name" in missing_df.columns else 0,
-    })
+        "paper_same_column_repos": paper_df["repo_name"].nunique() if "repo_name" in paper_df.columns else None,
+    }
 
-if qc_frames:
-    combined_long = pd.concat(qc_frames, ignore_index=True)
-else:
-    combined_long = pd.DataFrame()
+    if not paper_key_summary.empty:
+        summary = paper_key_summary.iloc[0]
+        wide_row.update({
+            "paper_repo_month_rows_matched": summary.get("repo_month_rows_matched_to_paper"),
+            "paper_repo_month_rows_unmatched": summary.get("repo_month_rows_not_matched_to_paper"),
+            "keep_overlap_paper_same_column": summary.get("keep_overlap_paper_same_column"),
+            "paper_duplicate_repo_month_rows": summary.get("paper_duplicate_repo_month_rows"),
+        })
+    else:
+        wide_row.update({
+            "paper_repo_month_rows_matched": None,
+            "paper_repo_month_rows_unmatched": None,
+            "keep_overlap_paper_same_column": None,
+            "paper_duplicate_repo_month_rows": None,
+        })
 
+    wide_rows.append(wide_row)
+
+combined_long = pd.concat(qc_frames, ignore_index=True) if qc_frames else pd.DataFrame()
 combined_wide = pd.DataFrame(wide_rows)
 
 combined_long_path.parent.mkdir(parents=True, exist_ok=True)
@@ -4275,22 +4580,36 @@ print("Combined QC wide:")
 print(combined_wide.to_string(index=False))
 PY
 
+  rm -rf "${WORK_ROOT}"
+
   echo
   echo "============================================================"
-  echo "run-py-2e completed successfully."
-  echo "Completed:        $(date)"
-  echo "Panel variant:    ${PANEL_VARIANT}"
-  echo "Manifest:         ${MANIFEST_FILE}"
-  echo "Combined QC long: ${COMBINED_QC_LONG}"
-  echo "Combined QC wide: ${COMBINED_QC_WIDE}"
-  echo "Log file:         ${LOG_FILE}"
+  echo "${RUN_PREFIX} completed successfully."
+  echo "Completed:                         $(date)"
+  echo "Panel variant:                     ${PANEL_VARIANT}"
+  echo "Convert paper same column:         ${CONVERT_PAPER_SAME_COLUMN}"
+  echo "Keep overlap paper same column:    ${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
+  echo "Main output dir:                   ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:                  ${TMP_DIR}"
+  echo "Temporary work files:              removed"
+  echo "Log file:                          ${LOG_FILE}"
   echo "============================================================"
 
 } 2>&1 | tee "${LOG_FILE}"
-#
-# This wrapper is adapted from the logic of run9e_prepare_quality_did_input.sh,
-# but it does NOT call the existing JS/TS shell wrapper.
-#
+
+# This wrapper reuses the logic of the previous run-py-2e and run-py-2b15
+# workflows without directly calling either existing wrapper.
+
+
+###############################################################################
+# FILE: run-py-2f1-did-borusyak-quality.sh
+###############################################################################
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Rscript -e "rmarkdown::render('proc_r/DiffInDiffBorusyak.Rmd')"
+Rscript -e "rmarkdown::render('proc_r/DiffInDiffBorusyak.Rmd', params = list(panel_file = '../repo_python/run-py-2e/strict/panel_event_monthly_quality_py.csv'))"
 
 
 ###############################################################################
@@ -4304,15 +4623,26 @@ set -euo pipefail
 # run-py-2f: Borusyak DiD for Python SonarQube quality outcomes
 # ============================================================
 # Purpose:
-#   Run Borusyak DiD estimation for Python quality outcomes
-#   using complete-case quality DiD input files from run-py-2e.
+#   Run Borusyak DiD estimation for Python quality outcomes.
 #
-# Current naming convention:
+# Inputs:
 #   strict:
-#     repo_python/did_final/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+#     repo_python/run-py-2e/strict/panel_event_monthly_quality_py.csv
 #
 #   flexible:
-#     repo_python/did_final/panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv
+#     repo_python/run-py-2e/flexible/
+#       panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv
+#
+# Main presentation outputs:
+#   repo_python/run-py-2f/<variant>/DiffInDiffBorusyak_quality_python_v2.html
+#   repo_python/run-py-2f/<variant>/dynamic_effects_borusyak_quality_python_v2.pdf
+#
+# Extra analysis outputs:
+#   repo_python/tmp/run-py-2f/<variant>/
+#
+# Temporary combined outputs:
+#   repo_python/tmp/run-py-2f/work_<timestamp>/
+#   Removed automatically after a successful run.
 #
 # Supported PANEL_VARIANT values:
 #   strict
@@ -4321,22 +4651,27 @@ set -euo pipefail
 #
 # Usage:
 #   PANEL_VARIANT=strict bash run-py-2f-did-borusyak-quality.sh
-#   PANEL_VARIANT=flexible bash run-py-2f-did-borusyak-quality.sh
-#   PANEL_VARIANT=all      bash run-py-2f-did-borusyak-quality.sh
 #
-# Outputs:
-#   repo_python/did_final/quality_did_borusyak/<variant>/
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_manifest_<variant>_<timestamp>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_static_effects_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_dynamic_effects_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_panel_checks_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_input_summary_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_errors_<variant>.csv
+# Notes:
+#   This wrapper reuses the analysis flow of the existing run-py-2f
+#   implementation, but it is independent and does not call another wrapper.
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${PROJECT_ROOT:-${SCRIPT_DIR}}"
+cd "${PROJECT_ROOT}"
+export PROJECT_ROOT
 
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-
 PANEL_VARIANT="${PANEL_VARIANT:-strict}"
 
 if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${PANEL_VARIANT}" != "all" ]]; then
@@ -4344,50 +4679,62 @@ if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${P
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2f_did_borusyak_quality_${PANEL_VARIANT}_${RUN_TS}.log}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_did_borusyak_quality_${PANEL_VARIANT}_${RUN_TS}.log}"
 
-export PROJECT_ROOT="${PROJECT_ROOT:-$(pwd)}"
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+MAIN_OUTPUT_ROOT="${MAIN_OUTPUT_ROOT:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_ROOT="${TMP_ROOT:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+WORK_DIR="${WORK_DIR:-${TMP_ROOT}/work_${RUN_TS}}"
+PROC_R_DIR="${PROC_R_DIR:-proc_r}"
 
-DID_DIR="${DID_DIR:-repo_python/did_final}"
-RMD_FILE="${RMD_FILE:-proc_r/DiffInDiffBorusyak_quality_python_v2.Rmd}"
-HELPER_FILE="${HELPER_FILE:-proc_r/diff_in_diff_borusyak_helpers.R}"
-OUT_ROOT="${OUT_ROOT:-${DID_DIR}/quality_did_borusyak}"
+RMD_FILE="${RMD_FILE:-${PROC_R_DIR}/DiffInDiffBorusyak_quality_python_v2.Rmd}"
+HELPER_FILE="${HELPER_FILE:-${PROC_R_DIR}/diff_in_diff_borusyak_helpers.R}"
+OUT_ROOT="${OUT_ROOT:-${TMP_ROOT}}"
 
-MANIFEST_FILE="${OUT_ROOT}/borusyak_quality_manifest_${PANEL_VARIANT}_${RUN_TS}.csv"
-COMBINED_STATIC="${OUT_ROOT}/borusyak_quality_static_effects_${PANEL_VARIANT}.csv"
-COMBINED_DYNAMIC="${OUT_ROOT}/borusyak_quality_dynamic_effects_${PANEL_VARIANT}.csv"
-COMBINED_CHECKS="${OUT_ROOT}/borusyak_quality_panel_checks_${PANEL_VARIANT}.csv"
-COMBINED_INPUT_SUMMARY="${OUT_ROOT}/borusyak_quality_input_summary_${PANEL_VARIANT}.csv"
-COMBINED_ERRORS="${OUT_ROOT}/borusyak_quality_errors_${PANEL_VARIANT}.csv"
+STRICT_PANEL_FILE="${STRICT_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/strict/panel_event_monthly_quality_py.csv}"
+FLEXIBLE_PANEL_FILE="${FLEXIBLE_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/flexible/panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv}"
+
+STRICT_HTML_FILE="${STRICT_HTML_FILE:-${MAIN_OUTPUT_ROOT}/strict/DiffInDiffBorusyak_quality_python_v2.html}"
+STRICT_PDF_FILE="${STRICT_PDF_FILE:-${MAIN_OUTPUT_ROOT}/strict/dynamic_effects_borusyak_quality_python_v2.pdf}"
+FLEXIBLE_HTML_FILE="${FLEXIBLE_HTML_FILE:-${MAIN_OUTPUT_ROOT}/flexible/DiffInDiffBorusyak_quality_python_v2.html}"
+FLEXIBLE_PDF_FILE="${FLEXIBLE_PDF_FILE:-${MAIN_OUTPUT_ROOT}/flexible/dynamic_effects_borusyak_quality_python_v2.pdf}"
+
+MANIFEST_FILE="${WORK_DIR}/borusyak_quality_manifest_${PANEL_VARIANT}.csv"
+COMBINED_STATIC="${WORK_DIR}/borusyak_quality_static_effects_${PANEL_VARIANT}.csv"
+COMBINED_DYNAMIC="${WORK_DIR}/borusyak_quality_dynamic_effects_${PANEL_VARIANT}.csv"
+COMBINED_CHECKS="${WORK_DIR}/borusyak_quality_panel_checks_${PANEL_VARIANT}.csv"
+COMBINED_INPUT_SUMMARY="${WORK_DIR}/borusyak_quality_input_summary_${PANEL_VARIANT}.csv"
+COMBINED_ERRORS="${WORK_DIR}/borusyak_quality_errors_${PANEL_VARIANT}.csv"
 
 PANELS=()
 
 if [[ "${PANEL_VARIANT}" == "strict" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("strict|${DID_DIR}/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv")
+  PANELS+=("strict|${STRICT_PANEL_FILE}")
 fi
 
 if [[ "${PANEL_VARIANT}" == "flexible" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("flexible|${DID_DIR}/panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv")
+  PANELS+=("flexible|${FLEXIBLE_PANEL_FILE}")
 fi
 
-mkdir -p "${LOG_DIR}" "${OUT_ROOT}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_ROOT}" "${TMP_ROOT}" "${WORK_DIR}"
 
 {
   echo "============================================================"
-  echo "run-py-2f: Python Borusyak DiD for SonarQube quality outcomes"
+  echo "${RUN_PREFIX}: Python Borusyak DiD for SonarQube quality outcomes"
   echo "Started:                $(date)"
+  echo "Script name:            ${SCRIPT_NAME}"
+  echo "Run prefix:             ${RUN_PREFIX}"
   echo "Panel variant:          ${PANEL_VARIANT}"
-  echo "PROJECT_ROOT:           ${PROJECT_ROOT}"
+  echo "Project root:           ${PROJECT_ROOT}"
   echo "Rmd file:               ${RMD_FILE}"
   echo "Helper file:            ${HELPER_FILE}"
-  echo "DID dir:                ${DID_DIR}"
-  echo "Output root:            ${OUT_ROOT}"
-  echo "Manifest:               ${MANIFEST_FILE}"
-  echo "Combined static:        ${COMBINED_STATIC}"
-  echo "Combined dynamic:       ${COMBINED_DYNAMIC}"
-  echo "Combined checks:        ${COMBINED_CHECKS}"
-  echo "Combined input summary: ${COMBINED_INPUT_SUMMARY}"
-  echo "Combined errors:        ${COMBINED_ERRORS}"
+  echo "Strict input:           ${STRICT_PANEL_FILE}"
+  echo "Flexible input:         ${FLEXIBLE_PANEL_FILE}"
+  echo "Main output root:       ${MAIN_OUTPUT_ROOT}"
+  echo "Extra output root:      ${TMP_ROOT}"
+  echo "Temporary work dir:     ${WORK_DIR}"
+  echo "Strict HTML:            ${STRICT_HTML_FILE}"
+  echo "Strict PDF:             ${STRICT_PDF_FILE}"
   echo "Log file:               ${LOG_FILE}"
   echo "============================================================"
   echo
@@ -4402,67 +4749,142 @@ mkdir -p "${LOG_DIR}" "${OUT_ROOT}"
     exit 1
   fi
 
-  echo "panel,input,out_dir,html,static,dynamic,checks,input_summary,metadata,static_errors,dynamic_errors" > "${MANIFEST_FILE}"
+  if ! command -v Rscript >/dev/null 2>&1; then
+    echo "ERROR: Rscript was not found in PATH."
+    exit 1
+  fi
+
+  echo "panel,input,out_dir,html,pdf,static,dynamic,checks,input_summary,metadata,static_errors,dynamic_errors" > "${MANIFEST_FILE}"
 
   for entry in "${PANELS[@]}"; do
     PANEL_LABEL="${entry%%|*}"
     INPUT_FILE="${entry#*|}"
     PANEL_OUT_DIR="${OUT_ROOT}/${PANEL_LABEL}"
-    HTML_FILE="${PANEL_OUT_DIR}/borusyak_quality_${PANEL_LABEL}.html"
 
     if [[ ! -f "${INPUT_FILE}" ]]; then
-      echo "ERROR: Input complete-case panel not found for ${PANEL_LABEL}: ${INPUT_FILE}"
+      echo "ERROR: Input panel not found for ${PANEL_LABEL}: ${INPUT_FILE}"
       echo
-      echo "If this is flexible, first finish:"
-      echo "  1. flexible treatment/control scan"
-      echo "  2. PANEL_VARIANT=flexible bash run-py-2c-merge-sonarqube-panel.sh"
-      echo "  3. PANEL_VARIANT=flexible bash run-py-2d-check-sonarqube-panels.sh"
-      echo "  4. PANEL_VARIANT=flexible bash run-py-2e-prepare-quality-did-input.sh"
+      if [[ "${PANEL_LABEL}" == "strict" ]]; then
+        echo "Create the strict paper-schema input first:"
+        echo "  PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE"
+      else
+        echo "Create the flexible complete-case quality input first."
+      fi
       exit 1
     fi
 
+    rm -rf "${PANEL_OUT_DIR}"
     mkdir -p "${PANEL_OUT_DIR}"
+
+    GENERATED_PDF_FILE="${PANEL_OUT_DIR}/dynamic_effects_borusyak_quality.pdf"
+    STATIC_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_effects.csv"
+    DYNAMIC_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_effects.csv"
+    CHECKS_FILE="${PANEL_OUT_DIR}/borusyak_quality_panel_checks.csv"
+    INPUT_SUMMARY_FILE="${PANEL_OUT_DIR}/borusyak_quality_input_summary.csv"
+    METADATA_FILE="${PANEL_OUT_DIR}/borusyak_quality_metadata.csv"
+    GENERATED_STATIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_errors.csv"
+    GENERATED_DYNAMIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_errors.csv"
+
+    rm -f \
+      "${GENERATED_PDF_FILE}" \
+      "${GENERATED_STATIC_ERRORS_FILE}" \
+      "${GENERATED_DYNAMIC_ERRORS_FILE}"
+
+    if [[ "${PANEL_LABEL}" == "strict" ]]; then
+      HTML_FILE="${STRICT_HTML_FILE}"
+      PDF_FILE="${STRICT_PDF_FILE}"
+      RENDER_OUTPUT_DIR="$(dirname "${HTML_FILE}")"
+      RENDER_OUTPUT_FILE="$(basename "${HTML_FILE}")"
+      STATIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_errors_${RUN_TS}.csv"
+      DYNAMIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_errors_${RUN_TS}.csv"
+    else
+      HTML_FILE="${FLEXIBLE_HTML_FILE}"
+      PDF_FILE="${FLEXIBLE_PDF_FILE}"
+      RENDER_OUTPUT_DIR="$(dirname "${HTML_FILE}")"
+      RENDER_OUTPUT_FILE="$(basename "${HTML_FILE}")"
+      STATIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_errors_${RUN_TS}.csv"
+      DYNAMIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_errors_${RUN_TS}.csv"
+    fi
+
+    mkdir -p "${RENDER_OUTPUT_DIR}" "$(dirname "${PDF_FILE}")"
+    rm -f "${HTML_FILE}" "${PDF_FILE}" "${STATIC_ERRORS_FILE}" "${DYNAMIC_ERRORS_FILE}"
 
     echo
     echo "============================================================"
     echo "Running panel: ${PANEL_LABEL}"
     echo "Input:         ${INPUT_FILE}"
-    echo "Output dir:    ${PANEL_OUT_DIR}"
-    echo "HTML:          ${HTML_FILE}"
+    echo "Main HTML:     ${HTML_FILE}"
+    echo "Main PDF:      ${PDF_FILE}"
+    echo "Extra outputs: ${PANEL_OUT_DIR}"
     echo "============================================================"
 
     export PANEL_LABEL
     export PANEL_PATH="${INPUT_FILE}"
     export OUT_DIR="${PANEL_OUT_DIR}"
     export RMD_FILE
+    export RENDER_OUTPUT_DIR
+    export RENDER_OUTPUT_FILE
 
-    Rscript -e "rmarkdown::render(
-      input = Sys.getenv('RMD_FILE'),
-      output_file = paste0('borusyak_quality_', Sys.getenv('PANEL_LABEL'), '.html'),
-      output_dir = Sys.getenv('OUT_DIR'),
-      params = list(
-        panel_label = Sys.getenv('PANEL_LABEL'),
-        panel_path = Sys.getenv('PANEL_PATH'),
-        out_dir = Sys.getenv('OUT_DIR')
-      ),
-      knit_root_dir = getwd(),
-      envir = new.env(parent = globalenv()),
-      quiet = FALSE
-    )"
+    Rscript - <<'RS'
+rmd <- Sys.getenv("RMD_FILE")
+render_output_dir <- Sys.getenv("RENDER_OUTPUT_DIR")
+render_output_file <- Sys.getenv("RENDER_OUTPUT_FILE")
 
-    STATIC_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_effects.csv"
-    DYNAMIC_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_effects.csv"
-    CHECKS_FILE="${PANEL_OUT_DIR}/borusyak_quality_panel_checks.csv"
-    INPUT_SUMMARY_FILE="${PANEL_OUT_DIR}/borusyak_quality_input_summary.csv"
-    METADATA_FILE="${PANEL_OUT_DIR}/borusyak_quality_metadata.csv"
-    STATIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_static_errors.csv"
-    DYNAMIC_ERRORS_FILE="${PANEL_OUT_DIR}/borusyak_quality_dynamic_errors.csv"
+if (!file.exists(rmd)) {
+  stop("Rmd file not found: ", rmd)
+}
 
-    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' \
+if (!requireNamespace("rmarkdown", quietly = TRUE)) {
+  stop("Package 'rmarkdown' is required.")
+}
+
+rmarkdown::render(
+  input = rmd,
+  output_file = render_output_file,
+  output_dir = render_output_dir,
+  knit_root_dir = getwd(),
+  envir = new.env(parent = globalenv()),
+  quiet = FALSE
+)
+RS
+
+    if [[ ! -f "${HTML_FILE}" ]]; then
+      echo "ERROR: Expected HTML output was not created: ${HTML_FILE}"
+      exit 1
+    fi
+
+    if [[ ! -f "${GENERATED_PDF_FILE}" ]]; then
+      echo "ERROR: Expected PDF output was not created: ${GENERATED_PDF_FILE}"
+      exit 1
+    fi
+    mv -f "${GENERATED_PDF_FILE}" "${PDF_FILE}"
+
+    if [[ -f "${GENERATED_STATIC_ERRORS_FILE}" ]]; then
+      mv -f "${GENERATED_STATIC_ERRORS_FILE}" "${STATIC_ERRORS_FILE}"
+    fi
+
+    if [[ -f "${GENERATED_DYNAMIC_ERRORS_FILE}" ]]; then
+      mv -f "${GENERATED_DYNAMIC_ERRORS_FILE}" "${DYNAMIC_ERRORS_FILE}"
+    fi
+
+    for required_output in \
+      "${STATIC_FILE}" \
+      "${DYNAMIC_FILE}" \
+      "${CHECKS_FILE}" \
+      "${INPUT_SUMMARY_FILE}" \
+      "${METADATA_FILE}"; do
+      if [[ ! -f "${required_output}" ]]; then
+        echo "ERROR: Expected core output was not created: ${required_output}"
+        exit 1
+      fi
+    done
+
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' \
       "${PANEL_LABEL}" \
       "${INPUT_FILE}" \
       "${PANEL_OUT_DIR}" \
       "${HTML_FILE}" \
+      "${PDF_FILE}" \
       "${STATIC_FILE}" \
       "${DYNAMIC_FILE}" \
       "${CHECKS_FILE}" \
@@ -4473,10 +4895,8 @@ mkdir -p "${LOG_DIR}" "${OUT_ROOT}"
   done
 
   echo
-  echo "** Combining Borusyak quality outputs"
+  echo "** Building combined diagnostic outputs"
   echo "------------------------------------------------------------"
-
-
 
   python - "${MANIFEST_FILE}" \
     "${COMBINED_STATIC}" \
@@ -4499,30 +4919,41 @@ combined_errors_path = Path(sys.argv[6])
 manifest = pd.read_csv(manifest_path)
 
 
-def read_optional_csv(path, panel, kind):
-    """Read one output CSV and add panel/kind only when missing."""
-    path = Path(path)
-
-    if not path.exists() or path.stat().st_size == 0:
-        return pd.DataFrame([{
-            "panel": panel,
-            "kind": kind,
-            "missing_file": str(path),
-        }])
+def read_required_csv(path: str, panel: str, kind: str) -> pd.DataFrame:
+    """Read a required core output and attach panel metadata when needed."""
+    csv_path = Path(path)
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Missing {kind} output for {panel}: {csv_path}")
 
     try:
-        df = pd.read_csv(path)
+        frame = pd.read_csv(csv_path)
     except pd.errors.EmptyDataError:
-        return pd.DataFrame([{
-            "panel": panel,
-            "kind": kind,
-            "empty_file": str(path),
-        }])
+        frame = pd.DataFrame()
 
-    if "panel" not in df.columns:
-        df.insert(0, "panel", panel)
+    if "panel" not in frame.columns:
+        frame.insert(0, "panel", panel)
 
-    return df
+    return frame
+
+
+def read_error_csv(path: str, panel: str, model_type: str) -> pd.DataFrame | None:
+    """Read an optional model error file."""
+    csv_path = Path(path)
+    if not csv_path.exists() or csv_path.stat().st_size == 0:
+        return None
+
+    try:
+        frame = pd.read_csv(csv_path)
+    except pd.errors.EmptyDataError:
+        return None
+
+    if "panel" not in frame.columns:
+        frame.insert(0, "panel", panel)
+    if "model_type" not in frame.columns:
+        insert_pos = 1 if "panel" in frame.columns else 0
+        frame.insert(insert_pos, "model_type", model_type)
+
+    return frame
 
 
 static_frames = []
@@ -4532,46 +4963,39 @@ summary_frames = []
 error_frames = []
 
 for _, row in manifest.iterrows():
-    panel = row["panel"]
+    panel = str(row["panel"])
 
-    static_frames.append(read_optional_csv(row["static"], panel, "static"))
-    dynamic_frames.append(read_optional_csv(row["dynamic"], panel, "dynamic"))
-    checks_frames.append(read_optional_csv(row["checks"], panel, "checks"))
-    summary_frames.append(read_optional_csv(row["input_summary"], panel, "input_summary"))
+    static_frames.append(read_required_csv(row["static"], panel, "static"))
+    dynamic_frames.append(read_required_csv(row["dynamic"], panel, "dynamic"))
+    checks_frames.append(read_required_csv(row["checks"], panel, "checks"))
+    summary_frames.append(read_required_csv(row["input_summary"], panel, "input summary"))
 
-    for error_col, model_type in [
+    for error_column, model_type in (
         ("static_errors", "static"),
         ("dynamic_errors", "dynamic"),
-    ]:
-        error_path = Path(row[error_col])
-
-        if not error_path.exists() or error_path.stat().st_size == 0:
-            continue
-
-        try:
-            err = pd.read_csv(error_path)
-        except pd.errors.EmptyDataError:
-            continue
-
-        if "panel" not in err.columns:
-            err.insert(0, "panel", panel)
-
-        if "model_type" not in err.columns:
-            insert_pos = 1 if "panel" in err.columns else 0
-            err.insert(insert_pos, "model_type", model_type)
-
-        error_frames.append(err)
-
+    ):
+        error_frame = read_error_csv(row[error_column], panel, model_type)
+        if error_frame is not None:
+            error_frames.append(error_frame)
 
 combined_static = pd.concat(static_frames, ignore_index=True) if static_frames else pd.DataFrame()
 combined_dynamic = pd.concat(dynamic_frames, ignore_index=True) if dynamic_frames else pd.DataFrame()
 combined_checks = pd.concat(checks_frames, ignore_index=True) if checks_frames else pd.DataFrame()
 combined_input_summary = pd.concat(summary_frames, ignore_index=True) if summary_frames else pd.DataFrame()
-combined_errors = pd.concat(error_frames, ignore_index=True) if error_frames else pd.DataFrame(
-    columns=["panel", "model_type", "outcome", "error"]
+combined_errors = (
+    pd.concat(error_frames, ignore_index=True)
+    if error_frames
+    else pd.DataFrame(columns=["panel", "model_type", "outcome", "error"])
 )
 
-combined_static_path.parent.mkdir(parents=True, exist_ok=True)
+for output_path in (
+    combined_static_path,
+    combined_dynamic_path,
+    combined_checks_path,
+    combined_input_summary_path,
+    combined_errors_path,
+):
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
 combined_static.to_csv(combined_static_path, index=False)
 combined_dynamic.to_csv(combined_dynamic_path, index=False)
@@ -4579,566 +5003,33 @@ combined_checks.to_csv(combined_checks_path, index=False)
 combined_input_summary.to_csv(combined_input_summary_path, index=False)
 combined_errors.to_csv(combined_errors_path, index=False)
 
-print("Combined static effects:")
-print(combined_static.to_string(index=False))
-print()
-
+print("Combined static effects rows:", len(combined_static))
 print("Combined dynamic effects rows:", len(combined_dynamic))
 print("Combined panel checks rows:", len(combined_checks))
 print("Combined input summary rows:", len(combined_input_summary))
 print("Combined error rows:", len(combined_errors))
 print()
-
-print(f"Saved combined static effects: {combined_static_path}")
-print(f"Saved combined dynamic effects: {combined_dynamic_path}")
-print(f"Saved combined panel checks: {combined_checks_path}")
-print(f"Saved combined input summary: {combined_input_summary_path}")
-print(f"Saved combined errors: {combined_errors_path}")
+print("Saved combined static effects:", combined_static_path)
+print("Saved combined dynamic effects:", combined_dynamic_path)
+print("Saved combined panel checks:", combined_checks_path)
+print("Saved combined input summary:", combined_input_summary_path)
+print("Saved combined errors:", combined_errors_path)
 PY
+
+  rm -rf "${WORK_DIR}"
 
   echo
   echo "============================================================"
-  echo "run-py-2f completed successfully."
+  echo "${RUN_PREFIX} completed successfully."
   echo "Completed:              $(date)"
   echo "Panel variant:          ${PANEL_VARIANT}"
-  echo "Manifest:               ${MANIFEST_FILE}"
-  echo "Combined static:        ${COMBINED_STATIC}"
-  echo "Combined dynamic:       ${COMBINED_DYNAMIC}"
-  echo "Combined checks:        ${COMBINED_CHECKS}"
-  echo "Combined input summary: ${COMBINED_INPUT_SUMMARY}"
-  echo "Combined errors:        ${COMBINED_ERRORS}"
+  echo "Strict HTML:            ${STRICT_HTML_FILE}"
+  echo "Strict PDF:             ${STRICT_PDF_FILE}"
+  echo "Main output root:       ${MAIN_OUTPUT_ROOT}"
+  echo "Extra output root:      ${TMP_ROOT}"
+  echo "Temporary outputs:      removed"
   echo "Log file:               ${LOG_FILE}"
   echo "============================================================"
 
 } 2>&1 | tee "${LOG_FILE}"
-#
-# This wrapper is adapted from the logic of run9f_did_borusyak_quality.sh,
-# but it does NOT call the existing JS/TS shell wrapper.
-#
-
-
-###############################################################################
-# FILE: run-py-2g-summarize-borusyak-quality.sh
-###############################################################################
-
-#!/usr/bin/env bash
-set -euo pipefail
-
-# ============================================================
-# run-py-2g: Summarize Python Borusyak quality DiD outputs
-# ============================================================
-#
-# Purpose:
-#   Summarize Python Borusyak quality DiD outputs generated by
-#   run-py-2f-did-borusyak-quality.sh.
-# Inputs:
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_static_effects_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_dynamic_effects_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_panel_checks_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_input_summary_<variant>.csv
-#   repo_python/did_final/quality_did_borusyak/borusyak_quality_errors_<variant>.csv
-#
-# Supported variants:
-#   flexible
-#   strict
-#
-# Outputs:
-#   repo_python/did_final/quality_did_borusyak/summary/
-#     - borusyak_quality_static_effects_paper_ready.csv
-#     - borusyak_quality_static_effects_wide.csv
-#     - borusyak_quality_main_panel_table.csv
-#     - borusyak_quality_main_panel_table.md
-#     - borusyak_quality_dynamic_effects_percent.csv
-#     - borusyak_quality_dynamic_effects_plot_ready.csv
-#     - borusyak_quality_summary_notes.txt
-#
-# Usage:
-#   MAIN_PANEL=strict bash run-py-2g-summarize-borusyak-quality.sh
-#   MAIN_PANEL=flexible bash run-py-2g-summarize-borusyak-quality.sh
-# ============================================================
-
-LOG_DIR="${LOG_DIR:-logs}"
-RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2g_summarize_borusyak_quality_${RUN_TS}.log}"
-
-INPUT_DIR="${INPUT_DIR:-repo_python/did_final/quality_did_borusyak}"
-OUTPUT_DIR="${OUTPUT_DIR:-${INPUT_DIR}/summary}"
-PY_SCRIPT="${PY_SCRIPT:-proc_scripts/summarize_borusyak_quality_outputs_python.py}"
-
-MAIN_PANEL="${MAIN_PANEL:-strict}"
-PANEL_VARIANTS="${PANEL_VARIANTS:-flexible strict}"
-
-mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
-
-{
-  echo "============================================================"
-  echo "run-py-2g: summarize Python Borusyak quality DiD outputs"
-  echo "Started:        $(date)"
-  echo "Python script:  ${PY_SCRIPT}"
-  echo "Input dir:      ${INPUT_DIR}"
-  echo "Output dir:     ${OUTPUT_DIR}"
-  echo "Main panel:     ${MAIN_PANEL}"
-  echo "Panel variants: ${PANEL_VARIANTS}"
-  echo "Log file:       ${LOG_FILE}"
-  echo "============================================================"
-  echo
-
-  if [[ ! -f "${PY_SCRIPT}" ]]; then
-    echo "ERROR: Python script not found: ${PY_SCRIPT}"
-    exit 1
-  fi
-
-  if [[ ! -d "${INPUT_DIR}" ]]; then
-    echo "ERROR: Input directory not found: ${INPUT_DIR}"
-    exit 1
-  fi
-
-  case "${MAIN_PANEL}" in
-    flexible|strict)
-      ;;
-    *)
-      echo "ERROR: MAIN_PANEL must be flexible or strict. Got: ${MAIN_PANEL}"
-      exit 1
-      ;;
-  esac
-
-  python -m py_compile "${PY_SCRIPT}"
-
-  echo "** Build combined Python quality outputs"
-  echo "------------------------------------------------------------"
-
-  variant_args=()
-  for variant in ${PANEL_VARIANTS}; do
-    variant_args+=("${variant}")
-  done
-
-  python - "${INPUT_DIR}" "${variant_args[@]}" <<'PY'
-import sys
-from pathlib import Path
-
-import pandas as pd
-
-input_dir = Path(sys.argv[1])
-variants = sys.argv[2:]
-
-if not variants:
-    raise SystemExit("ERROR: no panel variants provided.")
-
-specs = [
-    ("static_effects", True),
-    ("dynamic_effects", True),
-    ("panel_checks", False),
-    ("input_summary", False),
-    ("errors", False),
-]
-
-for stem, required in specs:
-    frames = []
-
-    for variant in variants:
-        path = input_dir / f"borusyak_quality_{stem}_{variant}.csv"
-        if not path.exists():
-            print(f"Missing optional input: {path}")
-            continue
-
-        df = pd.read_csv(path)
-
-        if "panel" not in df.columns:
-            df.insert(0, "panel", variant)
-        else:
-            df["panel"] = df["panel"].fillna(variant)
-            df.loc[df["panel"].astype(str).str.strip().eq(""), "panel"] = variant
-
-        frames.append(df)
-        print(f"Loaded {variant}: {path} rows={len(df)}")
-
-    out_path = input_dir / f"borusyak_quality_{stem}_all.csv"
-
-    if frames:
-        combined = pd.concat(frames, ignore_index=True)
-        combined.to_csv(out_path, index=False)
-        print(f"Saved combined file: {out_path} rows={len(combined)}")
-    elif required:
-        raise SystemExit(f"ERROR: required combined input could not be built for {stem}")
-    else:
-        empty = pd.DataFrame(columns=["panel"])
-        empty.to_csv(out_path, index=False)
-        print(f"Saved empty optional combined file: {out_path}")
-PY
-
-  echo
-  echo "** Summarize Python quality DiD outputs"
-  echo "------------------------------------------------------------"
-
-  python "${PY_SCRIPT}" \
-    --input-dir "${INPUT_DIR}" \
-    --output-dir "${OUTPUT_DIR}" \
-    --main-panel "${MAIN_PANEL}"
-
-  echo
-  echo "============================================================"
-  echo "run-py-2g completed successfully."
-  echo "Completed:   $(date)"
-  echo "Output dir:  ${OUTPUT_DIR}"
-  echo "Log file:    ${LOG_FILE}"
-  echo "============================================================"
-
-} 2>&1 | tee "${LOG_FILE}"
-
-echo "Saved log to ${LOG_FILE}"
-#
-# Reused logic:
-#   This wrapper follows the structure of run9g_summarize_borusyak_quality.sh,
-#   but it uses Python-specific paths, labels, and panel variants.
-#
-
-
-###############################################################################
-# FILE: run-py-2h-did-borusyak-velocity.sh
-###############################################################################
-
-#!/usr/bin/env bash
-set -euo pipefail
-
-# ============================================================
-# run-py-2h: Borusyak DiD for Python development velocity outcomes
-# ============================================================
-#
-# Purpose:
-#   Run Borusyak imputation DiD for Python development velocity
-#   outcomes using the final matched Python panels.
-#
-# Outcomes handled inside the Rmd:
-#   - commits
-#   - lines_added
-#
-# Current Python panel naming convention:
-#   flexible
-#     - Sample-coverage panel.
-#     - Keeps treatments with 2 or 3 final controls.
-#     - Primary analysis candidate.
-#
-#   strict
-#     - 1:3 matching-rule panel.
-#     - Keeps only treatments with exactly 3 final controls.
-#     - Primary robustness / matching-rule panel.
-#
-#   flexible_window_driven
-#     - Diagnostic window-completed version of flexible.
-#
-#   strict_window_driven
-#     - Diagnostic window-completed version of strict.
-#
-# Default run:
-#   PANEL_VARIANTS="flexible strict"
-#
-# Optional diagnostic run:
-#   PANEL_VARIANTS="flexible strict flexible_window_driven strict_window_driven"
-#
-# Inputs:
-#   repo_python/did_final/panel_event_matched_flexible.csv
-#   repo_python/did_final/panel_event_matched_strict.csv
-#   repo_python/did_final/panel_event_matched_flexible_window_driven.csv
-#   repo_python/did_final/panel_event_matched_strict_window_driven.csv
-#
-# Outputs:
-#   repo_python/did_final/velocity_did_borusyak/<variant>/borusyak_velocity_<variant>.html
-#   repo_python/did_final/velocity_did_borusyak/borusyak_velocity_static_effects_all.csv
-#   repo_python/did_final/velocity_did_borusyak/borusyak_velocity_dynamic_effects_all.csv
-#   repo_python/did_final/velocity_did_borusyak/summary/borusyak_velocity_static_effects_paper_ready.csv
-#   repo_python/did_final/velocity_did_borusyak/summary/borusyak_velocity_static_effects_wide.csv
-#   repo_python/did_final/velocity_did_borusyak/summary/borusyak_velocity_dynamic_effects_percent.csv
-#   repo_python/did_final/velocity_did_borusyak/summary/borusyak_velocity_dynamic_effects_plot_ready.csv
-#   repo_python/did_final/velocity_did_borusyak/summary/borusyak_velocity_summary_notes.txt
-#
-# Usage:
-#   bash run-py-2h-did-borusyak-velocity.sh
-#
-#   PANEL_VARIANTS="flexible strict flexible_window_driven strict_window_driven" \
-#   bash run-py-2h-did-borusyak-velocity.sh
-# ============================================================
-
-LOG_DIR="${LOG_DIR:-logs}"
-RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2h_did_borusyak_velocity_${RUN_TS}.log}"
-
-RMD="${RMD:-proc_r/DiffInDiffBorusyak_velocity_python_v2.Rmd}"
-
-DID_DIR="${DID_DIR:-repo_python/did_final}"
-OUT_ROOT="${OUT_ROOT:-${DID_DIR}/velocity_did_borusyak}"
-SUMMARY_DIR="${SUMMARY_DIR:-${OUT_ROOT}/summary}"
-
-PANEL_VARIANTS="${PANEL_VARIANTS:-flexible strict}"
-
-FLEXIBLE_PANEL="${FLEXIBLE_PANEL:-${DID_DIR}/panel_event_matched_flexible.csv}"
-STRICT_PANEL="${STRICT_PANEL:-${DID_DIR}/panel_event_matched_strict.csv}"
-FLEXIBLE_WINDOW_DRIVEN_PANEL="${FLEXIBLE_WINDOW_DRIVEN_PANEL:-${DID_DIR}/panel_event_matched_flexible_window_driven.csv}"
-STRICT_WINDOW_DRIVEN_PANEL="${STRICT_WINDOW_DRIVEN_PANEL:-${DID_DIR}/panel_event_matched_strict_window_driven.csv}"
-
-mkdir -p "${LOG_DIR}" "${OUT_ROOT}" "${SUMMARY_DIR}"
-
-resolve_panel_path() {
-  local label="$1"
-
-  case "${label}" in
-    flexible)
-      echo "${FLEXIBLE_PANEL}"
-      ;;
-    strict)
-      echo "${STRICT_PANEL}"
-      ;;
-    flexible_window_driven)
-      echo "${FLEXIBLE_WINDOW_DRIVEN_PANEL}"
-      ;;
-    strict_window_driven)
-      echo "${STRICT_WINDOW_DRIVEN_PANEL}"
-      ;;
-    *)
-      echo "ERROR: unsupported panel variant: ${label}" >&2
-      echo "Supported variants: flexible strict flexible_window_driven strict_window_driven" >&2
-      exit 1
-      ;;
-  esac
-}
-
-render_one_panel() {
-  local label="$1"
-  local panel="$2"
-  local out_dir="${OUT_ROOT}/${label}"
-
-  echo
-  echo "============================================================"
-  echo "Rendering Python velocity Borusyak panel: ${label}"
-  echo "Panel:      ${panel}"
-  echo "Output dir: ${out_dir}"
-  echo "============================================================"
-
-  if [[ ! -f "${panel}" ]]; then
-    echo "ERROR: panel file not found: ${panel}"
-    exit 1
-  fi
-
-  mkdir -p "${out_dir}"
-
-  PANEL_LABEL="${label}" \
-  PANEL_PATH="${panel}" \
-  OUT_DIR="${out_dir}" \
-  RMD_PATH="${RMD}" \
-  Rscript - <<'RS'
-rmd <- Sys.getenv("RMD_PATH")
-panel_label <- Sys.getenv("PANEL_LABEL")
-panel_path <- Sys.getenv("PANEL_PATH")
-out_dir <- Sys.getenv("OUT_DIR")
-
-if (!file.exists(rmd)) {
-  stop("Rmd file not found: ", rmd)
-}
-
-if (!requireNamespace("rmarkdown", quietly = TRUE)) {
-  stop("Package 'rmarkdown' is required.")
-}
-
-rmarkdown::render(
-  input = rmd,
-  output_file = paste0("borusyak_velocity_", panel_label, ".html"),
-  output_dir = out_dir,
-  params = list(
-    panel_label = panel_label,
-    panel_path = panel_path,
-    out_dir = out_dir
-  ),
-  knit_root_dir = getwd(),
-  envir = new.env(parent = globalenv()),
-  quiet = FALSE
-)
-RS
-}
-
-{
-  echo "============================================================"
-  echo "run-py-2h: Python development velocity Borusyak DiD"
-  echo "Started:        $(date)"
-  echo "Rmd:            ${RMD}"
-  echo "DID dir:        ${DID_DIR}"
-  echo "Output root:    ${OUT_ROOT}"
-  echo "Summary dir:    ${SUMMARY_DIR}"
-  echo "Panel variants: ${PANEL_VARIANTS}"
-  echo "Log file:       ${LOG_FILE}"
-  echo "============================================================"
-  echo
-
-  if [[ ! -f "${RMD}" ]]; then
-    echo "ERROR: Rmd file not found: ${RMD}"
-    echo "Create it first from proc_r/DiffInDiffBorusyak_velocity_v2.Rmd."
-    exit 1
-  fi
-
-  for label in ${PANEL_VARIANTS}; do
-    panel_path="$(resolve_panel_path "${label}")"
-    render_one_panel "${label}" "${panel_path}"
-  done
-
-  echo
-  echo "** Building combined Python velocity summaries"
-  echo "------------------------------------------------------------"
-
-  python - "${OUT_ROOT}" "${SUMMARY_DIR}" "${PANEL_VARIANTS}" <<'PY'
-import math
-import sys
-from pathlib import Path
-
-import pandas as pd
-
-out_root = Path(sys.argv[1])
-summary_dir = Path(sys.argv[2])
-labels = sys.argv[3].split()
-
-summary_dir.mkdir(parents=True, exist_ok=True)
-
-def read_if_exists(label: str, filename: str) -> pd.DataFrame | None:
-    path = out_root / label / filename
-    if not path.exists():
-        print(f"MISSING: {path}")
-        return None
-
-    df = pd.read_csv(path)
-
-    if "panel" not in df.columns:
-        df.insert(0, "panel", label)
-    else:
-        df["panel"] = df["panel"].fillna(label)
-        df.loc[df["panel"].astype(str).str.strip().eq(""), "panel"] = label
-
-    return df
-
-combined_specs = [
-    ("borusyak_velocity_static_effects.csv", "borusyak_velocity_static_effects_all.csv"),
-    ("borusyak_velocity_dynamic_effects.csv", "borusyak_velocity_dynamic_effects_all.csv"),
-    ("borusyak_velocity_input_summary.csv", "borusyak_velocity_input_summary_all.csv"),
-    ("borusyak_velocity_panel_checks.csv", "borusyak_velocity_panel_checks_all.csv"),
-]
-
-for src_name, out_name in combined_specs:
-    parts = []
-
-    for label in labels:
-        df = read_if_exists(label, src_name)
-        if df is not None:
-            parts.append(df)
-
-    if parts:
-        combined = pd.concat(parts, ignore_index=True)
-        out = out_root / out_name
-        combined.to_csv(out, index=False)
-        print(f"Saved: {out}")
-    else:
-        print(f"WARNING: no input files found for {src_name}")
-
-static_path = out_root / "borusyak_velocity_static_effects_all.csv"
-if static_path.exists():
-    static = pd.read_csv(static_path)
-
-    for col in ["estimate", "conf_low", "conf_high"]:
-        if col in static.columns:
-            static[f"{col}_pct"] = static[col].apply(
-                lambda x: None if pd.isna(x) else (math.exp(float(x)) - 1.0) * 100.0
-            )
-
-    paper_cols = [
-        "panel",
-        "outcome",
-        "outcome_label",
-        "estimate",
-        "estimate_pct",
-        "conf_low",
-        "conf_low_pct",
-        "conf_high",
-        "conf_high_pct",
-        "std_error",
-        "p_value",
-        "note",
-    ]
-    paper_cols = [c for c in paper_cols if c in static.columns]
-
-    paper = static[paper_cols].copy()
-    out = summary_dir / "borusyak_velocity_static_effects_paper_ready.csv"
-    paper.to_csv(out, index=False)
-    print(f"Saved: {out}")
-
-    if {"panel", "outcome", "estimate_pct"}.issubset(paper.columns):
-        wide = paper.pivot_table(
-            index=["panel"],
-            columns=["outcome"],
-            values=["estimate_pct", "conf_low_pct", "conf_high_pct"],
-            aggfunc="first",
-        )
-        wide.columns = ["_".join([str(x) for x in col if str(x) != ""]) for col in wide.columns]
-        wide = wide.reset_index()
-        out = summary_dir / "borusyak_velocity_static_effects_wide.csv"
-        wide.to_csv(out, index=False)
-        print(f"Saved: {out}")
-
-dynamic_path = out_root / "borusyak_velocity_dynamic_effects_all.csv"
-if dynamic_path.exists():
-    dynamic = pd.read_csv(dynamic_path)
-
-    for col in ["estimate", "conf_low", "conf_high"]:
-        if col in dynamic.columns:
-            dynamic[f"{col}_pct"] = dynamic[col].apply(
-                lambda x: None if pd.isna(x) else (math.exp(float(x)) - 1.0) * 100.0
-            )
-
-    out = summary_dir / "borusyak_velocity_dynamic_effects_percent.csv"
-    dynamic.to_csv(out, index=False)
-    print(f"Saved: {out}")
-
-    plot_cols = [
-        "panel",
-        "outcome",
-        "outcome_label",
-        "time",
-        "estimate",
-        "conf_low",
-        "conf_high",
-        "estimate_pct",
-        "conf_low_pct",
-        "conf_high_pct",
-        "significant",
-    ]
-    plot_cols = [c for c in plot_cols if c in dynamic.columns]
-
-    out = summary_dir / "borusyak_velocity_dynamic_effects_plot_ready.csv"
-    dynamic[plot_cols].to_csv(out, index=False)
-    print(f"Saved: {out}")
-
-notes = summary_dir / "borusyak_velocity_summary_notes.txt"
-notes.write_text(
-    "Python velocity Borusyak DiD completed for panel variants: "
-    + ", ".join(labels)
-    + ". Outcomes are log_commits and log_lines_added. "
-    + "Static effects summarize average post-adoption treatment effects. "
-    + "Dynamic effects use event-time horizons -6 to 6 with pretrend horizons -6 to -2. "
-    + "Primary Python panels are flexible and strict; window-driven panels are diagnostic if included.\\n",
-    encoding="utf-8",
-)
-print(f"Saved: {notes}")
-PY
-
-  echo
-  echo "============================================================"
-  echo "run-py-2h completed successfully."
-  echo "Completed:       $(date)"
-  echo "Output root:     ${OUT_ROOT}"
-  echo "Summary dir:     ${SUMMARY_DIR}"
-  echo "Log file:        ${LOG_FILE}"
-  echo "============================================================"
-
-} 2>&1 | tee "${LOG_FILE}"
-
-echo "Saved log to ${LOG_FILE}"
-#
-# Reused logic:
-#   This wrapper is adapted from run9h-did-velocity-borusyak.sh.
-#   It does not call the old JS/TS shell wrapper.
-
 

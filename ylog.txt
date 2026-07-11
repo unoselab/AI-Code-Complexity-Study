@@ -1,211 +1,49 @@
-============================================================
-run-py-1a: Count Python Cursor-adopting treatment repositories
-Started:                    Fri Jul 10 03:50:49 PM CDT 2026
-Project root:               /home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study
-Python script:              proc_scripts/count_repo_lang.py
-Baseline panel:             data_baseline_backup/panel_event_monthly.csv
-Repository metadata:        data_baseline_backup/repos.csv
-Dataset source:             treatment
-Language:                   Python
-Group name:                 Python
-Main output directory:      repo_python
-Extra output directory:     repo_python/tmp
-Main output:                repo_python/treatment_python_repos.csv
-Balanced-window diagnostic: repo_python/tmp/treatment_python_repos_bw6.csv
-Minimum balanced window:    6
-Top print:                  30
-Log file:                   repo_python/tmp/run-py-1a_count_repo_20260710-155049.log
-============================================================
 
-Panel file: data_baseline_backup/panel_event_monthly.csv
-Repos file: data_baseline_backup/repos.csv
-panel rows: 22096
-repos rows: 8621
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -1 data/repos.csv 
+repo_name,repo_stars,repo_forks,repo_created,repo_updated,repo_description,repo_issues,repo_pulls,repo_commits,repo_contributors,repo_size,repo_languages,repo_primary_language
 
-dataset_source counts:
-dataset_source
-control      12203
-treatment     9893
 
-unique treatment repos from panel: 858
-repos after metadata join: 858
-missing primary language: 24
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -3 repo_python/run-py-2e/strict/panel_event_monthly_quality_py.csv
+repo_name,time,is_treatment,event,post_event,time_to_event,lead_6,lead_5,lead_4,lead_3,lead_2,lead_1,lag_0,lag_1,lag_2,lag_3,lag_4,lag_5,lag_6,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,dataset_source,other_agents,high_confidence
+1mrat/cursor-taskrunner,2024-08,1,2024-08,1,0.0,0,0,0,0,0,0,1,0,0,0,0,0,0,True,4,264,8,1,9.0,0.0,0.0,0.0,209.0,1.0,0.0,1.0,0.0,5.9,28.0,5.0,,,,treatment,False,True
+Anemll/Anemll,2025-02,1,2025-02,1,0.0,0,0,0,0,0,0,1,0,0,0,0,0,0,True,8,2742,701,2,212.0,3.0,3.0,0.0,3990.0,4.0,0.0,72.0,22.3,24.8,1013.0,427.0,,,,treatment,True,True
 
-Primary language counts among treatment repos:
-repo_primary_language
-TypeScript          379
-Python              128
-JavaScript           62
-Go                   36
-(missing)            24
-Rust                 24
-PHP                  23
-Vue                  16
-HTML                 16
-C#                   13
-Jupyter Notebook     13
-Dart                 12
-Swift                11
-C++                  11
-Shell                11
-Ruby                 10
-Elixir                8
-Svelte                7
-CSS                   7
-MDX                   6
-Astro                 5
-Java                  5
-C                     4
-Solidity              4
-Lua                   4
-Kotlin                3
-OCaml                 2
-HCL                   1
-Liquid                1
-Mathematica           1
 
-Selected languages: Python
-Group name: Python
-Python treatment repos: 128
-Unique repos: 128
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ ls ../treatment-repos/| grep -i Anemll
+Anemll_Anemll
 
-Saved language subset: repo_python/treatment_python_repos.csv
 
-Top 30 Python repos:
-                           repo_name repo_primary_language repo_stars repo_commits repo_contributors repo_size
-             1mrat/cursor-taskrunner                Python         13          4.0               1.0   27458.0
-         Altinity/clickhouse-grafana                Python        739       1809.0              33.0 1989751.0
-                       Anemll/Anemll                Python        307          8.0               1.0    2542.0
-    Apocrathia/home-assistant-config                Python        182       1000.0               9.0    3652.0
-Aronnaxx/Behold-Urwar-Droid-Concepts                Python         14         64.0               1.0   18131.0
-                   AttackIQ/DetectIQ                Python        101         36.0               1.0   16575.0
-                     ChatFAQ/ChatFAQ                Python        128       1391.0               8.0   14270.0
-        Chocksy/qc-options-framework                Python         14        100.0               3.0     497.0
-                  DannyMac180/mirror                Python         10         15.0               1.0     802.0
-           DataDog/integrations-core                Python        995      17955.0             381.0  276062.0
-             DataScienceUIBK/Rankify                Python        318        125.0               3.0    5359.0
-            DutchCryptoDad/bamboo-ta                Python         12        129.0               1.0   30773.0
-    Elevate-Code/better-voice-typing                Python         31         22.0               1.0    2385.0
-  Hankanman/Area-Occupancy-Detection                Python         58        195.0               1.0     552.0
-                        Kiln-AI/Kiln                Python       3284       1477.0               6.0   14657.0
-                KroMiose/nekro-agent                Python        149        434.0               4.0    5649.0
- LearningCircuit/local-deep-research                Python       1985        371.0              10.0    1460.0
-                 MDGrey33/pyvisionai                Python         98        142.0               1.0   10416.0
-   Meeting-Baas/speaking-meeting-bot                Python         11         92.0               2.0     464.0
-                      Metta-AI/metta                Python         21        686.0               8.0    2270.0
-           Mineru98/mysql-mcp-server                Python         20         62.0               1.0     157.0
-                     Multi-V-VM/MVVM                Python         36        486.0               5.0   17522.0
-        Ody-Z/Trading_Game_Simulator                Python         34          4.0               1.0      58.0
-        OpenMOSS/Language-Model-SAEs                Python        105        577.0               8.0   10244.0
-             OpenSPP/openspp-modules                Python         27       3532.0              18.0   74717.0
-         PiotrCzapla/smart_dictation                Python         16          6.0               1.0      56.0
-                     PostHog/posthog                Python      25398      22659.0             275.0 2044832.0
-                    PrefectHQ/marvin                Python       5586       3817.0              52.0   64290.0
-     ResearchHub/researchhub-backend                Python         40       9323.0              25.0  143476.0
-                 Scrapybara/codecapy                Python        159         35.0               1.0     765.0
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ cloc ../treatment-repos/Anemll_Anemll/
+     300 text files.
+     297 unique files.                                          
+      28 files ignored.
 
-============================================================
-Event-window coverage among selected language-group repos
-============================================================
-Duplicated repo-month rows collapsed: 51
-All Python treatment repos with window summary: 123
-Unique repos: 123
+github.com/AlDanial/cloc v 1.90  T=0.33 s (861.1 files/s, 298192.2 lines/s)
+--------------------------------------------------------------------------------
+Language                      files          blank        comment           code
+--------------------------------------------------------------------------------
+Python                          159           9705           8120          42281
+Swift                            40           2862           1883          16933
+Markdown                         44           2299              0           7298
+Bourne Shell                     19            665            563           4878
+XML                               9              0              0            341
+JSON                              9              0              0             99
+TOML                              1              4              0             42
+Bourne Again Shell                1              6             21              4
+INI                               1              0              0              2
+--------------------------------------------------------------------------------
+SUM:                            283          15541          10587          71878
+--------------------------------------------------------------------------------
 
-Primary language counts in window-summary subset:
-repo_primary_language
-Python    123
 
-balanced_window counts:
-balanced_window
-0    52
-1    14
-2     7
-3     5
-4     9
-5    17
-6    11
-7     6
-8     1
-9     1
+head -1 repo_python/run-py-2b/strict/treatment/ts_repos_monthly_scanned.csv && grep -i anemll repo_python/run-py-2b/strict/treatment/ts_repos_monthly_scanned.csv
+repo_name,month,latest_commit,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
+Anemll/Anemll,2025-02,d3b2e3660c0657ab643b68a0513b4b5ab443c04c,3990.0,4.0,0.0,72.0,22.3,24.8,1013.0,427.0
+Anemll/Anemll,2025-03,d3b2e3660c0657ab643b68a0513b4b5ab443c04c,3990.0,4.0,0.0,72.0,22.3,24.8,1013.0,427.0
+Anemll/Anemll,2025-04,d175746c2ffbabd0a0e4491212c0ef0a501d9848,4093.0,4.0,0.0,71.0,20.1,25.2,1064.0,425.0
+Anemll/Anemll,2025-05,4bfa0b08183a437e759798f2245bbcba2313521f,4093.0,4.0,0.0,71.0,20.1,25.2,1064.0,425.0
+Anemll/Anemll,2025-06,b0ea623eaac791a0803849c4f35ef8357f98935b,18458.0,8.0,0.0,175.0,16.9,19.1,4188.0,1485.0
+Anemll/Anemll,2025-07,6ecb10d7dfe90533af13ac23c825ca76aab0c56e,21444.0,9.0,1.0,232.0,23.4,19.4,5144.0,2092.0
+Anemll/Anemll,2025-08,6ecb10d7dfe90533af13ac23c825ca76aab0c56e,21444.0,9.0,1.0,232.0,23.4,19.4,5144.0,2092.0
 
-balanced_window >= 3: 50
-balanced_window >= 4: 45
-balanced_window >= 5: 36
-balanced_window >= 6: 19
-balanced_window >= 7: 8
-balanced_window >= 8: 2
-balanced_window >= 9: 1
 
-Good-window Python repos, balanced_window >= 6: 19
-Unique good-window repos: 19
-
-Event month counts for balanced_window >= 6:
-event_month
-2024-09    2
-2024-10    1
-2024-12    1
-2025-01    6
-2025-02    9
-
-Saved good-window subset: repo_python/tmp/treatment_python_repos_bw6.csv
-
-Top 30 good-window Python repos:
-                       repo_name event_month  pre_panel_months  post_panel_months  balanced_window repo_primary_language repo_stars repo_commits repo_contributors
-              VRSEN/agency-swarm     2024-10                 9                 10                9                Python       3605        574.0              16.0
-                ericmjl/llamabot     2024-09                 8                 11                8                Python        135       1656.0              12.0
-    OpenMOSS/Language-Model-SAEs     2024-12                 9                  7                7                Python        105        577.0               8.0
-                PrefectHQ/marvin     2025-01                12                  7                7                Python       5586       3817.0              52.0
-      assafelovic/gpt-researcher     2025-01                12                  7                7                Python      20634       2492.0             146.0
-                 atopile/atopile     2025-01                12                  7                7                Python       2054       2489.0              32.0
-                 terryyin/lizard     2025-01                12                  7                7                Python       1938       1117.0              49.0
-            tsukumijima/KonomiTV     2025-01                12                  7                7                Python        725       2994.0              18.0
-Apocrathia/home-assistant-config     2025-02                13                  6                6                Python        182       1000.0               9.0
-                 ChatFAQ/ChatFAQ     2024-09                 7                  6                6                Python        128       1391.0               8.0
-        DutchCryptoDad/bamboo-ta     2025-02                13                  6                6                Python         12        129.0               1.0
-            KroMiose/nekro-agent     2025-01                 6                  7                6                Python        149        434.0               4.0
-                  Metta-AI/metta     2025-02                 6                  6                6                Python         21        686.0               8.0
-                 PostHog/posthog     2025-02                13                  6                6                Python      25398      22659.0             275.0
-              allthingslinux/tux     2025-02                13                  6                6                Python         93       1908.0              35.0
-                   cgevans/qslib     2025-02                13                  6                6                Python         10        447.0               2.0
-                getsentry/sentry     2025-02                13                  6                6                Python      40425      82057.0             337.0
-            kenshiro-o/nagato-ai     2025-02                11                  6                6                Python        115        115.0               1.0
-                tw-haiven/haiven     2025-02                10                  6                6                Python        129       1331.0              10.0
-
-============================================================
-run-py-1a output verification
-============================================================
-Main output:                repo_python/treatment_python_repos.csv
-Main repository rows:       128
-Diagnostic output:          repo_python/tmp/treatment_python_repos_bw6.csv
-Diagnostic repository rows: 19
-
-Main output preview:
-repo_name,repo_primary_language,repo_stars,repo_commits,repo_contributors,repo_size,repo_languages
-1mrat/cursor-taskrunner,Python,13,4.0,1.0,27458.0,Python: 4996
-Altinity/clickhouse-grafana,Python,739,1809.0,33.0,1989751.0,Python: 456153; TypeScript: 376675; Go: 208210; Shell: 4461; JavaScript: 4262; Dockerfile: 1840; CSS: 89
-Anemll/Anemll,Python,307,8.0,1.0,2542.0,Python: 252255; Shell: 19620
-Apocrathia/home-assistant-config,Python,182,1000.0,9.0,3652.0,Python: 2728; C++: 2037; Shell: 983
-Aronnaxx/Behold-Urwar-Droid-Concepts,Python,14,64.0,1.0,18131.0,Python: 168252; HTML: 133404; JavaScript: 24660; CSS: 11080
-AttackIQ/DetectIQ,Python,101,36.0,1.0,16575.0,Python: 386470; TypeScript: 155128; JavaScript: 2064; Makefile: 1322; Shell: 613; CSS: 374
-ChatFAQ/ChatFAQ,Python,128,1391.0,8.0,14270.0,Python: 1066102; Vue: 363332; SCSS: 43290; JavaScript: 37927; Dockerfile: 5938; TypeScript: 2181; Makefile: 1927; Shell: 989
-Chocksy/qc-options-framework,Python,14,100.0,3.0,497.0,Python: 706400; Jupyter Notebook: 2105; Shell: 1163
-DannyMac180/mirror,Python,10,15.0,1.0,802.0,Python: 166452; Jupyter Notebook: 47445; HCL: 25460; Makefile: 855; Dockerfile: 342
-
-Diagnostic output preview:
-repo_name,event_month,panel_first_month,panel_latest_month,panel_month_count,min_relative_month,max_relative_month,pre_panel_months,event_months,post_panel_months,balanced_window,repo_primary_language,repo_stars,repo_commits,repo_contributors,repo_size,repo_languages
-VRSEN/agency-swarm,2024-10,2024-01,2025-08,20,-9,10,9,1,10,9,Python,3605,574.0,16.0,5947.0,Python: 389581; Jupyter Notebook: 87169; HTML: 1038
-ericmjl/llamabot,2024-09,2024-01,2025-08,20,-8,11,8,1,11,8,Python,135,1656.0,12.0,4822.0,Python: 385531; Jupyter Notebook: 353882; HTML: 20441; CSS: 7743; Dockerfile: 871; JavaScript: 624
-OpenMOSS/Language-Model-SAEs,2024-12,2024-03,2025-07,17,-9,7,9,1,7,7,Python,105,577.0,8.0,10244.0,Python: 412037; TypeScript: 196983; JavaScript: 3620; CSS: 1618; HTML: 383
-PrefectHQ/marvin,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,5586,3817.0,52.0,64290.0,Python: 450250; Jinja: 2905; Just: 1103; Mako: 494
-assafelovic/gpt-researcher,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,20634,2492.0,146.0,34132.0,Python: 431237; TypeScript: 114500; CSS: 18459; JavaScript: 17539; HTML: 11108; Dockerfile: 2886; Shell: 1214; Procfile: 78
-atopile/atopile,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,2054,2489.0,32.0,108255.0,Python: 2160023; C++: 103410; TypeScript: 30583; ANTLR: 11517; CMake: 2916; JavaScript: 2040; Shell: 397
-terryyin/lizard,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,1938,1117.0,49.0,2881.0,Python: 530214; Less: 175512; HTML: 102979; JavaScript: 77780; PHP: 4914; CSS: 4084; XSLT: 2233; Makefile: 1026; Nix: 896; Shell: 504; C: 76
-tsukumijima/KonomiTV,2025-01,2024-01,2025-08,20,-12,7,12,1,7,7,Python,725,2994.0,18.0,161519.0,Python: 1295281; Vue: 769210; TypeScript: 686372; HTML: 7579; Dockerfile: 6249; SCSS: 2580; JavaScript: 83
-Apocrathia/home-assistant-config,2025-02,2024-01,2025-08,20,-13,6,13,1,6,6,Python,182,1000.0,9.0,3652.0,Python: 2728; C++: 2037; Shell: 983
-
-============================================================
-run-py-1a completed successfully.
-Completed:                  Fri Jul 10 03:50:49 PM CDT 2026
-Main pipeline input:        repo_python/treatment_python_repos.csv
-Extra diagnostic output:    repo_python/tmp/treatment_python_repos_bw6.csv
-============================================================
