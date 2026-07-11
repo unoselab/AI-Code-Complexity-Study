@@ -9,41 +9,40 @@ set -euo pipefail
 #   Optionally create a paper-schema diagnostic output without calling
 #   compare/run-py-2b15-create-paper-structure-panel.sh.
 #
-# New CLI options:
-#   --convert-paper-same-column TRUE|FALSE
-#     Create an additional output with the same column order as
-#     data/panel_event_monthly.csv.
+# Input:
+#   repo_python/run-py-2c/<variant>/panel_event_matched_<variant>_with_sonarqube.csv
 #
-#   --keep-overlap-paper-same-column TRUE|FALSE
-#     Keep only exact repo-month matches with the paper panel in the
-#     paper-schema output. This option requires conversion to be TRUE.
+# Main output for the strict paper-overlap run:
+#   repo_python/run-py-2e/strict/panel_event_monthly_quality_py.csv
 #
-# Examples:
-#   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh
+# Main output for flexible or non-paper runs:
+#   repo_python/run-py-2e/<variant>/
+#     panel_event_matched_<variant>_with_sonarqube_quality_did_input_complete.csv
 #
+# Extra outputs:
+#   repo_python/tmp/run-py-2e/<variant>/quality_did_input_qc.csv
+#   repo_python/tmp/run-py-2e/<variant>/paper_audit/
+#
+# Temporary outputs:
+#   Full inputs, missing-row outputs, manifest, and combined QC files are
+#   created under a timestamped work directory and removed after success.
+#
+# Paper-comparable strict run:
 #   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
 #
-# Existing outputs for each panel variant:
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input_complete.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input_qc.csv
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input_missing_core_quality.csv
-#
-# Optional paper-schema output when both new flags are TRUE:
-#   repo_python/did_final/panel_event_matched_<variant>_with_sonarqube_quality_did_input_complete_paper_same_column_overlap.csv
-#
-# Paper-schema audit outputs:
-#   repo_python/tmp/<paper-output-stem>_column_sources.csv
-#   repo_python/tmp/<paper-output-stem>_key_match_summary.csv
-#   repo_python/tmp/<paper-output-stem>_metric_comparison.csv
-#   repo_python/tmp/<paper-output-stem>_unmatched_repo_months.csv
-#   repo_python/tmp/<paper-output-stem>_notes.md
-#
 # Important:
-#   The paper-schema output is a diagnostic dataset. It preserves regenerated
-#   Python SonarQube metrics and fills selected unavailable columns from the
-#   frozen paper panel on exact repo-month matches.
+#   The paper-schema output preserves regenerated Python SonarQube metrics.
+#   Selected unavailable covariates are filled from the frozen paper panel
+#   only on exact repo-month matches.
 # ============================================================
+
+SCRIPT_NAME="$(basename "$0")"
+if [[ "${SCRIPT_NAME}" =~ ^(run-py-[^-]+)- ]]; then
+  RUN_PREFIX="${BASH_REMATCH[1]}"
+else
+  echo "ERROR: unable to extract run prefix from script name: ${SCRIPT_NAME}" >&2
+  exit 1
+fi
 
 usage() {
   cat <<'EOF'
@@ -88,13 +87,18 @@ require_option_value() {
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 PANEL_VARIANT="${PANEL_VARIANT:-strict}"
-DID_DIR="${DID_DIR:-repo_python/did_final}"
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/prepare_quality_did_input_v2.py}"
+
+OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
+PANEL_INPUT_DIR="${PANEL_INPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-2c}"
+MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
+TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
+WORK_ROOT="${WORK_ROOT:-${TMP_DIR}/work_${RUN_TS}}"
 
 CONVERT_PAPER_SAME_COLUMN="${CONVERT_PAPER_SAME_COLUMN:-FALSE}"
 KEEP_OVERLAP_PAPER_SAME_COLUMN="${KEEP_OVERLAP_PAPER_SAME_COLUMN:-FALSE}"
 PAPER_PANEL_FILE="${PAPER_PANEL_FILE:-data/panel_event_monthly.csv}"
-PAPER_AUDIT_DIR="${PAPER_AUDIT_DIR:-repo_python/tmp}"
+PAPER_AUDIT_DIR="${PAPER_AUDIT_DIR:-${TMP_DIR}}"
 FILL_FROM_PAPER_COLUMNS="${FILL_FROM_PAPER_COLUMNS:-stars,issues,issue_comments,age,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,other_agents,high_confidence}"
 METRIC_COMPARE_COLUMNS="${METRIC_COMPARE_COLUMNS:-ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt}"
 TOP_PRINT="${TOP_PRINT:-20}"
@@ -171,40 +175,44 @@ if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" && ! -f "${PAPER_PANEL_FILE}" ]];
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-2e_prepare_quality_did_input_${PANEL_VARIANT}_${RUN_TS}.log}"
-MANIFEST_FILE="${DID_DIR}/quality_did_input_manifest_${PANEL_VARIANT}_${RUN_TS}.csv"
-COMBINED_QC_LONG="${DID_DIR}/quality_did_input_qc_${PANEL_VARIANT}_long.csv"
-COMBINED_QC_WIDE="${DID_DIR}/quality_did_input_qc_${PANEL_VARIANT}_wide.csv"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_prepare_quality_did_input_${PANEL_VARIANT}_${RUN_TS}.log}"
+MANIFEST_FILE="${WORK_ROOT}/quality_did_input_manifest_${PANEL_VARIANT}.csv"
+COMBINED_QC_LONG="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}_long.csv"
+COMBINED_QC_WIDE="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}_wide.csv"
 
 PANELS=()
 
 if [[ "${PANEL_VARIANT}" == "strict" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("strict|${DID_DIR}/panel_event_matched_strict_with_sonarqube.csv")
+  PANELS+=("strict|${PANEL_INPUT_DIR}/strict/panel_event_matched_strict_with_sonarqube.csv")
 fi
 
 if [[ "${PANEL_VARIANT}" == "flexible" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("flexible|${DID_DIR}/panel_event_matched_flexible_with_sonarqube.csv")
+  PANELS+=("flexible|${PANEL_INPUT_DIR}/flexible/panel_event_matched_flexible_with_sonarqube.csv")
 fi
 
-mkdir -p "${LOG_DIR}" "${DID_DIR}" "${PAPER_AUDIT_DIR}"
+mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${WORK_ROOT}"
 
 {
   echo "============================================================"
-  echo "run-py-2e: prepare Python quality DiD input"
+  echo "${RUN_PREFIX}: prepare Python quality DiD input"
   echo "Started:                           $(date)"
+  echo "Script name:                       ${SCRIPT_NAME}"
+  echo "Run prefix:                        ${RUN_PREFIX}"
   echo "Panel variant:                     ${PANEL_VARIANT}"
   echo "Python script:                     ${PY_SCRIPT}"
-  echo "DID dir:                           ${DID_DIR}"
+  echo "Panel input dir:                   ${PANEL_INPUT_DIR}"
+  echo "Main output dir:                   ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:                  ${TMP_DIR}"
   echo "Convert paper same column:         ${CONVERT_PAPER_SAME_COLUMN}"
   echo "Keep overlap paper same column:    ${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
   echo "Paper panel file:                  ${PAPER_PANEL_FILE}"
-  echo "Paper audit dir:                    ${PAPER_AUDIT_DIR}"
+  echo "Paper audit root:                   ${PAPER_AUDIT_DIR}"
   echo "Fill from paper columns:           ${FILL_FROM_PAPER_COLUMNS}"
   echo "Metric compare columns:            ${METRIC_COMPARE_COLUMNS}"
   echo "Top print:                         ${TOP_PRINT}"
-  echo "Manifest:                          ${MANIFEST_FILE}"
-  echo "Combined QC long:                  ${COMBINED_QC_LONG}"
-  echo "Combined QC wide:                  ${COMBINED_QC_WIDE}"
+  echo "Temporary manifest:                ${MANIFEST_FILE}"
+  echo "Temporary combined QC long:        ${COMBINED_QC_LONG}"
+  echo "Temporary combined QC wide:        ${COMBINED_QC_WIDE}"
   echo "Log file:                          ${LOG_FILE}"
   echo "============================================================"
   echo
@@ -232,29 +240,37 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}" "${PAPER_AUDIT_DIR}"
       exit 1
     fi
 
-    BASE_FILE="${INPUT_FILE%.csv}"
-    OUTPUT_FILE="${BASE_FILE}_quality_did_input.csv"
-    COMPLETE_OUTPUT_FILE="${BASE_FILE}_quality_did_input_complete.csv"
-    QC_OUTPUT_FILE="${BASE_FILE}_quality_did_input_qc.csv"
-    MISSING_OUTPUT_FILE="${BASE_FILE}_quality_did_input_missing_core_quality.csv"
+    PANEL_MAIN_DIR="${MAIN_OUTPUT_DIR}/${PANEL_LABEL}"
+    PANEL_TMP_DIR="${TMP_DIR}/${PANEL_LABEL}"
+    PANEL_WORK_DIR="${WORK_ROOT}/${PANEL_LABEL}"
+    CURRENT_PAPER_AUDIT_DIR="${PAPER_AUDIT_DIR}/${PANEL_LABEL}/paper_audit"
+
+    mkdir -p "${PANEL_MAIN_DIR}" "${PANEL_TMP_DIR}" "${PANEL_WORK_DIR}" "${CURRENT_PAPER_AUDIT_DIR}"
+
+    OUTPUT_FILE="${PANEL_WORK_DIR}/quality_did_input_full.csv"
+    MISSING_OUTPUT_FILE="${PANEL_WORK_DIR}/missing_core_quality.csv"
+    QC_OUTPUT_FILE="${PANEL_TMP_DIR}/quality_did_input_qc.csv"
+
+    if [[ "${PANEL_LABEL}" == "strict" && "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" && "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+      COMPLETE_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv"
+    else
+      COMPLETE_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_matched_${PANEL_LABEL}_with_sonarqube_quality_did_input_complete.csv"
+    fi
 
     PAPER_SAME_COLUMN_OUTPUT_FILE=""
     PAPER_KEY_SUMMARY_FILE=""
     PAPER_UNMATCHED_OUTPUT_FILE=""
 
-    #   if [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-    #     PAPER_SAME_COLUMN_OUTPUT_FILE="panel_event_monthly_quality_py.csv"
-    #   else
-    #     PAPER_SAME_COLUMN_OUTPUT_FILE="${COMPLETE_OUTPUT_FILE%.csv}_paper_same_column.csv"
-    #   fi
     if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-      if [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-        PAPER_SAME_COLUMN_OUTPUT_FILE="${DID_DIR}/panel_event_monthly_quality_py.csv"
+      if [[ "${PANEL_LABEL}" == "strict" && "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_monthly_quality_py.csv"
+      elif [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}.csv"
       else
-        PAPER_SAME_COLUMN_OUTPUT_FILE="${DID_DIR}/panel_event_monthly_quality_py_with_unmatched.csv"
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}_with_unmatched.csv"
       fi
       PAPER_OUTPUT_STEM="$(basename "${PAPER_SAME_COLUMN_OUTPUT_FILE%.csv}")"
-      PAPER_AUDIT_BASE="${PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
+      PAPER_AUDIT_BASE="${CURRENT_PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
       PAPER_KEY_SUMMARY_FILE="${PAPER_AUDIT_BASE}_key_match_summary.csv"
       PAPER_UNMATCHED_OUTPUT_FILE="${PAPER_AUDIT_BASE}_unmatched_repo_months.csv"
     fi
@@ -268,7 +284,7 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}" "${PAPER_AUDIT_DIR}"
     echo "QC output:                     ${QC_OUTPUT_FILE}"
     echo "Missing output:                ${MISSING_OUTPUT_FILE}"
     echo "Paper same-column output:      ${PAPER_SAME_COLUMN_OUTPUT_FILE:-<disabled>}"
-    echo "Paper audit directory:         ${PAPER_AUDIT_DIR}"
+    echo "Paper audit directory:         ${CURRENT_PAPER_AUDIT_DIR}"
     echo "Paper overlap-only:            ${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
     echo "============================================================"
 
@@ -282,7 +298,7 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}" "${PAPER_AUDIT_DIR}"
       --convert-paper-same-column "${CONVERT_PAPER_SAME_COLUMN}"
       --keep-overlap-paper-same-column "${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
       --paper-panel-file "${PAPER_PANEL_FILE}"
-      --paper-audit-dir "${PAPER_AUDIT_DIR}"
+      --paper-audit-dir "${CURRENT_PAPER_AUDIT_DIR}"
       --fill-from-paper-columns "${FILL_FROM_PAPER_COLUMNS}"
       --metric-compare-columns "${METRIC_COMPARE_COLUMNS}"
       --top-print "${TOP_PRINT}"
@@ -307,7 +323,7 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}" "${PAPER_AUDIT_DIR}"
 
     if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
       PAPER_OUTPUT_STEM="$(basename "${PAPER_SAME_COLUMN_OUTPUT_FILE%.csv}")"
-      PAPER_AUDIT_BASE="${PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
+      PAPER_AUDIT_BASE="${CURRENT_PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
       for expected_file in \
         "${PAPER_SAME_COLUMN_OUTPUT_FILE}" \
         "${PAPER_AUDIT_BASE}_column_sources.csv" \
@@ -323,6 +339,7 @@ mkdir -p "${LOG_DIR}" "${DID_DIR}" "${PAPER_AUDIT_DIR}"
 
       echo "Paper-schema key match summary:"
       cat "${PAPER_KEY_SUMMARY_FILE}"
+      rm -f "${PAPER_AUDIT_BASE}_notes.md"
     fi
 
     printf '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' \
@@ -427,16 +444,18 @@ print("Combined QC wide:")
 print(combined_wide.to_string(index=False))
 PY
 
+  rm -rf "${WORK_ROOT}"
+
   echo
   echo "============================================================"
-  echo "run-py-2e completed successfully."
+  echo "${RUN_PREFIX} completed successfully."
   echo "Completed:                         $(date)"
   echo "Panel variant:                     ${PANEL_VARIANT}"
   echo "Convert paper same column:         ${CONVERT_PAPER_SAME_COLUMN}"
   echo "Keep overlap paper same column:    ${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
-  echo "Manifest:                          ${MANIFEST_FILE}"
-  echo "Combined QC long:                  ${COMBINED_QC_LONG}"
-  echo "Combined QC wide:                  ${COMBINED_QC_WIDE}"
+  echo "Main output dir:                   ${MAIN_OUTPUT_DIR}"
+  echo "Extra output dir:                  ${TMP_DIR}"
+  echo "Temporary work files:              removed"
   echo "Log file:                          ${LOG_FILE}"
   echo "============================================================"
 
