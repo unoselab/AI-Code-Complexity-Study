@@ -29,6 +29,9 @@ set -euo pipefail
 #
 # Paper-comparable strict run:
 #   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
+# 
+# Usage for Python only
+# OUTPUT_SUFFIX=python_only PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
 #
 # Important:
 #   The paper-schema output preserves regenerated Python SonarQube metrics.
@@ -87,13 +90,13 @@ require_option_value() {
 LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 PANEL_VARIANT="${PANEL_VARIANT:-strict}"
+OUTPUT_SUFFIX="${OUTPUT_SUFFIX:-}"
 PY_SCRIPT="${PY_SCRIPT:-proc_scripts/prepare_quality_did_input_v2.py}"
 
 OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
 PANEL_INPUT_DIR="${PANEL_INPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-2c}"
 MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
 TMP_DIR="${TMP_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
-WORK_ROOT="${WORK_ROOT:-${TMP_DIR}/work_${RUN_TS}}"
 
 CONVERT_PAPER_SAME_COLUMN="${CONVERT_PAPER_SAME_COLUMN:-FALSE}"
 KEEP_OVERLAP_PAPER_SAME_COLUMN="${KEEP_OVERLAP_PAPER_SAME_COLUMN:-FALSE}"
@@ -165,6 +168,19 @@ if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${P
   exit 1
 fi
 
+if [[ -n "${OUTPUT_SUFFIX}" && ! "${OUTPUT_SUFFIX}" =~ ^[A-Za-z0-9_]+$ ]]; then
+  echo "ERROR: OUTPUT_SUFFIX must contain only letters, numbers, and underscores. Got: ${OUTPUT_SUFFIX}"
+  exit 1
+fi
+
+FILE_SUFFIX=""
+if [[ -n "${OUTPUT_SUFFIX}" ]]; then
+  FILE_SUFFIX="_${OUTPUT_SUFFIX}"
+fi
+
+WORK_ROOT="${WORK_ROOT:-${TMP_DIR}/work_${PANEL_VARIANT}${FILE_SUFFIX}_${RUN_TS}}"
+
+
 if ! [[ "${TOP_PRINT}" =~ ^[0-9]+$ ]]; then
   echo "ERROR: --top-print must be a non-negative integer. Got: ${TOP_PRINT}"
   exit 1
@@ -175,19 +191,19 @@ if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" && ! -f "${PAPER_PANEL_FILE}" ]];
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_prepare_quality_did_input_${PANEL_VARIANT}_${RUN_TS}.log}"
-MANIFEST_FILE="${WORK_ROOT}/quality_did_input_manifest_${PANEL_VARIANT}.csv"
-COMBINED_QC_LONG="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}_long.csv"
-COMBINED_QC_WIDE="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}_wide.csv"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_prepare_quality_did_input_${PANEL_VARIANT}${FILE_SUFFIX}_${RUN_TS}.log}"
+MANIFEST_FILE="${WORK_ROOT}/quality_did_input_manifest_${PANEL_VARIANT}${FILE_SUFFIX}.csv"
+COMBINED_QC_LONG="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}${FILE_SUFFIX}_long.csv"
+COMBINED_QC_WIDE="${WORK_ROOT}/quality_did_input_qc_${PANEL_VARIANT}${FILE_SUFFIX}_wide.csv"
 
 PANELS=()
 
 if [[ "${PANEL_VARIANT}" == "strict" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("strict|${PANEL_INPUT_DIR}/strict/panel_event_matched_strict_with_sonarqube.csv")
+  PANELS+=("strict|${PANEL_INPUT_DIR}/strict/panel_event_matched_strict_with_sonarqube${FILE_SUFFIX}.csv")
 fi
 
 if [[ "${PANEL_VARIANT}" == "flexible" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("flexible|${PANEL_INPUT_DIR}/flexible/panel_event_matched_flexible_with_sonarqube.csv")
+  PANELS+=("flexible|${PANEL_INPUT_DIR}/flexible/panel_event_matched_flexible_with_sonarqube${FILE_SUFFIX}.csv")
 fi
 
 mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${WORK_ROOT}"
@@ -199,6 +215,7 @@ mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${WORK_ROOT}"
   echo "Script name:                       ${SCRIPT_NAME}"
   echo "Run prefix:                        ${RUN_PREFIX}"
   echo "Panel variant:                     ${PANEL_VARIANT}"
+  echo "Output suffix:                     ${OUTPUT_SUFFIX:-<none>}"
   echo "Python script:                     ${PY_SCRIPT}"
   echo "Panel input dir:                   ${PANEL_INPUT_DIR}"
   echo "Main output dir:                   ${MAIN_OUTPUT_DIR}"
@@ -241,9 +258,9 @@ mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${WORK_ROOT}"
     fi
 
     PANEL_MAIN_DIR="${MAIN_OUTPUT_DIR}/${PANEL_LABEL}"
-    PANEL_TMP_DIR="${TMP_DIR}/${PANEL_LABEL}"
+    PANEL_TMP_DIR="${TMP_DIR}/${PANEL_LABEL}${FILE_SUFFIX}"
     PANEL_WORK_DIR="${WORK_ROOT}/${PANEL_LABEL}"
-    CURRENT_PAPER_AUDIT_DIR="${PAPER_AUDIT_DIR}/${PANEL_LABEL}/paper_audit"
+    CURRENT_PAPER_AUDIT_DIR="${PAPER_AUDIT_DIR}/${PANEL_LABEL}${FILE_SUFFIX}/paper_audit"
 
     mkdir -p "${PANEL_MAIN_DIR}" "${PANEL_TMP_DIR}" "${PANEL_WORK_DIR}" "${CURRENT_PAPER_AUDIT_DIR}"
 
@@ -252,9 +269,9 @@ mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${WORK_ROOT}"
     QC_OUTPUT_FILE="${PANEL_TMP_DIR}/quality_did_input_qc.csv"
 
     if [[ "${PANEL_LABEL}" == "strict" && "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" && "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-      COMPLETE_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv"
+      COMPLETE_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_matched_strict_with_sonarqube${FILE_SUFFIX}_quality_did_input_complete.csv"
     else
-      COMPLETE_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_matched_${PANEL_LABEL}_with_sonarqube_quality_did_input_complete.csv"
+      COMPLETE_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_matched_${PANEL_LABEL}_with_sonarqube${FILE_SUFFIX}_quality_did_input_complete.csv"
     fi
 
     PAPER_SAME_COLUMN_OUTPUT_FILE=""
@@ -263,11 +280,11 @@ mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_DIR}" "${WORK_ROOT}"
 
     if [[ "${CONVERT_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
       if [[ "${PANEL_LABEL}" == "strict" && "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_monthly_quality_py.csv"
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_MAIN_DIR}/panel_event_monthly_quality_py${FILE_SUFFIX}.csv"
       elif [[ "${KEEP_OVERLAP_PAPER_SAME_COLUMN}" == "TRUE" ]]; then
-        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}.csv"
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}${FILE_SUFFIX}.csv"
       else
-        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}_with_unmatched.csv"
+        PAPER_SAME_COLUMN_OUTPUT_FILE="${PANEL_TMP_DIR}/panel_event_monthly_quality_py_${PANEL_LABEL}${FILE_SUFFIX}_with_unmatched.csv"
       fi
       PAPER_OUTPUT_STEM="$(basename "${PAPER_SAME_COLUMN_OUTPUT_FILE%.csv}")"
       PAPER_AUDIT_BASE="${CURRENT_PAPER_AUDIT_DIR}/${PAPER_OUTPUT_STEM}"
@@ -451,6 +468,7 @@ PY
   echo "${RUN_PREFIX} completed successfully."
   echo "Completed:                         $(date)"
   echo "Panel variant:                     ${PANEL_VARIANT}"
+  echo "Output suffix:                     ${OUTPUT_SUFFIX:-<none>}"
   echo "Convert paper same column:         ${CONVERT_PAPER_SAME_COLUMN}"
   echo "Keep overlap paper same column:    ${KEEP_OVERLAP_PAPER_SAME_COLUMN}"
   echo "Main output dir:                   ${MAIN_OUTPUT_DIR}"

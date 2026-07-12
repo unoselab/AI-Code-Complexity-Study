@@ -24,6 +24,7 @@ set -euo pipefail
 #   PANEL_VARIANT=strict bash run-py-2d-check-sonarqube-panels.sh
 #   PANEL_VARIANT=flexible bash run-py-2d-check-sonarqube-panels.sh
 #   PANEL_VARIANT=all bash run-py-2d-check-sonarqube-panels.sh
+#   OUTPUT_SUFFIX=python_only PANEL_VARIANT=strict bash run-py-2d-check-sonarqube-panels.sh
 #
 # Persistent output:
 #   logs/run-py-2d_check_sonarqube_panels_<variant>_<timestamp>.log
@@ -46,29 +47,42 @@ LOG_DIR="${LOG_DIR:-logs}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 
 PANEL_VARIANT="${PANEL_VARIANT:-strict}"
+OUTPUT_SUFFIX="${OUTPUT_SUFFIX:-}"
 
 if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${PANEL_VARIANT}" != "all" ]]; then
   echo "ERROR: PANEL_VARIANT must be strict, flexible, or all. Got: ${PANEL_VARIANT}"
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_check_sonarqube_panels_${PANEL_VARIANT}_${RUN_TS}.log}"
+if [[ -n "${OUTPUT_SUFFIX}" && ! "${OUTPUT_SUFFIX}" =~ ^[A-Za-z0-9_]+$ ]]; then
+  echo "ERROR: OUTPUT_SUFFIX must contain only letters, numbers, and underscores. Got: ${OUTPUT_SUFFIX}"
+  exit 1
+fi
+
+FILE_SUFFIX=""
+LOG_SUFFIX=""
+if [[ -n "${OUTPUT_SUFFIX}" ]]; then
+  FILE_SUFFIX="_${OUTPUT_SUFFIX}"
+  LOG_SUFFIX="_${OUTPUT_SUFFIX}"
+fi
+
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_check_sonarqube_panels_${PANEL_VARIANT}${LOG_SUFFIX}_${RUN_TS}.log}"
 
 CHECK_SCRIPT="${CHECK_SCRIPT:-proc_scripts/check_sonarqube_panel.py}"
 
 OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
 PANEL_INPUT_DIR="${PANEL_INPUT_DIR:-${OUTPUT_BASE_DIR}/run-py-2c}"
 TMP_PARENT_DIR="${TMP_PARENT_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
-TMP_WORK_DIR="${TMP_WORK_DIR:-${TMP_PARENT_DIR}/${PANEL_VARIANT}_${RUN_TS}}"
+TMP_WORK_DIR="${TMP_WORK_DIR:-${TMP_PARENT_DIR}/${PANEL_VARIANT}${FILE_SUFFIX}_${RUN_TS}}"
 
 PANELS=()
 
 if [[ "${PANEL_VARIANT}" == "strict" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("strict|${PANEL_INPUT_DIR}/strict/panel_event_matched_strict_with_sonarqube.csv")
+  PANELS+=("strict|${PANEL_INPUT_DIR}/strict/panel_event_matched_strict_with_sonarqube${FILE_SUFFIX}.csv")
 fi
 
 if [[ "${PANEL_VARIANT}" == "flexible" || "${PANEL_VARIANT}" == "all" ]]; then
-  PANELS+=("flexible|${PANEL_INPUT_DIR}/flexible/panel_event_matched_flexible_with_sonarqube.csv")
+  PANELS+=("flexible|${PANEL_INPUT_DIR}/flexible/panel_event_matched_flexible_with_sonarqube${FILE_SUFFIX}.csv")
 fi
 
 cleanup_tmp_work_dir() {
@@ -86,6 +100,7 @@ mkdir -p "${LOG_DIR}" "${TMP_WORK_DIR}"
   echo "Script name:      ${SCRIPT_NAME}"
   echo "Run prefix:       ${RUN_PREFIX}"
   echo "Panel variant:    ${PANEL_VARIANT}"
+  echo "Output suffix:    ${OUTPUT_SUFFIX:-<none>}"
   echo "Checker script:   ${CHECK_SCRIPT}"
   echo "Panel input dir:  ${PANEL_INPUT_DIR}"
   echo "Temporary dir:    ${TMP_WORK_DIR}"
@@ -138,6 +153,7 @@ mkdir -p "${LOG_DIR}" "${TMP_WORK_DIR}"
   echo "${RUN_PREFIX} completed successfully."
   echo "Completed:         $(date)"
   echo "Panel variant:     ${PANEL_VARIANT}"
+  echo "Output suffix:     ${OUTPUT_SUFFIX:-<none>}"
   echo "Persistent output: ${LOG_FILE}"
   echo "Temporary outputs: removed automatically"
   echo "============================================================"

@@ -1,161 +1,230 @@
-[   11985666 Jul 11 02:35]  repo_python
-├── [      57222 Jul 10 19:24]  run-py-1f
-│   └── [      53126 Jul 10 19:24]  treatment_python_sample_main_118.csv
-├── [      83839 Jul 10 19:34]  run-py-1g
-│   ├── [       3797 Jul 10 19:34]  python_control_repos_to_clone_main_118.csv
-│   └── [      75946 Jul 10 19:34]  python_matched_control_pairs_main_118.csv
-├── [      31229 Jul 10 20:12]  run-py-1h
-│   └── [      27133 Jul 10 20:12]  python_control_clone_status_main_118.csv
-├── [     107306 Jul 10 22:17]  run-py-1i
-│   ├── [      28814 Jul 10 22:17]  python_control_clone_usable_repos_main.csv
-│   └── [      74396 Jul 10 22:17]  python_matched_control_pairs_main_clone_usable.csv
-├── [    1038877 Jul 10 22:37]  run-py-1j
-│   ├── [        117 Jul 10 22:37]  ai_adoption_dates.csv
-│   ├── [         61 Jul 10 22:37]  cursor_commits.csv
-│   ├── [     825751 Jul 10 22:37]  ts_contributors_monthly.csv
-│   └── [     208852 Jul 10 22:37]  ts_repos_monthly.csv
-├── [    1211804 Jul 10 22:52]  run-py-1k
-│   ├── [      28814 Jul 10 22:53]  python_control_clone_usable_repos_main_final_clean.csv
-│   ├── [      69895 Jul 10 22:53]  python_matched_control_pairs_main_final_clean_1to3_only.csv
-│   ├── [      74396 Jul 10 22:53]  python_matched_control_pairs_main_final_clean.csv
-│   ├── [     825751 Jul 10 22:53]  ts_contributors_monthly_final_clean.csv
-│   └── [     208852 Jul 10 22:53]  ts_repos_monthly_final_clean.csv
-├── [    1490652 Jul 10 23:29]  run-py-1l
-│   ├── [     227943 Jul 10 23:29]  panel_event_matched_flexible.csv
-│   ├── [     531470 Jul 10 23:29]  panel_event_matched_flexible_window_driven.csv
-│   ├── [     217505 Jul 10 23:29]  panel_event_matched_strict.csv
-│   └── [     509638 Jul 10 23:29]  panel_event_matched_strict_window_driven.csv
-├── [     496386 Jul 11 01:00]  run-py-2a
-│   ├── [     251155 Jul 11 01:00]  flexible
-│   │   ├── [     139301 Jul 11 01:00]  control
-│   │   │   └── [     135205 Jul 11 01:00]  data
-│   │   │       └── [     131109 Jul 11 01:00]  ts_repos_monthly.csv
-│   │   └── [     107758 Jul 11 01:00]  treatment
-│   │       └── [     103662 Jul 11 01:00]  data
-│   │           └── [      99566 Jul 11 01:00]  ts_repos_monthly.csv
-│   └── [     241135 Jul 11 00:58]  strict
-│       ├── [     137882 Jul 11 00:58]  control
-│       │   └── [     133786 Jul 11 00:59]  data
-│       │       └── [     129690 Jul 11 00:59]  ts_repos_monthly.csv
-│       └── [      99157 Jul 11 00:58]  treatment
-│           └── [      95061 Jul 11 00:58]  data
-│               └── [      90965 Jul 11 00:58]  ts_repos_monthly.csv
-├── [     721031 Jul 11 01:19]  run-py-2b
-│   ├── [      12288 Jul 11 01:19]  flexible
-│   │   ├── [       4096 Jul 11 01:19]  control
-│   │   └── [       4096 Jul 11 01:19]  treatment
-│   └── [     704647 Jul 11 01:19]  strict
-│       ├── [     407390 Jul 12 12:50]  control
-│       │   ├── [     201930 Jul 11 01:19]  ts_repos_monthly_scanned.csv
-│       │   └── [     201364 Jul 12 12:50]  ts_repos_monthly_scanned_python_only.csv
-│       └── [     293161 Jul 11 18:42]  treatment
-│           ├── [     144899 Jul 11 01:19]  ts_repos_monthly_scanned.csv
-│           └── [     144166 Jul 12 00:40]  ts_repos_monthly_scanned_python_only.csv
-├── [     570626 Jul 11 01:43]  run-py-2c
-│   └── [     566530 Jul 11 01:43]  strict
-│       └── [     562434 Jul 11 01:43]  panel_event_matched_strict_with_sonarqube.csv
-├── [     276524 Jul 11 02:12]  run-py-2e
-│   └── [     272428 Jul 11 02:12]  strict
-│       └── [     268332 Jul 11 02:12]  panel_event_monthly_quality_py.csv
-├── [     783526 Jul 11 02:35]  run-py-2f
-│   └── [     779430 Jul 11 02:35]  strict
-│       ├── [     766485 Jul 11 02:35]  DiffInDiffBorusyak_quality_python_v2.html
-│       └── [       8849 Jul 11 02:35]  dynamic_effects_borusyak_quality_python_v2.pdf
-├── [    2134874 Jul 11 15:40]  tmp
-│   ├── [      37535 Jul 10 18:19]  run-py-1b
-│   │   └── [      33439 Jul 10 18:19]  treatment_python_clone_status_20260710-181947.csv
-│   ├── [       6427 Jul 10 18:43]  run-py-1c
-│   │   └── [       2331 Jul 10 18:43]  treatment_python_clone_failed_repos.csv
-│   ├── [       4096 Jul 10 18:50]  run-py-1d
-│   ├── [       8713 Jul 10 19:01]  run-py-1e
-│   │   └── [       4617 Jul 10 19:01]  full
-│   │       ├── [        230 Jul 10 19:01]  run-py-1e_cache_check_20260710-190130.txt
-│   │       └── [        291 Jul 10 19:01]  run-py-1e_missing_repos_20260710-190130.csv
-│   ├── [     110797 Jul 10 19:24]  run-py-1f
-│   │   ├── [        449 Jul 10 19:24]  treatment_python_sample_diagnostic_0.csv
-│   │   ├── [      53126 Jul 10 19:24]  treatment_python_sample_exact_match_118.csv
-│   │   └── [      53126 Jul 10 19:24]  treatment_python_sample_within1_month_118.csv
-│   ├── [      93010 Jul 10 19:34]  run-py-1g
-│   │   ├── [        497 Jul 10 19:34]  python_control_extract_summary_main_118.csv
-│   │   ├── [        119 Jul 10 19:34]  python_control_repos_to_clone_main_118_overlap_repos.csv
-│   │   ├── [       3830 Jul 10 19:34]  python_control_repos_to_clone_main_118_raw.csv
-│   │   ├── [       2878 Jul 10 19:34]  python_matched_control_pairs_main_118_coverage.csv
-│   │   ├── [        963 Jul 10 19:34]  python_matched_control_pairs_main_118_overlap_pairs.csv
-│   │   ├── [      76672 Jul 10 19:34]  python_matched_control_pairs_main_118_raw.csv
-│   │   └── [       3955 Jul 10 19:34]  python_treatment_missing_matching_main_118.csv
-│   ├── [      31229 Jul 10 20:12]  run-py-1h
-│   │   └── [      27133 Jul 10 20:12]  python_control_clone_status_main_118_20260710-201225.csv
-│   ├── [      10611 Jul 10 22:17]  run-py-1i
-│   │   ├── [        835 Jul 10 22:17]  python_control_clone_failed_repos_main.csv
-│   │   ├── [        454 Jul 10 22:17]  python_control_clone_usable_summary_main.csv
-│   │   ├── [       3361 Jul 10 22:17]  python_control_pair_coverage_main_clone_usable.csv
-│   │   ├── [       1787 Jul 10 22:17]  python_matched_control_pairs_main_clone_failed.csv
-│   │   └── [         78 Jul 10 22:17]  python_treatment_lost_all_controls_main.csv
-│   ├── [      14688 Jul 10 22:38]  run-py-1j
-│   │   └── [      10592 Jul 10 22:38]  full
-│   │       ├── [       6221 Jul 10 22:38]  run-py-1j_analyzed_repos_manifest.csv
-│   │       ├── [        230 Jul 10 22:38]  run-py-1j_cache_check_20260710-223826.txt
-│   │       └── [         45 Jul 10 22:38]  run-py-1j_missing_repos_20260710-223826.csv
-│   ├── [      11851 Jul 10 22:52]  run-py-1k
-│   │   ├── [        117 Jul 10 22:53]  python_control_local_cursor_evidence_in_window.csv
-│   │   ├── [        117 Jul 10 22:53]  python_control_local_cursor_evidence_post_window.csv
-│   │   ├── [        684 Jul 10 22:53]  python_control_local_cursor_filter_summary_main.csv
-│   │   ├── [       3101 Jul 10 22:53]  python_control_pair_coverage_main_final_clean_1to3_only.csv
-│   │   ├── [       3391 Jul 10 22:53]  python_control_pair_coverage_main_final_clean.csv
-│   │   ├── [        237 Jul 10 22:53]  python_matched_control_pairs_main_local_cursor_dropped.csv
-│   │   └── [        108 Jul 10 22:53]  python_treatment_lost_all_controls_main_final_clean.csv
-│   ├── [      15734 Jul 10 23:29]  run-py-1l
-│   │   └── [      11638 Jul 10 23:28]  qc
-│   │       ├── [        733 Jul 10 23:29]  panel_qc_attrition_summary.csv
-│   │       ├── [        326 Jul 10 23:29]  panel_qc_by_source.csv
-│   │       ├── [        284 Jul 10 23:29]  panel_qc_dropped_by_strict.csv
-│   │       ├── [       5024 Jul 10 23:29]  panel_qc_notes.md
-│   │       ├── [        494 Jul 10 23:29]  panel_qc_paper_comparison.csv
-│   │       └── [        681 Jul 10 23:29]  panel_qc_summary.csv
-│   ├── [      24107 Jul 11 01:00]  run-py-2a
-│   │   ├── [      10141 Jul 11 01:00]  flexible
-│   │   │   ├── [       2955 Jul 11 01:00]  control_repos.txt
-│   │   │   ├── [        160 Jul 11 01:00]  months.txt
-│   │   │   ├── [        307 Jul 11 01:00]  sonarqube_input_summary.csv
-│   │   │   └── [       2623 Jul 11 01:00]  treatment_repos.txt
-│   │   └── [       9870 Jul 11 00:59]  strict
-│   │       ├── [       2918 Jul 11 00:58]  control_repos.txt
-│   │       ├── [        160 Jul 11 00:58]  months.txt
-│   │       ├── [        303 Jul 11 00:59]  sonarqube_input_summary.csv
-│   │       └── [       2393 Jul 11 00:58]  treatment_repos.txt
-│   ├── [       8450 Jul 11 15:40]  run-py-2b
-│   │   └── [       4354 Jul 11 15:40]  python-only-target
-│   │       └── [        258 Jul 11 16:08]  Anemll_Anemll_2025-02.csv
-│   ├── [      10111 Jul 11 01:43]  run-py-2c
-│   │   └── [       6015 Jul 11 01:43]  strict
-│   │       └── [       1919 Jul 11 01:43]  panel_event_matched_strict_with_sonarqube_qc.csv
-│   ├── [    1723160 Jul 11 02:12]  run-py-2e
-│   │   └── [    1719064 Jul 11 02:12]  strict
-│   │       ├── [     846058 Jul 11 02:12]  panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
-│   │       ├── [     864472 Jul 11 02:12]  paper_audit
-│   │       │   ├── [       1819 Jul 11 02:12]  panel_event_monthly_quality_py_column_sources.csv
-│   │       │   ├── [        320 Jul 11 02:12]  panel_event_monthly_quality_py_key_match_summary.csv
-│   │       │   ├── [     849285 Jul 11 02:12]  panel_event_monthly_quality_py_metric_comparison.csv
-│   │       │   └── [       8952 Jul 11 02:12]  panel_event_monthly_quality_py_unmatched_repo_months.csv
-│   │       └── [       4438 Jul 11 02:12]  quality_did_input_qc.csv
-│   ├── [      16541 Jul 11 02:35]  run-py-2f
-│   │   └── [      12445 Jul 11 02:35]  strict
-│   │       ├── [       5240 Jul 11 02:35]  borusyak_quality_dynamic_effects.csv
-│   │       ├── [        474 Jul 11 02:35]  borusyak_quality_input_summary.csv
-│   │       ├── [       1316 Jul 11 02:35]  borusyak_quality_metadata.csv
-│   │       ├── [        700 Jul 11 02:35]  borusyak_quality_panel_checks.csv
-│   │       └── [        619 Jul 11 02:35]  borusyak_quality_static_effects.csv
-│   └── [       3718 Jul 10 15:50]  treatment_python_repos_bw6.csv
-├── [      33439 Jul 10 18:19]  treatment_python_clone_status.csv
-├── [       1543 Jul 10 18:50]  treatment_python_clone_usable_missing_event_month.csv
-├── [      37793 Jul 10 18:43]  treatment_python_clone_usable_repos_with_event.csv
-├── [      36541 Jul 10 18:50]  treatment_python_clone_usable_repos_with_event_valid.csv
-├── [    2854901 Jul 10 19:01]  treatment_python_did
-│   ├── [      53126 Jul 10 19:01]  adoption_month_check.csv
-│   ├── [      23247 Jul 10 18:59]  ai_adoption_dates.csv
-│   ├── [     363216 Jul 10 18:59]  cursor_commits.csv
-│   ├── [    2154034 Jul 10 18:59]  ts_contributors_monthly.csv
-│   └── [     257182 Jul 10 18:59]  ts_repos_monthly.csv
-└── [      13457 Jul 10 15:50]  treatment_python_repos.csv
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ OUTPUT_SUFFIX=python_only PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE 
 
-    11985666 bytes used in 59 directories, 99 files
+============================================================
+run-py-2e: prepare Python quality DiD input
+Started:                           Sun Jul 12 02:08:57 PM CDT 2026
+Script name:                       run-py-2e-prepare-quality-did-input.sh
+Run prefix:                        run-py-2e
+Panel variant:                     strict
+Output suffix:                     python_only
+Python script:                     proc_scripts/prepare_quality_did_input_v2.py
+Panel input dir:                   repo_python/run-py-2c
+Main output dir:                   repo_python/run-py-2e
+Extra output dir:                  repo_python/tmp/run-py-2e
+Convert paper same column:         TRUE
+Keep overlap paper same column:    TRUE
+Paper panel file:                  data/panel_event_monthly.csv
+Paper audit root:                   repo_python/tmp/run-py-2e
+Fill from paper columns:           stars,issues,issue_comments,age,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,other_agents,high_confidence
+Metric compare columns:            ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
+Top print:                         20
+Temporary manifest:                repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_manifest_strict_python_only.csv
+Temporary combined QC long:        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_long.csv
+Temporary combined QC wide:        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_wide.csv
+Log file:                          logs/run-py-2e_prepare_quality_did_input_strict_python_only_20260712-140857.log
+============================================================
+
+
+============================================================
+Preparing quality DiD input for panel: strict
+Input:                         repo_python/run-py-2c/strict/panel_event_matched_strict_with_sonarqube_python_only.csv
+Output:                        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/quality_did_input_full.csv
+Complete output:               repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv
+QC output:                     repo_python/tmp/run-py-2e/strict_python_only/quality_did_input_qc.csv
+Missing output:                repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/missing_core_quality.csv
+Paper same-column output:      repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv
+Paper audit directory:         repo_python/tmp/run-py-2e/strict_python_only/paper_audit
+Paper overlap-only:            TRUE
+============================================================
+2026-07-12 14:08:57,540 [INFO] Loading merged panel: repo_python/run-py-2c/strict/panel_event_matched_strict_with_sonarqube_python_only.csv
+2026-07-12 14:08:57,548 [INFO] Input rows: 1633
+2026-07-12 14:08:57,548 [INFO] Input repos: 220
+2026-07-12 14:08:57,548 [INFO] Input months: 2024-01 to 2025-08
+2026-07-12 14:08:57,860 [INFO] Saved paper-schema output: repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv
+2026-07-12 14:08:57,860 [INFO] Saved paper-schema audit directory: repo_python/tmp/run-py-2e/strict_python_only/paper_audit
+2026-07-12 14:08:57,860 [INFO] Saved paper-schema key summary: repo_python/tmp/run-py-2e/strict_python_only/paper_audit/panel_event_monthly_quality_py_python_only_key_match_summary.csv
+2026-07-12 14:08:57,860 [INFO] Saved unmatched repo-month rows: repo_python/tmp/run-py-2e/strict_python_only/paper_audit/panel_event_monthly_quality_py_python_only_unmatched_repo_months.csv
+2026-07-12 14:08:57,860 [INFO] Paper-schema exact matches: 1591; unmatched: 13; output rows: 1591
+
+Top paper-versus-regenerated metric differences:
+  getsentry/sentry,2025-08,ncloc,our=995274.0,paper=2038867.0,diff=-1043593.0
+  getsentry/sentry,2025-07,ncloc,our=972083.0,paper=2015026.0,diff=-1042943.0
+  getsentry/sentry,2025-06,ncloc,our=952260.0,paper=1962140.0,diff=-1009880.0
+  getsentry/sentry,2025-05,ncloc,our=924005.0,paper=1909669.0,diff=-985664.0
+  getsentry/sentry,2025-04,ncloc,our=931540.0,paper=1907308.0,diff=-975768.0
+  getsentry/sentry,2025-03,ncloc,our=898868.0,paper=1853961.0,diff=-955093.0
+  getsentry/sentry,2025-02,ncloc,our=870983.0,paper=1771865.0,diff=-900882.0
+  getsentry/sentry,2025-01,ncloc,our=857681.0,paper=1670416.0,diff=-812735.0
+  getsentry/sentry,2024-12,ncloc,our=844550.0,paper=1644542.0,diff=-799992.0
+  getsentry/sentry,2024-11,ncloc,our=838698.0,paper=1626387.0,diff=-787689.0
+  getsentry/sentry,2024-10,ncloc,our=826479.0,paper=1607265.0,diff=-780786.0
+  getsentry/sentry,2024-09,ncloc,our=812590.0,paper=1578069.0,diff=-765479.0
+  getsentry/sentry,2024-08,ncloc,our=805047.0,paper=1550545.0,diff=-745498.0
+  getsentry/sentry,2024-07,ncloc,our=795404.0,paper=1523120.0,diff=-727716.0
+  getsentry/sentry,2024-06,ncloc,our=780596.0,paper=1483303.0,diff=-702707.0
+  getsentry/sentry,2024-05,ncloc,our=764337.0,paper=1455256.0,diff=-690919.0
+  getsentry/sentry,2024-04,ncloc,our=748988.0,paper=1428367.0,diff=-679379.0
+  getsentry/sentry,2024-03,ncloc,our=731865.0,paper=1388532.0,diff=-656667.0
+  getsentry/sentry,2024-02,ncloc,our=745495.0,paper=1382944.0,diff=-637449.0
+  getsentry/sentry,2024-01,ncloc,our=727562.0,paper=1349397.0,diff=-621835.0
+2026-07-12 14:08:57,869 [INFO] Saved full quality DiD input: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/quality_did_input_full.csv
+2026-07-12 14:08:57,869 [INFO] Saved missing core quality rows: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/missing_core_quality.csv
+2026-07-12 14:08:57,869 [INFO] Saved complete-case quality DiD input: repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv
+2026-07-12 14:08:57,869 [INFO] Saved QC: repo_python/tmp/run-py-2e/strict_python_only/quality_did_input_qc.csv
+
+QC summary:
+                                     check                                                                                                                             value
+                               panel_label                                                                                                                            strict
+                                input_rows                                                                                                                              1633
+                               output_rows                                                                                                                              1633
+        row_count_preserved_in_full_output                                                                                                                                 1
+                                     repos                                                                                                                               220
+                                  min_time                                                                                                                           2024-01
+                                  max_time                                                                                                                           2025-08
+                            treatment_rows                                                                                                                               853
+                              control_rows                                                                                                                               780
+                           treatment_repos                                                                                                                               100
+                             control_repos                                                                                                                               120
+           duplicate_repo_time_source_rows                                                                                                                                 0
+              analysis_ready_did_base_rows                                                                                                                              1633
+          analysis_ready_core_quality_rows                                                                                                                              1604
+           analysis_ready_quality_did_rows                                                                                                                              1604
+                 missing_core_quality_rows                                                                                                                                29
+        treatment_time_to_event_nonmissing                                                                                                                               853
+          control_time_to_event_nonmissing                                                                                                                                 0
+                            post_event_sum                                                                                                                               432
+                    control_post_event_sum                                                                                                                                 0
+                  treatment_post_event_sum                                                                                                                               432
+           sonarqube_latest_commit_missing                                                                                                                                 0
+      sonarqube_any_raw_metric_missing_sum                                                                                                                                29
+     sonarqube_all_raw_metrics_missing_sum                                                                                                                                 0
+                  sonarqube_ncloc_zero_sum                                                                                                                                 0
+     sonarqube_static_warnings_missing_sum                                                                                                                                 0
+   sonarqube_duplicate_density_missing_sum                                                                                                                                29
+sonarqube_cognitive_complexity_missing_sum                                                                                                                                29
+   sonarqube_quality_outcomes_complete_sum                                                                                                                              1604
+       static_analysis_warnings_nonmissing                                                                                                                              1633
+          static_analysis_warnings_missing                                                                                                                                 0
+       static_analysis_warnings_zero_count                                                                                                                                91
+             static_analysis_warnings_mean                                                                                                                        357.214942
+           static_analysis_warnings_median                                                                                                                              96.0
+         duplicate_line_density_nonmissing                                                                                                                              1604
+            duplicate_line_density_missing                                                                                                                                29
+         duplicate_line_density_zero_count                                                                                                                               482
+               duplicate_line_density_mean                                                                                                                          5.899439
+             duplicate_line_density_median                                                                                                                               2.4
+                code_complexity_nonmissing                                                                                                                              1604
+                   code_complexity_missing                                                                                                                                29
+                code_complexity_zero_count                                                                                                                                 2
+                      code_complexity_mean                                                                                                                       3210.618454
+                    code_complexity_median                                                                                                                             831.5
+              warnings_per_kloc_nonmissing                                                                                                                              1604
+                 warnings_per_kloc_missing                                                                                                                                29
+              warnings_per_kloc_zero_count                                                                                                                                62
+                    warnings_per_kloc_mean                                                                                                                         23.226661
+                  warnings_per_kloc_median                                                                                                                         16.404474
+            complexity_per_kloc_nonmissing                                                                                                                              1604
+               complexity_per_kloc_missing                                                                                                                                29
+            complexity_per_kloc_zero_count                                                                                                                                 2
+                  complexity_per_kloc_mean                                                                                                                        143.916234
+                complexity_per_kloc_median                                                                                                                        122.517798
+           code_smells_per_kloc_nonmissing                                                                                                                              1604
+              code_smells_per_kloc_missing                                                                                                                                29
+           code_smells_per_kloc_zero_count                                                                                                                                68
+                 code_smells_per_kloc_mean                                                                                                                         21.490784
+               code_smells_per_kloc_median                                                                                                                         15.175238
+                 technical_debt_nonmissing                                                                                                                              1633
+                    technical_debt_missing                                                                                                                                 0
+                 technical_debt_zero_count                                                                                                                                97
+                       technical_debt_mean                                                                                                                       2503.712799
+                     technical_debt_median                                                                                                                             602.0
+                          ncloc_nonmissing                                                                                                                              1604
+                             ncloc_missing                                                                                                                                29
+                          ncloc_zero_count                                                                                                                                 0
+                                ncloc_mean                                                                                                                      35442.935786
+                              ncloc_median                                                                                                                            6391.5
+       duplicated_lines_density_nonmissing                                                                                                                              1604
+          duplicated_lines_density_missing                                                                                                                                29
+       duplicated_lines_density_zero_count                                                                                                                               482
+             duplicated_lines_density_mean                                                                                                                          5.899439
+           duplicated_lines_density_median                                                                                                                               2.4
+          comment_lines_density_nonmissing                                                                                                                              1604
+             comment_lines_density_missing                                                                                                                                29
+          comment_lines_density_zero_count                                                                                                                                 9
+                comment_lines_density_mean                                                                                                                         17.012344
+              comment_lines_density_median                                                                                                                              14.3
+           cognitive_complexity_nonmissing                                                                                                                              1604
+              cognitive_complexity_missing                                                                                                                                29
+           cognitive_complexity_zero_count                                                                                                                                 2
+                 cognitive_complexity_mean                                                                                                                       3210.618454
+               cognitive_complexity_median                                                                                                                             831.5
+                           bugs_nonmissing                                                                                                                              1633
+                              bugs_missing                                                                                                                                 0
+                           bugs_zero_count                                                                                                                               528
+                                 bugs_mean                                                                                                                          7.993264
+                               bugs_median                                                                                                                               2.0
+                vulnerabilities_nonmissing                                                                                                                              1633
+                   vulnerabilities_missing                                                                                                                                 0
+                vulnerabilities_zero_count                                                                                                                               747
+                      vulnerabilities_mean                                                                                                                          5.770974
+                    vulnerabilities_median                                                                                                                               1.0
+                    code_smells_nonmissing                                                                                                                              1633
+                       code_smells_missing                                                                                                                                 0
+                    code_smells_zero_count                                                                                                                                97
+                          code_smells_mean                                                                                                                        343.450704
+                        code_smells_median                                                                                                                              87.0
+   log_static_analysis_warnings_nonmissing                                                                                                                              1633
+       log_static_analysis_warnings_finite                                                                                                                              1633
+            log_code_complexity_nonmissing                                                                                                                              1604
+                log_code_complexity_finite                                                                                                                              1604
+             log_technical_debt_nonmissing                                                                                                                              1633
+                 log_technical_debt_finite                                                                                                                              1633
+                      log_ncloc_nonmissing                                                                                                                              1604
+                          log_ncloc_finite                                                                                                                              1604
+                       log_bugs_nonmissing                                                                                                                              1633
+                           log_bugs_finite                                                                                                                              1633
+            log_vulnerabilities_nonmissing                                                                                                                              1633
+                log_vulnerabilities_finite                                                                                                                              1633
+                log_code_smells_nonmissing                                                                                                                              1633
+                    log_code_smells_finite                                                                                                                              1633
+          log_warnings_per_kloc_nonmissing                                                                                                                              1604
+              log_warnings_per_kloc_finite                                                                                                                              1604
+        log_complexity_per_kloc_nonmissing                                                                                                                              1604
+            log_complexity_per_kloc_finite                                                                                                                              1604
+       log_code_smells_per_kloc_nonmissing                                                                                                                              1604
+           log_code_smells_per_kloc_finite                                                                                                                              1604
+                      complete_output_path repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv
+                      complete_output_rows                                                                                                                              1604
+                     complete_output_repos                                                                                                                               218
+                 convert_paper_same_column                                                                                                                                 1
+            keep_overlap_paper_same_column                                                                                                                                 1
+             paper_same_column_output_path                                                       repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv
+             paper_same_column_output_rows                                                                                                                              1591
+            paper_same_column_matched_rows                                                                                                                              1591
+          paper_same_column_unmatched_rows                                                                                                                                13
+   paper_same_column_unmatched_output_path     repo_python/tmp/run-py-2e/strict_python_only/paper_audit/panel_event_monthly_quality_py_python_only_unmatched_repo_months.csv
+Paper-schema key match summary:
+source_complete_rows,paper_rows,paper_same_column_output_rows,paper_same_column_output_columns,paper_schema_columns,source_duplicate_repo_month_rows,paper_duplicate_repo_month_rows,repo_month_rows_matched_to_paper,repo_month_rows_not_matched_to_paper,keep_overlap_paper_same_column
+1604,22096,1591,42,42,0,153,1591,13,1
+
+** Building combined quality DiD input QC
+------------------------------------------------------------
+Saved combined QC long: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_long.csv
+Saved combined QC wide: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_wide.csv
+
+Combined QC wide:
+ panel                                                                                         output_file                                                                                                              complete_output_file                                                                               missing_output_file                                               paper_same_column_output_file  output_rows  complete_rows  missing_core_quality_rows  paper_same_column_output_rows  output_repos  complete_repos  paper_same_column_repos  paper_repo_month_rows_matched  paper_repo_month_rows_unmatched  keep_overlap_paper_same_column  paper_duplicate_repo_month_rows
+strict repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/quality_did_input_full.csv repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/missing_core_quality.csv repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv         1633           1604                         29                           1591           220             218                      217                           1591                               13                               1                              153
+
+============================================================
+run-py-2e completed successfully.
+Completed:                         Sun Jul 12 02:08:58 PM CDT 2026
+Panel variant:                     strict
+Output suffix:                     python_only
+Convert paper same column:         TRUE
+Keep overlap paper same column:    TRUE
+Main output dir:                   repo_python/run-py-2e
+Extra output dir:                  repo_python/tmp/run-py-2e
+Temporary work files:              removed
+Log file:                          logs/run-py-2e_prepare_quality_did_input_strict_python_only_20260712-140857.log
+============================================================
