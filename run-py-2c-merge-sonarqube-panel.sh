@@ -23,6 +23,14 @@ set -euo pipefail
 # Usage:
 #   PANEL_VARIANT=strict bash run-py-2c-merge-sonarqube-panel.sh
 #   PANEL_VARIANT=flexible bash run-py-2c-merge-sonarqube-panel.sh
+# 
+# 
+# PANEL_VARIANT=strict \
+# TREATMENT_METRICS=repo_python/run-py-2b/strict/treatment/ts_repos_monthly_scanned_python_only.csv \
+# CONTROL_METRICS=repo_python/run-py-2b/strict/control/ts_repos_monthly_scanned_python_only.csv \
+# OUTPUT_FILE=repo_python/run-py-2c/strict/panel_event_matched_strict_with_sonarqube_python_only.csv \
+# QC_OUTPUT_FILE=repo_python/tmp/run-py-2c/strict/panel_event_matched_strict_with_sonarqube_python_only_qc.csv \
+# bash run-py-2c-merge-sonarqube-panel.sh
 # ============================================================
 
 SCRIPT_NAME="$(basename "$0")"

@@ -1,49 +1,161 @@
+[   11985666 Jul 11 02:35]  repo_python
+├── [      57222 Jul 10 19:24]  run-py-1f
+│   └── [      53126 Jul 10 19:24]  treatment_python_sample_main_118.csv
+├── [      83839 Jul 10 19:34]  run-py-1g
+│   ├── [       3797 Jul 10 19:34]  python_control_repos_to_clone_main_118.csv
+│   └── [      75946 Jul 10 19:34]  python_matched_control_pairs_main_118.csv
+├── [      31229 Jul 10 20:12]  run-py-1h
+│   └── [      27133 Jul 10 20:12]  python_control_clone_status_main_118.csv
+├── [     107306 Jul 10 22:17]  run-py-1i
+│   ├── [      28814 Jul 10 22:17]  python_control_clone_usable_repos_main.csv
+│   └── [      74396 Jul 10 22:17]  python_matched_control_pairs_main_clone_usable.csv
+├── [    1038877 Jul 10 22:37]  run-py-1j
+│   ├── [        117 Jul 10 22:37]  ai_adoption_dates.csv
+│   ├── [         61 Jul 10 22:37]  cursor_commits.csv
+│   ├── [     825751 Jul 10 22:37]  ts_contributors_monthly.csv
+│   └── [     208852 Jul 10 22:37]  ts_repos_monthly.csv
+├── [    1211804 Jul 10 22:52]  run-py-1k
+│   ├── [      28814 Jul 10 22:53]  python_control_clone_usable_repos_main_final_clean.csv
+│   ├── [      69895 Jul 10 22:53]  python_matched_control_pairs_main_final_clean_1to3_only.csv
+│   ├── [      74396 Jul 10 22:53]  python_matched_control_pairs_main_final_clean.csv
+│   ├── [     825751 Jul 10 22:53]  ts_contributors_monthly_final_clean.csv
+│   └── [     208852 Jul 10 22:53]  ts_repos_monthly_final_clean.csv
+├── [    1490652 Jul 10 23:29]  run-py-1l
+│   ├── [     227943 Jul 10 23:29]  panel_event_matched_flexible.csv
+│   ├── [     531470 Jul 10 23:29]  panel_event_matched_flexible_window_driven.csv
+│   ├── [     217505 Jul 10 23:29]  panel_event_matched_strict.csv
+│   └── [     509638 Jul 10 23:29]  panel_event_matched_strict_window_driven.csv
+├── [     496386 Jul 11 01:00]  run-py-2a
+│   ├── [     251155 Jul 11 01:00]  flexible
+│   │   ├── [     139301 Jul 11 01:00]  control
+│   │   │   └── [     135205 Jul 11 01:00]  data
+│   │   │       └── [     131109 Jul 11 01:00]  ts_repos_monthly.csv
+│   │   └── [     107758 Jul 11 01:00]  treatment
+│   │       └── [     103662 Jul 11 01:00]  data
+│   │           └── [      99566 Jul 11 01:00]  ts_repos_monthly.csv
+│   └── [     241135 Jul 11 00:58]  strict
+│       ├── [     137882 Jul 11 00:58]  control
+│       │   └── [     133786 Jul 11 00:59]  data
+│       │       └── [     129690 Jul 11 00:59]  ts_repos_monthly.csv
+│       └── [      99157 Jul 11 00:58]  treatment
+│           └── [      95061 Jul 11 00:58]  data
+│               └── [      90965 Jul 11 00:58]  ts_repos_monthly.csv
+├── [     721031 Jul 11 01:19]  run-py-2b
+│   ├── [      12288 Jul 11 01:19]  flexible
+│   │   ├── [       4096 Jul 11 01:19]  control
+│   │   └── [       4096 Jul 11 01:19]  treatment
+│   └── [     704647 Jul 11 01:19]  strict
+│       ├── [     407390 Jul 12 12:50]  control
+│       │   ├── [     201930 Jul 11 01:19]  ts_repos_monthly_scanned.csv
+│       │   └── [     201364 Jul 12 12:50]  ts_repos_monthly_scanned_python_only.csv
+│       └── [     293161 Jul 11 18:42]  treatment
+│           ├── [     144899 Jul 11 01:19]  ts_repos_monthly_scanned.csv
+│           └── [     144166 Jul 12 00:40]  ts_repos_monthly_scanned_python_only.csv
+├── [     570626 Jul 11 01:43]  run-py-2c
+│   └── [     566530 Jul 11 01:43]  strict
+│       └── [     562434 Jul 11 01:43]  panel_event_matched_strict_with_sonarqube.csv
+├── [     276524 Jul 11 02:12]  run-py-2e
+│   └── [     272428 Jul 11 02:12]  strict
+│       └── [     268332 Jul 11 02:12]  panel_event_monthly_quality_py.csv
+├── [     783526 Jul 11 02:35]  run-py-2f
+│   └── [     779430 Jul 11 02:35]  strict
+│       ├── [     766485 Jul 11 02:35]  DiffInDiffBorusyak_quality_python_v2.html
+│       └── [       8849 Jul 11 02:35]  dynamic_effects_borusyak_quality_python_v2.pdf
+├── [    2134874 Jul 11 15:40]  tmp
+│   ├── [      37535 Jul 10 18:19]  run-py-1b
+│   │   └── [      33439 Jul 10 18:19]  treatment_python_clone_status_20260710-181947.csv
+│   ├── [       6427 Jul 10 18:43]  run-py-1c
+│   │   └── [       2331 Jul 10 18:43]  treatment_python_clone_failed_repos.csv
+│   ├── [       4096 Jul 10 18:50]  run-py-1d
+│   ├── [       8713 Jul 10 19:01]  run-py-1e
+│   │   └── [       4617 Jul 10 19:01]  full
+│   │       ├── [        230 Jul 10 19:01]  run-py-1e_cache_check_20260710-190130.txt
+│   │       └── [        291 Jul 10 19:01]  run-py-1e_missing_repos_20260710-190130.csv
+│   ├── [     110797 Jul 10 19:24]  run-py-1f
+│   │   ├── [        449 Jul 10 19:24]  treatment_python_sample_diagnostic_0.csv
+│   │   ├── [      53126 Jul 10 19:24]  treatment_python_sample_exact_match_118.csv
+│   │   └── [      53126 Jul 10 19:24]  treatment_python_sample_within1_month_118.csv
+│   ├── [      93010 Jul 10 19:34]  run-py-1g
+│   │   ├── [        497 Jul 10 19:34]  python_control_extract_summary_main_118.csv
+│   │   ├── [        119 Jul 10 19:34]  python_control_repos_to_clone_main_118_overlap_repos.csv
+│   │   ├── [       3830 Jul 10 19:34]  python_control_repos_to_clone_main_118_raw.csv
+│   │   ├── [       2878 Jul 10 19:34]  python_matched_control_pairs_main_118_coverage.csv
+│   │   ├── [        963 Jul 10 19:34]  python_matched_control_pairs_main_118_overlap_pairs.csv
+│   │   ├── [      76672 Jul 10 19:34]  python_matched_control_pairs_main_118_raw.csv
+│   │   └── [       3955 Jul 10 19:34]  python_treatment_missing_matching_main_118.csv
+│   ├── [      31229 Jul 10 20:12]  run-py-1h
+│   │   └── [      27133 Jul 10 20:12]  python_control_clone_status_main_118_20260710-201225.csv
+│   ├── [      10611 Jul 10 22:17]  run-py-1i
+│   │   ├── [        835 Jul 10 22:17]  python_control_clone_failed_repos_main.csv
+│   │   ├── [        454 Jul 10 22:17]  python_control_clone_usable_summary_main.csv
+│   │   ├── [       3361 Jul 10 22:17]  python_control_pair_coverage_main_clone_usable.csv
+│   │   ├── [       1787 Jul 10 22:17]  python_matched_control_pairs_main_clone_failed.csv
+│   │   └── [         78 Jul 10 22:17]  python_treatment_lost_all_controls_main.csv
+│   ├── [      14688 Jul 10 22:38]  run-py-1j
+│   │   └── [      10592 Jul 10 22:38]  full
+│   │       ├── [       6221 Jul 10 22:38]  run-py-1j_analyzed_repos_manifest.csv
+│   │       ├── [        230 Jul 10 22:38]  run-py-1j_cache_check_20260710-223826.txt
+│   │       └── [         45 Jul 10 22:38]  run-py-1j_missing_repos_20260710-223826.csv
+│   ├── [      11851 Jul 10 22:52]  run-py-1k
+│   │   ├── [        117 Jul 10 22:53]  python_control_local_cursor_evidence_in_window.csv
+│   │   ├── [        117 Jul 10 22:53]  python_control_local_cursor_evidence_post_window.csv
+│   │   ├── [        684 Jul 10 22:53]  python_control_local_cursor_filter_summary_main.csv
+│   │   ├── [       3101 Jul 10 22:53]  python_control_pair_coverage_main_final_clean_1to3_only.csv
+│   │   ├── [       3391 Jul 10 22:53]  python_control_pair_coverage_main_final_clean.csv
+│   │   ├── [        237 Jul 10 22:53]  python_matched_control_pairs_main_local_cursor_dropped.csv
+│   │   └── [        108 Jul 10 22:53]  python_treatment_lost_all_controls_main_final_clean.csv
+│   ├── [      15734 Jul 10 23:29]  run-py-1l
+│   │   └── [      11638 Jul 10 23:28]  qc
+│   │       ├── [        733 Jul 10 23:29]  panel_qc_attrition_summary.csv
+│   │       ├── [        326 Jul 10 23:29]  panel_qc_by_source.csv
+│   │       ├── [        284 Jul 10 23:29]  panel_qc_dropped_by_strict.csv
+│   │       ├── [       5024 Jul 10 23:29]  panel_qc_notes.md
+│   │       ├── [        494 Jul 10 23:29]  panel_qc_paper_comparison.csv
+│   │       └── [        681 Jul 10 23:29]  panel_qc_summary.csv
+│   ├── [      24107 Jul 11 01:00]  run-py-2a
+│   │   ├── [      10141 Jul 11 01:00]  flexible
+│   │   │   ├── [       2955 Jul 11 01:00]  control_repos.txt
+│   │   │   ├── [        160 Jul 11 01:00]  months.txt
+│   │   │   ├── [        307 Jul 11 01:00]  sonarqube_input_summary.csv
+│   │   │   └── [       2623 Jul 11 01:00]  treatment_repos.txt
+│   │   └── [       9870 Jul 11 00:59]  strict
+│   │       ├── [       2918 Jul 11 00:58]  control_repos.txt
+│   │       ├── [        160 Jul 11 00:58]  months.txt
+│   │       ├── [        303 Jul 11 00:59]  sonarqube_input_summary.csv
+│   │       └── [       2393 Jul 11 00:58]  treatment_repos.txt
+│   ├── [       8450 Jul 11 15:40]  run-py-2b
+│   │   └── [       4354 Jul 11 15:40]  python-only-target
+│   │       └── [        258 Jul 11 16:08]  Anemll_Anemll_2025-02.csv
+│   ├── [      10111 Jul 11 01:43]  run-py-2c
+│   │   └── [       6015 Jul 11 01:43]  strict
+│   │       └── [       1919 Jul 11 01:43]  panel_event_matched_strict_with_sonarqube_qc.csv
+│   ├── [    1723160 Jul 11 02:12]  run-py-2e
+│   │   └── [    1719064 Jul 11 02:12]  strict
+│   │       ├── [     846058 Jul 11 02:12]  panel_event_matched_strict_with_sonarqube_quality_did_input_complete.csv
+│   │       ├── [     864472 Jul 11 02:12]  paper_audit
+│   │       │   ├── [       1819 Jul 11 02:12]  panel_event_monthly_quality_py_column_sources.csv
+│   │       │   ├── [        320 Jul 11 02:12]  panel_event_monthly_quality_py_key_match_summary.csv
+│   │       │   ├── [     849285 Jul 11 02:12]  panel_event_monthly_quality_py_metric_comparison.csv
+│   │       │   └── [       8952 Jul 11 02:12]  panel_event_monthly_quality_py_unmatched_repo_months.csv
+│   │       └── [       4438 Jul 11 02:12]  quality_did_input_qc.csv
+│   ├── [      16541 Jul 11 02:35]  run-py-2f
+│   │   └── [      12445 Jul 11 02:35]  strict
+│   │       ├── [       5240 Jul 11 02:35]  borusyak_quality_dynamic_effects.csv
+│   │       ├── [        474 Jul 11 02:35]  borusyak_quality_input_summary.csv
+│   │       ├── [       1316 Jul 11 02:35]  borusyak_quality_metadata.csv
+│   │       ├── [        700 Jul 11 02:35]  borusyak_quality_panel_checks.csv
+│   │       └── [        619 Jul 11 02:35]  borusyak_quality_static_effects.csv
+│   └── [       3718 Jul 10 15:50]  treatment_python_repos_bw6.csv
+├── [      33439 Jul 10 18:19]  treatment_python_clone_status.csv
+├── [       1543 Jul 10 18:50]  treatment_python_clone_usable_missing_event_month.csv
+├── [      37793 Jul 10 18:43]  treatment_python_clone_usable_repos_with_event.csv
+├── [      36541 Jul 10 18:50]  treatment_python_clone_usable_repos_with_event_valid.csv
+├── [    2854901 Jul 10 19:01]  treatment_python_did
+│   ├── [      53126 Jul 10 19:01]  adoption_month_check.csv
+│   ├── [      23247 Jul 10 18:59]  ai_adoption_dates.csv
+│   ├── [     363216 Jul 10 18:59]  cursor_commits.csv
+│   ├── [    2154034 Jul 10 18:59]  ts_contributors_monthly.csv
+│   └── [     257182 Jul 10 18:59]  ts_repos_monthly.csv
+└── [      13457 Jul 10 15:50]  treatment_python_repos.csv
 
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -1 data/repos.csv 
-repo_name,repo_stars,repo_forks,repo_created,repo_updated,repo_description,repo_issues,repo_pulls,repo_commits,repo_contributors,repo_size,repo_languages,repo_primary_language
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head -3 repo_python/run-py-2e/strict/panel_event_monthly_quality_py.csv
-repo_name,time,is_treatment,event,post_event,time_to_event,lead_6,lead_5,lead_4,lead_3,lead_2,lead_1,lag_0,lag_1,lag_2,lag_3,lag_4,lag_5,lag_6,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,dataset_source,other_agents,high_confidence
-1mrat/cursor-taskrunner,2024-08,1,2024-08,1,0.0,0,0,0,0,0,0,1,0,0,0,0,0,0,True,4,264,8,1,9.0,0.0,0.0,0.0,209.0,1.0,0.0,1.0,0.0,5.9,28.0,5.0,,,,treatment,False,True
-Anemll/Anemll,2025-02,1,2025-02,1,0.0,0,0,0,0,0,0,1,0,0,0,0,0,0,True,8,2742,701,2,212.0,3.0,3.0,0.0,3990.0,4.0,0.0,72.0,22.3,24.8,1013.0,427.0,,,,treatment,True,True
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ ls ../treatment-repos/| grep -i Anemll
-Anemll_Anemll
-
-
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ cloc ../treatment-repos/Anemll_Anemll/
-     300 text files.
-     297 unique files.                                          
-      28 files ignored.
-
-github.com/AlDanial/cloc v 1.90  T=0.33 s (861.1 files/s, 298192.2 lines/s)
---------------------------------------------------------------------------------
-Language                      files          blank        comment           code
---------------------------------------------------------------------------------
-Python                          159           9705           8120          42281
-Swift                            40           2862           1883          16933
-Markdown                         44           2299              0           7298
-Bourne Shell                     19            665            563           4878
-XML                               9              0              0            341
-JSON                              9              0              0             99
-TOML                              1              4              0             42
-Bourne Again Shell                1              6             21              4
-INI                               1              0              0              2
---------------------------------------------------------------------------------
-SUM:                            283          15541          10587          71878
---------------------------------------------------------------------------------
-
-
-head -1 repo_python/run-py-2b/strict/treatment/ts_repos_monthly_scanned.csv && grep -i anemll repo_python/run-py-2b/strict/treatment/ts_repos_monthly_scanned.csv
-repo_name,month,latest_commit,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
-Anemll/Anemll,2025-02,d3b2e3660c0657ab643b68a0513b4b5ab443c04c,3990.0,4.0,0.0,72.0,22.3,24.8,1013.0,427.0
-Anemll/Anemll,2025-03,d3b2e3660c0657ab643b68a0513b4b5ab443c04c,3990.0,4.0,0.0,72.0,22.3,24.8,1013.0,427.0
-Anemll/Anemll,2025-04,d175746c2ffbabd0a0e4491212c0ef0a501d9848,4093.0,4.0,0.0,71.0,20.1,25.2,1064.0,425.0
-Anemll/Anemll,2025-05,4bfa0b08183a437e759798f2245bbcba2313521f,4093.0,4.0,0.0,71.0,20.1,25.2,1064.0,425.0
-Anemll/Anemll,2025-06,b0ea623eaac791a0803849c4f35ef8357f98935b,18458.0,8.0,0.0,175.0,16.9,19.1,4188.0,1485.0
-Anemll/Anemll,2025-07,6ecb10d7dfe90533af13ac23c825ca76aab0c56e,21444.0,9.0,1.0,232.0,23.4,19.4,5144.0,2092.0
-Anemll/Anemll,2025-08,6ecb10d7dfe90533af13ac23c825ca76aab0c56e,21444.0,9.0,1.0,232.0,23.4,19.4,5144.0,2092.0
-
-
+    11985666 bytes used in 59 directories, 99 files
