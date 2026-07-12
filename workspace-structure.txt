@@ -88,7 +88,8 @@ repo_python
 │       ├── control
 │       │   └── ts_repos_monthly_scanned.csv
 │       └── treatment
-│           └── ts_repos_monthly_scanned.csv
+│           ├── ts_repos_monthly_scanned.csv
+│           └── ts_repos_monthly_scanned_python_only.csv
 ├── run-py-2c
 │   └── strict
 │       └── panel_event_matched_strict_with_sonarqube.csv
@@ -161,6 +162,9 @@ repo_python
 │   │       ├── months.txt
 │   │       ├── sonarqube_input_summary.csv
 │   │       └── treatment_repos.txt
+│   ├── run-py-2b
+│   │   └── python-only-target
+│   │       └── Anemll_Anemll_2025-02.csv
 │   ├── run-py-2c
 │   │   └── strict
 │   │       └── panel_event_matched_strict_with_sonarqube_qc.csv
@@ -213,56 +217,23 @@ proc_r
 proc_scripts
 ├── analyze_repos_v2.py
 ├── check_cache_control_repos.py
-├── check_python_repo_clone.py
-├── check_repo_balanced_window.py
-├── check-sonarqube-coverage.py
-├── check-sonarqube-panel.py
 ├── check_sonarqube_panel.py
 ├── check_time_of_event_and_adoption.py
 ├── clone_repos_v2.py
-├── collect_sonarqube_warnings_all_repos.py
-├── collect_sonarqube_warnings_v2.py
-├── compare_jsts_paper.py
-├── count_cloned_repos.py
 ├── count_repo_lang.py
-├── count_repo.py
-├── create_clone_usable_repos.py
 ├── create_clone_usable_repos_with_event.py
 ├── create_control_usable_repos.py
-├── create-lang-candidate-file.py
 ├── create_tmp_repo_timeseries_history.py
-├── create_tmp_repo_timeseries_input.py
-├── did_code_hygiene.py
-├── extract-jsts-control-repos.py
 ├── extract_matched_control_repos.py
-├── fetch_ai_tool_repos.py
 ├── filter_controls_by_local_cursor_evidence.py
-├── find_control_groups_v2.py
-├── find_repo_pre_post_ai_adoption.py
-├── merge-sonarqube-panel.py
 ├── merge_sonarqube_panel_v2.py
 ├── prepare_panel_event_v2.py
-├── prepare-quality-did-input.py
 ├── prepare_quality_did_input_v2.py
 ├── prepare_sonarqube_input.py
-├── run_sonarqube_one_repo_test.py
 ├── run_sonarqube_v2.py
 ├── save_treatment_options.py
-├── summarize_borusyak_quality_outputs.py
 ├── summarize_borusyak_quality_outputs_python.py
-├── summarize-borusyak-quality-results.py
-├── summarize_borusyak_warning_subcategories.py
-├── summarize_jsts_panels.py
-├── summarize_matched_panels.py
-├── test_create_tmp_repo_timeseries_input_batch.py
-├── test_create_tmp_repo_timeseries_input.py
-├── test_display_metrics.py
-├── test_find_candidate_repo.py
-├── test_github_query.py
-├── test_sonarqube_connection.py
-├── test_sonarqube_metrics.py
-├── test_sonarqube_scan.py
-└── test_sonarqube_tiny_issues.py
+└── summarize_matched_panels.py
 
 ============== [ run-py-* FILES ] ==============
 run-py-1a-count-repo.sh
@@ -287,5 +258,3 @@ run-py-2f1-did-borusyak-quality.sh
 run-py-2f-did-borusyak-quality.sh
 run-py-2g-summarize-borusyak-quality.sh
 run-py-2h-did-borusyak-velocity.sh
-run-py-all-scripts-merge.sh
-run-py-all-scripts.sh

@@ -16,7 +16,7 @@ tree --noreport -I '__pycache__|bak|compare-[0-9]*' proc_r
 
 echo
 echo "============== [ proc_scripts ] =============="
-tree --noreport -I '__pycache__|bak|compare-[0-9]*' proc_scripts
+tree --noreport -I '__pycache__|bak|bak2|compare-[0-9]*' proc_scripts
 
 echo
 echo "============== [ run-py-* FILES ] =============="
