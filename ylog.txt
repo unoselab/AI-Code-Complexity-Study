@@ -1,8 +1,6 @@
-(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ OUTPUT_SUFFIX=python_only PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE 
-
 ============================================================
 run-py-2e: prepare Python quality DiD input
-Started:                           Sun Jul 12 02:08:57 PM CDT 2026
+Started:                           Sun Jul 12 02:22:55 PM CDT 2026
 Script name:                       run-py-2e-prepare-quality-did-input.sh
 Run prefix:                        run-py-2e
 Panel variant:                     strict
@@ -18,33 +16,33 @@ Paper audit root:                   repo_python/tmp/run-py-2e
 Fill from paper columns:           stars,issues,issue_comments,age,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,other_agents,high_confidence
 Metric compare columns:            ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
 Top print:                         20
-Temporary manifest:                repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_manifest_strict_python_only.csv
-Temporary combined QC long:        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_long.csv
-Temporary combined QC wide:        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_wide.csv
-Log file:                          logs/run-py-2e_prepare_quality_did_input_strict_python_only_20260712-140857.log
+Temporary manifest:                repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/quality_did_input_manifest_strict_python_only.csv
+Temporary combined QC long:        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/quality_did_input_qc_strict_python_only_long.csv
+Temporary combined QC wide:        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/quality_did_input_qc_strict_python_only_wide.csv
+Log file:                          logs/run-py-2e_prepare_quality_did_input_strict_python_only_20260712-142255.log
 ============================================================
 
 
 ============================================================
 Preparing quality DiD input for panel: strict
 Input:                         repo_python/run-py-2c/strict/panel_event_matched_strict_with_sonarqube_python_only.csv
-Output:                        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/quality_did_input_full.csv
+Output:                        repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/strict/quality_did_input_full.csv
 Complete output:               repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv
 QC output:                     repo_python/tmp/run-py-2e/strict_python_only/quality_did_input_qc.csv
-Missing output:                repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/missing_core_quality.csv
+Missing output:                repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/strict/missing_core_quality.csv
 Paper same-column output:      repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv
 Paper audit directory:         repo_python/tmp/run-py-2e/strict_python_only/paper_audit
 Paper overlap-only:            TRUE
 ============================================================
-2026-07-12 14:08:57,540 [INFO] Loading merged panel: repo_python/run-py-2c/strict/panel_event_matched_strict_with_sonarqube_python_only.csv
-2026-07-12 14:08:57,548 [INFO] Input rows: 1633
-2026-07-12 14:08:57,548 [INFO] Input repos: 220
-2026-07-12 14:08:57,548 [INFO] Input months: 2024-01 to 2025-08
-2026-07-12 14:08:57,860 [INFO] Saved paper-schema output: repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv
-2026-07-12 14:08:57,860 [INFO] Saved paper-schema audit directory: repo_python/tmp/run-py-2e/strict_python_only/paper_audit
-2026-07-12 14:08:57,860 [INFO] Saved paper-schema key summary: repo_python/tmp/run-py-2e/strict_python_only/paper_audit/panel_event_monthly_quality_py_python_only_key_match_summary.csv
-2026-07-12 14:08:57,860 [INFO] Saved unmatched repo-month rows: repo_python/tmp/run-py-2e/strict_python_only/paper_audit/panel_event_monthly_quality_py_python_only_unmatched_repo_months.csv
-2026-07-12 14:08:57,860 [INFO] Paper-schema exact matches: 1591; unmatched: 13; output rows: 1591
+2026-07-12 14:22:55,790 [INFO] Loading merged panel: repo_python/run-py-2c/strict/panel_event_matched_strict_with_sonarqube_python_only.csv
+2026-07-12 14:22:55,798 [INFO] Input rows: 1633
+2026-07-12 14:22:55,799 [INFO] Input repos: 220
+2026-07-12 14:22:55,799 [INFO] Input months: 2024-01 to 2025-08
+2026-07-12 14:22:56,102 [INFO] Saved paper-schema output: repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv
+2026-07-12 14:22:56,102 [INFO] Saved paper-schema audit directory: repo_python/tmp/run-py-2e/strict_python_only/paper_audit
+2026-07-12 14:22:56,102 [INFO] Saved paper-schema key summary: repo_python/tmp/run-py-2e/strict_python_only/paper_audit/panel_event_monthly_quality_py_python_only_key_match_summary.csv
+2026-07-12 14:22:56,102 [INFO] Saved unmatched repo-month rows: repo_python/tmp/run-py-2e/strict_python_only/paper_audit/panel_event_monthly_quality_py_python_only_unmatched_repo_months.csv
+2026-07-12 14:22:56,103 [INFO] Paper-schema exact matches: 1591; unmatched: 13; output rows: 1591
 
 Top paper-versus-regenerated metric differences:
   getsentry/sentry,2025-08,ncloc,our=995274.0,paper=2038867.0,diff=-1043593.0
@@ -67,10 +65,10 @@ Top paper-versus-regenerated metric differences:
   getsentry/sentry,2024-03,ncloc,our=731865.0,paper=1388532.0,diff=-656667.0
   getsentry/sentry,2024-02,ncloc,our=745495.0,paper=1382944.0,diff=-637449.0
   getsentry/sentry,2024-01,ncloc,our=727562.0,paper=1349397.0,diff=-621835.0
-2026-07-12 14:08:57,869 [INFO] Saved full quality DiD input: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/quality_did_input_full.csv
-2026-07-12 14:08:57,869 [INFO] Saved missing core quality rows: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/missing_core_quality.csv
-2026-07-12 14:08:57,869 [INFO] Saved complete-case quality DiD input: repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv
-2026-07-12 14:08:57,869 [INFO] Saved QC: repo_python/tmp/run-py-2e/strict_python_only/quality_did_input_qc.csv
+2026-07-12 14:22:56,110 [INFO] Saved full quality DiD input: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/strict/quality_did_input_full.csv
+2026-07-12 14:22:56,110 [INFO] Saved missing core quality rows: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/strict/missing_core_quality.csv
+2026-07-12 14:22:56,110 [INFO] Saved complete-case quality DiD input: repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv
+2026-07-12 14:22:56,110 [INFO] Saved QC: repo_python/tmp/run-py-2e/strict_python_only/quality_did_input_qc.csv
 
 QC summary:
                                      check                                                                                                                             value
@@ -209,16 +207,16 @@ source_complete_rows,paper_rows,paper_same_column_output_rows,paper_same_column_
 
 ** Building combined quality DiD input QC
 ------------------------------------------------------------
-Saved combined QC long: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_long.csv
-Saved combined QC wide: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/quality_did_input_qc_strict_python_only_wide.csv
+Saved combined QC long: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/quality_did_input_qc_strict_python_only_long.csv
+Saved combined QC wide: repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/quality_did_input_qc_strict_python_only_wide.csv
 
 Combined QC wide:
  panel                                                                                         output_file                                                                                                              complete_output_file                                                                               missing_output_file                                               paper_same_column_output_file  output_rows  complete_rows  missing_core_quality_rows  paper_same_column_output_rows  output_repos  complete_repos  paper_same_column_repos  paper_repo_month_rows_matched  paper_repo_month_rows_unmatched  keep_overlap_paper_same_column  paper_duplicate_repo_month_rows
-strict repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/quality_did_input_full.csv repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv repo_python/tmp/run-py-2e/work_strict_python_only_20260712-140857/strict/missing_core_quality.csv repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv         1633           1604                         29                           1591           220             218                      217                           1591                               13                               1                              153
+strict repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/strict/quality_did_input_full.csv repo_python/tmp/run-py-2e/strict_python_only/panel_event_matched_strict_with_sonarqube_python_only_quality_did_input_complete.csv repo_python/tmp/run-py-2e/work_strict_python_only_20260712-142255/strict/missing_core_quality.csv repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv         1633           1604                         29                           1591           220             218                      217                           1591                               13                               1                              153
 
 ============================================================
 run-py-2e completed successfully.
-Completed:                         Sun Jul 12 02:08:58 PM CDT 2026
+Completed:                         Sun Jul 12 02:22:56 PM CDT 2026
 Panel variant:                     strict
 Output suffix:                     python_only
 Convert paper same column:         TRUE
@@ -226,5 +224,5 @@ Keep overlap paper same column:    TRUE
 Main output dir:                   repo_python/run-py-2e
 Extra output dir:                  repo_python/tmp/run-py-2e
 Temporary work files:              removed
-Log file:                          logs/run-py-2e_prepare_quality_did_input_strict_python_only_20260712-140857.log
+Log file:                          logs/run-py-2e_prepare_quality_did_input_strict_python_only_20260712-142255.log
 ============================================================

@@ -31,7 +31,7 @@ set -euo pipefail
 #   PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
 # 
 # Usage for Python only
-# OUTPUT_SUFFIX=python_only PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
+# OUTPUT_SUFFIX=python_specific PANEL_VARIANT=strict bash run-py-2e-prepare-quality-did-input.sh --convert-paper-same-column TRUE --keep-overlap-paper-same-column TRUE
 #
 # Important:
 #   The paper-schema output preserves regenerated Python SonarQube metrics.
