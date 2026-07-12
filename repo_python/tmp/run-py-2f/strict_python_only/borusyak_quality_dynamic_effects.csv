@@ -1,0 +1,37 @@
+outcome,outcome_label,time,estimate,conf_low,conf_high,std_error,p_value,significant,panel,covariate_mode
+log_static_analysis_warnings,Static Analysis Warnings,-6,0.117646034115034,-0.352677604213058,0.587969672443127,0.239961039963313,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,-5,0.139749283035005,-0.333361524667376,0.612860090737386,0.241383065154276,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,-4,0.173720898949495,-0.305214421028529,0.652656218927519,0.244354755090829,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,-3,-0.0847098965937823,-0.903724011983176,0.734304218795611,0.417864344586425,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,-2,0.0181768513264559,-0.130781557051298,0.16713525970421,0.0759991879478338,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,0,0.292920267892832,0.106937086677138,0.478903449108527,0.0948893781712727,,TRUE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,1,0.305809472877713,0.0836466886519146,0.527972257103511,0.113348359298877,,TRUE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,2,0.226399582893258,-0.0310063512962298,0.483805517082746,0.131329558259943,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,3,0.164041917718787,-0.142127201987881,0.470211037425454,0.156208734544218,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,4,0.219276463852092,-0.14007452559747,0.578627453301653,0.183342341555899,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,5,0.00478857407534191,-0.417068758206857,0.426645906357541,0.21523333279704,,FALSE,strict,paper
+log_static_analysis_warnings,Static Analysis Warnings,6,0.00673565515000019,-0.798757473886263,0.812228784186263,0.410965882161359,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,-6,0.094777771042291,-0.0931885672866854,0.282744109371267,0.095901193024988,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,-5,-0.0913749970617425,-0.26811941385957,0.0853694197360853,0.0901757228560346,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,-4,-0.0755850066263692,-0.212934583515805,0.0617645702630666,0.070076314739508,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,-3,-0.0586168109787947,-0.185069563542097,0.0678359415845078,0.0645167104914809,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,-2,-0.0167301594673557,-0.143766287375866,0.110305968441154,0.0648143509737296,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,0,-0.0176878812300125,-0.207791518703974,0.172415756243949,0.0969916517724293,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,1,-0.0441556273028696,-0.208192829554508,0.119881574948769,0.0836924501283868,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,2,-0.136812350593732,-0.31870098631359,0.045076285126126,0.0928003243468662,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,3,-0.17013398077346,-0.388551563708699,0.0482836021617789,0.111437542313897,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,4,-0.337811236488292,-0.607625555992588,-0.0679969169839972,0.137660367094028,,TRUE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,5,-0.257113528947163,-0.575409358333461,0.0611823004391358,0.16239583131954,,FALSE,strict,paper
+log_duplicate_line_density,Duplicate Line Density,6,-0.24501396309397,-0.749868725340218,0.259840799152278,0.257578960329718,,FALSE,strict,paper
+log_code_complexity,Code Complexity,-6,-0.0473045669059634,-0.491928243603989,0.397319109792062,0.22684881464185,,FALSE,strict,paper
+log_code_complexity,Code Complexity,-5,0.0378757108601891,-0.386525714470435,0.462277136190813,0.2165313394544,,FALSE,strict,paper
+log_code_complexity,Code Complexity,-4,-0.0420992381820427,-0.515363761472669,0.431165285108583,0.241461491474809,,FALSE,strict,paper
+log_code_complexity,Code Complexity,-3,-0.51619867744606,-1.77885671606144,0.746459361169324,0.644213285007849,,FALSE,strict,paper
+log_code_complexity,Code Complexity,-2,0.0925392042751332,-0.0646207459901939,0.24969915454046,0.0801836480945546,,FALSE,strict,paper
+log_code_complexity,Code Complexity,0,0.340142288441046,0.14284808726487,0.537436489617222,0.100660306722539,,TRUE,strict,paper
+log_code_complexity,Code Complexity,1,0.348680244673956,0.110804788778772,0.58655570056914,0.121365028517951,,TRUE,strict,paper
+log_code_complexity,Code Complexity,2,0.247739969311907,-0.019202810637531,0.514682749261346,0.136195295892571,,FALSE,strict,paper
+log_code_complexity,Code Complexity,3,0.272640765895577,-0.0467452390949982,0.592026770886152,0.162952043362538,,FALSE,strict,paper
+log_code_complexity,Code Complexity,4,0.297653673603575,-0.0605182618460691,0.655825609053219,0.182740783392675,,FALSE,strict,paper
+log_code_complexity,Code Complexity,5,0.147152886646475,-0.248864491978051,0.543170265271,0.202049682971697,,FALSE,strict,paper
+log_code_complexity,Code Complexity,6,-0.0069671543415771,-0.744040599391824,0.730106290708669,0.376057880127677,,FALSE,strict,paper

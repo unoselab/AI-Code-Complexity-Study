@@ -1,0 +1,21 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_quality_python_v2.Rmd
+helper_file,proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-2e/strict/panel_event_monthly_quality_py_python_only.csv
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-2f/strict_python_only
+input_schema,paper_same_column
+covariate_mode_requested,auto
+covariate_mode_used,paper
+paper_time_mode_requested,original_yyyymm
+outcomes,"log_static_analysis_warnings, log_duplicate_line_density, log_code_complexity"
+covariates,age + ncloc + contributors + stars + issues
+first_stage_formula,~age + ncloc + contributors + stars + issues | repo_id + time_id
+rows_before_model_complete_filter,1591
+rows_removed_by_model_complete_filter,0
+rows_used_by_models,1591
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,paper_original_numeric_yyyymm
+covariate_scaling,"log1p(age, contributors, stars, issues); raw ncloc"
+input_source,run-py-2e paper-compatible overlap panel with regenerated SonarQube outcomes
+interpretation_note,"Original-Rmd-compatible first stage: log1p(age, contributors, stars, issues) + raw ncloc; paper_original_numeric_yyyymm"

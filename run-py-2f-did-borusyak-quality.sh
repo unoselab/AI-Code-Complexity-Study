@@ -31,9 +31,12 @@ set -euo pipefail
 #   flexible
 #   all
 #
-# Usage:
+# Usage1:
 #   PANEL_VARIANT=strict bash run-py-2f-did-borusyak-quality.sh
 #
+# Usage2:
+#   OUTPUT_SUFFIX=python_only PANEL_VARIANT=strict bash run-py-2f-did-borusyak-quality.sh
+# 
 # Notes:
 #   This wrapper reuses the analysis flow of the existing run-py-2f
 #   implementation, but it is independent and does not call another wrapper.
@@ -61,32 +64,43 @@ if [[ "${PANEL_VARIANT}" != "strict" && "${PANEL_VARIANT}" != "flexible" && "${P
   exit 1
 fi
 
-LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_did_borusyak_quality_${PANEL_VARIANT}_${RUN_TS}.log}"
+OUTPUT_SUFFIX="${OUTPUT_SUFFIX:-}"
+if [[ -n "${OUTPUT_SUFFIX}" && ! "${OUTPUT_SUFFIX}" =~ ^[A-Za-z0-9_]+$ ]]; then
+  echo "ERROR: OUTPUT_SUFFIX must contain only letters, numbers, and underscores. Got: ${OUTPUT_SUFFIX}"
+  exit 1
+fi
+
+FILE_SUFFIX=""
+if [[ -n "${OUTPUT_SUFFIX}" ]]; then
+  FILE_SUFFIX="_${OUTPUT_SUFFIX}"
+fi
+
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_PREFIX}_did_borusyak_quality_${PANEL_VARIANT}${FILE_SUFFIX}_${RUN_TS}.log}"
 
 OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_python}"
 MAIN_OUTPUT_ROOT="${MAIN_OUTPUT_ROOT:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
 TMP_ROOT="${TMP_ROOT:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
-WORK_DIR="${WORK_DIR:-${TMP_ROOT}/work_${RUN_TS}}"
+WORK_DIR="${WORK_DIR:-${TMP_ROOT}/work_${PANEL_VARIANT}${FILE_SUFFIX}_${RUN_TS}}"
 PROC_R_DIR="${PROC_R_DIR:-proc_r}"
 
 RMD_FILE="${RMD_FILE:-${PROC_R_DIR}/DiffInDiffBorusyak_quality_python_v2.Rmd}"
 HELPER_FILE="${HELPER_FILE:-${PROC_R_DIR}/diff_in_diff_borusyak_helpers.R}"
 OUT_ROOT="${OUT_ROOT:-${TMP_ROOT}}"
 
-STRICT_PANEL_FILE="${STRICT_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/strict/panel_event_monthly_quality_py.csv}"
-FLEXIBLE_PANEL_FILE="${FLEXIBLE_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/flexible/panel_event_matched_flexible_with_sonarqube_quality_did_input_complete.csv}"
+STRICT_PANEL_FILE="${STRICT_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/strict/panel_event_monthly_quality_py${FILE_SUFFIX}.csv}"
+FLEXIBLE_PANEL_FILE="${FLEXIBLE_PANEL_FILE:-${OUTPUT_BASE_DIR}/run-py-2e/flexible/panel_event_matched_flexible_with_sonarqube${FILE_SUFFIX}_quality_did_input_complete.csv}"
 
-STRICT_HTML_FILE="${STRICT_HTML_FILE:-${MAIN_OUTPUT_ROOT}/strict/DiffInDiffBorusyak_quality_python_v2.html}"
-STRICT_PDF_FILE="${STRICT_PDF_FILE:-${MAIN_OUTPUT_ROOT}/strict/dynamic_effects_borusyak_quality_python_v2.pdf}"
-FLEXIBLE_HTML_FILE="${FLEXIBLE_HTML_FILE:-${MAIN_OUTPUT_ROOT}/flexible/DiffInDiffBorusyak_quality_python_v2.html}"
-FLEXIBLE_PDF_FILE="${FLEXIBLE_PDF_FILE:-${MAIN_OUTPUT_ROOT}/flexible/dynamic_effects_borusyak_quality_python_v2.pdf}"
+STRICT_HTML_FILE="${STRICT_HTML_FILE:-${MAIN_OUTPUT_ROOT}/strict/DiffInDiffBorusyak_quality_python_v2${FILE_SUFFIX}.html}"
+STRICT_PDF_FILE="${STRICT_PDF_FILE:-${MAIN_OUTPUT_ROOT}/strict/dynamic_effects_borusyak_quality_python_v2${FILE_SUFFIX}.pdf}"
+FLEXIBLE_HTML_FILE="${FLEXIBLE_HTML_FILE:-${MAIN_OUTPUT_ROOT}/flexible/DiffInDiffBorusyak_quality_python_v2${FILE_SUFFIX}.html}"
+FLEXIBLE_PDF_FILE="${FLEXIBLE_PDF_FILE:-${MAIN_OUTPUT_ROOT}/flexible/dynamic_effects_borusyak_quality_python_v2${FILE_SUFFIX}.pdf}"
 
-MANIFEST_FILE="${WORK_DIR}/borusyak_quality_manifest_${PANEL_VARIANT}.csv"
-COMBINED_STATIC="${WORK_DIR}/borusyak_quality_static_effects_${PANEL_VARIANT}.csv"
-COMBINED_DYNAMIC="${WORK_DIR}/borusyak_quality_dynamic_effects_${PANEL_VARIANT}.csv"
-COMBINED_CHECKS="${WORK_DIR}/borusyak_quality_panel_checks_${PANEL_VARIANT}.csv"
-COMBINED_INPUT_SUMMARY="${WORK_DIR}/borusyak_quality_input_summary_${PANEL_VARIANT}.csv"
-COMBINED_ERRORS="${WORK_DIR}/borusyak_quality_errors_${PANEL_VARIANT}.csv"
+MANIFEST_FILE="${WORK_DIR}/borusyak_quality_manifest_${PANEL_VARIANT}${FILE_SUFFIX}.csv"
+COMBINED_STATIC="${WORK_DIR}/borusyak_quality_static_effects_${PANEL_VARIANT}${FILE_SUFFIX}.csv"
+COMBINED_DYNAMIC="${WORK_DIR}/borusyak_quality_dynamic_effects_${PANEL_VARIANT}${FILE_SUFFIX}.csv"
+COMBINED_CHECKS="${WORK_DIR}/borusyak_quality_panel_checks_${PANEL_VARIANT}${FILE_SUFFIX}.csv"
+COMBINED_INPUT_SUMMARY="${WORK_DIR}/borusyak_quality_input_summary_${PANEL_VARIANT}${FILE_SUFFIX}.csv"
+COMBINED_ERRORS="${WORK_DIR}/borusyak_quality_errors_${PANEL_VARIANT}${FILE_SUFFIX}.csv"
 
 PANELS=()
 
@@ -107,6 +121,7 @@ mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_ROOT}" "${TMP_ROOT}" "${WORK_DIR}"
   echo "Script name:            ${SCRIPT_NAME}"
   echo "Run prefix:             ${RUN_PREFIX}"
   echo "Panel variant:          ${PANEL_VARIANT}"
+  echo "Output suffix:          ${OUTPUT_SUFFIX:-<none>}"
   echo "Project root:           ${PROJECT_ROOT}"
   echo "Rmd file:               ${RMD_FILE}"
   echo "Helper file:            ${HELPER_FILE}"
@@ -141,7 +156,7 @@ mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_ROOT}" "${TMP_ROOT}" "${WORK_DIR}"
   for entry in "${PANELS[@]}"; do
     PANEL_LABEL="${entry%%|*}"
     INPUT_FILE="${entry#*|}"
-    PANEL_OUT_DIR="${OUT_ROOT}/${PANEL_LABEL}"
+    PANEL_OUT_DIR="${OUT_ROOT}/${PANEL_LABEL}${FILE_SUFFIX}"
 
     if [[ ! -f "${INPUT_FILE}" ]]; then
       echo "ERROR: Input panel not found for ${PANEL_LABEL}: ${INPUT_FILE}"
@@ -405,6 +420,7 @@ PY
   echo "${RUN_PREFIX} completed successfully."
   echo "Completed:              $(date)"
   echo "Panel variant:          ${PANEL_VARIANT}"
+  echo "Output suffix:          ${OUTPUT_SUFFIX:-<none>}"
   echo "Strict HTML:            ${STRICT_HTML_FILE}"
   echo "Strict PDF:             ${STRICT_PDF_FILE}"
   echo "Main output root:       ${MAIN_OUTPUT_ROOT}"
