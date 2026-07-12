@@ -1,0 +1,2 @@
+repo_name,month,latest_commit,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt
+Anemll/Anemll,2025-02,d3b2e3660c0657ab643b68a0513b4b5ab443c04c,3990.0,4.0,0.0,72.0,22.3,24.8,1013.0,427.0

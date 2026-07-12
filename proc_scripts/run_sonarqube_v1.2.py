@@ -4,9 +4,8 @@ Script to run SonarQube scanner on the latest commits of each week or month.
 
 This script:
 1. Reads the time series repository stats from ts_repos_weekly.csv or ts_repos_monthly.csv
-2. Optionally builds a one-row target input from REPO_NAME,MONTH,LATEST_COMMIT
-3. For each repository and time period, runs SonarQube scanner on the latest commit
-4. Collects and stores the analysis results
+2. For each repository and time period, runs SonarQube scanner on the latest commit
+3. Collects and stores the analysis results
 
 NOTE: Sometimes the analysis results are not immediately available in database,
 so you may have to run this script twice in order to fetch all available metrics
@@ -165,12 +164,6 @@ def build_language_specific_sonar_args(language_profile: str) -> list[str]:
             "-Dsonar.python.version=3.11",
         ]
 
-    if profile in {"python-only", "py-only"}:
-        return common_args + [
-            "-Dsonar.python.version=3.11",
-            "-Dsonar.inclusions=**/*.py",
-        ]
-
     if profile in {"javascript", "typescript", "js", "ts", "js-ts", "jsts"}:
         return common_args + [
             # Keep JS/TS settings conservative. The scanner can usually find
@@ -180,7 +173,7 @@ def build_language_specific_sonar_args(language_profile: str) -> list[str]:
 
     raise ValueError(
         f"Unsupported language profile: {language_profile}. "
-        "Use one of: generic, python, python-only, js-ts."
+        "Use one of: generic, python, js-ts."
     )
 
 
@@ -258,62 +251,9 @@ def run_sonar_scan(
         return False
 
 
-def _find_analysis_date(project_key: str, version: str) -> Optional[str]:
-    """
-    Find the analysis date for a project's VERSION analysis.
-
-    Args:
-        project_key: SonarQube project key
-        version: Version identifier of the analysis
-
-    Returns:
-        str: Analysis date if found, None otherwise
-    """
-    analysis_date = None
-    page = 1
-
-    while analysis_date is None:
-        url = f"{SONAR_HOST}/api/project_analyses/search"
-        auth = (SONAR_TOKEN, "")
-        params = {
-            "project": project_key,
-            "category": "VERSION",
-            "ps": 100,  # Page size
-            "p": page,  # Page number
-        }
-
-        response = requests.get(url, auth=auth, params=params)
-        response.raise_for_status()
-
-        data = response.json()
-
-        logging.info("Found %d analyses for %s", len(data["analyses"]), project_key)
-
-        # Find the analysis with matching version to get its date
-        if "analyses" in data and data["analyses"]:
-            for analysis in data["analyses"]:
-                if analysis.get("projectVersion") == version:
-                    analysis_date = analysis.get("date")
-                    break
-
-            # If we haven't found the analysis and there are more pages, continue to the next page
-            if analysis_date is None and len(data["analyses"]) == 100:
-                page += 1
-            else:
-                break  # No more results or found the analysis
-        else:
-            break  # No analyses returned
-
-    return analysis_date
-
-
 def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
     """
     Get metrics from SonarQube API for a project and specific version.
-
-    Only fetches the metrics listed in METRICS_OF_INTEREST. Use
-    get_all_sonar_metrics() to fetch every metric available on the
-    SonarQube instance instead.
 
     Args:
         project_key: SonarQube project key
@@ -323,14 +263,47 @@ def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
         dict: Metrics data or None if request failed
     """
     try:
-        analysis_date = _find_analysis_date(project_key, version)
+        # First, find the analysis with the matching version to get its date
+        analysis_date = None
+        page = 1
+
+        while analysis_date is None:
+            url = f"{SONAR_HOST}/api/project_analyses/search"
+            auth = (SONAR_TOKEN, "")
+            params = {
+                "project": project_key,
+                "category": "VERSION",
+                "ps": 100,  # Page size
+                "p": page,  # Page number
+            }
+
+            response = requests.get(url, auth=auth, params=params)
+            response.raise_for_status()
+
+            data = response.json()
+
+            logging.info("Found %d analyses for %s", len(data["analyses"]), project_key)
+
+            # Find the analysis with matching version to get its date
+            if "analyses" in data and data["analyses"]:
+                for analysis in data["analyses"]:
+                    if analysis.get("projectVersion") == version:
+                        analysis_date = analysis.get("date")
+                        break
+
+                # If we haven't found the analysis and there are more pages, continue to the next page
+                if analysis_date is None and len(data["analyses"]) == 100:
+                    page += 1
+                else:
+                    break  # No more results or found the analysis
+            else:
+                break  # No analyses returned
 
         if not analysis_date:
             logging.warning("No analysis found for %s version %s", project_key, version)
             return None
 
         # Now get the measures for this specific date using search_history
-        auth = (SONAR_TOKEN, "")
         url = f"{SONAR_HOST}/api/measures/search_history"
         params = {
             "component": project_key,
@@ -359,131 +332,6 @@ def get_sonar_metrics(project_key: str, version: str) -> Optional[Dict]:
     except requests.exceptions.RequestException as e:
         logging.error(
             "Failed to get metrics for %s version %s: %s", project_key, version, str(e)
-        )
-        return None
-
-
-def get_all_metric_keys() -> list[str]:
-    """
-    Fetch the keys of every metric defined on this SonarQube instance.
-
-    Returns:
-        list[str]: Metric keys (empty list if the request failed).
-    """
-    metric_keys: list[str] = []
-    page = 1
-
-    try:
-        while True:
-            url = f"{SONAR_HOST}/api/metrics/search"
-            auth = (SONAR_TOKEN, "")
-            params = {"ps": 500, "p": page}  # Max page size for this endpoint
-
-            response = requests.get(url, auth=auth, params=params)
-            response.raise_for_status()
-
-            data = response.json()
-            page_metrics = data.get("metrics", [])
-            metric_keys.extend(m["key"] for m in page_metrics if "key" in m)
-
-            total = data.get("total", len(metric_keys))
-            if not page_metrics or len(metric_keys) >= total:
-                break
-            page += 1
-
-        return metric_keys
-
-    except requests.exceptions.RequestException as e:
-        logging.error("Failed to fetch SonarQube metric definitions: %s", str(e))
-        return []
-
-
-def get_all_sonar_metrics(
-    project_key: str, version: str, batch_size: int = 15
-) -> Optional[Dict]:
-    """
-    Get ALL available metrics from SonarQube API for a project and version,
-    regardless of METRICS_OF_INTEREST.
-
-    Unlike get_sonar_metrics(), this discovers every metric key defined on
-    the SonarQube instance (via /api/metrics/search) and fetches all of
-    them. The measures/search_history endpoint only accepts a limited
-    number of metric keys per request, so the keys are fetched in batches
-    and merged into a single result.
-
-    Args:
-        project_key: SonarQube project key
-        version: Version identifier of the analysis
-        batch_size: Max number of metric keys to request per API call.
-            Keep conservative since search_history limits how many metrics
-            can be requested at once.
-
-    Returns:
-        dict: Metrics data (metric key -> value) or None if no metrics
-        could be retrieved. Non-numeric metric values (e.g. rating letters
-        or alert statuses) are kept as their raw string values.
-    """
-    try:
-        analysis_date = _find_analysis_date(project_key, version)
-
-        if not analysis_date:
-            logging.warning("No analysis found for %s version %s", project_key, version)
-            return None
-
-        metric_keys = get_all_metric_keys()       
-        logging.info( "metric_keys (%d):\n%s", len(metric_keys), "\n".join(f"  - {k}" for k in metric_keys), )
-        
-        if not metric_keys:
-            logging.warning("No metric definitions found on %s", SONAR_HOST)
-            return None
-
-        auth = (SONAR_TOKEN, "")
-        url = f"{SONAR_HOST}/api/measures/search_history"
-        metrics: Dict = {}
-
-        for i in range(0, len(metric_keys), batch_size):
-            batch = metric_keys[i : i + batch_size]
-            params = {
-                "component": project_key,
-                "metrics": ",".join(batch),
-                "from": analysis_date,
-                "to": analysis_date,
-            }
-
-            try:
-                response = requests.get(url, auth=auth, params=params)
-                response.raise_for_status()
-            except requests.exceptions.RequestException as e:
-                logging.error(
-                    "Failed to get metrics batch %s for %s version %s: %s",
-                    batch,
-                    project_key,
-                    version,
-                    str(e),
-                )
-                continue
-
-            data = response.json()
-
-            if "measures" in data:
-                for measure in data["measures"]:
-                    if (
-                        measure["history"]
-                        and len(measure["history"]) > 0
-                        and "value" in measure["history"][0]
-                    ):
-                        raw_value = measure["history"][0]["value"]
-                        try:
-                            metrics[measure["metric"]] = float(raw_value)
-                        except (TypeError, ValueError):
-                            # Some metrics (e.g. alert_status, ratings) aren't numeric.
-                            metrics[measure["metric"]] = raw_value
-
-        return metrics if metrics else None
-
-    except requests.exceptions.RequestException as e:
-        logging.error(
-            "Failed to get all metrics for %s version %s: %s", project_key, version, str(e)
         )
         return None
 
@@ -528,8 +376,6 @@ def process_repository(
     clone_dir: Path,
     language_profile: str = "generic",
     project_key_prefix: str = "",
-    analysis_again: bool = False,
-    all_metrics: bool = False,
 ) -> pd.DataFrame:
     """
     Process a single repository's SonarQube analysis.
@@ -539,11 +385,6 @@ def process_repository(
         repo_name: Name of the repository to process.
         aggregation: Either "week" or "month".
         clone_dir: Directory containing cloned repositories.
-        analysis_again: If True, re-run the scan even if an analysis already
-            exists for the project/version, and refresh stored metrics.
-        all_metrics: If True, fetch every metric available on the SonarQube
-            instance (via get_all_sonar_metrics) instead of only the
-            METRICS_OF_INTEREST subset (via get_sonar_metrics).
 
     Returns:
         pd.DataFrame: Updated time series dataframe for this repository.
@@ -591,15 +432,6 @@ def process_repository(
 
         analysis_exists = check_analysis_exists(project_key, time_period)
 
-        if analysis_exists and analysis_again:
-            logging.info(
-                "Analysis already exists for %s at %s, but --analysis-again was "
-                "set; re-running scan.",
-                repo_name,
-                time_period,
-            )
-            analysis_exists = False
-
         if not analysis_exists:
             logging.info("%s at %s (%s)", repo_name, time_period, commit_hash[:8])
 
@@ -635,18 +467,10 @@ def process_repository(
                 continue
 
         # Get and store metrics.
-        # Use get_all_sonar_metrics() when the caller wants every metric
-        # available on the SonarQube instance; otherwise fall back to the
-        # METRICS_OF_INTEREST-only get_sonar_metrics().
-        if all_metrics:
-            metrics = get_all_sonar_metrics(project_key, time_period)
-        else:
-            metrics = get_sonar_metrics(project_key, time_period)
+        metrics = get_sonar_metrics(project_key, time_period)
 
         if metrics:
             for metric, value in metrics.items():
-                # New columns (e.g. metrics outside METRICS_OF_INTEREST) are
-                # created automatically on assignment if they don't exist yet.
                 repo_df.loc[row_idx, metric] = value
 
             logging.info("Metrics for %s at %s: %s", repo_name, time_period, metrics)
@@ -687,62 +511,6 @@ def infer_date_range_from_input(ts_df: pd.DataFrame, time_key: str) -> tuple[str
 
     return min(normalized), max(normalized)
 
-
-
-def build_target_timeseries_input(
-    target_spec: str,
-    aggregation: str,
-) -> pd.DataFrame:
-    """Build a one-row SonarQube input from a CLI target specification.
-
-    The target format is REPO_NAME,MONTH,LATEST_COMMIT. Repository names may
-    use either OWNER/REPO or the local clone-directory form OWNER_REPO. The
-    slash form is recommended because it matches the pipeline CSV convention.
-    """
-    if aggregation != "month":
-        raise ValueError(
-            "Target mode currently supports monthly analysis only. "
-            "Use --aggregation month."
-        )
-
-    parts = [part.strip() for part in str(target_spec).split(",", 2)]
-    if len(parts) != 3 or any(not part for part in parts):
-        raise ValueError(
-            "Invalid --target value. Expected "
-            "REPO_NAME,MONTH,LATEST_COMMIT."
-        )
-
-    repo_name, month, latest_commit = parts
-
-    if re.fullmatch(r"\d{6}", month):
-        month = f"{month[:4]}-{month[4:]}"
-
-    if not re.fullmatch(r"\d{4}-\d{2}", month):
-        raise ValueError(
-            f"Invalid target month: {month}. Expected YYYY-MM or YYYYMM."
-        )
-
-    try:
-        parsed_month = pd.Period(month, freq="M")
-    except ValueError as exc:
-        raise ValueError(f"Invalid target month: {month}.") from exc
-
-    normalized_month = str(parsed_month)
-
-    if not re.fullmatch(r"[0-9a-fA-F]{40}", latest_commit):
-        raise ValueError(
-            "Invalid target commit. Expected a full 40-character Git SHA."
-        )
-
-    return pd.DataFrame(
-        [
-            {
-                "repo_name": repo_name,
-                "month": normalized_month,
-                "latest_commit": latest_commit.lower(),
-            }
-        ]
-    )
 
 
 def save_progress(
@@ -849,52 +617,9 @@ def main() -> None:
         ),
     )
     parser.add_argument(
-        "--analysis-again",
-        action="store_true",
-        help=(
-            "Run the SonarQube scan again even if an analysis already exists "
-            "for the project/version, and refresh the stored metrics."
-        ),
-    )
-    parser.add_argument(
-        "--analysis-all-metrics",
-        action="store_true",
-        help=("Run the SonarQube scan to get all metrics."),
-    )
-    parser.add_argument(
-        "--language-profile",
-        choices=[
-            "generic",
-            "auto",
-            "python",
-            "py",
-            "python-only",
-            "py-only",
-            "js-ts",
-            "jsts",
-            "javascript",
-            "typescript",
-            "js",
-            "ts",
-        ],
-        default="generic",
-        help=(
-            "Language-specific SonarQube scanner settings. "
-            "Use 'python-only' to scan only **/*.py files, 'python' for the "
-            "existing Python-primary whole-repository behavior, 'js-ts' for "
-            "JavaScript/TypeScript repos, or 'generic' for language-neutral scans."
-        ),
-    )
-
-    parser.add_argument(
-        "--target",
-        default=None,
-        metavar="REPO_NAME,MONTH,LATEST_COMMIT",
-        help=(
-            "Analyze one monthly repo-commit target without an input CSV. "
-            "Example: Anemll/Anemll,2025-02,"
-            "d3b2e3660c0657ab643b68a0513b4b5ab443c04c. "
-            "Target mode uses Python-only scanning and requires --output-file."
+        "--language-profile", choices=["generic", "auto", "python", "py", "js-ts", "jsts", "javascript", "typescript", "js", "ts"],
+        default="generic", help=(
+            "Language-specific SonarQube scanner settings. " "Use 'python' for Python repos, 'js-ts' for JavaScript/TypeScript repos, " "or 'generic' for language-neutral scans."
         ),
     )
 
@@ -909,24 +634,6 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-
-    if args.target is not None:
-        if args.aggregation != "month":
-            parser.error("--target requires --aggregation month.")
-        if args.input_file is not None:
-            parser.error("--target cannot be combined with --input-file.")
-        if args.output_file is None:
-            parser.error("--target requires --output-file.")
-        if args.language_profile in {"js-ts", "jsts", "javascript", "typescript", "js", "ts"}:
-            parser.error("--target is reserved for Python-only validation.")
-
-        # Keep the previous whole-repository Python profile unchanged.
-        args.language_profile = "python-only"
-
-        # Avoid reusing an existing whole-repository project/version analysis.
-        if not args.project_key_prefix:
-            args.project_key_prefix = "pyonly_"
-
     TIME_KEY = "week" if args.aggregation == "week" else "month"
 
     logging.basicConfig(
@@ -941,55 +648,41 @@ def main() -> None:
 
     # Set input/output file paths.
     data_dir = Path(args.data_dir).expanduser().resolve()
+    logging.info("Using data directory: %s", data_dir)
+
+    if args.input_file is not None:
+        ts_repos_file = Path(args.input_file).expanduser().resolve()
+    else:
+        file_prefix = "ts_repos_control_" if args.control else "ts_repos_"
+        ts_repos_file = data_dir / f"{file_prefix}{args.aggregation}ly.csv"
+
+    if args.output_file is not None:
+        output_file = Path(args.output_file).expanduser().resolve()
+    else:
+        output_file = ts_repos_file
 
     if args.clone_dir is not None:
         clone_dir = Path(args.clone_dir).expanduser().resolve()
     else:
         clone_dir = CONTROL_CLONE_DIR if args.control else CLONE_DIR
 
-    if args.target is not None:
-        ts_repos_file = None
-        output_file = Path(args.output_file).expanduser().resolve()
-        try:
-            ts_df = build_target_timeseries_input(args.target, args.aggregation)
-        except ValueError as exc:
-            parser.error(str(exc))
-    else:
-        logging.info("Using data directory: %s", data_dir)
-
-        if args.input_file is not None:
-            ts_repos_file = Path(args.input_file).expanduser().resolve()
-        else:
-            file_prefix = "ts_repos_control_" if args.control else "ts_repos_"
-            ts_repos_file = data_dir / f"{file_prefix}{args.aggregation}ly.csv"
-
-        if args.output_file is not None:
-            output_file = Path(args.output_file).expanduser().resolve()
-        else:
-            output_file = ts_repos_file
-
-        try:
-            ts_df = pd.read_csv(ts_repos_file)
-        except FileNotFoundError as exc:
-            logging.error("Required file not found: %s", exc)
-            return
-
-    global START_DATE, END_DATE
-    START_DATE, END_DATE = infer_date_range_from_input(ts_df, TIME_KEY)
-
-    if ts_repos_file is not None:
-        logging.info("Using input file: %s", ts_repos_file)
-    else:
-        logging.info("Using target specification: %s", args.target)
-
+    logging.info("Using input file: %s", ts_repos_file)
     logging.info("Using output file: %s", output_file)
     logging.info("Using clone directory: %s", clone_dir)
     logging.info("Using num processes: %s", args.num_processes)
     logging.info("Using language profile: %s", args.language_profile)
     logging.info("Using project key prefix: %s", args.project_key_prefix)
-    logging.info("Re-run existing analyses: %s", args.analysis_again)
-    logging.info("Fetch all metrics (ignore METRICS_OF_INTEREST): %s", args.analysis_all_metrics)
-    logging.info("Using input-derived date range: %s to %s", START_DATE, END_DATE)
+
+    # Read repository time series data and adoption data
+    try:
+        ts_df = pd.read_csv(ts_repos_file)
+        global START_DATE, END_DATE
+        START_DATE, END_DATE = infer_date_range_from_input(ts_df, TIME_KEY)
+        logging.info("Using input-derived date range: %s to %s", START_DATE, END_DATE)
+
+    except FileNotFoundError as e:
+        logging.error(f"Required file not found: {e}")
+        return
 
     # Create columns for metrics if they don't exist
     for col in METRICS_OF_INTEREST:
@@ -1000,16 +693,7 @@ def main() -> None:
     repo_names = sorted(set(ts_df["repo_name"].unique()) - set(REPO_IGNORE))
 
     args_list = [
-        (
-            ts_df,
-            repo_name,
-            args.aggregation,
-            clone_dir,
-            args.language_profile,
-            args.project_key_prefix,
-            args.analysis_again,
-            args.analysis_all_metrics,
-        )
+        (ts_df, repo_name, args.aggregation, clone_dir, args.language_profile, args.project_key_prefix)
         for repo_name in repo_names
     ]
 

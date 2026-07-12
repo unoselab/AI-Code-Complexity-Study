@@ -1,0 +1,3 @@
+dataset_source,file,rows,repos,min_month,max_month,missing_latest_commit,duplicate_repo_month_rows
+treatment,repo_python/run-py-2a/flexible/treatment/data/ts_repos_monthly.csv,1384,110,2024-01,2025-08,0,0
+control,repo_python/run-py-2a/flexible/control/data/ts_repos_monthly.csv,1800,122,2024-01,2025-08,0,0

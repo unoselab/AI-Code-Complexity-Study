@@ -1,0 +1,8 @@
+metric,value,note
+current_treatment_sample,118,Current reproducible Python treatment sample.
+treatments_missing_matching_rows,8,Treatment repos present in the treatment sample but missing selected matching rows.
+flexible_final_matched_treatments,110,Treatments retained by the flexible final-clean matched pair file.
+treatments_with_2_final_controls,10,Final control-count distribution after clone and local Cursor filtering.
+treatments_with_3_final_controls,100,Final control-count distribution after clone and local Cursor filtering.
+strict_1to3_treatments,100,Treatments retained by the strict 1:3 final-clean matched pair file.
+final_clean_controls_before_panel,153,Final clean controls before unbalanced observed-row filtering.

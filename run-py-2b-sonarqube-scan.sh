@@ -35,6 +35,9 @@ set -euo pipefail
 #   SKIP_SCAN=true PANEL_VARIANT=strict TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 #   SKIP_SCAN=true PANEL_VARIANT=flexible TARGET=treatment NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 #   SKIP_SCAN=true PANEL_VARIANT=flexible TARGET=control   NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+# 
+#   SKIP_SCAN=false PANEL_VARIANT=strict TARGET=treatment LANGUAGE_PROFILE=python-only PROJECT_KEY_PREFIX=pyonly_ OUTPUT_SUFFIX=python_only NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
+#   SKIP_SCAN=false PANEL_VARIANT=strict TARGET=control LANGUAGE_PROFILE=python-only PROJECT_KEY_PREFIX=pyonly_ OUTPUT_SUFFIX=python_only NUM_PROCESSES=1 bash run-py-2b-sonarqube-scan.sh
 # ============================================================
 
 TARGET="${TARGET:-treatment}"
