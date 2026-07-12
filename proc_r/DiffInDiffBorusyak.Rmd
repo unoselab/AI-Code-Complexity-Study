@@ -2,7 +2,9 @@
 title: "The Impact of Cursor Adoption on Velocity and Quality - Borusyak et al. (2021) DiD Approach"
 output: html_document
 params:
-  panel_file: "../repo_python/did_final/panel_event_monthly_quality_py.csv"
+  panel_file: "SHOULD BE A CLI ARGUMENT.csv"
+  borusyak_pdf_file: "SHOULD BE A CLI ARGUMENT.pdf"
+  python_group_pdf_file: "SHOULD BE A CLI ARGUMENT.pdf"
 ---
 
 ```{r setup, include=FALSE}
@@ -310,7 +312,8 @@ event_study_plot <- ggplot(plot_data, aes(x = time, y = estimate)) +
 
 print(event_study_plot)
 
-ggsave("../proc_r/dynamic_effects_borusyak.pdf",
+# ggsave("../proc_r/dynamic_effects_borusyak.pdf",
+ggsave(params$borusyak_pdf_file,
   plot = event_study_plot, width = 11, height = 2.5,
   device = CairoPDF, family = "DejaVu Sans")
 ```
@@ -686,7 +689,8 @@ plot_python_only <- create_event_study_plot(
 
 print(plot_python_only)
 
-ggsave("../proc_r/dynamic_effects_python_only.pdf",
+# ggsave("../proc_r/dynamic_effects_python_only.pdf",
+ggsave(params$python_group_pdf_file,
   plot = plot_python_only, width = 16, height = 2.5,
   device = CairoPDF, family = "DejaVu Sans")
 ```
