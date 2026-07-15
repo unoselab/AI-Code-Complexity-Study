@@ -1,4 +1,154 @@
 
+You are reviewing DiD workspace, a consolidated reference file containing the current Python experiment pipeline.
+
+The file is organized in repeated sections:
+
+* `# -- SHELL SCRIPT: <filename> --`
+* the complete contents of that shell script
+* `# -- CALLED PYTHON SCRIPT: <path> --`
+* the complete contents of each Python script referenced by that shell script
+
+Use the following rules when analyzing or updating this pipeline.
+
+## 1. Purpose of the consolidated file
+
+Treat DiD workspace as a read-only reference snapshot used to understand relationships among shell wrappers and Python scripts.
+
+Do not directly modify the consolidated file unless I explicitly ask you to update the merge process itself.
+
+When proposing a change, identify the actual original file that should be edited, such as:
+
+* `run-py-1e-analyze-treatment-repos.sh`
+* `proc_scripts/analyze_repos_v2.py`
+
+## 2. Pipeline structure
+
+Review the pipeline in execution order:
+
+* `run-py-1a` through `run-py-1l`: repository selection, cloning, validation, control construction, and panel creation
+* `run-py-2a` through `run-py-2h`: SonarQube input preparation, scanning, panel merging, quality input preparation, and DiD analyses
+
+When explaining a step, clearly identify:
+
+1. shell script name
+2. Python scripts it calls
+3. input files
+4. output files
+5. environment-variable overrides
+6. dependencies on earlier pipeline steps
+7. validation or failure checks
+
+## 3. Source-of-truth rules
+
+The original shell and Python files are the source of truth.
+
+The consolidated file may contain the same Python script more than once because multiple shell wrappers call it. Do not treat repeated Python sections as separate implementations.
+
+Before recommending a change, determine whether the change belongs in:
+
+* the shell wrapper
+* the shared Python script
+* both files
+
+Avoid duplicating logic in multiple wrappers when it belongs in a shared Python script.
+
+## 4. Python experiment naming convention
+
+Preserve the current Python experiment naming convention:
+
+* shell wrappers: `run-py-<step>-<description>.sh`
+* Python scripts: descriptive snake_case names under `proc_scripts/`
+* primary outputs: under step-specific directories such as `repo_python/run-py-1l/`
+* diagnostics and temporary outputs: under appropriate `tmp/`, `logs/`, or QC directories
+* SonarQube variants: explicit panel, target, language profile, project-key prefix, and output suffix
+
+Do not introduce ambiguous names such as `test2`, `new`, `final2`, or `updated`.
+
+## 5. Shell-wrapper design rule
+
+When creating or updating a shell wrapper:
+
+* reuse the logic and execution sequence of an existing relevant wrapper
+* do not call the old shell wrapper from the new wrapper
+* keep the new wrapper independent
+* reuse existing Python scripts when appropriate
+* clearly document all inputs, outputs, optional variables, and expected artifacts
+* use `set -euo pipefail`
+* validate required files before execution
+* remove or isolate stale outputs when necessary
+* verify expected outputs after execution
+* write logs with descriptive timestamps
+
+## 6. Python-script design rule
+
+When updating Python:
+
+* keep code and code comments in English
+* preserve existing CLI compatibility unless a breaking change is explicitly approved
+* use clear `argparse` options
+* validate required files and columns
+* produce deterministic outputs where possible
+* preserve diagnostic and QC information
+* do not silently drop repositories, rows, or metrics
+* explain any filtering or imputation policy explicitly
+* avoid modifying frozen baseline data
+
+## 7. Analysis behavior
+
+When I provide an error, log, or output:
+
+1. locate the relevant shell section
+2. locate all Python scripts called by that shell script
+3. trace the input and output paths
+4. identify the exact failure point
+5. distinguish the root cause from secondary warnings
+6. propose the smallest safe correction
+7. provide exact validation commands
+
+Do not rewrite an entire script when a small targeted change is sufficient.
+
+## 8. Output and explanation format
+
+Explain all analysis in Korean.
+
+Keep shell, Python, R, and code comments in English.
+
+For short commands, use inline code.
+
+Use a fenced code block only when a multi-line command or script must be copied. Use no more than one main code block per response when practical.
+
+Do not attach metadata or attributes to code fences.
+
+## 9. Safety and reproducibility
+
+Do not assume a file exists merely because it is mentioned in a comment or error message.
+
+Distinguish among:
+
+* an executable Python reference
+* a commented historical reference
+* an error-message string containing a `.py` filename
+* an optional or deprecated script
+* an actual file under `proc_scripts/`
+
+Do not treat `proc_scripts/extract-jsts-control-repos.py` as part of the current Python pipeline.
+
+Do not recommend deleting expensive clone, Git-history, or SonarQube artifacts without first identifying whether they can be reused.
+
+## 10. Response expectations
+
+For every requested review or modification, provide:
+
+* the conclusion
+* the affected original file or files
+* the reason
+* the exact proposed change
+* the command to validate the change
+* the expected result
+
+When information is insufficient, make the best evidence-based assessment from the consolidated file and clearly state the remaining uncertainty.
+
+
 ============== [ data ] ==============
 data
 ├── cursor_commits.csv

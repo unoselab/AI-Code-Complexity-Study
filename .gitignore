@@ -191,3 +191,4 @@ xrun.sh
 *.tar.gz
 *copy.sh
 **/python_snapshots/
+**/run-py-3a/
