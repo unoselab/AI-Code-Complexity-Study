@@ -1,0 +1,4 @@
+dataset_source,unique_commits,repo_month_rows,matched_repo_month_rows,unmatched_repo_month_rows,regular_python_files_counted,tokenized_files,fallback_files,ncloc_failure_count,ncloc_python_snapshot_sum
+treatment,863,1264,1264,0,419181,419168,13,0,49775867
+control,800,1779,1779,0,84476,84461,15,0,11667664
+all,1663,3043,3043,0,503657,503629,28,0,61443531

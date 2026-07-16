@@ -16,10 +16,12 @@ do not establish code provenance or identify a specific AI tool.
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import logging
 import os
 import tempfile
+import tokenize
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -67,11 +69,22 @@ ACTIVITY_COLS = [
     "contributors",
 ]
 
-COVARIATE_COLS = [
+PAPER_COVARIATE_COLS = [
     "stars",
     "issues",
     "age",
-    "ncloc",
+    "ncloc_paper",
+]
+
+COVARIATE_COLS = PAPER_COVARIATE_COLS + [
+    "ncloc_python_snapshot",
+]
+
+COVARIATE_AUDIT_COLS = [
+    "paper_covariate_matched",
+    "python_snapshot_ncloc_matched",
+    "analysis_ready_agc_paper_ncloc",
+    "analysis_ready_agc_python_snapshot_ncloc",
 ]
 
 SNAPSHOT_AUDIT_COLS = [
@@ -109,6 +122,7 @@ OUTPUT_COLS = (
     + EVENT_COLS
     + ACTIVITY_COLS
     + COVARIATE_COLS
+    + COVARIATE_AUDIT_COLS
     + SNAPSHOT_AUDIT_COLS
     + TOP_LEVEL_COLS
     + FUNCTION_COLS
@@ -160,7 +174,9 @@ def parse_args() -> argparse.Namespace:
         description="Prepare strict repository-month AGC DiD input."
     )
     parser.add_argument("--base-panel", required=True, type=Path)
+    parser.add_argument("--paper-panel", required=True, type=Path)
     parser.add_argument("--snapshot-manifest", required=True, type=Path)
+    parser.add_argument("--snapshot-root", required=True, type=Path)
     parser.add_argument("--block-treatment", required=True, type=Path)
     parser.add_argument("--block-control", required=True, type=Path)
     parser.add_argument("--repo-month-treatment", required=True, type=Path)
@@ -169,6 +185,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run-metadata-control", required=True, type=Path)
     parser.add_argument("--combined-validation", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--repo-commit-ncloc-output", required=True, type=Path)
+    parser.add_argument("--repo-month-outcomes-output", required=True, type=Path)
     parser.add_argument("--qc-dir", required=True, type=Path)
     parser.add_argument("--panel-label", default="strict")
     parser.add_argument(
@@ -253,6 +271,461 @@ def load_json(path: Path, label: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{label} must contain a JSON object: {path}")
     return value
+
+
+def first_nonmissing(series: pd.Series) -> Any:
+    """Return the first nonmissing value from a grouped series."""
+    values = series.dropna()
+    if values.empty:
+        return np.nan
+    return values.iloc[0]
+
+
+def load_paper_covariates(
+    path: Path,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Load frozen-paper covariates and audit duplicate repository-month keys."""
+    require_file(path, "frozen paper panel")
+    source_columns = KEY_COLS + ["stars", "issues", "age", "ncloc"]
+    paper = pd.read_csv(path, usecols=source_columns, low_memory=False)
+    require_columns(paper, source_columns, "frozen paper panel")
+
+    paper["repo_name"] = paper["repo_name"].astype(str).str.strip()
+    paper["dataset_source"] = paper["dataset_source"].astype(str).str.strip()
+    paper["time"] = paper["time"].map(normalize_month_value)
+
+    invalid_sources = sorted(set(paper["dataset_source"]) - ALLOWED_SOURCES)
+    if invalid_sources:
+        raise ValueError(f"Frozen paper panel has invalid sources: {invalid_sources}")
+
+    duplicate_rows = paper.loc[paper.duplicated(KEY_COLS, keep=False)].copy()
+    duplicate_summary_rows: list[dict[str, Any]] = []
+    conflict_rows: list[pd.DataFrame] = []
+    source_covariates = ["stars", "issues", "age", "ncloc"]
+
+    if not duplicate_rows.empty:
+        for key_values, group in duplicate_rows.groupby(KEY_COLS, dropna=False):
+            if not isinstance(key_values, tuple):
+                key_values = (key_values,)
+            key_record = dict(zip(KEY_COLS, key_values))
+            unique_counts = {
+                column: int(group[column].dropna().nunique())
+                for column in source_covariates
+            }
+            has_conflict = any(count > 1 for count in unique_counts.values())
+            duplicate_summary_rows.append(
+                {
+                    **key_record,
+                    "duplicate_rows": len(group),
+                    **{
+                        f"{column}_unique_nonmissing": count
+                        for column, count in unique_counts.items()
+                    },
+                    "has_conflict": int(has_conflict),
+                }
+            )
+            if has_conflict:
+                conflict = group.copy()
+                conflict["conflict_reason"] = ";".join(
+                    column
+                    for column, count in unique_counts.items()
+                    if count > 1
+                )
+                conflict_rows.append(conflict)
+
+    duplicate_summary = pd.DataFrame(
+        duplicate_summary_rows,
+        columns=(
+            KEY_COLS
+            + [
+                "duplicate_rows",
+                "stars_unique_nonmissing",
+                "issues_unique_nonmissing",
+                "age_unique_nonmissing",
+                "ncloc_unique_nonmissing",
+                "has_conflict",
+            ]
+        ),
+    )
+    conflicts = (
+        pd.concat(conflict_rows, ignore_index=True)
+        if conflict_rows
+        else pd.DataFrame(columns=source_columns + ["conflict_reason"])
+    )
+
+    collapsed = (
+        paper.groupby(KEY_COLS, as_index=False, dropna=False)[source_covariates]
+        .agg(first_nonmissing)
+        .rename(columns={"ncloc": "ncloc_paper"})
+    )
+    require_unique(collapsed, KEY_COLS, "collapsed frozen paper covariates")
+    return collapsed, duplicate_summary, conflicts
+
+
+def merge_paper_covariates(
+    base: pd.DataFrame,
+    paper_lookup: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Left-join frozen-paper covariates while preserving the strict base sample."""
+    merged = base.merge(
+        paper_lookup,
+        on=KEY_COLS,
+        how="left",
+        validate="one_to_one",
+        indicator="__paper_merge",
+    )
+    merged["paper_covariate_matched"] = merged["__paper_merge"].eq("both").astype(int)
+
+    unmatched = merged.loc[
+        merged["paper_covariate_matched"] == 0,
+        KEY_COLS + ["is_treatment", "event", "post_event", "time_to_event"],
+    ].copy()
+
+    summary_rows: list[dict[str, Any]] = []
+    for source in ["treatment", "control", "all"]:
+        part = merged if source == "all" else merged.loc[merged["dataset_source"] == source]
+        matched_rows = int(part["paper_covariate_matched"].sum())
+        row = {
+            "dataset_source": source,
+            "base_rows": len(part),
+            "paper_matched_rows": matched_rows,
+            "paper_unmatched_rows": len(part) - matched_rows,
+            "paper_match_rate": matched_rows / len(part) if len(part) else np.nan,
+        }
+        for column in PAPER_COVARIATE_COLS:
+            row[f"{column}_nonmissing"] = int(part[column].notna().sum())
+            row[f"{column}_missing"] = int(part[column].isna().sum())
+        summary_rows.append(row)
+
+    missingness_rows: list[dict[str, Any]] = []
+    for source in ["treatment", "control", "all"]:
+        part = merged if source == "all" else merged.loc[merged["dataset_source"] == source]
+        for column in PAPER_COVARIATE_COLS:
+            missingness_rows.append(
+                {
+                    "dataset_source": source,
+                    "covariate": column,
+                    "rows": len(part),
+                    "nonmissing": int(part[column].notna().sum()),
+                    "missing": int(part[column].isna().sum()),
+                    "missing_rate": part[column].isna().mean() if len(part) else np.nan,
+                }
+            )
+
+    merged = merged.drop(columns=["__paper_merge"])
+    return (
+        merged,
+        unmatched,
+        pd.DataFrame(summary_rows),
+        pd.DataFrame(missingness_rows),
+    )
+
+
+def decode_python_source(data: bytes) -> str:
+    """Decode Python source using the encoding declaration when available."""
+    reader = io.BytesIO(data).readline
+    encoding, _ = tokenize.detect_encoding(reader)
+    return data.decode(encoding)
+
+
+def count_python_ncloc(data: bytes) -> tuple[int, int, int, str]:
+    """Count nonblank, non-comment physical lines while retaining docstrings.
+
+    The tokenizer identifies code-bearing physical lines. COMMENT-only and blank
+    lines are excluded. Multiline STRING tokens, including module/class/function
+    docstrings, mark each nonblank physical line in their span as code.
+    """
+    text = decode_python_source(data)
+    lines = text.splitlines()
+    nonblank_lines = {
+        number
+        for number, line in enumerate(lines, start=1)
+        if line.strip()
+    }
+    code_lines: set[int] = set()
+    ignored_types = {
+        tokenize.NL,
+        tokenize.NEWLINE,
+        tokenize.INDENT,
+        tokenize.DEDENT,
+        tokenize.ENDMARKER,
+        tokenize.COMMENT,
+    }
+
+    try:
+        for token in tokenize.generate_tokens(io.StringIO(text).readline):
+            if token.type in ignored_types:
+                continue
+            start_line = max(1, token.start[0])
+            end_line = max(start_line, token.end[0])
+            for line_number in range(start_line, end_line + 1):
+                if line_number in nonblank_lines:
+                    code_lines.add(line_number)
+        method = "python_tokenize"
+    except (tokenize.TokenError, IndentationError, SyntaxError):
+        code_lines = {
+            number
+            for number, line in enumerate(lines, start=1)
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+        method = "fallback_line_rule"
+
+    ncloc = len(code_lines)
+    comment_only_lines = len(nonblank_lines - code_lines)
+    return ncloc, len(lines), comment_only_lines, method
+
+
+def resolve_snapshot_dir(
+    snapshot_root: Path,
+    source: str,
+    repo_name: str,
+    commit: str,
+) -> Path:
+    """Resolve the canonical local snapshot directory."""
+    repo_slug = repo_name.replace("/", "_")
+    return snapshot_root / source / repo_slug / commit
+
+
+def compute_python_snapshot_ncloc(
+    manifest: pd.DataFrame,
+    snapshot_root: Path,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Compute Python-only NCLOC once per unique historical repository commit."""
+    if not snapshot_root.is_dir():
+        raise FileNotFoundError(f"Python snapshot root not found: {snapshot_root}")
+
+    unique_commits = (
+        manifest[["dataset_source", "repo_name", "latest_commit", "python_file_count"]]
+        .drop_duplicates(["dataset_source", "repo_name", "latest_commit"])
+        .sort_values(["dataset_source", "repo_name", "latest_commit"])
+        .reset_index(drop=True)
+    )
+
+    commit_rows: list[dict[str, Any]] = []
+    failure_rows: list[dict[str, Any]] = []
+    total_commits = len(unique_commits)
+
+    for number, row in enumerate(unique_commits.itertuples(index=False), start=1):
+        source = str(row.dataset_source)
+        repo_name = str(row.repo_name)
+        commit = str(row.latest_commit)
+        snapshot_dir = resolve_snapshot_dir(snapshot_root, source, repo_name, commit)
+        file_manifest = snapshot_dir / "_files.jsonl"
+
+        commit_result: dict[str, Any] = {
+            "dataset_source": source,
+            "repo_name": repo_name,
+            "latest_commit": commit,
+            "snapshot_dir": str(snapshot_dir),
+            "python_files_manifest": int(row.python_file_count),
+            "regular_python_files_counted": 0,
+            "symlinks_skipped": 0,
+            "total_physical_lines": 0,
+            "comment_only_lines": 0,
+            "ncloc_python_snapshot": 0,
+            "tokenized_files": 0,
+            "fallback_files": 0,
+            "ncloc_failure_count": 0,
+        }
+
+        if not file_manifest.is_file():
+            failure_rows.append(
+                {
+                    "dataset_source": source,
+                    "repo_name": repo_name,
+                    "latest_commit": commit,
+                    "relative_path": "",
+                    "error": f"snapshot file manifest not found: {file_manifest}",
+                }
+            )
+            commit_result["ncloc_failure_count"] += 1
+            commit_rows.append(commit_result)
+            continue
+
+        with file_manifest.open("r", encoding="utf-8") as handle:
+            for line_number, line in enumerate(handle, start=1):
+                if not line.strip():
+                    continue
+                try:
+                    record = json.loads(line)
+                    relative_path = str(record["relative_path"])
+                    file_type = str(record.get("file_type", ""))
+                except Exception as exc:
+                    failure_rows.append(
+                        {
+                            "dataset_source": source,
+                            "repo_name": repo_name,
+                            "latest_commit": commit,
+                            "relative_path": f"_files.jsonl:{line_number}",
+                            "error": f"invalid file-manifest record: {exc}",
+                        }
+                    )
+                    commit_result["ncloc_failure_count"] += 1
+                    continue
+
+                if file_type != "file":
+                    commit_result["symlinks_skipped"] += 1
+                    continue
+
+                source_path = snapshot_dir / Path(relative_path)
+                try:
+                    data = source_path.read_bytes()
+                    ncloc, physical_lines, comment_lines, method = count_python_ncloc(data)
+                    commit_result["regular_python_files_counted"] += 1
+                    commit_result["total_physical_lines"] += physical_lines
+                    commit_result["comment_only_lines"] += comment_lines
+                    commit_result["ncloc_python_snapshot"] += ncloc
+                    if method == "python_tokenize":
+                        commit_result["tokenized_files"] += 1
+                    else:
+                        commit_result["fallback_files"] += 1
+                except Exception as exc:
+                    failure_rows.append(
+                        {
+                            "dataset_source": source,
+                            "repo_name": repo_name,
+                            "latest_commit": commit,
+                            "relative_path": relative_path,
+                            "error": str(exc),
+                        }
+                    )
+                    commit_result["ncloc_failure_count"] += 1
+
+        manifest_count = int(commit_result["python_files_manifest"])
+        observed_count = (
+            int(commit_result["regular_python_files_counted"])
+            + int(commit_result["symlinks_skipped"])
+            + int(commit_result["ncloc_failure_count"])
+        )
+        if observed_count != manifest_count:
+            failure_rows.append(
+                {
+                    "dataset_source": source,
+                    "repo_name": repo_name,
+                    "latest_commit": commit,
+                    "relative_path": "",
+                    "error": (
+                        "file count mismatch: "
+                        f"manifest={manifest_count}, observed={observed_count}"
+                    ),
+                }
+            )
+            commit_result["ncloc_failure_count"] += 1
+
+        commit_rows.append(commit_result)
+        if number % 100 == 0 or number == total_commits:
+            logging.info(
+                "Python snapshot NCLOC: %d/%d unique commits processed",
+                number,
+                total_commits,
+            )
+
+    commit_ncloc = pd.DataFrame(commit_rows)
+    failures = pd.DataFrame(
+        failure_rows,
+        columns=[
+            "dataset_source",
+            "repo_name",
+            "latest_commit",
+            "relative_path",
+            "error",
+        ],
+    )
+    require_unique(
+        commit_ncloc,
+        ["dataset_source", "repo_name", "latest_commit"],
+        "repository-commit Python snapshot NCLOC",
+    )
+    return commit_ncloc, failures
+
+
+def expand_snapshot_ncloc_to_month(
+    manifest: pd.DataFrame,
+    commit_ncloc: pd.DataFrame,
+) -> pd.DataFrame:
+    """Expand unique-commit snapshot NCLOC to repository-month rows."""
+    month_ncloc = manifest.merge(
+        commit_ncloc,
+        on=["dataset_source", "repo_name", "latest_commit"],
+        how="left",
+        validate="many_to_one",
+        indicator="__ncloc_merge",
+        suffixes=("", "_commit"),
+    )
+    month_ncloc["python_snapshot_ncloc_matched"] = (
+        month_ncloc["__ncloc_merge"].eq("both")
+        & pd.to_numeric(month_ncloc["ncloc_failure_count"], errors="coerce").fillna(1).eq(0)
+    ).astype(int)
+    month_ncloc = month_ncloc.drop(columns=["__ncloc_merge"])
+    month_ncloc = month_ncloc.rename(columns={"month": "time"})
+    require_unique(month_ncloc, KEY_COLS, "repository-month Python snapshot NCLOC")
+    return month_ncloc
+
+
+def build_snapshot_ncloc_summary(
+    commit_ncloc: pd.DataFrame,
+    month_ncloc: pd.DataFrame,
+) -> pd.DataFrame:
+    """Summarize snapshot NCLOC coverage by source."""
+    rows: list[dict[str, Any]] = []
+    for source in ["treatment", "control", "all"]:
+        commits = commit_ncloc if source == "all" else commit_ncloc.loc[commit_ncloc["dataset_source"] == source]
+        months = month_ncloc if source == "all" else month_ncloc.loc[month_ncloc["dataset_source"] == source]
+        rows.append(
+            {
+                "dataset_source": source,
+                "unique_commits": len(commits),
+                "repo_month_rows": len(months),
+                "matched_repo_month_rows": int(months["python_snapshot_ncloc_matched"].sum()),
+                "unmatched_repo_month_rows": int((months["python_snapshot_ncloc_matched"] == 0).sum()),
+                "regular_python_files_counted": pd.to_numeric(commits["regular_python_files_counted"], errors="coerce").fillna(0).sum(),
+                "tokenized_files": pd.to_numeric(commits["tokenized_files"], errors="coerce").fillna(0).sum(),
+                "fallback_files": pd.to_numeric(commits["fallback_files"], errors="coerce").fillna(0).sum(),
+                "ncloc_failure_count": pd.to_numeric(commits["ncloc_failure_count"], errors="coerce").fillna(0).sum(),
+                "ncloc_python_snapshot_sum": pd.to_numeric(commits["ncloc_python_snapshot"], errors="coerce").fillna(0).sum(),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def build_ncloc_comparison_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """Compare frozen-paper and snapshot-derived NCLOC where both are present."""
+    rows: list[dict[str, Any]] = []
+    group_specs = [
+        ([], "all"),
+        (["dataset_source"], "source"),
+        (["dataset_source", "post_event"], "source_post"),
+    ]
+    for group_cols, group_type in group_specs:
+        grouped = [((), df)] if not group_cols else df.groupby(group_cols, dropna=False)
+        for group_values, group in grouped:
+            if not isinstance(group_values, tuple):
+                group_values = (group_values,)
+            labels = dict(zip(group_cols, group_values))
+            pair = group[["ncloc_paper", "ncloc_python_snapshot"]].apply(
+                pd.to_numeric, errors="coerce"
+            ).dropna()
+            paper = pair["ncloc_paper"]
+            snapshot = pair["ncloc_python_snapshot"]
+            positive_paper = paper.gt(0)
+            ratios = snapshot.loc[positive_paper] / paper.loc[positive_paper]
+            rows.append(
+                {
+                    "group_type": group_type,
+                    "dataset_source": labels.get("dataset_source", "all"),
+                    "post_event": labels.get("post_event", "all"),
+                    "paired_rows": len(pair),
+                    "paper_mean": paper.mean() if len(pair) else np.nan,
+                    "paper_median": paper.median() if len(pair) else np.nan,
+                    "snapshot_mean": snapshot.mean() if len(pair) else np.nan,
+                    "snapshot_median": snapshot.median() if len(pair) else np.nan,
+                    "pearson_correlation": paper.corr(snapshot, method="pearson") if len(pair) > 1 else np.nan,
+                    "spearman_correlation": paper.corr(snapshot, method="spearman") if len(pair) > 1 else np.nan,
+                    "mean_absolute_difference": (snapshot - paper).abs().mean() if len(pair) else np.nan,
+                    "median_snapshot_to_paper_ratio": ratios.median() if len(ratios) else np.nan,
+                }
+            )
+    return pd.DataFrame(rows)
 
 
 def validate_detector_metadata(
@@ -670,11 +1143,39 @@ def prepare_outcome_columns(compared: pd.DataFrame) -> pd.DataFrame:
     return outcomes
 
 
+def merge_snapshot_ncloc_into_outcomes(
+    outcomes: pd.DataFrame,
+    month_ncloc: pd.DataFrame,
+) -> pd.DataFrame:
+    """Attach snapshot-derived Python NCLOC to validated AGC outcomes."""
+    selected = month_ncloc[
+        KEY_COLS
+        + [
+            "ncloc_python_snapshot",
+            "python_snapshot_ncloc_matched",
+            "regular_python_files_counted",
+            "tokenized_files",
+            "fallback_files",
+            "ncloc_failure_count",
+        ]
+    ].copy()
+    merged = outcomes.merge(
+        selected,
+        on=KEY_COLS,
+        how="left",
+        validate="one_to_one",
+    )
+    merged["python_snapshot_ncloc_matched"] = pd.to_numeric(
+        merged["python_snapshot_ncloc_matched"], errors="coerce"
+    ).fillna(0).astype(int)
+    return merged
+
+
 def load_base_panel(path: Path) -> pd.DataFrame:
     """Load and validate the strict matched DiD panel."""
     require_file(path, "strict base panel")
     panel = pd.read_csv(path, low_memory=False, dtype={"latest_commit": "string"})
-    required = PANEL_IDENTITY_COLS + EVENT_COLS + ACTIVITY_COLS + COVARIATE_COLS
+    required = PANEL_IDENTITY_COLS + EVENT_COLS + ACTIVITY_COLS
     require_columns(panel, required, "strict base panel")
     panel["repo_name"] = panel["repo_name"].astype(str)
     panel["dataset_source"] = panel["dataset_source"].astype(str)
@@ -778,6 +1279,31 @@ def coerce_output_types(df: pd.DataFrame) -> pd.DataFrame:
         invalid = result[column].notna() & ~result[column].between(0, 1, inclusive="both")
         if invalid.any():
             raise ValueError(f"{column} contains {int(invalid.sum())} values outside [0, 1]")
+
+    for column in COVARIATE_COLS:
+        result[column] = pd.to_numeric(result[column], errors="coerce")
+
+    result["paper_covariate_matched"] = pd.to_numeric(
+        result["paper_covariate_matched"], errors="coerce"
+    ).fillna(0).astype("Int64")
+    result["python_snapshot_ncloc_matched"] = pd.to_numeric(
+        result["python_snapshot_ncloc_matched"], errors="coerce"
+    ).fillna(0).astype("Int64")
+
+    agc_ready = (
+        result["agc_repo_month_matched"].eq(1)
+        & result["agc_top_level_block_ratio"].notna()
+    )
+    shared_covariates_ready = result[["stars", "issues", "age"]].notna().all(axis=1)
+    result["analysis_ready_agc_paper_ncloc"] = (
+        agc_ready & shared_covariates_ready & result["ncloc_paper"].notna()
+    ).astype("Int64")
+    result["analysis_ready_agc_python_snapshot_ncloc"] = (
+        agc_ready
+        & shared_covariates_ready
+        & result["ncloc_python_snapshot"].notna()
+        & result["python_snapshot_ncloc_matched"].eq(1)
+    ).astype("Int64")
 
     matched = result["agc_repo_month_matched"].eq(1)
     count_checks = {
@@ -908,6 +1434,12 @@ def build_qc_summary(
     add("treatment_rows", int((merged["dataset_source"] == "treatment").sum()))
     add("control_rows", int((merged["dataset_source"] == "control").sum()))
     add("agc_failure_count_sum", pd.to_numeric(merged["failure_count"], errors="coerce").fillna(0).sum())
+    add("paper_covariate_matched_rows", int(pd.to_numeric(merged["paper_covariate_matched"], errors="coerce").fillna(0).sum()))
+    add("python_snapshot_ncloc_matched_rows", int(pd.to_numeric(merged["python_snapshot_ncloc_matched"], errors="coerce").fillna(0).sum()))
+    add("analysis_ready_agc_paper_ncloc_rows", int(pd.to_numeric(merged["analysis_ready_agc_paper_ncloc"], errors="coerce").fillna(0).sum()))
+    add("analysis_ready_agc_python_snapshot_ncloc_rows", int(pd.to_numeric(merged["analysis_ready_agc_python_snapshot_ncloc"], errors="coerce").fillna(0).sum()))
+    add("ncloc_paper_nonmissing", int(merged["ncloc_paper"].notna().sum()))
+    add("ncloc_python_snapshot_nonmissing", int(merged["ncloc_python_snapshot"].notna().sum()))
 
     for outcome in RATIO_COLS:
         values = pd.to_numeric(merged[outcome], errors="coerce")
@@ -928,6 +1460,7 @@ def main() -> int:
 
     input_paths = [
         args.base_panel,
+        args.paper_panel,
         args.snapshot_manifest,
         args.block_treatment,
         args.block_control,
@@ -939,8 +1472,12 @@ def main() -> int:
     ]
     for path in input_paths:
         require_file(path, "required input")
+    if not args.snapshot_root.is_dir():
+        raise FileNotFoundError(f"Python snapshot root not found: {args.snapshot_root}")
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.repo_commit_ncloc_output.parent.mkdir(parents=True, exist_ok=True)
+    args.repo_month_outcomes_output.parent.mkdir(parents=True, exist_ok=True)
     args.qc_dir.mkdir(parents=True, exist_ok=True)
 
     logging.info("Validating detector metadata")
@@ -979,9 +1516,63 @@ def main() -> int:
     )
     outcomes = prepare_outcome_columns(compared)
 
+    logging.info("Computing Python snapshot NCLOC from exported historical files")
+    commit_ncloc, ncloc_failures = compute_python_snapshot_ncloc(
+        manifest,
+        args.snapshot_root,
+    )
+    month_ncloc = expand_snapshot_ncloc_to_month(manifest, commit_ncloc)
+    snapshot_ncloc_summary = build_snapshot_ncloc_summary(
+        commit_ncloc,
+        month_ncloc,
+    )
+    atomic_write_csv(commit_ncloc, args.repo_commit_ncloc_output)
+    atomic_write_csv(
+        ncloc_failures,
+        args.qc_dir / "agc_python_snapshot_ncloc_failures.csv",
+    )
+    atomic_write_csv(
+        snapshot_ncloc_summary,
+        args.qc_dir / "agc_python_snapshot_ncloc_summary.csv",
+    )
+    if not ncloc_failures.empty:
+        raise ValueError(
+            "Python snapshot NCLOC computation reported "
+            f"{len(ncloc_failures)} failures; see "
+            f"{args.qc_dir / 'agc_python_snapshot_ncloc_failures.csv'}"
+        )
+    outcomes = merge_snapshot_ncloc_into_outcomes(outcomes, month_ncloc)
+    require_unique(outcomes, KEY_COLS, "AGC outcomes with snapshot NCLOC")
+
     logging.info("Loading strict matched DiD panel")
     base = load_base_panel(args.base_panel)
-    merged, unmatched_base, detector_only = merge_base_panel(base, outcomes)
+
+    logging.info("Loading frozen-paper covariates")
+    paper_lookup, paper_duplicate_summary, paper_conflicts = load_paper_covariates(
+        args.paper_panel
+    )
+    atomic_write_csv(
+        paper_duplicate_summary,
+        args.qc_dir / "agc_paper_duplicate_key_summary.csv",
+    )
+    atomic_write_csv(
+        paper_conflicts,
+        args.qc_dir / "agc_paper_duplicate_key_conflicts.csv",
+    )
+    if not paper_conflicts.empty:
+        raise ValueError(
+            "Frozen paper panel has conflicting duplicate repository-month keys; "
+            f"see {args.qc_dir / 'agc_paper_duplicate_key_conflicts.csv'}"
+        )
+
+    base_with_covariates, unmatched_paper, paper_match_summary, paper_missingness = (
+        merge_paper_covariates(base, paper_lookup)
+    )
+
+    merged, unmatched_base, detector_only = merge_base_panel(
+        base_with_covariates,
+        outcomes,
+    )
     merged = coerce_output_types(merged)
     require_unique(merged, KEY_COLS, "final AGC DiD panel")
 
@@ -991,6 +1582,17 @@ def main() -> int:
             f"Final panel is missing required output columns: {missing_output_columns}"
         )
     final_output = merged[OUTPUT_COLS].copy()
+
+    unmatched_snapshot_ncloc = final_output.loc[
+        final_output["python_snapshot_ncloc_matched"].fillna(0).eq(0),
+        KEY_COLS
+        + [
+            "latest_commit",
+            "python_file_count",
+            "ncloc_python_snapshot",
+            "agc_repo_month_matched",
+        ],
+    ].copy()
 
     match_summary = build_match_summary(base, merged, outcomes)
     descriptive_summary = build_descriptive_summary(final_output)
@@ -1002,6 +1604,7 @@ def main() -> int:
         unmatched_base,
         detector_only,
     )
+    ncloc_comparison = build_ncloc_comparison_summary(final_output)
     column_manifest = pd.DataFrame(
         {
             "column_order": range(1, len(OUTPUT_COLS) + 1),
@@ -1011,7 +1614,7 @@ def main() -> int:
 
     output_paths = {
         "main": args.output,
-        "repo_month_outcomes": args.qc_dir / "repo_month_agc_outcomes_py.csv",
+        "repo_month_outcomes": args.repo_month_outcomes_output,
         "qc": args.qc_dir / "agc_did_input_qc.csv",
         "match_summary": args.qc_dir / "agc_repo_month_match_summary.csv",
         "unmatched_base": args.qc_dir / "agc_unmatched_base_repo_months.csv",
@@ -1021,6 +1624,11 @@ def main() -> int:
         "aggregation_qc": args.qc_dir / "agc_block_kind_aggregation_qc.csv",
         "aggregation_mismatches": args.qc_dir / "agc_block_kind_aggregation_mismatches.csv",
         "column_manifest": args.qc_dir / "agc_output_column_manifest.csv",
+        "paper_match": args.qc_dir / "agc_paper_covariate_match_summary.csv",
+        "paper_unmatched": args.qc_dir / "agc_unmatched_paper_covariate_repo_months.csv",
+        "paper_missingness": args.qc_dir / "agc_paper_covariate_missingness.csv",
+        "snapshot_ncloc_unmatched": args.qc_dir / "agc_unmatched_python_snapshot_ncloc_rows.csv",
+        "ncloc_comparison": args.qc_dir / "agc_ncloc_comparison_summary.csv",
     }
 
     atomic_write_csv(final_output, output_paths["main"])
@@ -1032,10 +1640,20 @@ def main() -> int:
     atomic_write_csv(metadata_comparison, output_paths["metadata"])
     atomic_write_csv(descriptive_summary, output_paths["descriptive"])
     atomic_write_csv(aggregation_qc, output_paths["aggregation_qc"])
-    atomic_write_csv(compared.loc[~compared["all_checks_pass"]], output_paths["aggregation_mismatches"])
+    atomic_write_csv(
+        compared.loc[~compared["all_checks_pass"]],
+        output_paths["aggregation_mismatches"],
+    )
     atomic_write_csv(column_manifest, output_paths["column_manifest"])
+    atomic_write_csv(paper_match_summary, output_paths["paper_match"])
+    atomic_write_csv(unmatched_paper, output_paths["paper_unmatched"])
+    atomic_write_csv(paper_missingness, output_paths["paper_missingness"])
+    atomic_write_csv(unmatched_snapshot_ncloc, output_paths["snapshot_ncloc_unmatched"])
+    atomic_write_csv(ncloc_comparison, output_paths["ncloc_comparison"])
 
     logging.info("Saved AGC DiD panel: %s", args.output)
+    logging.info("Saved repository-commit snapshot NCLOC: %s", args.repo_commit_ncloc_output)
+    logging.info("Saved repository-month AGC outcomes: %s", args.repo_month_outcomes_output)
     logging.info("Saved QC directory: %s", args.qc_dir)
     print()
     print("QC summary:")
@@ -1043,6 +1661,12 @@ def main() -> int:
     print()
     print("Repository-month match summary:")
     print(match_summary.to_string(index=False))
+    print()
+    print("Paper covariate match summary:")
+    print(paper_match_summary.to_string(index=False))
+    print()
+    print("Python snapshot NCLOC summary:")
+    print(snapshot_ncloc_summary.to_string(index=False))
     print()
     print("Completed successfully.")
     return 0
