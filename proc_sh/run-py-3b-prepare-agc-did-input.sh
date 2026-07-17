@@ -20,12 +20,12 @@ set -euo pipefail
 #   - ncloc_python_snapshot: nonblank, non-comment physical lines counted
 #     directly from regular Python files in the exported historical snapshot.
 #     Docstring lines are retained. No SonarQube input is used.
+#   - Existing repository-commit NCLOC output is reused by default after
+#     exact manifest-key and count validation. Set
+#     REUSE_REPO_COMMIT_NCLOC=0 to force recomputation.
 #
 # Main output:
 #   repo_python/run-py-3b/strict/panel_event_monthly_agc_py.csv
-# 
-# Usage: 
-#   PANEL_VARIANT=strict bash proc_sh/run-py-3b-prepare-agc-did-input.sh
 #
 # QC outputs:
 #   repo_python/tmp/run-py-3b/strict/
@@ -85,6 +85,7 @@ OUTPUT_FILE="${OUTPUT_FILE:-${MAIN_OUTPUT_DIR}/panel_event_monthly_agc_py.csv}"
 REPO_COMMIT_NCLOC_OUTPUT="${REPO_COMMIT_NCLOC_OUTPUT:-${MAIN_OUTPUT_DIR}/repo_commit_python_snapshot_ncloc.csv}"
 REPO_MONTH_OUTCOMES_OUTPUT="${REPO_MONTH_OUTCOMES_OUTPUT:-${MAIN_OUTPUT_DIR}/repo_month_agc_outcomes_py.csv}"
 CHUNKSIZE="${CHUNKSIZE:-250000}"
+REUSE_REPO_COMMIT_NCLOC="${REUSE_REPO_COMMIT_NCLOC:-1}"
 
 mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${QC_DIR}"
 exec > >(tee -a "${LOG_FILE}") 2>&1
@@ -146,6 +147,7 @@ echo "Treatment repo-month input: ${REPO_MONTH_TREATMENT}"
 echo "Control repo-month input:   ${REPO_MONTH_CONTROL}"
 echo "Combined validation:        ${COMBINED_VALIDATION}"
 echo "Chunk size:                 ${CHUNKSIZE}"
+echo "Reuse commit NCLOC:         ${REUSE_REPO_COMMIT_NCLOC}"
 echo "Main output:                ${OUTPUT_FILE}"
 echo "Commit NCLOC output:        ${REPO_COMMIT_NCLOC_OUTPUT}"
 echo "Repo-month outcomes:        ${REPO_MONTH_OUTCOMES_OUTPUT}"
@@ -174,6 +176,16 @@ if ! [[ "${CHUNKSIZE}" =~ ^[1-9][0-9]*$ ]]; then
   exit 2
 fi
 
+if [[ "${REUSE_REPO_COMMIT_NCLOC}" != "0" && "${REUSE_REPO_COMMIT_NCLOC}" != "1" ]]; then
+  echo "ERROR: REUSE_REPO_COMMIT_NCLOC must be 0 or 1. Got: ${REUSE_REPO_COMMIT_NCLOC}" >&2
+  exit 2
+fi
+
+NCLOC_REUSE_ARGS=()
+if [[ "${REUSE_REPO_COMMIT_NCLOC}" == "1" ]]; then
+  NCLOC_REUSE_ARGS+=(--reuse-repo-commit-ncloc)
+fi
+
 "${PYTHON_BIN}" -m py_compile "${PY_SCRIPT}"
 
 PYTHONUNBUFFERED=1 "${PYTHON_BIN}" "${PY_SCRIPT}" \
@@ -193,7 +205,8 @@ PYTHONUNBUFFERED=1 "${PYTHON_BIN}" "${PY_SCRIPT}" \
   --repo-month-outcomes-output "${REPO_MONTH_OUTCOMES_OUTPUT}" \
   --qc-dir "${QC_DIR}" \
   --panel-label "${PANEL_VARIANT}" \
-  --chunksize "${CHUNKSIZE}"
+  --chunksize "${CHUNKSIZE}" \
+  "${NCLOC_REUSE_ARGS[@]}"
 
 EXPECTED_OUTPUTS=(
   "${OUTPUT_FILE}"

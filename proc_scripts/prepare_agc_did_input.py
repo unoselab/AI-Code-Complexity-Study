@@ -11,6 +11,9 @@ blocks classified as AI-generated-like. Function-only and class-only shares are
 also retained as secondary outcomes. These outcomes capture structural
 similarity to AI-generated code in the detector's training distribution; they
 do not establish code provenance or identify a specific AI tool.
+
+Revision v3 validates strict-panel treatment indicators before expensive work
+and can reuse a previously validated repository-commit snapshot NCLOC file.
 """
 
 from __future__ import annotations
@@ -188,6 +191,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo-commit-ncloc-output", required=True, type=Path)
     parser.add_argument("--repo-month-outcomes-output", required=True, type=Path)
     parser.add_argument("--qc-dir", required=True, type=Path)
+    parser.add_argument(
+        "--reuse-repo-commit-ncloc",
+        action="store_true",
+        help=(
+            "Reuse an existing validated repository-commit snapshot NCLOC "
+            "output when the file exists. Missing files are recomputed."
+        ),
+    )
     parser.add_argument("--panel-label", default="strict")
     parser.add_argument(
         "--chunksize",
@@ -637,6 +648,148 @@ def compute_python_snapshot_ncloc(
         "repository-commit Python snapshot NCLOC",
     )
     return commit_ncloc, failures
+
+
+def load_reusable_repo_commit_ncloc(
+    path: Path,
+    manifest: pd.DataFrame,
+) -> pd.DataFrame:
+    """Load and fully validate a reusable repository-commit NCLOC output."""
+    require_file(path, "reusable repository-commit snapshot NCLOC")
+    required = [
+        "dataset_source",
+        "repo_name",
+        "latest_commit",
+        "snapshot_dir",
+        "python_files_manifest",
+        "regular_python_files_counted",
+        "symlinks_skipped",
+        "total_physical_lines",
+        "comment_only_lines",
+        "ncloc_python_snapshot",
+        "tokenized_files",
+        "fallback_files",
+        "ncloc_failure_count",
+    ]
+    commit_ncloc = pd.read_csv(
+        path,
+        low_memory=False,
+        dtype={"latest_commit": "string"},
+    )
+    require_columns(commit_ncloc, required, "reusable repository-commit snapshot NCLOC")
+    commit_ncloc = commit_ncloc[required].copy()
+    commit_ncloc["dataset_source"] = (
+        commit_ncloc["dataset_source"].astype(str).str.strip()
+    )
+    commit_ncloc["repo_name"] = commit_ncloc["repo_name"].astype(str).str.strip()
+    commit_ncloc["latest_commit"] = commit_ncloc["latest_commit"].astype(str).str.strip()
+
+    invalid_sources = sorted(set(commit_ncloc["dataset_source"]) - ALLOWED_SOURCES)
+    if invalid_sources:
+        raise ValueError(
+            "Reusable repository-commit snapshot NCLOC has invalid sources: "
+            f"{invalid_sources}"
+        )
+
+    commit_keys = ["dataset_source", "repo_name", "latest_commit"]
+    require_unique(
+        commit_ncloc,
+        commit_keys,
+        "reusable repository-commit snapshot NCLOC",
+    )
+
+    expected = (
+        manifest[commit_keys + ["python_file_count"]]
+        .drop_duplicates(commit_keys)
+        .rename(columns={"python_file_count": "expected_python_files_manifest"})
+        .copy()
+    )
+    require_unique(expected, commit_keys, "expected repository-commit manifest")
+
+    key_check = expected[commit_keys].merge(
+        commit_ncloc[commit_keys],
+        on=commit_keys,
+        how="outer",
+        indicator=True,
+        validate="one_to_one",
+    )
+    missing = int(key_check["_merge"].eq("left_only").sum())
+    extra = int(key_check["_merge"].eq("right_only").sum())
+    if missing or extra:
+        raise ValueError(
+            "Reusable repository-commit snapshot NCLOC key mismatch: "
+            f"missing={missing}, extra={extra}"
+        )
+
+    numeric_columns = [
+        "python_files_manifest",
+        "regular_python_files_counted",
+        "symlinks_skipped",
+        "total_physical_lines",
+        "comment_only_lines",
+        "ncloc_python_snapshot",
+        "tokenized_files",
+        "fallback_files",
+        "ncloc_failure_count",
+    ]
+    for column in numeric_columns:
+        values = pd.to_numeric(commit_ncloc[column], errors="coerce")
+        invalid = values.isna() | values.lt(0) | values.mod(1).ne(0)
+        if invalid.any():
+            raise ValueError(
+                f"Reusable repository-commit snapshot NCLOC column {column} has "
+                f"{int(invalid.sum())} invalid values"
+            )
+        commit_ncloc[column] = values.astype("int64")
+
+    checked = commit_ncloc.merge(
+        expected,
+        on=commit_keys,
+        how="left",
+        validate="one_to_one",
+    )
+    expected_count = pd.to_numeric(
+        checked["expected_python_files_manifest"], errors="coerce"
+    )
+    manifest_mismatch = checked["python_files_manifest"].ne(expected_count)
+    if manifest_mismatch.any():
+        raise ValueError(
+            "Reusable repository-commit snapshot NCLOC has "
+            f"{int(manifest_mismatch.sum())} Python file-count mismatches"
+        )
+
+    failures = checked["ncloc_failure_count"].ne(0)
+    if failures.any():
+        raise ValueError(
+            "Reusable repository-commit snapshot NCLOC has "
+            f"{int(failures.sum())} commits with failures"
+        )
+
+    observed_files = (
+        checked["regular_python_files_counted"] + checked["symlinks_skipped"]
+    )
+    observed_mismatch = observed_files.ne(checked["python_files_manifest"])
+    if observed_mismatch.any():
+        raise ValueError(
+            "Reusable repository-commit snapshot NCLOC has "
+            f"{int(observed_mismatch.sum())} observed file-count mismatches"
+        )
+
+    method_mismatch = (
+        checked["tokenized_files"] + checked["fallback_files"]
+    ).ne(checked["regular_python_files_counted"])
+    if method_mismatch.any():
+        raise ValueError(
+            "Reusable repository-commit snapshot NCLOC has "
+            f"{int(method_mismatch.sum())} tokenizer/fallback count mismatches"
+        )
+
+    logging.info(
+        "Reusing validated Python snapshot NCLOC: %d unique commits from %s",
+        len(commit_ncloc),
+        path,
+    )
+    return commit_ncloc.sort_values(commit_keys).reset_index(drop=True)
 
 
 def expand_snapshot_ncloc_to_month(
@@ -1172,31 +1325,100 @@ def merge_snapshot_ncloc_into_outcomes(
 
 
 def load_base_panel(path: Path) -> pd.DataFrame:
-    """Load and validate the strict matched DiD panel."""
+    """Load and validate the strict matched DiD panel.
+
+    ``ever_treated`` is the static treatment-group indicator. ``is_treatment``
+    is the absorbing post-adoption indicator and must equal ``post_event``.
+    ``is_treatment_dynamic`` records contemporaneous Cursor evidence and must
+    equal ``cursor``.
+    """
     require_file(path, "strict base panel")
     panel = pd.read_csv(path, low_memory=False, dtype={"latest_commit": "string"})
-    required = PANEL_IDENTITY_COLS + EVENT_COLS + ACTIVITY_COLS
+    validation_columns = ["ever_treated", "is_treatment_dynamic"]
+    required = PANEL_IDENTITY_COLS + EVENT_COLS + ACTIVITY_COLS + validation_columns
     require_columns(panel, required, "strict base panel")
-    panel["repo_name"] = panel["repo_name"].astype(str)
-    panel["dataset_source"] = panel["dataset_source"].astype(str)
+
+    panel["repo_name"] = panel["repo_name"].astype(str).str.strip()
+    panel["dataset_source"] = panel["dataset_source"].astype(str).str.strip()
     panel["time"] = panel["time"].map(normalize_month_value)
     invalid_sources = sorted(set(panel["dataset_source"]) - ALLOWED_SOURCES)
     if invalid_sources:
         raise ValueError(f"Strict base panel has invalid sources: {invalid_sources}")
     require_unique(panel, KEY_COLS, "strict base panel")
 
-    treatment_mismatch = panel.loc[
-        (panel["dataset_source"] == "treatment")
-        & (pd.to_numeric(panel["is_treatment"], errors="coerce") != 1)
+    indicator_columns = [
+        "ever_treated",
+        "is_treatment",
+        "is_treatment_dynamic",
+        "post_event",
+        "cursor",
     ]
-    control_mismatch = panel.loc[
-        (panel["dataset_source"] == "control")
-        & (pd.to_numeric(panel["is_treatment"], errors="coerce") != 0)
-    ]
-    if len(treatment_mismatch) or len(control_mismatch):
-        raise ValueError(
-            "dataset_source and is_treatment are inconsistent in the base panel"
+    for column in indicator_columns:
+        panel[column] = pd.to_numeric(panel[column], errors="coerce")
+        invalid = panel[column].isna() | ~panel[column].isin([0, 1])
+        if invalid.any():
+            raise ValueError(
+                f"Strict base panel column {column} has "
+                f"{int(invalid.sum())} missing or non-binary values"
+            )
+        panel[column] = panel[column].astype(int)
+
+    expected_ever_treated = panel["dataset_source"].map(
+        {"treatment": 1, "control": 0}
+    )
+    static_mismatch = panel["ever_treated"].ne(expected_ever_treated)
+    absorbing_mismatch = panel["is_treatment"].ne(panel["post_event"])
+    dynamic_mismatch = panel["is_treatment_dynamic"].ne(panel["cursor"])
+    control_post_mismatch = panel["dataset_source"].eq("control") & (
+        panel["post_event"].ne(0) | panel["is_treatment"].ne(0)
+    )
+
+    validation_errors: list[str] = []
+    if static_mismatch.any():
+        validation_errors.append(
+            "dataset_source vs ever_treated mismatches="
+            f"{int(static_mismatch.sum())}"
         )
+    if absorbing_mismatch.any():
+        validation_errors.append(
+            "is_treatment vs post_event mismatches="
+            f"{int(absorbing_mismatch.sum())}"
+        )
+    if dynamic_mismatch.any():
+        validation_errors.append(
+            "is_treatment_dynamic vs cursor mismatches="
+            f"{int(dynamic_mismatch.sum())}"
+        )
+    if control_post_mismatch.any():
+        validation_errors.append(
+            "control post-treatment mismatches="
+            f"{int(control_post_mismatch.sum())}"
+        )
+    if validation_errors:
+        raise ValueError(
+            "Strict base panel treatment-indicator validation failed: "
+            + "; ".join(validation_errors)
+        )
+
+    logging.info(
+        "Strict base panel validated: rows=%d treatment=%d control=%d "
+        "treatment_pre=%d treatment_post=%d",
+        len(panel),
+        int(panel["dataset_source"].eq("treatment").sum()),
+        int(panel["dataset_source"].eq("control").sum()),
+        int(
+            (
+                panel["dataset_source"].eq("treatment")
+                & panel["post_event"].eq(0)
+            ).sum()
+        ),
+        int(
+            (
+                panel["dataset_source"].eq("treatment")
+                & panel["post_event"].eq(1)
+            ).sum()
+        ),
+    )
     return panel
 
 
@@ -1480,71 +1702,9 @@ def main() -> int:
     args.repo_month_outcomes_output.parent.mkdir(parents=True, exist_ok=True)
     args.qc_dir.mkdir(parents=True, exist_ok=True)
 
-    logging.info("Validating detector metadata")
-    metadata_comparison = validate_detector_metadata(
-        args.run_metadata_treatment,
-        args.run_metadata_control,
-        args.combined_validation,
-    )
-
-    logging.info("Aggregating treatment block predictions")
-    treatment_blocks = aggregate_block_file(
-        args.block_treatment, "treatment", args.chunksize
-    )
-    logging.info("Aggregating control block predictions")
-    control_blocks = aggregate_block_file(
-        args.block_control, "control", args.chunksize
-    )
-    block_aggregates = pd.concat(
-        [treatment_blocks, control_blocks], ignore_index=True
-    )
-    commit_wide = make_commit_wide(block_aggregates)
-    require_unique(commit_wide, COMMIT_KEY_COLS, "commit-level block outcomes")
-
-    logging.info("Loading repository-month snapshot manifest")
-    manifest = load_snapshot_manifest(args.snapshot_manifest)
-    reconstructed = expand_commit_outcomes_to_month(manifest, commit_wide)
-
-    logging.info("Loading existing repository-month AGC outputs")
-    oracle = load_repo_month_oracle(
-        args.repo_month_treatment,
-        args.repo_month_control,
-    )
-    compared, aggregation_qc = compare_reconstructed_with_oracle(
-        reconstructed,
-        oracle,
-    )
-    outcomes = prepare_outcome_columns(compared)
-
-    logging.info("Computing Python snapshot NCLOC from exported historical files")
-    commit_ncloc, ncloc_failures = compute_python_snapshot_ncloc(
-        manifest,
-        args.snapshot_root,
-    )
-    month_ncloc = expand_snapshot_ncloc_to_month(manifest, commit_ncloc)
-    snapshot_ncloc_summary = build_snapshot_ncloc_summary(
-        commit_ncloc,
-        month_ncloc,
-    )
-    atomic_write_csv(commit_ncloc, args.repo_commit_ncloc_output)
-    atomic_write_csv(
-        ncloc_failures,
-        args.qc_dir / "agc_python_snapshot_ncloc_failures.csv",
-    )
-    atomic_write_csv(
-        snapshot_ncloc_summary,
-        args.qc_dir / "agc_python_snapshot_ncloc_summary.csv",
-    )
-    if not ncloc_failures.empty:
-        raise ValueError(
-            "Python snapshot NCLOC computation reported "
-            f"{len(ncloc_failures)} failures; see "
-            f"{args.qc_dir / 'agc_python_snapshot_ncloc_failures.csv'}"
-        )
-    outcomes = merge_snapshot_ncloc_into_outcomes(outcomes, month_ncloc)
-    require_unique(outcomes, KEY_COLS, "AGC outcomes with snapshot NCLOC")
-
-    logging.info("Loading strict matched DiD panel")
+    # Fail fast on panel semantics and frozen-paper duplicate conflicts before
+    # running expensive block aggregation or historical snapshot scans.
+    logging.info("Loading and validating strict matched DiD panel")
     base = load_base_panel(args.base_panel)
 
     logging.info("Loading frozen-paper covariates")
@@ -1564,6 +1724,96 @@ def main() -> int:
             "Frozen paper panel has conflicting duplicate repository-month keys; "
             f"see {args.qc_dir / 'agc_paper_duplicate_key_conflicts.csv'}"
         )
+
+    logging.info("Validating detector metadata")
+    metadata_comparison = validate_detector_metadata(
+        args.run_metadata_treatment,
+        args.run_metadata_control,
+        args.combined_validation,
+    )
+
+    logging.info("Loading repository-month snapshot manifest")
+    manifest = load_snapshot_manifest(args.snapshot_manifest)
+
+    empty_failures = pd.DataFrame(
+        columns=[
+            "dataset_source",
+            "repo_name",
+            "latest_commit",
+            "relative_path",
+            "error",
+        ]
+    )
+    if args.reuse_repo_commit_ncloc and args.repo_commit_ncloc_output.is_file():
+        commit_ncloc = load_reusable_repo_commit_ncloc(
+            args.repo_commit_ncloc_output,
+            manifest,
+        )
+        ncloc_failures = empty_failures
+        ncloc_mode = "reused"
+    else:
+        if args.reuse_repo_commit_ncloc:
+            logging.info(
+                "Reusable Python snapshot NCLOC file does not exist; computing: %s",
+                args.repo_commit_ncloc_output,
+            )
+        logging.info("Computing Python snapshot NCLOC from exported historical files")
+        commit_ncloc, ncloc_failures = compute_python_snapshot_ncloc(
+            manifest,
+            args.snapshot_root,
+        )
+        ncloc_mode = "computed"
+        atomic_write_csv(commit_ncloc, args.repo_commit_ncloc_output)
+
+    month_ncloc = expand_snapshot_ncloc_to_month(manifest, commit_ncloc)
+    snapshot_ncloc_summary = build_snapshot_ncloc_summary(
+        commit_ncloc,
+        month_ncloc,
+    )
+    snapshot_ncloc_summary["ncloc_mode"] = ncloc_mode
+    atomic_write_csv(
+        ncloc_failures,
+        args.qc_dir / "agc_python_snapshot_ncloc_failures.csv",
+    )
+    atomic_write_csv(
+        snapshot_ncloc_summary,
+        args.qc_dir / "agc_python_snapshot_ncloc_summary.csv",
+    )
+    if not ncloc_failures.empty:
+        raise ValueError(
+            "Python snapshot NCLOC computation reported "
+            f"{len(ncloc_failures)} failures; see "
+            f"{args.qc_dir / 'agc_python_snapshot_ncloc_failures.csv'}"
+        )
+
+    logging.info("Aggregating treatment block predictions")
+    treatment_blocks = aggregate_block_file(
+        args.block_treatment, "treatment", args.chunksize
+    )
+    logging.info("Aggregating control block predictions")
+    control_blocks = aggregate_block_file(
+        args.block_control, "control", args.chunksize
+    )
+    block_aggregates = pd.concat(
+        [treatment_blocks, control_blocks], ignore_index=True
+    )
+    commit_wide = make_commit_wide(block_aggregates)
+    require_unique(commit_wide, COMMIT_KEY_COLS, "commit-level block outcomes")
+
+    reconstructed = expand_commit_outcomes_to_month(manifest, commit_wide)
+
+    logging.info("Loading existing repository-month AGC outputs")
+    oracle = load_repo_month_oracle(
+        args.repo_month_treatment,
+        args.repo_month_control,
+    )
+    compared, aggregation_qc = compare_reconstructed_with_oracle(
+        reconstructed,
+        oracle,
+    )
+    outcomes = prepare_outcome_columns(compared)
+    outcomes = merge_snapshot_ncloc_into_outcomes(outcomes, month_ncloc)
+    require_unique(outcomes, KEY_COLS, "AGC outcomes with snapshot NCLOC")
 
     base_with_covariates, unmatched_paper, paper_match_summary, paper_missingness = (
         merge_paper_covariates(base, paper_lookup)
@@ -1652,8 +1902,15 @@ def main() -> int:
     atomic_write_csv(ncloc_comparison, output_paths["ncloc_comparison"])
 
     logging.info("Saved AGC DiD panel: %s", args.output)
-    logging.info("Saved repository-commit snapshot NCLOC: %s", args.repo_commit_ncloc_output)
-    logging.info("Saved repository-month AGC outcomes: %s", args.repo_month_outcomes_output)
+    logging.info(
+        "Saved repository-commit snapshot NCLOC: %s (%s)",
+        args.repo_commit_ncloc_output,
+        ncloc_mode,
+    )
+    logging.info(
+        "Saved repository-month AGC outcomes: %s",
+        args.repo_month_outcomes_output,
+    )
     logging.info("Saved QC directory: %s", args.qc_dir)
     print()
     print("QC summary:")
