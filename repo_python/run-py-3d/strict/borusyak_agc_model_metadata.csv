@@ -1,0 +1,22 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_AGC.Rmd
+source_notebook,DiffInDiffBorusyak.Rmd
+helper_file,proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-3b/strict/panel_event_monthly_agc_py.csv
+validation_summary_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-3c/strict/agc_did_input_validation_summary.json
+validation_status,PASS
+validation_checks_passed,176
+validation_checks_total,176
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-3d/strict
+outcomes,"agc_top_level_block_ratio, agc_function_block_ratio, agc_class_block_ratio"
+primary_outcome,agc_top_level_block_ratio
+specifications,"paper_ncloc, python_snapshot_ncloc"
+common_covariates,"age_log, contributors_log, stars_log, issues_log, ncloc_paper, ncloc_python_snapshot"
+first_stage_formula,~age_log + ncloc_model + contributors_log + stars_log + issues_log |      repo_id + time_id
+time_encoding,sequential calendar-month id
+dynamic_horizon,-6 through +6 months
+pretrend_horizon,-6 through -2 months
+outcome_scale,proportion; reported as percentage points
+interpretation,Change in the repository-month share of top-level Python blocks classified as AI-generated-like after observed Cursor adoption
+limitation,The detector outcome captures structural similarity to AI-generated code and does not establish block provenance or tool identity.

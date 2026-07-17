@@ -14,15 +14,13 @@ Primary validation areas:
 - repository-commit NCLOC arithmetic and fallback-file accounting;
 - exact overlap between the main panel and repository-month outcome artifact;
 - detector metadata provenance consistency;
-- empty mismatch/error files emitted by run-py-3b;
-- line-volume impact of tokenizer fallback files on snapshot NCLOC.
+- empty mismatch/error files emitted by run-py-3b.
 
 The validator can also identify the exact Python files that required the
 fallback physical-line rule because Python tokenization failed. Fallback is not
 an inference failure: the file is still counted with the documented fallback
 rule. The audit verifies that the located file count matches the aggregate
-fallback count saved by run-py-3b. It also quantifies fallback impact at
-commit and strict repository-month levels without changing the prepared panel.
+fallback count saved by run-py-3b.
 """
 
 from __future__ import annotations
@@ -1083,46 +1081,17 @@ def validate_prepare_qc_files(
 
 
 
-def decode_python_source(data: bytes) -> str:
-    """Decode Python source using its declared source encoding."""
-    reader = io.BytesIO(data).readline
-    encoding, _ = tokenize.detect_encoding(reader)
-    return data.decode(encoding)
-
-
 def tokenizer_fallback_reason(data: bytes) -> str | None:
     """Return the tokenizer exception when the fallback rule is required."""
-    text = decode_python_source(data)
+    reader = io.BytesIO(data).readline
+    encoding, _ = tokenize.detect_encoding(reader)
+    text = data.decode(encoding)
     try:
         list(tokenize.generate_tokens(io.StringIO(text).readline))
     except (tokenize.TokenError, IndentationError, SyntaxError) as exc:
         return f"{type(exc).__name__}: {exc}"
     return None
 
-
-def fallback_line_metrics(data: bytes) -> dict[str, int]:
-    """Compute the exact physical-line fallback metrics used by run-py-3b."""
-    text = decode_python_source(data)
-    lines = text.splitlines()
-    blank_lines = sum(1 for line in lines if not line.strip())
-    comment_only_lines = sum(
-        1 for line in lines if line.strip() and line.lstrip().startswith("#")
-    )
-    fallback_ncloc = len(lines) - blank_lines - comment_only_lines
-    return {
-        "size_bytes_observed": len(data),
-        "physical_lines": len(lines),
-        "blank_lines": blank_lines,
-        "comment_only_lines": comment_only_lines,
-        "fallback_ncloc": fallback_ncloc,
-    }
-
-
-def safe_ratio(numerator: float, denominator: float) -> float:
-    """Return a ratio or NaN when the denominator is zero."""
-    if denominator == 0:
-        return float("nan")
-    return float(numerator) / float(denominator)
 
 
 def audit_fallback_files(
@@ -1169,8 +1138,6 @@ def audit_fallback_files(
                         "relative_path": relative_path,
                         "snapshot_path": str(source_path),
                         "manifest_line": line_number,
-                        "content_sha256": record.get("content_sha256", ""),
-                        "size_bytes_manifest": record.get("size_bytes"),
                         "fallback_reason": reason,
                     }
                 )
@@ -1184,8 +1151,6 @@ def audit_fallback_files(
             "relative_path",
             "snapshot_path",
             "manifest_line",
-            "content_sha256",
-            "size_bytes_manifest",
             "fallback_reason",
         ],
     )
@@ -1231,401 +1196,6 @@ def audit_fallback_files(
         )
     return audit
 
-
-def build_fallback_impact_outputs(
-    fallback_audit: pd.DataFrame,
-    commit_ncloc: pd.DataFrame,
-    main_panel: pd.DataFrame,
-    recorder: ValidationRecorder,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Quantify fallback line-volume impact without modifying the main panel."""
-    detail_columns = [
-        "dataset_source",
-        "repo_name",
-        "latest_commit",
-        "relative_path",
-        "snapshot_path",
-        "manifest_line",
-        "content_sha256",
-        "size_bytes_manifest",
-        "size_bytes_observed",
-        "error_type",
-        "fallback_reason",
-        "physical_lines",
-        "blank_lines",
-        "comment_only_lines",
-        "fallback_ncloc",
-        "logical_file_key",
-        "logical_file_occurrences",
-        "logical_file_unique_contents",
-    ]
-    if fallback_audit.empty:
-        details = pd.DataFrame(columns=detail_columns)
-    else:
-        detail_rows: list[dict[str, Any]] = []
-        for row in fallback_audit.itertuples(index=False):
-            source_path = Path(str(row.snapshot_path))
-            require_file(source_path, "fallback source file")
-            data = source_path.read_bytes()
-            metrics = fallback_line_metrics(data)
-            detail_rows.append(
-                {
-                    "dataset_source": str(row.dataset_source),
-                    "repo_name": str(row.repo_name),
-                    "latest_commit": str(row.latest_commit),
-                    "relative_path": str(row.relative_path),
-                    "snapshot_path": str(row.snapshot_path),
-                    "manifest_line": int(row.manifest_line),
-                    "content_sha256": str(getattr(row, "content_sha256", "") or ""),
-                    "size_bytes_manifest": getattr(row, "size_bytes_manifest", np.nan),
-                    "size_bytes_observed": metrics["size_bytes_observed"],
-                    "error_type": str(row.fallback_reason).split(":", 1)[0],
-                    "fallback_reason": str(row.fallback_reason),
-                    "physical_lines": metrics["physical_lines"],
-                    "blank_lines": metrics["blank_lines"],
-                    "comment_only_lines": metrics["comment_only_lines"],
-                    "fallback_ncloc": metrics["fallback_ncloc"],
-                    "logical_file_key": f"{row.repo_name}::{row.relative_path}",
-                }
-            )
-        details = pd.DataFrame(detail_rows)
-        details["logical_file_occurrences"] = details.groupby(
-            "logical_file_key"
-        )["logical_file_key"].transform("size")
-        details["logical_file_unique_contents"] = details.groupby(
-            "logical_file_key"
-        )["content_sha256"].transform(lambda values: values.loc[values.ne("")].nunique())
-        details = details[detail_columns].sort_values(
-            COMMIT_KEY_COLS + ["relative_path"], kind="stable"
-        ).reset_index(drop=True)
-
-    recorder.require_equal(
-        "fallback_impact_detail_rows",
-        len(details),
-        len(fallback_audit),
-        "fallback_impact",
-    )
-    if not details.empty:
-        arithmetic_mismatch = details["physical_lines"].ne(
-            details["blank_lines"]
-            + details["comment_only_lines"]
-            + details["fallback_ncloc"]
-        )
-        recorder.require_zero(
-            "fallback_impact_line_arithmetic_mismatches",
-            int(arithmetic_mismatch.sum()),
-            "fallback_impact",
-        )
-        recorder.require_zero(
-            "fallback_impact_negative_ncloc_rows",
-            int(pd.to_numeric(details["fallback_ncloc"], errors="coerce").lt(0).sum()),
-            "fallback_impact",
-        )
-        manifest_sizes = pd.to_numeric(details["size_bytes_manifest"], errors="coerce")
-        observed_sizes = pd.to_numeric(details["size_bytes_observed"], errors="coerce")
-        size_mismatch = manifest_sizes.notna() & manifest_sizes.ne(observed_sizes)
-        recorder.require_zero(
-            "fallback_impact_manifest_size_mismatches",
-            int(size_mismatch.sum()),
-            "fallback_impact",
-        )
-
-    commit_totals = (
-        details.groupby(COMMIT_KEY_COLS, as_index=False)
-        .agg(
-            fallback_file_occurrences=("relative_path", "size"),
-            fallback_unique_logical_paths=("logical_file_key", "nunique"),
-            fallback_physical_lines=("physical_lines", "sum"),
-            fallback_blank_lines=("blank_lines", "sum"),
-            fallback_comment_only_lines=("comment_only_lines", "sum"),
-            fallback_ncloc=("fallback_ncloc", "sum"),
-        )
-        if not details.empty
-        else pd.DataFrame(
-            columns=COMMIT_KEY_COLS
-            + [
-                "fallback_file_occurrences",
-                "fallback_unique_logical_paths",
-                "fallback_physical_lines",
-                "fallback_blank_lines",
-                "fallback_comment_only_lines",
-                "fallback_ncloc",
-            ]
-        )
-    )
-    commit_reference = commit_ncloc[
-        COMMIT_KEY_COLS
-        + [
-            "regular_python_files_counted",
-            "ncloc_python_snapshot",
-            "fallback_files",
-        ]
-    ].copy()
-    by_commit = commit_totals.merge(
-        commit_reference,
-        on=COMMIT_KEY_COLS,
-        how="left",
-        validate="one_to_one",
-    )
-    if not by_commit.empty:
-        for column in [
-            "fallback_file_occurrences",
-            "fallback_ncloc",
-            "ncloc_python_snapshot",
-            "fallback_files",
-        ]:
-            by_commit[column] = pd.to_numeric(by_commit[column], errors="coerce")
-        by_commit["ncloc_python_snapshot_excluding_fallback"] = (
-            by_commit["ncloc_python_snapshot"] - by_commit["fallback_ncloc"]
-        )
-        by_commit["fallback_ncloc_share"] = np.where(
-            by_commit["ncloc_python_snapshot"].gt(0),
-            by_commit["fallback_ncloc"] / by_commit["ncloc_python_snapshot"],
-            np.nan,
-        )
-        recorder.require_zero(
-            "fallback_impact_commit_file_count_mismatches",
-            int(
-                by_commit["fallback_file_occurrences"]
-                .ne(by_commit["fallback_files"])
-                .sum()
-            ),
-            "fallback_impact",
-        )
-        recorder.require_zero(
-            "fallback_impact_commit_ncloc_exceeds_total",
-            int(by_commit["fallback_ncloc"].gt(by_commit["ncloc_python_snapshot"]).sum()),
-            "fallback_impact",
-        )
-        recorder.require_zero(
-            "fallback_impact_negative_excluding_fallback_ncloc",
-            int(
-                by_commit["ncloc_python_snapshot_excluding_fallback"].lt(0).sum()
-            ),
-            "fallback_impact",
-        )
-
-    main_for_impact = main_panel[
-        KEY_COLS + ["latest_commit", "ncloc_python_snapshot"]
-    ].copy()
-    main_for_impact["latest_commit"] = main_for_impact["latest_commit"].astype(str)
-    by_repo_month = main_for_impact.merge(
-        by_commit[
-            COMMIT_KEY_COLS
-            + [
-                "fallback_file_occurrences",
-                "fallback_physical_lines",
-                "fallback_ncloc",
-            ]
-        ],
-        on=COMMIT_KEY_COLS,
-        how="inner",
-        validate="many_to_one",
-    )
-    if not by_repo_month.empty:
-        by_repo_month["ncloc_python_snapshot"] = pd.to_numeric(
-            by_repo_month["ncloc_python_snapshot"], errors="coerce"
-        )
-        by_repo_month["fallback_ncloc"] = pd.to_numeric(
-            by_repo_month["fallback_ncloc"], errors="coerce"
-        )
-        by_repo_month["ncloc_python_snapshot_excluding_fallback"] = (
-            by_repo_month["ncloc_python_snapshot"] - by_repo_month["fallback_ncloc"]
-        )
-        by_repo_month["fallback_ncloc_share"] = np.where(
-            by_repo_month["ncloc_python_snapshot"].gt(0),
-            by_repo_month["fallback_ncloc"]
-            / by_repo_month["ncloc_python_snapshot"],
-            np.nan,
-        )
-        by_repo_month = by_repo_month.sort_values(KEY_COLS, kind="stable").reset_index(
-            drop=True
-        )
-        recorder.require_zero(
-            "fallback_impact_repo_month_ncloc_exceeds_total",
-            int(
-                by_repo_month["fallback_ncloc"]
-                .gt(by_repo_month["ncloc_python_snapshot"])
-                .sum()
-            ),
-            "fallback_impact",
-        )
-
-    summary_rows: list[dict[str, Any]] = []
-
-    def add_summary(
-        scope: str,
-        group: str,
-        metric: str,
-        value: Any,
-        unit: str,
-        detail: str = "",
-    ) -> None:
-        summary_rows.append(
-            {
-                "scope": scope,
-                "group": group,
-                "metric": metric,
-                "value": value,
-                "unit": unit,
-                "detail": detail,
-            }
-        )
-
-    all_regular_files = float(
-        pd.to_numeric(commit_ncloc["regular_python_files_counted"], errors="coerce")
-        .fillna(0)
-        .sum()
-    )
-    all_physical_lines = float(
-        pd.to_numeric(commit_ncloc["total_physical_lines"], errors="coerce")
-        .fillna(0)
-        .sum()
-    )
-    all_commit_ncloc = float(
-        pd.to_numeric(commit_ncloc["ncloc_python_snapshot"], errors="coerce")
-        .fillna(0)
-        .sum()
-    )
-    fallback_physical_lines_total = float(
-        pd.to_numeric(details.get("physical_lines", pd.Series(dtype=float)), errors="coerce")
-        .fillna(0)
-        .sum()
-    )
-    fallback_ncloc_total = float(
-        pd.to_numeric(details.get("fallback_ncloc", pd.Series(dtype=float)), errors="coerce")
-        .fillna(0)
-        .sum()
-    )
-    add_summary("all_commits", "all", "fallback_commit_file_occurrences", len(details), "count")
-    add_summary("all_commits", "all", "fallback_unique_repositories", int(details["repo_name"].nunique()) if not details.empty else 0, "count")
-    add_summary("all_commits", "all", "fallback_unique_logical_paths", int(details["logical_file_key"].nunique()) if not details.empty else 0, "count")
-    add_summary("all_commits", "all", "fallback_unique_commits", int(details[COMMIT_KEY_COLS].drop_duplicates().shape[0]) if not details.empty else 0, "count")
-    add_summary("all_commits", "all", "fallback_repeated_occurrences", len(details) - (int(details["logical_file_key"].nunique()) if not details.empty else 0), "count")
-    add_summary("all_commits", "all", "all_regular_python_files", int(all_regular_files), "count")
-    add_summary("all_commits", "all", "fallback_file_share", safe_ratio(len(details), all_regular_files), "proportion")
-    add_summary("all_commits", "all", "fallback_physical_lines", int(fallback_physical_lines_total), "lines")
-    add_summary("all_commits", "all", "all_physical_lines", int(all_physical_lines), "lines")
-    add_summary("all_commits", "all", "fallback_physical_line_share", safe_ratio(fallback_physical_lines_total, all_physical_lines), "proportion")
-    add_summary("all_commits", "all", "fallback_ncloc", int(fallback_ncloc_total), "lines")
-    add_summary("all_commits", "all", "all_snapshot_ncloc", int(all_commit_ncloc), "lines")
-    add_summary("all_commits", "all", "fallback_ncloc_share", safe_ratio(fallback_ncloc_total, all_commit_ncloc), "proportion")
-    add_summary("all_commits", "all", "max_file_fallback_ncloc", int(pd.to_numeric(details.get("fallback_ncloc", pd.Series(dtype=float)), errors="coerce").max()) if not details.empty else 0, "lines")
-    add_summary("all_commits", "all", "median_file_fallback_ncloc", float(pd.to_numeric(details.get("fallback_ncloc", pd.Series(dtype=float)), errors="coerce").median()) if not details.empty else np.nan, "lines")
-    add_summary("all_commits", "all", "max_commit_fallback_ncloc_share", float(by_commit["fallback_ncloc_share"].max()) if not by_commit.empty else np.nan, "proportion")
-    add_summary("all_commits", "all", "median_commit_fallback_ncloc_share", float(by_commit["fallback_ncloc_share"].median()) if not by_commit.empty else np.nan, "proportion")
-
-    main_ncloc_total = float(
-        pd.to_numeric(main_panel["ncloc_python_snapshot"], errors="coerce")
-        .fillna(0)
-        .sum()
-    )
-    main_fallback_ncloc = float(
-        pd.to_numeric(by_repo_month.get("fallback_ncloc", pd.Series(dtype=float)), errors="coerce")
-        .fillna(0)
-        .sum()
-    )
-    add_summary("strict_repo_months", "all", "affected_repo_months", len(by_repo_month), "count")
-    add_summary("strict_repo_months", "all", "strict_snapshot_ncloc", int(main_ncloc_total), "lines")
-    add_summary("strict_repo_months", "all", "fallback_ncloc", int(main_fallback_ncloc), "lines")
-    add_summary("strict_repo_months", "all", "fallback_ncloc_share", safe_ratio(main_fallback_ncloc, main_ncloc_total), "proportion")
-    add_summary("strict_repo_months", "all", "max_repo_month_fallback_ncloc_share", float(by_repo_month["fallback_ncloc_share"].max()) if not by_repo_month.empty else np.nan, "proportion")
-    add_summary("strict_repo_months", "all", "median_affected_repo_month_fallback_ncloc_share", float(by_repo_month["fallback_ncloc_share"].median()) if not by_repo_month.empty else np.nan, "proportion")
-    add_summary("strict_repo_months", "all", "repo_months_fallback_share_gt_1pct", int(by_repo_month["fallback_ncloc_share"].gt(0.01).sum()) if not by_repo_month.empty else 0, "count")
-    add_summary("strict_repo_months", "all", "repo_months_fallback_share_gt_5pct", int(by_repo_month["fallback_ncloc_share"].gt(0.05).sum()) if not by_repo_month.empty else 0, "count")
-
-    for source in ["treatment", "control"]:
-        source_details = details.loc[details["dataset_source"].eq(source)] if not details.empty else details
-        source_commits = commit_ncloc.loc[commit_ncloc["dataset_source"].eq(source)]
-        source_all_files = float(
-            pd.to_numeric(source_commits["regular_python_files_counted"], errors="coerce")
-            .fillna(0)
-            .sum()
-        )
-        source_all_physical_lines = float(
-            pd.to_numeric(source_commits["total_physical_lines"], errors="coerce")
-            .fillna(0)
-            .sum()
-        )
-        source_all_ncloc = float(
-            pd.to_numeric(source_commits["ncloc_python_snapshot"], errors="coerce")
-            .fillna(0)
-            .sum()
-        )
-        source_fallback_physical_lines = float(
-            pd.to_numeric(source_details.get("physical_lines", pd.Series(dtype=float)), errors="coerce")
-            .fillna(0)
-            .sum()
-        )
-        source_fallback_ncloc = float(
-            pd.to_numeric(source_details.get("fallback_ncloc", pd.Series(dtype=float)), errors="coerce")
-            .fillna(0)
-            .sum()
-        )
-        add_summary("all_commits", source, "fallback_commit_file_occurrences", len(source_details), "count")
-        add_summary("all_commits", source, "fallback_unique_repositories", int(source_details["repo_name"].nunique()) if not source_details.empty else 0, "count")
-        add_summary("all_commits", source, "fallback_unique_logical_paths", int(source_details["logical_file_key"].nunique()) if not source_details.empty else 0, "count")
-        add_summary("all_commits", source, "all_regular_python_files", int(source_all_files), "count")
-        add_summary("all_commits", source, "fallback_file_share", safe_ratio(len(source_details), source_all_files), "proportion")
-        add_summary("all_commits", source, "fallback_physical_lines", int(source_fallback_physical_lines), "lines")
-        add_summary("all_commits", source, "all_physical_lines", int(source_all_physical_lines), "lines")
-        add_summary("all_commits", source, "fallback_physical_line_share", safe_ratio(source_fallback_physical_lines, source_all_physical_lines), "proportion")
-        add_summary("all_commits", source, "fallback_ncloc", int(source_fallback_ncloc), "lines")
-        add_summary("all_commits", source, "all_snapshot_ncloc", int(source_all_ncloc), "lines")
-        add_summary("all_commits", source, "fallback_ncloc_share", safe_ratio(source_fallback_ncloc, source_all_ncloc), "proportion")
-
-        source_main = main_panel.loc[main_panel["dataset_source"].eq(source)]
-        source_repo_month = by_repo_month.loc[by_repo_month["dataset_source"].eq(source)] if not by_repo_month.empty else by_repo_month
-        source_main_ncloc = float(
-            pd.to_numeric(source_main["ncloc_python_snapshot"], errors="coerce")
-            .fillna(0)
-            .sum()
-        )
-        source_main_fallback = float(
-            pd.to_numeric(source_repo_month.get("fallback_ncloc", pd.Series(dtype=float)), errors="coerce")
-            .fillna(0)
-            .sum()
-        )
-        add_summary("strict_repo_months", source, "affected_repo_months", len(source_repo_month), "count")
-        add_summary("strict_repo_months", source, "fallback_ncloc", int(source_main_fallback), "lines")
-        add_summary("strict_repo_months", source, "strict_snapshot_ncloc", int(source_main_ncloc), "lines")
-        add_summary("strict_repo_months", source, "fallback_ncloc_share", safe_ratio(source_main_fallback, source_main_ncloc), "proportion")
-
-    for error_type, part in details.groupby("error_type") if not details.empty else []:
-        error_physical_lines = float(pd.to_numeric(part["physical_lines"], errors="coerce").fillna(0).sum())
-        error_ncloc = float(pd.to_numeric(part["fallback_ncloc"], errors="coerce").fillna(0).sum())
-        add_summary("error_type", str(error_type), "fallback_commit_file_occurrences", len(part), "count")
-        add_summary("error_type", str(error_type), "fallback_unique_repositories", int(part["repo_name"].nunique()), "count")
-        add_summary("error_type", str(error_type), "fallback_unique_logical_paths", int(part["logical_file_key"].nunique()), "count")
-        add_summary("error_type", str(error_type), "fallback_physical_lines", int(error_physical_lines), "lines")
-        add_summary("error_type", str(error_type), "share_of_fallback_physical_lines", safe_ratio(error_physical_lines, fallback_physical_lines_total), "proportion")
-        add_summary("error_type", str(error_type), "fallback_ncloc", int(error_ncloc), "lines")
-        add_summary("error_type", str(error_type), "share_of_fallback_ncloc", safe_ratio(error_ncloc, fallback_ncloc_total), "proportion")
-
-    summary = pd.DataFrame(summary_rows)
-    recorder.require_zero(
-        "fallback_impact_summary_nonfinite_proportions",
-        int(
-            (
-                summary["unit"].eq("proportion")
-                & pd.to_numeric(summary["value"], errors="coerce").notna()
-                & ~np.isfinite(pd.to_numeric(summary["value"], errors="coerce"))
-            ).sum()
-        ),
-        "fallback_impact",
-    )
-    recorder.require_zero(
-        "fallback_impact_proportions_outside_zero_one",
-        int(
-            (
-                summary["unit"].eq("proportion")
-                & pd.to_numeric(summary["value"], errors="coerce").notna()
-                & ~pd.to_numeric(summary["value"], errors="coerce").between(0, 1)
-            ).sum()
-        ),
-        "fallback_impact",
-    )
-    return details, by_commit, by_repo_month, summary
 
 
 def main() -> int:
@@ -1686,8 +1256,6 @@ def main() -> int:
                 "relative_path",
                 "snapshot_path",
                 "manifest_line",
-                "content_sha256",
-                "size_bytes_manifest",
                 "fallback_reason",
             ]
         )
@@ -1698,26 +1266,6 @@ def main() -> int:
             True,
             "fallback_audit",
             "Run with --audit-fallback-files to identify exact fallback files.",
-        )
-
-    if args.audit_fallback_files:
-        (
-            fallback_impact_details,
-            fallback_impact_by_commit,
-            fallback_impact_by_repo_month,
-            fallback_impact_summary,
-        ) = build_fallback_impact_outputs(
-            fallback_audit,
-            commit_ncloc,
-            main_panel,
-            recorder,
-        )
-    else:
-        fallback_impact_details = pd.DataFrame()
-        fallback_impact_by_commit = pd.DataFrame()
-        fallback_impact_by_repo_month = pd.DataFrame()
-        fallback_impact_summary = pd.DataFrame(
-            columns=["scope", "group", "metric", "value", "unit", "detail"]
         )
 
     checks = pd.DataFrame(recorder.checks)
@@ -1741,12 +1289,6 @@ def main() -> int:
         "checks_failed": int(checks["status"].eq("FAIL").sum()),
         "fallback_audit_enabled": bool(args.audit_fallback_files),
         "fallback_files_located": len(fallback_audit),
-        "fallback_impact_details_rows": len(fallback_impact_details),
-        "fallback_unique_repositories": int(fallback_impact_details["repo_name"].nunique()) if not fallback_impact_details.empty else 0,
-        "fallback_unique_logical_paths": int(fallback_impact_details["logical_file_key"].nunique()) if not fallback_impact_details.empty else 0,
-        "fallback_ncloc_total": int(pd.to_numeric(fallback_impact_details.get("fallback_ncloc", pd.Series(dtype=float)), errors="coerce").fillna(0).sum()),
-        "fallback_affected_strict_repo_months": len(fallback_impact_by_repo_month),
-        "fallback_max_strict_repo_month_share": float(fallback_impact_by_repo_month["fallback_ncloc_share"].max()) if not fallback_impact_by_repo_month.empty else None,
         "errors": recorder.errors,
     }
 
@@ -1760,10 +1302,6 @@ def main() -> int:
         "detector_metadata": args.output_dir / "agc_detector_provenance_validation.csv",
         "prepare_qc_files": args.output_dir / "agc_prepare_qc_file_validation.csv",
         "fallback_audit": args.output_dir / "agc_python_snapshot_fallback_files.csv",
-        "fallback_impact_details": args.output_dir / "agc_python_snapshot_fallback_impact_details.csv",
-        "fallback_impact_by_commit": args.output_dir / "agc_python_snapshot_fallback_impact_by_commit.csv",
-        "fallback_impact_by_repo_month": args.output_dir / "agc_python_snapshot_fallback_impact_by_repo_month.csv",
-        "fallback_impact_summary": args.output_dir / "agc_python_snapshot_fallback_impact_summary.csv",
     }
 
     atomic_write_json(summary, output_paths["summary"])
@@ -1775,10 +1313,6 @@ def main() -> int:
     atomic_write_csv(detector_metadata, output_paths["detector_metadata"])
     atomic_write_csv(prepare_qc_files, output_paths["prepare_qc_files"])
     atomic_write_csv(fallback_audit, output_paths["fallback_audit"])
-    atomic_write_csv(fallback_impact_details, output_paths["fallback_impact_details"])
-    atomic_write_csv(fallback_impact_by_commit, output_paths["fallback_impact_by_commit"])
-    atomic_write_csv(fallback_impact_by_repo_month, output_paths["fallback_impact_by_repo_month"])
-    atomic_write_csv(fallback_impact_summary, output_paths["fallback_impact_summary"])
 
     print("=" * 72)
     print("AGC DiD input validation")
@@ -1788,8 +1322,6 @@ def main() -> int:
     print(f"Checks passed:       {summary['checks_passed']}/{summary['checks_total']}")
     print(f"Checks failed:       {summary['checks_failed']}")
     print(f"Fallback files:      {len(fallback_audit)}")
-    print(f"Fallback NCLOC:      {summary['fallback_ncloc_total']}")
-    print(f"Affected strict rows:{summary['fallback_affected_strict_repo_months']:>7}")
     print(f"Validation output:   {args.output_dir}")
     print(f"Summary:             {output_paths['summary']}")
     print("=" * 72)

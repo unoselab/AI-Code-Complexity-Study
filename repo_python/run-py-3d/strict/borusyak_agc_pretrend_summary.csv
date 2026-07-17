@@ -1,0 +1,7 @@
+panel,specification,specification_label,outcome,outcome_label,pre_periods_available,pre_periods_ci_excludes_zero,all_preperiod_cis_include_zero,max_absolute_pretrend_estimate
+strict,paper_ncloc,Paper NCLOC,agc_class_block_ratio,AGC-like Class Block Share,5,0,TRUE,0.0177856628149149
+strict,paper_ncloc,Paper NCLOC,agc_function_block_ratio,AGC-like Function Block Share,5,1,FALSE,0.0226191808260162
+strict,paper_ncloc,Paper NCLOC,agc_top_level_block_ratio,AGC-like Top-Level Block Share,5,0,TRUE,0.0272452559804528
+strict,python_snapshot_ncloc,Python Snapshot NCLOC,agc_class_block_ratio,AGC-like Class Block Share,5,0,TRUE,0.0172960233642275
+strict,python_snapshot_ncloc,Python Snapshot NCLOC,agc_function_block_ratio,AGC-like Function Block Share,5,2,FALSE,0.0231493181099923
+strict,python_snapshot_ncloc,Python Snapshot NCLOC,agc_top_level_block_ratio,AGC-like Top-Level Block Share,5,0,TRUE,0.027012727806199

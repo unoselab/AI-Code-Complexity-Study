@@ -8,8 +8,7 @@ set -euo pipefail
 #   Independently validate the strict AGC DiD input produced by run-py-3b.
 #   The validator checks panel dimensions, event-time indicators, block-count
 #   arithmetic, ratio consistency, NCLOC readiness, detector provenance, and
-#   the mismatch/error artifacts created during preparation. When fallback
-#   auditing is enabled, it also quantifies the fallback line-volume impact.
+#   the mismatch/error artifacts created during preparation.
 #
 # Inputs:
 #   repo_python/run-py-3b/strict/panel_event_monthly_agc_py.csv
@@ -262,10 +261,6 @@ EXPECTED_OUTPUTS=(
   "${VALIDATION_DIR}/agc_detector_provenance_validation.csv"
   "${VALIDATION_DIR}/agc_prepare_qc_file_validation.csv"
   "${VALIDATION_DIR}/agc_python_snapshot_fallback_files.csv"
-  "${VALIDATION_DIR}/agc_python_snapshot_fallback_impact_details.csv"
-  "${VALIDATION_DIR}/agc_python_snapshot_fallback_impact_by_commit.csv"
-  "${VALIDATION_DIR}/agc_python_snapshot_fallback_impact_by_repo_month.csv"
-  "${VALIDATION_DIR}/agc_python_snapshot_fallback_impact_summary.csv"
 )
 
 for output_path in "${EXPECTED_OUTPUTS[@]}"; do
@@ -285,11 +280,6 @@ if summary.get("status") != "PASS":
 print("Validation status:", summary["status"])
 print("Checks passed:", f"{summary['checks_passed']}/{summary['checks_total']}")
 print("Fallback files located:", summary["fallback_files_located"])
-print("Fallback unique repositories:", summary["fallback_unique_repositories"])
-print("Fallback unique logical paths:", summary["fallback_unique_logical_paths"])
-print("Fallback NCLOC:", summary["fallback_ncloc_total"])
-print("Affected strict repo-months:", summary["fallback_affected_strict_repo_months"])
-print("Maximum strict repo-month share:", summary["fallback_max_strict_repo_month_share"])
 PY
 
 echo
@@ -298,6 +288,4 @@ echo "${RUN_PREFIX} completed successfully."
 echo "Validation summary: ${SUMMARY_FILE}"
 echo "Validation checks:  ${VALIDATION_DIR}/agc_did_input_validation_checks.csv"
 echo "Fallback audit:     ${VALIDATION_DIR}/agc_python_snapshot_fallback_files.csv"
-echo "Fallback impact:    ${VALIDATION_DIR}/agc_python_snapshot_fallback_impact_summary.csv"
-echo "Fallback details:   ${VALIDATION_DIR}/agc_python_snapshot_fallback_impact_details.csv"
 echo "============================================================"

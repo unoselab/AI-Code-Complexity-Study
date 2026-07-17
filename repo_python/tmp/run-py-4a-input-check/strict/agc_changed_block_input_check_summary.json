@@ -1,0 +1,21 @@
+{
+  "alignment_files_checked": 50,
+  "alignment_mismatches": 0,
+  "checks_failed": 0,
+  "checks_passed": 14,
+  "checks_total": 14,
+  "clone_commit_failures": 0,
+  "clone_commit_rows_checked": 1663,
+  "consecutive_month_pairs": 2823,
+  "detector_block_rows": {
+    "control": 338634,
+    "treatment": 1155087
+  },
+  "git_diff_failures": 0,
+  "git_diff_pairs_checked": 50,
+  "manifest_rows": 3043,
+  "monthly_pairs": 2823,
+  "output_dir": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-4a-input-check/strict",
+  "same_commit_pairs": 1380,
+  "status": "PASS"
+}

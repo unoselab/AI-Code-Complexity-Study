@@ -1,0 +1,4 @@
+outcome,outcome_label,rows,repositories,treatment_rows,control_rows,treatment_repositories,control_repositories,min_time,max_time
+agc_top_level_block_ratio,AGC-like Top-Level Block Share,1568,214,842,726,100,114,2024-01,2025-08
+agc_function_block_ratio,AGC-like Function Block Share,1554,211,839,715,100,111,2024-01,2025-08
+agc_class_block_ratio,AGC-like Class Block Share,1462,194,795,667,96,98,2024-01,2025-08

@@ -1,0 +1,29 @@
+{
+  "base_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-3b/strict/panel_event_monthly_agc_py.csv",
+  "base_panel_rows": 1633,
+  "changed_agc_top_level_blocks": 23595,
+  "changed_hwc_top_level_blocks": 139945,
+  "changed_top_level_blocks": 163540,
+  "checks_failed": 0,
+  "checks_passed": 11,
+  "checks_total": 11,
+  "classification_file": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/changed_block_classifications_py.csv",
+  "classification_rows": 415818,
+  "elapsed_seconds": 392.27,
+  "input_manifest": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-3a/strict/repo_month_snapshot_manifest.csv",
+  "manifest_rows": 3043,
+  "outcome_file": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/repo_month_agc_changed_block_outcomes_py.csv",
+  "output_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv",
+  "output_panel_rows": 1633,
+  "pair_errors": 0,
+  "pair_status_counts": {
+    "no_previous_month": 220,
+    "processed": 1443,
+    "same_commit": 1380
+  },
+  "prediction_mismatches": 0,
+  "repo_months_with_changed_blocks": 1127,
+  "repo_months_with_ratio": 1127,
+  "repositories": 220,
+  "status": "PASS"
+}

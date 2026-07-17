@@ -1,0 +1,15 @@
+section,check,passed,value
+manifest,required_columns_present,1,
+manifest,unique_source_repo_month,1,0
+manifest,repo_month_rows,1,3043
+manifest,monthly_pairs,1,2823
+manifest,consecutive_month_pairs,1,2823
+manifest,nonconsecutive_month_pairs,1,0
+block_predictions,treatment_schema_and_key,1,1155087
+block_predictions,control_schema_and_key,1,338634
+block_alignment,sample_files_checked,1,50
+block_alignment,snapshot_content_hash_matches,1,0
+block_alignment,detector_keys_reproduced_exactly,1,0
+clone_commits,all_clone_directories_exist,1,0
+clone_commits,all_manifest_commits_exist,1,0
+git_diff,sample_monthly_diffs_succeed,1,0

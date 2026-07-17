@@ -1,0 +1,12 @@
+section,check,passed,value
+upstream,input_check_pass,1,PASS
+predictions,filtered_prediction_keys_unique,1,0
+processing,pair_errors_zero,1,0
+processing,prediction_mismatches_zero,1,0
+panel,base_rows_preserved,1,output=1633 input=1633
+panel,base_rows_all_matched,1,0
+panel,unique_source_repo_month,1,0
+outcomes,agc_hwc_arithmetic,1,0
+outcomes,ratio_arithmetic,1,0
+outcomes,changed_decomposition,1,0
+cross_file,pair_qc_matches_outcomes,1,pair_qc=163540 outcomes=163540

@@ -1,0 +1,913 @@
+---
+title: "Diff-in-Diff Borusyak: AI-Generated-Like Code Outcomes"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+params:
+  panel_file: "repo_python/run-py-3b/strict/panel_event_monthly_agc_py.csv"
+  validation_summary_file: "repo_python/tmp/run-py-3c/strict/agc_did_input_validation_summary.json"
+  helper_file: "proc_r/diff_in_diff_borusyak_helpers.R"
+  out_dir: "repo_python/run-py-3d/strict"
+  panel_label: "strict"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- Sys.getenv("PROJECT_ROOT", unset = normalizePath(".", mustWork = TRUE))
+project_root <- normalizePath(project_root, mustWork = TRUE)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || identical(path_value, "")) {
+    return("")
+  }
+
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(params$panel_file)
+validation_summary_path <- resolve_project_path(params$validation_summary_file)
+helper_path <- resolve_project_path(params$helper_file)
+out_dir <- resolve_project_path(params$out_dir)
+panel_label <- as.character(params$panel_label)
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+# Purpose
+
+This notebook estimates the effect of observed Cursor adoption on repository-month AI-generated-like code outcomes using the Borusyak et al. imputation difference-in-differences estimator.
+
+The primary outcome is the proportion of scored top-level Python function and class blocks whose AST-based structural representations are classified as AI-generated-like. Function-only and class-only proportions are analyzed as robustness outcomes.
+
+Two adjusted specifications are compared on the same complete-case sample for each outcome:
+
+1. **Paper NCLOC specification:** uses `ncloc_paper` from the frozen paper panel.
+2. **Python snapshot NCLOC specification:** uses `ncloc_python_snapshot` calculated from the exact exported historical Python snapshot.
+
+The outcome captures structural patterns associated with AI-generated code. It does not establish the actual provenance of an individual block or identify which AI tool generated or assisted with it.
+
+Because the outcomes are proportions, coefficients are reported in both proportion units and percentage points. They are not transformed with `exp(beta) - 1`.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+library(jsonlite)
+
+if (!file.exists(helper_path)) {
+  stop("Borusyak helper file not found: ", helper_path)
+}
+
+source(helper_path)
+```
+
+# Utility Functions
+
+```{r utility-functions}
+normalize_yyyymm <- function(x) {
+  x <- as.character(x)
+  x[x %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+  x <- gsub("-", "", x)
+  suppressWarnings(as.integer(x))
+}
+
+yyyymm_to_month_id <- function(x) {
+  x <- as.integer(x)
+  year <- x %/% 100L
+  month <- x %% 100L
+
+  out <- year * 12L + month
+  out[is.na(x) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+numeric_if_present <- function(data, columns) {
+  for (column_name in intersect(columns, names(data))) {
+    set(
+      data,
+      j = column_name,
+      value = suppressWarnings(as.numeric(data[[column_name]]))
+    )
+  }
+
+  invisible(data)
+}
+
+safe_ratio <- function(numerator, denominator) {
+  out <- rep(NA_real_, length(denominator))
+  valid <- !is.na(numerator) & !is.na(denominator) & denominator > 0
+  out[valid] <- numerator[valid] / denominator[valid]
+  out
+}
+
+empty_model_error_table <- function() {
+  data.frame(
+    panel = character(),
+    specification = character(),
+    outcome = character(),
+    model_type = character(),
+    error = character(),
+    stringsAsFactors = FALSE
+  )
+}
+```
+
+# Validate the Upstream Input
+
+```{r validate-upstream}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Validation summary:", validation_summary_path, "\n")
+cat("Output directory:", out_dir, "\n")
+cat("Panel label:", panel_label, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("AGC DiD input panel not found: ", panel_path)
+}
+
+if (!file.exists(validation_summary_path)) {
+  stop("run-py-3c validation summary not found: ", validation_summary_path)
+}
+
+validation_summary <- jsonlite::fromJSON(validation_summary_path)
+
+if (is.null(validation_summary$status) || validation_summary$status != "PASS") {
+  stop(
+    "run-py-3c validation status must be PASS. Found: ",
+    validation_summary$status
+  )
+}
+
+if (!is.null(validation_summary$checks_failed) &&
+    as.integer(validation_summary$checks_failed) != 0L) {
+  stop(
+    "run-py-3c validation reports failed checks: ",
+    validation_summary$checks_failed
+  )
+}
+
+cat("Validated upstream rows:", validation_summary$rows, "\n")
+cat("Validated upstream repositories:", validation_summary$repositories, "\n")
+cat("Validated upstream checks:", validation_summary$checks_passed,
+    "/", validation_summary$checks_total, "\n")
+```
+
+# Load and Normalize the AGC Panel
+
+```{r load-panel}
+panel_raw <- fread(panel_path)
+
+required_columns <- c(
+  "repo_name",
+  "time",
+  "dataset_source",
+  "event",
+  "post_event",
+  "time_to_event",
+  "is_treatment",
+  "contributors",
+  "stars",
+  "issues",
+  "age",
+  "ncloc_paper",
+  "ncloc_python_snapshot",
+  "top_level_blocks_scored",
+  "agc_top_level_blocks",
+  "human_top_level_blocks",
+  "agc_top_level_block_ratio",
+  "function_blocks_scored",
+  "agc_function_blocks",
+  "human_function_blocks",
+  "agc_function_block_ratio",
+  "class_blocks_scored",
+  "agc_class_blocks",
+  "human_class_blocks",
+  "agc_class_block_ratio"
+)
+
+require_columns(panel_raw, required_columns, "AGC DiD input panel")
+
+numeric_columns <- c(
+  "post_event",
+  "time_to_event",
+  "is_treatment",
+  "contributors",
+  "stars",
+  "issues",
+  "age",
+  "ncloc_paper",
+  "ncloc_python_snapshot",
+  "top_level_blocks_scored",
+  "agc_top_level_blocks",
+  "human_top_level_blocks",
+  "agc_top_level_block_ratio",
+  "function_blocks_scored",
+  "agc_function_blocks",
+  "human_function_blocks",
+  "agc_function_block_ratio",
+  "class_blocks_scored",
+  "agc_class_blocks",
+  "human_class_blocks",
+  "agc_class_block_ratio"
+)
+
+numeric_if_present(panel_raw, numeric_columns)
+
+panel_raw[, time_yyyymm := normalize_yyyymm(time)]
+panel_raw[, event_yyyymm := normalize_yyyymm(event)]
+panel_raw[dataset_source == "control", event_yyyymm := 0L]
+
+panel_raw[, time_id := yyyymm_to_month_id(time_yyyymm)]
+panel_raw[, event_id := fifelse(
+  dataset_source == "control",
+  0L,
+  yyyymm_to_month_id(event_yyyymm)
+)]
+
+panel_raw[, repo_name_str := repo_name]
+panel_raw[, repo_id := as.integer(factor(repo_name_str))]
+panel_raw[, ever_treated := as.integer(dataset_source == "treatment")]
+
+# Match the original paper covariate scaling. NCLOC remains on its raw scale.
+panel_raw[, age_log := fifelse(!is.na(age) & age >= 0, log1p(age), NA_real_)]
+panel_raw[, contributors_log := fifelse(
+  !is.na(contributors) & contributors >= 0,
+  log1p(contributors),
+  NA_real_
+)]
+panel_raw[, stars_log := fifelse(
+  !is.na(stars) & stars >= 0,
+  log1p(stars),
+  NA_real_
+)]
+panel_raw[, issues_log := fifelse(
+  !is.na(issues) & issues >= 0,
+  log1p(issues),
+  NA_real_
+)]
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repositories:", uniqueN(panel_raw$repo_name), "\n")
+cat("Treatment rows:", sum(panel_raw$dataset_source == "treatment"), "\n")
+cat("Control rows:", sum(panel_raw$dataset_source == "control"), "\n")
+cat("Calendar range:", min(panel_raw$time, na.rm = TRUE), "to",
+    max(panel_raw$time, na.rm = TRUE), "\n")
+```
+
+# Panel Sanity Checks
+
+```{r panel-checks}
+key_columns <- c("repo_name", "time", "dataset_source")
+duplicate_keys <- duplicated(panel_raw, by = key_columns)
+
+recomputed_time_to_event <- rep(NA_real_, nrow(panel_raw))
+treated_idx <- panel_raw$dataset_source == "treatment"
+recomputed_time_to_event[treated_idx] <-
+  panel_raw$time_id[treated_idx] - panel_raw$event_id[treated_idx]
+
+panel_checks <- data.frame(
+  check = c(
+    "panel_label",
+    "rows",
+    "repositories",
+    "treatment_rows",
+    "control_rows",
+    "treatment_repositories",
+    "control_repositories",
+    "duplicate_keys",
+    "time_id_missing",
+    "treatment_event_id_missing",
+    "control_event_id_nonzero",
+    "is_treatment_post_event_mismatch",
+    "time_to_event_mismatch",
+    "top_level_count_mismatch",
+    "function_count_mismatch",
+    "class_count_mismatch",
+    "top_level_ratio_mismatch",
+    "function_ratio_mismatch",
+    "class_ratio_mismatch",
+    "ncloc_paper_nonmissing",
+    "ncloc_python_snapshot_nonmissing",
+    "upstream_validation_status",
+    "upstream_checks_failed"
+  ),
+  value = c(
+    panel_label,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    sum(panel_raw$dataset_source == "treatment"),
+    sum(panel_raw$dataset_source == "control"),
+    uniqueN(panel_raw[dataset_source == "treatment", repo_name]),
+    uniqueN(panel_raw[dataset_source == "control", repo_name]),
+    sum(duplicate_keys),
+    sum(is.na(panel_raw$time_id)),
+    sum(panel_raw$dataset_source == "treatment" & is.na(panel_raw$event_id)),
+    sum(panel_raw$dataset_source == "control" & panel_raw$event_id != 0L),
+    sum(panel_raw$is_treatment != panel_raw$post_event, na.rm = TRUE),
+    sum(
+      panel_raw$dataset_source == "treatment" &
+        !is.na(panel_raw$time_to_event) &
+        panel_raw$time_to_event != recomputed_time_to_event,
+      na.rm = TRUE
+    ),
+    sum(
+      panel_raw$top_level_blocks_scored !=
+        panel_raw$function_blocks_scored + panel_raw$class_blocks_scored,
+      na.rm = TRUE
+    ),
+    sum(
+      panel_raw$function_blocks_scored !=
+        panel_raw$agc_function_blocks + panel_raw$human_function_blocks,
+      na.rm = TRUE
+    ),
+    sum(
+      panel_raw$class_blocks_scored !=
+        panel_raw$agc_class_blocks + panel_raw$human_class_blocks,
+      na.rm = TRUE
+    ),
+    sum(
+      abs(
+        panel_raw$agc_top_level_block_ratio -
+          safe_ratio(
+            panel_raw$agc_top_level_blocks,
+            panel_raw$top_level_blocks_scored
+          )
+      ) > 1e-12,
+      na.rm = TRUE
+    ),
+    sum(
+      abs(
+        panel_raw$agc_function_block_ratio -
+          safe_ratio(
+            panel_raw$agc_function_blocks,
+            panel_raw$function_blocks_scored
+          )
+      ) > 1e-12,
+      na.rm = TRUE
+    ),
+    sum(
+      abs(
+        panel_raw$agc_class_block_ratio -
+          safe_ratio(
+            panel_raw$agc_class_blocks,
+            panel_raw$class_blocks_scored
+          )
+      ) > 1e-12,
+      na.rm = TRUE
+    ),
+    sum(!is.na(panel_raw$ncloc_paper)),
+    sum(!is.na(panel_raw$ncloc_python_snapshot)),
+    validation_summary$status,
+    validation_summary$checks_failed
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(panel_checks)
+
+fwrite(
+  panel_checks,
+  file.path(out_dir, "borusyak_agc_panel_checks.csv")
+)
+
+hard_failure_checks <- c(
+  sum(duplicate_keys),
+  sum(is.na(panel_raw$time_id)),
+  sum(panel_raw$dataset_source == "treatment" & is.na(panel_raw$event_id)),
+  sum(panel_raw$dataset_source == "control" & panel_raw$event_id != 0L),
+  sum(panel_raw$is_treatment != panel_raw$post_event, na.rm = TRUE)
+)
+
+if (any(hard_failure_checks != 0)) {
+  stop("AGC panel sanity checks failed. See borusyak_agc_panel_checks.csv.")
+}
+```
+
+# Outcomes and Specifications
+
+```{r outcomes-and-specifications}
+outcome_definitions <- data.frame(
+  outcome = c(
+    "agc_top_level_block_ratio",
+    "agc_function_block_ratio",
+    "agc_class_block_ratio"
+  ),
+  outcome_label = c(
+    "AGC-like Top-Level Block Share",
+    "AGC-like Function Block Share",
+    "AGC-like Class Block Share"
+  ),
+  denominator = c(
+    "top_level_blocks_scored",
+    "function_blocks_scored",
+    "class_blocks_scored"
+  ),
+  role = c("primary", "robustness", "robustness"),
+  stringsAsFactors = FALSE
+)
+
+specification_definitions <- data.frame(
+  specification = c("paper_ncloc", "python_snapshot_ncloc"),
+  specification_label = c(
+    "Paper NCLOC",
+    "Python Snapshot NCLOC"
+  ),
+  ncloc_column = c("ncloc_paper", "ncloc_python_snapshot"),
+  stringsAsFactors = FALSE
+)
+
+print(outcome_definitions)
+print(specification_definitions)
+```
+
+# Prepare Common Samples
+
+```{r prepare-common-samples}
+common_covariates <- c(
+  "age_log",
+  "contributors_log",
+  "stars_log",
+  "issues_log",
+  "ncloc_paper",
+  "ncloc_python_snapshot"
+)
+
+common_samples <- list()
+sample_summary_rows <- list()
+
+for (outcome_var in outcome_definitions$outcome) {
+  required <- c(
+    "repo_id",
+    "time_id",
+    "event_id",
+    "dataset_source",
+    outcome_var,
+    common_covariates
+  )
+
+  sample_data <- copy(panel_raw)
+  sample_data <- sample_data[complete.cases(sample_data[, ..required])]
+
+  if (nrow(sample_data) == 0) {
+    stop("No complete rows remain for outcome: ", outcome_var)
+  }
+
+  sample_data[, sample_key := paste(repo_name, time, dataset_source, sep = "|")]
+  common_samples[[outcome_var]] <- sample_data
+
+  sample_summary_rows[[length(sample_summary_rows) + 1]] <- data.frame(
+    outcome = outcome_var,
+    outcome_label = outcome_definitions$outcome_label[
+      match(outcome_var, outcome_definitions$outcome)
+    ],
+    rows = nrow(sample_data),
+    repositories = uniqueN(sample_data$repo_id),
+    treatment_rows = sum(sample_data$dataset_source == "treatment"),
+    control_rows = sum(sample_data$dataset_source == "control"),
+    treatment_repositories = uniqueN(
+      sample_data[dataset_source == "treatment", repo_id]
+    ),
+    control_repositories = uniqueN(
+      sample_data[dataset_source == "control", repo_id]
+    ),
+    min_time = min(sample_data$time),
+    max_time = max(sample_data$time),
+    stringsAsFactors = FALSE
+  )
+}
+
+sample_summary <- bind_rows(sample_summary_rows)
+print(sample_summary)
+
+fwrite(
+  sample_summary,
+  file.path(out_dir, "borusyak_agc_sample_by_outcome.csv")
+)
+```
+
+# First-Stage Definition
+
+```{r first-stage}
+first_stage_formula <-
+  ~ age_log + ncloc_model + contributors_log + stars_log + issues_log |
+    repo_id + time_id
+
+cat("First-stage formula shared by both specifications:\n")
+print(first_stage_formula)
+cat("\nOnly ncloc_model changes between the two specifications.\n")
+```
+
+# Static Borusyak Effects
+
+```{r static-effects}
+static_rows <- list()
+model_error_rows <- list()
+
+for (outcome_var in outcome_definitions$outcome) {
+  base_sample <- common_samples[[outcome_var]]
+  outcome_label <- outcome_definitions$outcome_label[
+    match(outcome_var, outcome_definitions$outcome)
+  ]
+
+  for (spec_index in seq_len(nrow(specification_definitions))) {
+    specification <- specification_definitions$specification[spec_index]
+    specification_label <-
+      specification_definitions$specification_label[spec_index]
+    ncloc_column <- specification_definitions$ncloc_column[spec_index]
+
+    model_data <- copy(base_sample)
+    model_data[, ncloc_model := get(ncloc_column)]
+
+    cat(
+      "Running static Borusyak model:",
+      specification,
+      "|",
+      outcome_var,
+      "| rows =",
+      nrow(model_data),
+      "\n"
+    )
+
+    result <- tryCatch(
+      run_borusyak_static(
+        data = model_data,
+        outcome_var = outcome_var,
+        first_stage_formula = first_stage_formula,
+        idname = "repo_id",
+        tname = "time_id",
+        gname = "event_id"
+      ),
+      error = function(e) {
+        model_error_rows[[length(model_error_rows) + 1]] <<- data.frame(
+          panel = panel_label,
+          specification = specification,
+          outcome = outcome_var,
+          model_type = "static",
+          error = conditionMessage(e),
+          stringsAsFactors = FALSE
+        )
+        NULL
+      }
+    )
+
+    extracted <- extract_static_result(result, outcome_var)
+    extracted$panel <- panel_label
+    extracted$specification <- specification
+    extracted$specification_label <- specification_label
+    extracted$ncloc_column <- ncloc_column
+    extracted$outcome_label <- outcome_label
+    extracted$sample_rows <- nrow(model_data)
+    extracted$sample_repositories <- uniqueN(model_data$repo_id)
+    extracted$estimate_percentage_points <- extracted$estimate * 100
+    extracted$conf_low_percentage_points <- extracted$conf_low * 100
+    extracted$conf_high_percentage_points <- extracted$conf_high * 100
+
+    static_rows[[length(static_rows) + 1]] <- extracted
+  }
+}
+
+static_df <- bind_rows(static_rows)
+print(static_df)
+
+fwrite(
+  static_df,
+  file.path(out_dir, "borusyak_agc_static_effects.csv")
+)
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_rows <- list()
+
+for (outcome_var in outcome_definitions$outcome) {
+  base_sample <- common_samples[[outcome_var]]
+  outcome_label <- outcome_definitions$outcome_label[
+    match(outcome_var, outcome_definitions$outcome)
+  ]
+
+  for (spec_index in seq_len(nrow(specification_definitions))) {
+    specification <- specification_definitions$specification[spec_index]
+    specification_label <-
+      specification_definitions$specification_label[spec_index]
+    ncloc_column <- specification_definitions$ncloc_column[spec_index]
+
+    model_data <- copy(base_sample)
+    model_data[, ncloc_model := get(ncloc_column)]
+
+    cat(
+      "Running dynamic Borusyak model:",
+      specification,
+      "|",
+      outcome_var,
+      "| rows =",
+      nrow(model_data),
+      "\n"
+    )
+
+    result <- tryCatch(
+      run_borusyak_dynamic(
+        data = model_data,
+        outcome_var = outcome_var,
+        first_stage_formula = first_stage_formula,
+        horizon = -6:6,
+        pretrends = -6:-2,
+        idname = "repo_id",
+        tname = "time_id",
+        gname = "event_id"
+      ),
+      error = function(e) {
+        model_error_rows[[length(model_error_rows) + 1]] <<- data.frame(
+          panel = panel_label,
+          specification = specification,
+          outcome = outcome_var,
+          model_type = "dynamic",
+          error = conditionMessage(e),
+          stringsAsFactors = FALSE
+        )
+        NULL
+      }
+    )
+
+    extracted <- extract_dynamic_result(
+      result,
+      outcome = outcome_var,
+      outcome_label = outcome_label,
+      min_horizon = -6,
+      max_horizon = 6
+    )
+
+    if (nrow(extracted) > 0) {
+      extracted$panel <- panel_label
+      extracted$specification <- specification
+      extracted$specification_label <- specification_label
+      extracted$ncloc_column <- ncloc_column
+      extracted$sample_rows <- nrow(model_data)
+      extracted$sample_repositories <- uniqueN(model_data$repo_id)
+      extracted$estimate_percentage_points <- extracted$estimate * 100
+      extracted$conf_low_percentage_points <- extracted$conf_low * 100
+      extracted$conf_high_percentage_points <- extracted$conf_high * 100
+
+      dynamic_rows[[length(dynamic_rows) + 1]] <- extracted
+    }
+  }
+}
+
+dynamic_df <- bind_rows(dynamic_rows)
+print(dynamic_df)
+
+fwrite(
+  dynamic_df,
+  file.path(out_dir, "borusyak_agc_dynamic_effects.csv")
+)
+
+model_errors <- if (length(model_error_rows) > 0) {
+  bind_rows(model_error_rows)
+} else {
+  empty_model_error_table()
+}
+
+fwrite(
+  model_errors,
+  file.path(out_dir, "borusyak_agc_model_errors.csv")
+)
+
+if (nrow(model_errors) > 0) {
+  print(model_errors)
+  stop("One or more Borusyak models failed. See borusyak_agc_model_errors.csv.")
+}
+```
+
+# Pre-Treatment Diagnostics
+
+```{r pretrend-diagnostics}
+if (nrow(dynamic_df) > 0) {
+  pretrend_summary <- dynamic_df %>%
+    filter(time >= -6, time <= -2) %>%
+    group_by(
+      panel,
+      specification,
+      specification_label,
+      outcome,
+      outcome_label
+    ) %>%
+    summarise(
+      pre_periods_available = n(),
+      pre_periods_ci_excludes_zero = sum(significant %in% TRUE, na.rm = TRUE),
+      all_preperiod_cis_include_zero = all(!(significant %in% TRUE)),
+      max_absolute_pretrend_estimate = max(abs(estimate), na.rm = TRUE),
+      .groups = "drop"
+    )
+} else {
+  pretrend_summary <- data.frame()
+}
+
+print(pretrend_summary)
+
+fwrite(
+  pretrend_summary,
+  file.path(out_dir, "borusyak_agc_pretrend_summary.csv")
+)
+```
+
+# Static Effect Table
+
+```{r static-table}
+static_display <- static_df %>%
+  select(
+    specification_label,
+    outcome_label,
+    estimate_percentage_points,
+    conf_low_percentage_points,
+    conf_high_percentage_points,
+    sample_rows,
+    sample_repositories,
+    note
+  ) %>%
+  arrange(outcome_label, specification_label)
+
+knitr::kable(
+  static_display,
+  digits = 3,
+  caption = paste(
+    "Static Borusyak Effects on AGC-Like Block Shares",
+    "(percentage points)"
+  )
+)
+```
+
+# Dynamic Event-Study Plot
+
+```{r dynamic-plot, fig.width=12, fig.height=6}
+if (nrow(dynamic_df) > 0) {
+  dynamic_plot_data <- copy(as.data.table(dynamic_df))
+  dynamic_plot_data[, outcome_label := factor(
+    outcome_label,
+    levels = outcome_definitions$outcome_label
+  )]
+  dynamic_plot_data[, specification_label := factor(
+    specification_label,
+    levels = specification_definitions$specification_label
+  )]
+
+  position <- position_dodge(width = 0.35)
+
+  dynamic_plot <- ggplot(
+    dynamic_plot_data,
+    aes(
+      x = time,
+      y = estimate_percentage_points,
+      color = specification_label,
+      group = specification_label
+    )
+  ) +
+    geom_errorbar(
+      aes(
+        ymin = conf_low_percentage_points,
+        ymax = conf_high_percentage_points,
+        linetype = significant
+      ),
+      position = position,
+      width = 0.3
+    ) +
+    geom_point(
+      aes(shape = significant),
+      position = position,
+      size = 1.8
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    scale_shape_manual(
+      values = c("TRUE" = 19, "FALSE" = 1),
+      name = "CI excludes zero"
+    ) +
+    scale_linetype_manual(
+      values = c("TRUE" = "solid", "FALSE" = "dotted"),
+      name = "CI excludes zero"
+    ) +
+    facet_wrap(~ outcome_label, scales = "free_y", ncol = 1) +
+    labs(
+      title = paste("Borusyak AGC DiD:", panel_label),
+      subtitle = paste(
+        "Common outcome-specific samples;",
+        "paper NCLOC versus exact Python snapshot NCLOC"
+      ),
+      x = "Months Relative to First Observed Cursor Adoption",
+      y = "Treatment Effect (percentage points)",
+      color = "Specification",
+      caption = paste(
+        "Outcomes are AGC-like block proportions.",
+        "Filled points indicate that the confidence interval excludes zero."
+      )
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      legend.position = "bottom",
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
+
+  print(dynamic_plot)
+
+  ggsave(
+    filename = file.path(out_dir, "dynamic_effects_borusyak_agc.pdf"),
+    plot = dynamic_plot,
+    width = 12,
+    height = 6
+  )
+} else {
+  cat("No dynamic effects are available to plot.\n")
+}
+```
+
+# Model Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "source_notebook",
+    "helper_file",
+    "panel_label",
+    "panel_path",
+    "validation_summary_path",
+    "validation_status",
+    "validation_checks_passed",
+    "validation_checks_total",
+    "out_dir",
+    "outcomes",
+    "primary_outcome",
+    "specifications",
+    "common_covariates",
+    "first_stage_formula",
+    "time_encoding",
+    "dynamic_horizon",
+    "pretrend_horizon",
+    "outcome_scale",
+    "interpretation",
+    "limitation"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_AGC.Rmd",
+    "DiffInDiffBorusyak.Rmd",
+    params$helper_file,
+    panel_label,
+    panel_path,
+    validation_summary_path,
+    validation_summary$status,
+    validation_summary$checks_passed,
+    validation_summary$checks_total,
+    out_dir,
+    paste(outcome_definitions$outcome, collapse = ", "),
+    "agc_top_level_block_ratio",
+    paste(specification_definitions$specification, collapse = ", "),
+    paste(common_covariates, collapse = ", "),
+    paste(deparse(first_stage_formula), collapse = " "),
+    "sequential calendar-month id",
+    "-6 through +6 months",
+    "-6 through -2 months",
+    "proportion; reported as percentage points",
+    paste(
+      "Change in the repository-month share of top-level Python blocks",
+      "classified as AI-generated-like after observed Cursor adoption"
+    ),
+    paste(
+      "The detector outcome captures structural similarity to AI-generated",
+      "code and does not establish block provenance or tool identity."
+    )
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(metadata)
+
+fwrite(
+  metadata,
+  file.path(out_dir, "borusyak_agc_model_metadata.csv")
+)
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```
