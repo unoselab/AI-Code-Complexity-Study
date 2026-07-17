@@ -1,0 +1,16 @@
+repo_name,time,dataset_source,is_treatment,event,post_event,time_to_event
+Elevate-Code/better-voice-typing,2025-08,treatment,1,2024-10,1,10.0
+OpenMOSS/Language-Model-SAEs,2025-08,treatment,1,2024-12,1,8.0
+OpenSPP/openspp-modules,2025-08,treatment,1,2025-03,1,5.0
+sirkirby/unifi-network-rules,2025-08,treatment,1,2025-03,1,5.0
+vietanhdev/anylabeling,2025-07,treatment,1,2025-03,1,4.0
+JustinSparrrow/IOOI-EmotionEgg,2025-03,control,0,,0,
+JustinSparrrow/IOOI-EmotionEgg,2025-04,control,0,,0,
+Simatwa/free-proxies,2024-06,control,0,,0,
+Simatwa/free-proxies,2024-07,control,0,,0,
+Simatwa/free-proxies,2024-08,control,0,,0,
+Simatwa/free-proxies,2024-09,control,0,,0,
+Simatwa/free-proxies,2024-10,control,0,,0,
+Simatwa/free-proxies,2024-11,control,0,,0,
+Simatwa/free-proxies,2025-08,control,0,,0,
+monero-project/meta,2025-05,control,0,,0,

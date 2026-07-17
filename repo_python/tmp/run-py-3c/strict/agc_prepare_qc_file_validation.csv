@@ -1,0 +1,6 @@
+file,path,data_rows,status
+agc_block_kind_aggregation_mismatches.csv,repo_python/tmp/run-py-3b/strict/agc_block_kind_aggregation_mismatches.csv,0,PASS
+agc_paper_duplicate_key_conflicts.csv,repo_python/tmp/run-py-3b/strict/agc_paper_duplicate_key_conflicts.csv,0,PASS
+agc_python_snapshot_ncloc_failures.csv,repo_python/tmp/run-py-3b/strict/agc_python_snapshot_ncloc_failures.csv,0,PASS
+agc_unmatched_python_snapshot_ncloc_rows.csv,repo_python/tmp/run-py-3b/strict/agc_unmatched_python_snapshot_ncloc_rows.csv,0,PASS
+agc_unmatched_base_repo_months.csv,repo_python/tmp/run-py-3b/strict/agc_unmatched_base_repo_months.csv,0,PASS

@@ -1,0 +1,10 @@
+check,value
+reconstructed_repo_month_rows,3043
+oracle_repo_month_rows,3043
+latest_commit_mismatches,0
+python_file_count_mismatches,0
+top_level_block_count_mismatches,0
+agc_top_level_count_mismatches,0
+human_top_level_count_mismatches,0
+top_level_ratio_mismatches,0
+all_reconstructed_rows_match_oracle,1

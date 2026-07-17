@@ -1,0 +1,10 @@
+field,treatment_value,control_value,matches
+experiment,codellama-7b_4500_complexity_stratified_maxlen2048,codellama-7b_4500_complexity_stratified_maxlen2048,1
+classifier,svm,svm,1
+representation,ast,ast,1
+model_sha256,a7425af490022045d40da3aa660a38bfd2aabc22a27dd70a4f8ee5ebf1a61ce7,a7425af490022045d40da3aa660a38bfd2aabc22a27dd70a4f8ee5ebf1a61ce7,1
+model_key,codesearchnet_codellama-7b_python_merged_4500ast_,codesearchnet_codellama-7b_python_merged_4500ast_,1
+embedding_model_id,Salesforce/codet5p-110m-embedding,Salesforce/codet5p-110m-embedding,1
+max_len,2048,2048,1
+threshold_effective,0.0,0.0,1
+expected_score_mode,decision,decision,1

@@ -1,0 +1,4 @@
+dataset_source,base_rows,paper_matched_rows,paper_unmatched_rows,paper_match_rate,stars_nonmissing,stars_missing,issues_nonmissing,issues_missing,age_nonmissing,age_missing,ncloc_paper_nonmissing,ncloc_paper_missing
+treatment,853,848,5,0.9941383352872216,848,5,848,5,848,5,844,9
+control,780,770,10,0.9871794871794872,770,10,770,10,770,10,752,28
+all,1633,1618,15,0.9908144519289651,1618,15,1618,15,1618,15,1596,37

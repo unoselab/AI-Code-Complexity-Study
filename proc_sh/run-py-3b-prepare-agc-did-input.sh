@@ -27,6 +27,10 @@ set -euo pipefail
 # Main output:
 #   repo_python/run-py-3b/strict/panel_event_monthly_agc_py.csv
 #
+# Usage:
+#   REUSE_REPO_COMMIT_NCLOC=0 PANEL_VARIANT=strict bash proc_sh/run-py-3b-prepare-agc-did-input.sh
+#   REUSE_REPO_COMMIT_NCLOC=1 PANEL_VARIANT=strict bash proc_sh/run-py-3b-prepare-agc-did-input.sh
+# 
 # QC outputs:
 #   repo_python/tmp/run-py-3b/strict/
 #

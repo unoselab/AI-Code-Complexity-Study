@@ -1,0 +1,4 @@
+outcome,rows,nonmissing,missing,zero_denominator,mean,median
+agc_top_level_block_ratio,1633,1581,52,52,0.24006370693516077,0.2258064516129032
+agc_function_block_ratio,1633,1566,67,67,0.27898669872409254,0.23870215335915695
+agc_class_block_ratio,1633,1475,158,158,0.21049455608166773,0.2
