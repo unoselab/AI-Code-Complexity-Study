@@ -1,0 +1,32 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_AGC_ChangedBlock.Rmd
+source_notebook,DiffInDiffBorusyak_AGC.Rmd
+helper_file,proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv
+validation_summary_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-4b/strict/agc_changed_block_panel_validation_summary.json
+validation_status,PASS
+validation_checks_passed,65
+validation_checks_total,65
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4c/strict
+outcomes,"agc_changed_top_level_block_ratio, agc_changed_function_block_ratio, agc_changed_class_block_ratio"
+primary_outcome,agc_changed_top_level_block_ratio
+specifications,"unadjusted, paper_ncloc, python_snapshot_ncloc"
+common_model_sample,Each outcome uses one common complete-case sample across all three specifications so estimates are directly comparable.
+common_covariates,"age_log, commits_log, lines_added_log, contributors_log, stars_log, issues_log, ncloc_paper, ncloc_python_snapshot"
+activity_covariates,"commits, lines_added"
+activity_covariate_scaling,"log1p(commits), log1p(lines_added)"
+activity_adjustment_interpretation,"Adjusted specifications condition on contemporaneous monthly development activity. Because commits and lines_added may respond to adoption, these estimates are interpreted as conditional sensitivity analyses rather than the total treatment effect."
+adjusted_first_stage_formula,~age_log + ncloc_model + contributors_log + stars_log + issues_log +      commits_log + lines_added_log | repo_id + time_id
+unadjusted_first_stage_formula,~1 | repo_id + time_id
+time_encoding,sequential calendar-month id
+dynamic_horizon,-6 through +6 months
+pretrend_horizon,-6 through -2 months
+weighting,unweighted repository-month analysis
+outcome_scale,proportion; reported as percentage points
+agc_definition,AGC = AI likely generated code
+hwc_definition,HWC = Human likely written code
+changed_block_definition,"Current top-level functions/classes classified as added or structurally modified relative to the preceding monthly snapshot; unchanged, moved-unchanged, and deleted blocks are excluded."
+interpretation,Change in the repository-month AGC-like share among newly added or structurally modified top-level Python function and class blocks after observed Cursor adoption.
+stock_baseline,The stock-based analysis of accumulated repository snapshots is retained as a separate baseline estimand.
+limitation,The detector outcome captures structural similarity to AI-generated code and does not establish block provenance or tool identity.

@@ -1,0 +1,471 @@
+---
+title: "Borusyak DiD Activity Check: Commits and Lines Added"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+params:
+  panel_file: "repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv"
+  output_dir: "repo_python/run-py-4c/strict/activity-check"
+  apply_original_event_filter: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  dev = "CairoPNG",
+  dpi = 160
+)
+options(bitmapType = "cairo")
+utils::globalVariables(c(
+  "term", "estimate", "conf.low", "conf.high", "outcome",
+  "outcome_label", "event_time", "percent_change",
+  "percent_conf_low", "percent_conf_high", "is_significant"
+))
+```
+
+# Purpose
+
+This debugging report checks whether the validated AGC changed-block panel can
+also reproduce the original development-activity outcomes using only:
+
+- monthly commits; and
+- monthly lines added.
+
+The AGC changed-block columns are not used as outcomes in this report. The
+input panel is used because it preserves the strict matched repository-month
+sample and its original activity variables.
+
+# Packages
+
+```{r packages}
+library(didimputation)
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(Cairo)
+```
+
+# Helper Functions
+
+```{r helpers}
+normalize_yyyymm <- function(x) {
+  text <- gsub("-", "", trimws(as.character(x)))
+  text[text %in% c("", "NA", "NaN")] <- NA_character_
+  suppressWarnings(as.integer(text))
+}
+
+yyyymm_to_month_id <- function(x) {
+  year <- x %/% 100L
+  month <- x %% 100L
+  invalid <- is.na(x) | month < 1L | month > 12L
+  result <- year * 12L + month
+  result[invalid] <- NA_integer_
+  result
+}
+
+require_columns <- function(data, columns, label) {
+  missing <- setdiff(columns, names(data))
+  if (length(missing) > 0L) {
+    stop(label, " is missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+extract_static_effect <- function(result, outcome_name, outcome_label, n_rows) {
+  row <- result[result$term == "treat", , drop = FALSE]
+  if (nrow(row) != 1L) {
+    stop("Expected exactly one static treatment-effect row for ", outcome_name)
+  }
+
+  data.frame(
+    outcome = outcome_name,
+    outcome_label = outcome_label,
+    term = "treat",
+    estimate_log = row$estimate,
+    std_error = row$std.error,
+    conf_low_log = row$conf.low,
+    conf_high_log = row$conf.high,
+    percent_change = (exp(row$estimate) - 1) * 100,
+    percent_conf_low = (exp(row$conf.low) - 1) * 100,
+    percent_conf_high = (exp(row$conf.high) - 1) * 100,
+    model_rows = n_rows,
+    stringsAsFactors = FALSE
+  )
+}
+
+extract_dynamic_effects <- function(result, outcome_name, outcome_label, n_rows) {
+  rows <- result[result$term != "treat", , drop = FALSE]
+  rows$event_time <- suppressWarnings(as.integer(as.character(rows$term)))
+  rows <- rows[!is.na(rows$event_time) & rows$event_time >= -6L & rows$event_time <= 6L, ]
+
+  data.frame(
+    outcome = outcome_name,
+    outcome_label = outcome_label,
+    event_time = rows$event_time,
+    estimate_log = rows$estimate,
+    std_error = rows$std.error,
+    conf_low_log = rows$conf.low,
+    conf_high_log = rows$conf.high,
+    percent_change = (exp(rows$estimate) - 1) * 100,
+    percent_conf_low = (exp(rows$conf.low) - 1) * 100,
+    percent_conf_high = (exp(rows$conf.high) - 1) * 100,
+    is_significant = rows$conf.low > 0 | rows$conf.high < 0,
+    model_rows = n_rows,
+    stringsAsFactors = FALSE
+  )
+}
+```
+
+# Load and Validate the Panel
+
+```{r load-panel}
+panel_path <- normalizePath(params$panel_file, mustWork = TRUE)
+out_dir <- params$output_dir
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+
+panel <- fread(panel_path)
+
+ncloc_column <- if ("ncloc_paper" %in% names(panel)) {
+  "ncloc_paper"
+} else if ("ncloc" %in% names(panel)) {
+  "ncloc"
+} else {
+  stop("The panel must contain either ncloc_paper or ncloc.")
+}
+
+required_columns <- c(
+  "repo_name",
+  "time",
+  "event",
+  "dataset_source",
+  "commits",
+  "lines_added",
+  "age",
+  "contributors",
+  "stars",
+  "issues",
+  ncloc_column
+)
+require_columns(panel, required_columns, "Input panel")
+
+rows_before_filter <- nrow(panel)
+repos_before_filter <- uniqueN(panel$repo_name)
+
+panel[, time_yyyymm := normalize_yyyymm(time)]
+panel[, event_yyyymm := normalize_yyyymm(event)]
+panel[dataset_source == "control", event_yyyymm := 0L]
+
+if (isTRUE(params$apply_original_event_filter)) {
+  panel <- panel[
+    dataset_source == "control" |
+      (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+  ]
+}
+
+panel[, time_id := yyyymm_to_month_id(time_yyyymm)]
+panel[, event_id := fifelse(
+  dataset_source == "control",
+  0L,
+  yyyymm_to_month_id(event_yyyymm)
+)]
+panel[, repo_id := as.integer(factor(repo_name))]
+
+numeric_columns <- c(
+  "commits", "lines_added", "age", "contributors", "stars", "issues",
+  ncloc_column
+)
+for (column_name in numeric_columns) {
+  panel[, (column_name) := suppressWarnings(as.numeric(get(column_name)))]
+}
+
+negative_counts <- data.frame(
+  variable = c("commits", "lines_added"),
+  negative_rows = c(
+    sum(panel$commits < 0, na.rm = TRUE),
+    sum(panel$lines_added < 0, na.rm = TRUE)
+  )
+)
+if (any(negative_counts$negative_rows > 0L)) {
+  stop("Negative activity values were found; see negative_counts.")
+}
+
+panel[, commits_log := fifelse(!is.na(commits), log1p(commits), NA_real_)]
+panel[, lines_added_log := fifelse(!is.na(lines_added), log1p(lines_added), NA_real_)]
+panel[, age_log := fifelse(!is.na(age) & age >= 0, log1p(age), NA_real_)]
+panel[, contributors_log := fifelse(
+  !is.na(contributors) & contributors >= 0,
+  log1p(contributors),
+  NA_real_
+)]
+panel[, stars_log := fifelse(!is.na(stars) & stars >= 0, log1p(stars), NA_real_)]
+panel[, issues_log := fifelse(!is.na(issues) & issues >= 0, log1p(issues), NA_real_)]
+panel[, ncloc_model := get(ncloc_column)]
+
+if (any(is.na(panel$time_id))) {
+  stop("Some repository-month rows have invalid time values.")
+}
+if (any(panel$dataset_source == "treatment" & is.na(panel$event_id))) {
+  stop("Some treatment rows have invalid event values.")
+}
+if (any(panel$dataset_source == "control" & panel$event_id != 0L)) {
+  stop("Control rows must have event_id equal to zero.")
+}
+
+input_summary <- data.frame(
+  metric = c(
+    "panel_path",
+    "ncloc_column",
+    "original_event_filter",
+    "rows_before_filter",
+    "rows_after_filter",
+    "repositories_before_filter",
+    "repositories_after_filter",
+    "treatment_repositories",
+    "control_repositories",
+    "commits_nonmissing",
+    "lines_added_nonmissing"
+  ),
+  value = c(
+    panel_path,
+    ncloc_column,
+    as.character(params$apply_original_event_filter),
+    rows_before_filter,
+    nrow(panel),
+    repos_before_filter,
+    uniqueN(panel$repo_name),
+    uniqueN(panel[dataset_source == "treatment", repo_name]),
+    uniqueN(panel[dataset_source == "control", repo_name]),
+    sum(!is.na(panel$commits)),
+    sum(!is.na(panel$lines_added))
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(input_summary)
+print(negative_counts)
+
+fwrite(input_summary, file.path(out_dir, "borusyak_activity_input_summary.csv"))
+fwrite(negative_counts, file.path(out_dir, "borusyak_activity_negative_value_checks.csv"))
+```
+
+# Outcomes and Common Model Sample
+
+```{r outcomes-and-sample}
+outcome_definitions <- data.frame(
+  outcome = c("commits_log", "lines_added_log"),
+  outcome_label = c("Commits", "Lines Added"),
+  source_column = c("commits", "lines_added"),
+  stringsAsFactors = FALSE
+)
+
+model_required_columns <- c(
+  "repo_id",
+  "time_id",
+  "event_id",
+  "commits_log",
+  "lines_added_log",
+  "age_log",
+  "contributors_log",
+  "stars_log",
+  "issues_log",
+  "ncloc_model"
+)
+
+model_data <- copy(panel[complete.cases(panel[, ..model_required_columns])])
+if (nrow(model_data) == 0L) {
+  stop("No complete-case rows remain for the activity models.")
+}
+
+sample_summary <- data.frame(
+  metric = c(
+    "model_rows",
+    "model_repositories",
+    "treatment_repositories",
+    "control_repositories",
+    "treated_post_rows"
+  ),
+  value = c(
+    nrow(model_data),
+    uniqueN(model_data$repo_name),
+    uniqueN(model_data[dataset_source == "treatment", repo_name]),
+    uniqueN(model_data[dataset_source == "control", repo_name]),
+    sum(model_data$dataset_source == "treatment" & model_data$time_id >= model_data$event_id)
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(outcome_definitions)
+print(sample_summary)
+fwrite(sample_summary, file.path(out_dir, "borusyak_activity_sample_summary.csv"))
+```
+
+# Static Treatment Effects
+
+```{r static-effects}
+first_stage_formula <- ~ age_log + ncloc_model + contributors_log +
+  stars_log + issues_log | repo_id + time_id
+
+static_results <- list()
+static_rows <- list()
+
+for (i in seq_len(nrow(outcome_definitions))) {
+  outcome_var <- outcome_definitions$outcome[i]
+  outcome_label <- outcome_definitions$outcome_label[i]
+
+  cat("Running static activity model:", outcome_var, "| rows =", nrow(model_data), "\n")
+
+  result <- did_imputation(
+    data = model_data,
+    yname = outcome_var,
+    gname = "event_id",
+    tname = "time_id",
+    idname = "repo_id",
+    first_stage = first_stage_formula
+  )
+
+  static_results[[outcome_var]] <- result
+  static_rows[[length(static_rows) + 1L]] <- extract_static_effect(
+    result,
+    outcome_var,
+    outcome_label,
+    nrow(model_data)
+  )
+}
+
+static_df <- bind_rows(static_rows)
+print(static_df)
+fwrite(static_df, file.path(out_dir, "borusyak_activity_static_effects.csv"))
+
+knitr::kable(
+  static_df[, c(
+    "outcome_label", "estimate_log", "std_error", "conf_low_log",
+    "conf_high_log", "percent_change", "percent_conf_low",
+    "percent_conf_high", "model_rows"
+  )],
+  digits = 3,
+  caption = "Static Treatment Effects for Commits and Lines Added"
+)
+```
+
+# Dynamic Treatment Effects
+
+```{r dynamic-effects}
+dynamic_results <- list()
+dynamic_rows <- list()
+
+for (i in seq_len(nrow(outcome_definitions))) {
+  outcome_var <- outcome_definitions$outcome[i]
+  outcome_label <- outcome_definitions$outcome_label[i]
+
+  cat("Running dynamic activity model:", outcome_var, "| rows =", nrow(model_data), "\n")
+
+  result <- did_imputation(
+    data = model_data,
+    yname = outcome_var,
+    gname = "event_id",
+    tname = "time_id",
+    idname = "repo_id",
+    first_stage = first_stage_formula,
+    horizon = -6:6,
+    pretrends = -6:-2
+  )
+
+  dynamic_results[[outcome_var]] <- result
+  dynamic_rows[[length(dynamic_rows) + 1L]] <- extract_dynamic_effects(
+    result,
+    outcome_var,
+    outcome_label,
+    nrow(model_data)
+  )
+}
+
+dynamic_df <- bind_rows(dynamic_rows)
+print(dynamic_df)
+fwrite(dynamic_df, file.path(out_dir, "borusyak_activity_dynamic_effects.csv"))
+```
+
+# Activity Event-Study Plot
+
+```{r activity-event-study, fig.width=11, fig.height=3.4}
+dynamic_df$outcome_label <- factor(
+  dynamic_df$outcome_label,
+  levels = outcome_definitions$outcome_label
+)
+
+activity_plot <- ggplot(
+  dynamic_df,
+  aes(x = event_time, y = percent_change)
+) +
+  geom_point(
+    data = subset(dynamic_df, is_significant),
+    size = 1.8,
+    shape = 19
+  ) +
+  geom_point(
+    data = subset(dynamic_df, !is_significant),
+    size = 1.8,
+    shape = 21,
+    fill = "transparent"
+  ) +
+  geom_errorbar(
+    aes(ymin = percent_conf_low, ymax = percent_conf_high),
+    width = 0.35
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = -0.5, linetype = "dashed") +
+  scale_x_continuous(breaks = -6:6) +
+  coord_cartesian(xlim = c(-6.5, 6.5)) +
+  facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
+  labs(
+    title = "Borusyak DiD Activity Check",
+    subtitle = "Strict AGC changed-block panel; outcomes limited to commits and lines added",
+    x = "Months Relative to First Observed Cursor Adoption",
+    y = "Estimated Change (%)",
+    caption = paste(
+      "Outcomes are log1p transformed. Percent effects use exp(beta) - 1.",
+      "Filled points indicate that the confidence interval excludes zero."
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(hjust = 0.5, size = 8)
+  )
+
+print(activity_plot)
+
+ggsave(
+  filename = file.path(
+    out_dir,
+    "dynamic_effects_borusyak_activity_commits_lines_added.pdf"
+  ),
+  plot = activity_plot,
+  width = 11,
+  height = 3.4,
+  device = CairoPDF,
+  family = "DejaVu Sans"
+)
+```
+
+# Interpretation
+
+The activity outcomes are retained from the strict matched repository-month
+panel. They are separate from the AGC changed-block outcome:
+
+- commits measure monthly repository activity;
+- lines added measure monthly code-production volume; and
+- the AGC changed-block ratio measures the structural classification share
+  among newly added or structurally modified top-level blocks.
+
+A successful activity check does not validate the AGC treatment effect by
+itself. It verifies that the same strict panel still produces interpretable
+Cursor-adoption estimates for the original velocity outcomes.
+
+# Session Information
+
+```{r session-info}
+sessionInfo()
+```

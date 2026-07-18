@@ -1,0 +1,10 @@
+outcome,outcome_label,analysis_group,total_rows,ratio_rows,missing_ratio_rows,availability_rate,positive_denominator_rows,zero_denominator_rows,denominator_sum
+agc_changed_top_level_block_ratio,AGC-Like Changed Top-Level Block Share,treatment_post,432,324,108,0.75,324,70,61542
+agc_changed_top_level_block_ratio,AGC-Like Changed Top-Level Block Share,treatment_pre,421,314,107,0.745843230403801,314,55,60626
+agc_changed_top_level_block_ratio,AGC-Like Changed Top-Level Block Share,control,780,489,291,0.626923076923077,489,191,41372
+agc_changed_function_block_ratio,AGC-Like Changed Function Block Share,treatment_post,432,307,125,0.710648148148148,307,87,32583
+agc_changed_function_block_ratio,AGC-Like Changed Function Block Share,treatment_pre,421,284,137,0.67458432304038,284,85,29590
+agc_changed_function_block_ratio,AGC-Like Changed Function Block Share,control,780,429,351,0.55,429,251,28727
+agc_changed_class_block_ratio,AGC-Like Changed Class Block Share,treatment_post,432,293,139,0.678240740740741,293,101,28959
+agc_changed_class_block_ratio,AGC-Like Changed Class Block Share,treatment_pre,421,279,142,0.66270783847981,279,90,31036
+agc_changed_class_block_ratio,AGC-Like Changed Class Block Share,control,780,422,358,0.541025641025641,422,258,12645

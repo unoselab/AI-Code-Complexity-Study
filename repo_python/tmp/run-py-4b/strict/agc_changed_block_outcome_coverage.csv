@@ -1,0 +1,6 @@
+scope,unit,panel_rows,count_available_rows,positive_denominator_rows,zero_denominator_rows,count_unavailable_rows,ratio_available_rows,ratio_availability_rate,total_blocks
+changed,top_level,1633,1443,1127,316,190,1127,0.6901408450704225,163540
+added,top_level,1633,1443,905,538,190,905,0.554194733619106,64355
+modified,top_level,1633,1443,1068,375,190,1068,0.6540110226576853,99185
+changed,function,1633,1443,1020,423,190,1020,0.6246172688303735,90900
+changed,class,1633,1443,994,449,190,994,0.6086956521739131,72640

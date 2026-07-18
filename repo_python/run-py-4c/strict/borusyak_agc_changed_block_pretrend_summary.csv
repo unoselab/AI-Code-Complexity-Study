@@ -1,0 +1,10 @@
+panel,specification,specification_label,outcome,outcome_label,role,pre_periods_available,pre_periods_ci_excludes_zero,all_preperiod_cis_include_zero,max_absolute_pretrend_estimate,max_absolute_pretrend_percentage_points
+strict,paper_ncloc,Paper NCLOC + Activity,agc_changed_class_block_ratio,AGC-Like Changed Class Block Share,robustness,5,0,TRUE,0.0298209505656122,2.98209505656122
+strict,paper_ncloc,Paper NCLOC + Activity,agc_changed_function_block_ratio,AGC-Like Changed Function Block Share,robustness,5,0,TRUE,0.0493295771368833,4.93295771368833
+strict,paper_ncloc,Paper NCLOC + Activity,agc_changed_top_level_block_ratio,AGC-Like Changed Top-Level Block Share,primary,5,0,TRUE,0.029206288419927,2.9206288419927
+strict,python_snapshot_ncloc,Python Snapshot NCLOC + Activity,agc_changed_class_block_ratio,AGC-Like Changed Class Block Share,robustness,5,0,TRUE,0.0298495719166142,2.98495719166142
+strict,python_snapshot_ncloc,Python Snapshot NCLOC + Activity,agc_changed_function_block_ratio,AGC-Like Changed Function Block Share,robustness,5,0,TRUE,0.0486098025042149,4.86098025042149
+strict,python_snapshot_ncloc,Python Snapshot NCLOC + Activity,agc_changed_top_level_block_ratio,AGC-Like Changed Top-Level Block Share,primary,5,0,TRUE,0.0288438891966556,2.88438891966556
+strict,unadjusted,Unadjusted,agc_changed_class_block_ratio,AGC-Like Changed Class Block Share,robustness,5,0,TRUE,0.0313417494502305,3.13417494502305
+strict,unadjusted,Unadjusted,agc_changed_function_block_ratio,AGC-Like Changed Function Block Share,robustness,5,0,TRUE,0.0531905754358909,5.31905754358909
+strict,unadjusted,Unadjusted,agc_changed_top_level_block_ratio,AGC-Like Changed Top-Level Block Share,primary,5,0,TRUE,0.0272359752853114,2.72359752853114

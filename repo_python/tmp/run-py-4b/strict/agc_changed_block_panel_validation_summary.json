@@ -1,0 +1,45 @@
+{
+  "base_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-3b/strict/panel_event_monthly_agc_py.csv",
+  "block_classifications": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/changed_block_classifications_py.csv",
+  "changed_agc_top_level_blocks": 23595,
+  "changed_hwc_top_level_blocks": 139945,
+  "changed_top_level_blocks": 163540,
+  "checks_failed": 0,
+  "checks_passed": 65,
+  "checks_total": 65,
+  "classification_block_kind_counts": {
+    "class_definition": 155382,
+    "function_definition": 260436
+  },
+  "classification_change_type_counts": {
+    "added": 64355,
+    "modified": 99185,
+    "moved_unchanged": 7319,
+    "unchanged": 244959
+  },
+  "classification_rows": 415818,
+  "elapsed_seconds": 3.734,
+  "global_block_weighted_agc_ratio": 0.14427662957074722,
+  "input_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv",
+  "outcome_rows": 3043,
+  "outcome_status_counts": {
+    "no_previous_month": 220,
+    "ready": 1443,
+    "same_commit": 1380
+  },
+  "pair_status_counts": {
+    "no_previous_month": 220,
+    "processed": 1443,
+    "same_commit": 1380
+  },
+  "panel_label": "strict",
+  "panel_rows": 1633,
+  "paper_analysis_ready_rows": 1123,
+  "prepare_qc_dir": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-4a/strict",
+  "repo_month_outcomes": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/repo_month_agc_changed_block_outcomes_py.csv",
+  "repo_months_with_primary_ratio": 1127,
+  "repo_months_without_primary_ratio": 506,
+  "repositories": 220,
+  "snapshot_analysis_ready_rows": 1123,
+  "status": "PASS"
+}

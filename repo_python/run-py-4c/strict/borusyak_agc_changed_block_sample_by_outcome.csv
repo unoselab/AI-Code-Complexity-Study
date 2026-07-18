@@ -1,0 +1,4 @@
+outcome,outcome_label,role,denominator,panel_rows,outcome_available_rows,model_common_sample_rows,rows_removed_for_common_covariates,repositories,treatment_rows,control_rows,treatment_pre_rows,treatment_post_rows,treatment_repositories,control_repositories,min_time,max_time,changed_blocks_in_sample
+agc_changed_top_level_block_ratio,AGC-Like Changed Top-Level Block Share,primary,changed_top_level_blocks,1633,1127,1123,4,166,634,489,314,320,80,86,2024-02,2025-08,163374
+agc_changed_function_block_ratio,AGC-Like Changed Function Block Share,robustness,changed_function_blocks,1633,1020,1016,4,158,587,429,284,303,79,79,2024-02,2025-08,90822
+agc_changed_class_block_ratio,AGC-Like Changed Class Block Share,robustness,changed_class_blocks,1633,994,990,4,148,568,422,279,289,73,75,2024-02,2025-08,72552

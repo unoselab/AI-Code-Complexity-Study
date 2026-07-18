@@ -1,0 +1,1198 @@
+---
+title: "Diff-in-Diff Borusyak: AGC Changed-Block Outcomes"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+params:
+  panel_file: "repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv"
+  validation_summary_file: "repo_python/tmp/run-py-4b/strict/agc_changed_block_panel_validation_summary.json"
+  helper_file: "proc_r/diff_in_diff_borusyak_helpers.R"
+  out_dir: "repo_python/run-py-4c/strict"
+  panel_label: "strict"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- Sys.getenv("PROJECT_ROOT", unset = normalizePath(".", mustWork = TRUE))
+project_root <- normalizePath(project_root, mustWork = TRUE)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || identical(path_value, "")) {
+    return("")
+  }
+
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(params$panel_file)
+validation_summary_path <- resolve_project_path(params$validation_summary_file)
+helper_path <- resolve_project_path(params$helper_file)
+out_dir <- resolve_project_path(params$out_dir)
+panel_label <- as.character(params$panel_label)
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+# Purpose
+
+This notebook estimates the effect of observed Cursor adoption on the repository-month share of AI-generated-like code among newly added or structurally modified top-level Python function and class blocks. It uses the Borusyak et al. imputation difference-in-differences estimator.
+
+The primary flow-based outcome is:
+
+\[
+\text{AGC changed-block ratio}_{it}
+=
+\frac{\text{changed AGC blocks}_{it}}
+{\text{changed AGC blocks}_{it}+\text{changed HWC blocks}_{it}}
+\]
+
+where:
+
+- **AGC** means AI likely generated code.
+- **HWC** means Human likely written code.
+- Changed blocks include only newly added or structurally modified current top-level blocks.
+- Unchanged blocks, moved-but-structurally-unchanged blocks, and deleted blocks are excluded.
+
+The stock-based analysis measures the accumulated structural composition of each repository snapshot and is retained as a baseline analysis. This changed-block analysis focuses on current-period code flow to reduce dilution from unchanged legacy code.
+
+The detector outcome captures structural patterns associated with AI-generated code. It does not establish the actual provenance of individual blocks or identify which AI tool generated or assisted with them.
+
+The primary estimand is the average change in the repository-month AGC changed-block ratio after first observed Cursor adoption, relative to contemporaneous changes in matched repositories with no observed Cursor adoption during the study period.
+
+The adjusted specifications additionally include contemporaneous monthly development activity measured by `log1p(commits)` and `log1p(lines_added)`. Because commits and added lines may themselves respond to Cursor adoption, these activity-adjusted estimates are treated as conditional sensitivity analyses. The unadjusted specification remains the closest estimate of the total post-adoption change in the outcome.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+library(jsonlite)
+
+if (!file.exists(helper_path)) {
+  stop("Borusyak helper file not found: ", helper_path)
+}
+
+source(helper_path)
+```
+
+# Utility Functions
+
+```{r utility-functions}
+normalize_yyyymm <- function(x) {
+  x <- as.character(x)
+  x[x %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+  x <- gsub("-", "", x)
+  suppressWarnings(as.integer(x))
+}
+
+yyyymm_to_month_id <- function(x) {
+  x <- as.integer(x)
+  year <- x %/% 100L
+  month <- x %% 100L
+
+  out <- year * 12L + month
+  out[is.na(x) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+numeric_if_present <- function(data, columns) {
+  for (column_name in intersect(columns, names(data))) {
+    set(
+      data,
+      j = column_name,
+      value = suppressWarnings(as.numeric(data[[column_name]]))
+    )
+  }
+
+  invisible(data)
+}
+
+safe_ratio <- function(numerator, denominator) {
+  out <- rep(NA_real_, length(denominator))
+  valid <- !is.na(numerator) & !is.na(denominator) & denominator > 0
+  out[valid] <- numerator[valid] / denominator[valid]
+  out
+}
+
+count_mismatch <- function(left, right, tolerance = 1e-12) {
+  comparable <- !is.na(left) & !is.na(right)
+  sum(comparable & abs(left - right) > tolerance)
+}
+
+empty_model_error_table <- function() {
+  data.frame(
+    panel = character(),
+    specification = character(),
+    outcome = character(),
+    model_type = character(),
+    error = character(),
+    stringsAsFactors = FALSE
+  )
+}
+
+build_first_stage_formula <- function(specification) {
+  if (identical(specification, "unadjusted")) {
+    return(~ 1 | repo_id + time_id)
+  }
+
+  ~ age_log + ncloc_model + contributors_log + stars_log + issues_log +
+    commits_log + lines_added_log | repo_id + time_id
+}
+```
+
+# Validate the Upstream Input
+
+```{r validate-upstream}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Validation summary:", validation_summary_path, "\n")
+cat("Output directory:", out_dir, "\n")
+cat("Panel label:", panel_label, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("AGC changed-block panel not found: ", panel_path)
+}
+
+if (!file.exists(validation_summary_path)) {
+  stop("run-py-4b validation summary not found: ", validation_summary_path)
+}
+
+validation_summary <- jsonlite::fromJSON(validation_summary_path)
+
+if (is.null(validation_summary$status) || validation_summary$status != "PASS") {
+  stop(
+    "run-py-4b validation status must be PASS. Found: ",
+    validation_summary$status
+  )
+}
+
+if (!is.null(validation_summary$checks_failed) &&
+    as.integer(validation_summary$checks_failed) != 0L) {
+  stop(
+    "run-py-4b validation reports failed checks: ",
+    validation_summary$checks_failed
+  )
+}
+
+cat("Validated upstream rows:", validation_summary$panel_rows, "\n")
+cat("Validated upstream repositories:", validation_summary$repositories, "\n")
+cat("Validated changed blocks:", validation_summary$changed_top_level_blocks, "\n")
+cat("Validated ratio rows:", validation_summary$repo_months_with_primary_ratio, "\n")
+cat("Validated upstream checks:", validation_summary$checks_passed,
+    "/", validation_summary$checks_total, "\n")
+```
+
+# Load and Normalize the Changed-Block Panel
+
+```{r load-panel}
+panel_raw <- fread(panel_path)
+
+required_columns <- c(
+  "repo_name",
+  "time",
+  "dataset_source",
+  "event",
+  "post_event",
+  "time_to_event",
+  "is_treatment",
+  "commits",
+  "lines_added",
+  "contributors",
+  "stars",
+  "issues",
+  "age",
+  "ncloc_paper",
+  "ncloc_python_snapshot",
+  "changed_top_level_blocks",
+  "changed_agc_top_level_blocks",
+  "changed_hwc_top_level_blocks",
+  "agc_changed_top_level_block_ratio",
+  "added_top_level_blocks",
+  "added_agc_top_level_blocks",
+  "added_hwc_top_level_blocks",
+  "agc_added_top_level_block_ratio",
+  "modified_top_level_blocks",
+  "modified_agc_top_level_blocks",
+  "modified_hwc_top_level_blocks",
+  "agc_modified_top_level_block_ratio",
+  "changed_function_blocks",
+  "changed_agc_function_blocks",
+  "changed_hwc_function_blocks",
+  "agc_changed_function_block_ratio",
+  "changed_class_blocks",
+  "changed_agc_class_blocks",
+  "changed_hwc_class_blocks",
+  "agc_changed_class_block_ratio"
+)
+
+require_columns(panel_raw, required_columns, "AGC changed-block panel")
+
+numeric_columns <- setdiff(required_columns, c(
+  "repo_name",
+  "time",
+  "dataset_source",
+  "event"
+))
+numeric_if_present(panel_raw, numeric_columns)
+
+panel_raw[, time_yyyymm := normalize_yyyymm(time)]
+panel_raw[, event_yyyymm := normalize_yyyymm(event)]
+panel_raw[dataset_source == "control", event_yyyymm := 0L]
+
+panel_raw[, time_id := yyyymm_to_month_id(time_yyyymm)]
+panel_raw[, event_id := fifelse(
+  dataset_source == "control",
+  0L,
+  yyyymm_to_month_id(event_yyyymm)
+)]
+
+panel_raw[, repo_name_str := repo_name]
+panel_raw[, repo_id := as.integer(factor(repo_name_str))]
+panel_raw[, ever_treated := as.integer(dataset_source == "treatment")]
+panel_raw[, analysis_group := fifelse(
+  dataset_source == "control",
+  "control",
+  fifelse(post_event == 1, "treatment_post", "treatment_pre")
+)]
+
+panel_raw[, age_log := fifelse(!is.na(age) & age >= 0, log1p(age), NA_real_)]
+panel_raw[, commits_log := fifelse(
+  !is.na(commits) & commits >= 0,
+  log1p(commits),
+  NA_real_
+)]
+panel_raw[, lines_added_log := fifelse(
+  !is.na(lines_added) & lines_added >= 0,
+  log1p(lines_added),
+  NA_real_
+)]
+panel_raw[, contributors_log := fifelse(
+  !is.na(contributors) & contributors >= 0,
+  log1p(contributors),
+  NA_real_
+)]
+panel_raw[, stars_log := fifelse(
+  !is.na(stars) & stars >= 0,
+  log1p(stars),
+  NA_real_
+)]
+panel_raw[, issues_log := fifelse(
+  !is.na(issues) & issues >= 0,
+  log1p(issues),
+  NA_real_
+)]
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repositories:", uniqueN(panel_raw$repo_name), "\n")
+cat("Treatment rows:", sum(panel_raw$dataset_source == "treatment"), "\n")
+cat("Control rows:", sum(panel_raw$dataset_source == "control"), "\n")
+cat("Primary ratio rows:", sum(!is.na(panel_raw$agc_changed_top_level_block_ratio)), "\n")
+cat("Calendar range:", min(panel_raw$time, na.rm = TRUE), "to",
+    max(panel_raw$time, na.rm = TRUE), "\n")
+```
+
+# Panel and Outcome Sanity Checks
+
+```{r panel-checks}
+key_columns <- c("repo_name", "time", "dataset_source")
+duplicate_keys <- duplicated(panel_raw, by = key_columns)
+
+recomputed_time_to_event <- rep(NA_real_, nrow(panel_raw))
+treated_idx <- panel_raw$dataset_source == "treatment"
+recomputed_time_to_event[treated_idx] <-
+  panel_raw$time_id[treated_idx] - panel_raw$event_id[treated_idx]
+
+changed_count_mismatch <- count_mismatch(
+  panel_raw$changed_top_level_blocks,
+  panel_raw$changed_agc_top_level_blocks + panel_raw$changed_hwc_top_level_blocks
+)
+changed_scope_mismatch <- count_mismatch(
+  panel_raw$changed_top_level_blocks,
+  panel_raw$added_top_level_blocks + panel_raw$modified_top_level_blocks
+)
+changed_agc_scope_mismatch <- count_mismatch(
+  panel_raw$changed_agc_top_level_blocks,
+  panel_raw$added_agc_top_level_blocks + panel_raw$modified_agc_top_level_blocks
+)
+changed_hwc_scope_mismatch <- count_mismatch(
+  panel_raw$changed_hwc_top_level_blocks,
+  panel_raw$added_hwc_top_level_blocks + panel_raw$modified_hwc_top_level_blocks
+)
+changed_kind_mismatch <- count_mismatch(
+  panel_raw$changed_top_level_blocks,
+  panel_raw$changed_function_blocks + panel_raw$changed_class_blocks
+)
+changed_agc_kind_mismatch <- count_mismatch(
+  panel_raw$changed_agc_top_level_blocks,
+  panel_raw$changed_agc_function_blocks + panel_raw$changed_agc_class_blocks
+)
+changed_hwc_kind_mismatch <- count_mismatch(
+  panel_raw$changed_hwc_top_level_blocks,
+  panel_raw$changed_hwc_function_blocks + panel_raw$changed_hwc_class_blocks
+)
+
+primary_ratio_recomputed <- safe_ratio(
+  panel_raw$changed_agc_top_level_blocks,
+  panel_raw$changed_top_level_blocks
+)
+function_ratio_recomputed <- safe_ratio(
+  panel_raw$changed_agc_function_blocks,
+  panel_raw$changed_function_blocks
+)
+class_ratio_recomputed <- safe_ratio(
+  panel_raw$changed_agc_class_blocks,
+  panel_raw$changed_class_blocks
+)
+
+panel_checks <- data.frame(
+  check = c(
+    "panel_label",
+    "rows",
+    "repositories",
+    "treatment_rows",
+    "control_rows",
+    "treatment_repositories",
+    "control_repositories",
+    "duplicate_keys",
+    "time_id_missing",
+    "treatment_event_id_missing",
+    "control_event_id_nonzero",
+    "is_treatment_post_event_mismatch",
+    "time_to_event_mismatch",
+    "changed_agc_plus_hwc_mismatch",
+    "changed_added_plus_modified_mismatch",
+    "changed_agc_added_plus_modified_mismatch",
+    "changed_hwc_added_plus_modified_mismatch",
+    "changed_function_plus_class_mismatch",
+    "changed_agc_function_plus_class_mismatch",
+    "changed_hwc_function_plus_class_mismatch",
+    "primary_ratio_mismatch",
+    "function_ratio_mismatch",
+    "class_ratio_mismatch",
+    "primary_ratio_outside_unit_interval",
+    "function_ratio_outside_unit_interval",
+    "class_ratio_outside_unit_interval",
+    "primary_ratio_rows",
+    "commits_nonmissing",
+    "lines_added_nonmissing",
+    "commits_negative",
+    "lines_added_negative",
+    "ncloc_paper_nonmissing",
+    "ncloc_python_snapshot_nonmissing",
+    "upstream_validation_status",
+    "upstream_checks_failed"
+  ),
+  value = c(
+    panel_label,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    sum(panel_raw$dataset_source == "treatment"),
+    sum(panel_raw$dataset_source == "control"),
+    uniqueN(panel_raw[dataset_source == "treatment", repo_name]),
+    uniqueN(panel_raw[dataset_source == "control", repo_name]),
+    sum(duplicate_keys),
+    sum(is.na(panel_raw$time_id)),
+    sum(panel_raw$dataset_source == "treatment" & is.na(panel_raw$event_id)),
+    sum(panel_raw$dataset_source == "control" & panel_raw$event_id != 0L),
+    sum(panel_raw$is_treatment != panel_raw$post_event, na.rm = TRUE),
+    sum(
+      panel_raw$dataset_source == "treatment" &
+        !is.na(panel_raw$time_to_event) &
+        panel_raw$time_to_event != recomputed_time_to_event,
+      na.rm = TRUE
+    ),
+    changed_count_mismatch,
+    changed_scope_mismatch,
+    changed_agc_scope_mismatch,
+    changed_hwc_scope_mismatch,
+    changed_kind_mismatch,
+    changed_agc_kind_mismatch,
+    changed_hwc_kind_mismatch,
+    count_mismatch(panel_raw$agc_changed_top_level_block_ratio, primary_ratio_recomputed),
+    count_mismatch(panel_raw$agc_changed_function_block_ratio, function_ratio_recomputed),
+    count_mismatch(panel_raw$agc_changed_class_block_ratio, class_ratio_recomputed),
+    sum(
+      !is.na(panel_raw$agc_changed_top_level_block_ratio) &
+        (panel_raw$agc_changed_top_level_block_ratio < 0 |
+           panel_raw$agc_changed_top_level_block_ratio > 1)
+    ),
+    sum(
+      !is.na(panel_raw$agc_changed_function_block_ratio) &
+        (panel_raw$agc_changed_function_block_ratio < 0 |
+           panel_raw$agc_changed_function_block_ratio > 1)
+    ),
+    sum(
+      !is.na(panel_raw$agc_changed_class_block_ratio) &
+        (panel_raw$agc_changed_class_block_ratio < 0 |
+           panel_raw$agc_changed_class_block_ratio > 1)
+    ),
+    sum(!is.na(panel_raw$agc_changed_top_level_block_ratio)),
+    sum(!is.na(panel_raw$commits)),
+    sum(!is.na(panel_raw$lines_added)),
+    sum(panel_raw$commits < 0, na.rm = TRUE),
+    sum(panel_raw$lines_added < 0, na.rm = TRUE),
+    sum(!is.na(panel_raw$ncloc_paper)),
+    sum(!is.na(panel_raw$ncloc_python_snapshot)),
+    validation_summary$status,
+    validation_summary$checks_failed
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(panel_checks)
+
+fwrite(
+  panel_checks,
+  file.path(out_dir, "borusyak_agc_changed_block_panel_checks.csv")
+)
+
+hard_failure_checks <- c(
+  sum(duplicate_keys),
+  sum(is.na(panel_raw$time_id)),
+  sum(panel_raw$dataset_source == "treatment" & is.na(panel_raw$event_id)),
+  sum(panel_raw$dataset_source == "control" & panel_raw$event_id != 0L),
+  sum(panel_raw$is_treatment != panel_raw$post_event, na.rm = TRUE),
+  changed_count_mismatch,
+  changed_scope_mismatch,
+  changed_agc_scope_mismatch,
+  changed_hwc_scope_mismatch,
+  changed_kind_mismatch,
+  changed_agc_kind_mismatch,
+  changed_hwc_kind_mismatch,
+  count_mismatch(panel_raw$agc_changed_top_level_block_ratio, primary_ratio_recomputed),
+  count_mismatch(panel_raw$agc_changed_function_block_ratio, function_ratio_recomputed),
+  count_mismatch(panel_raw$agc_changed_class_block_ratio, class_ratio_recomputed),
+  sum(panel_raw$commits < 0, na.rm = TRUE),
+  sum(panel_raw$lines_added < 0, na.rm = TRUE)
+)
+
+if (any(hard_failure_checks != 0)) {
+  stop(
+    "AGC changed-block panel sanity checks failed. See ",
+    "borusyak_agc_changed_block_panel_checks.csv."
+  )
+}
+
+if (!is.null(validation_summary$panel_rows) &&
+    nrow(panel_raw) != as.integer(validation_summary$panel_rows)) {
+  stop("Panel row count differs from the run-py-4b validation summary.")
+}
+
+if (!is.null(validation_summary$repo_months_with_primary_ratio) &&
+    sum(!is.na(panel_raw$agc_changed_top_level_block_ratio)) !=
+      as.integer(validation_summary$repo_months_with_primary_ratio)) {
+  stop("Primary ratio row count differs from the run-py-4b validation summary.")
+}
+```
+
+# Ratio Coverage Diagnostics
+
+```{r coverage-diagnostics}
+outcome_definitions <- data.frame(
+  outcome = c(
+    "agc_changed_top_level_block_ratio",
+    "agc_changed_function_block_ratio",
+    "agc_changed_class_block_ratio"
+  ),
+  outcome_label = c(
+    "AGC-Like Changed Top-Level Block Share",
+    "AGC-Like Changed Function Block Share",
+    "AGC-Like Changed Class Block Share"
+  ),
+  denominator = c(
+    "changed_top_level_blocks",
+    "changed_function_blocks",
+    "changed_class_blocks"
+  ),
+  role = c("primary", "robustness", "robustness"),
+  stringsAsFactors = FALSE
+)
+
+coverage_rows <- list()
+for (outcome_index in seq_len(nrow(outcome_definitions))) {
+  outcome_var <- outcome_definitions$outcome[outcome_index]
+  outcome_label <- outcome_definitions$outcome_label[outcome_index]
+  denominator_var <- outcome_definitions$denominator[outcome_index]
+
+  coverage_part <- panel_raw[, .(
+    total_rows = .N,
+    ratio_rows = sum(!is.na(get(outcome_var))),
+    missing_ratio_rows = sum(is.na(get(outcome_var))),
+    positive_denominator_rows = sum(get(denominator_var) > 0, na.rm = TRUE),
+    zero_denominator_rows = sum(get(denominator_var) == 0, na.rm = TRUE),
+    denominator_sum = sum(get(denominator_var), na.rm = TRUE)
+  ), by = analysis_group]
+
+  coverage_part[, availability_rate := ratio_rows / total_rows]
+  coverage_part[, outcome := outcome_var]
+  coverage_part[, outcome_label := outcome_label]
+  coverage_rows[[length(coverage_rows) + 1]] <- coverage_part
+}
+
+coverage_by_group <- rbindlist(coverage_rows, fill = TRUE)
+setcolorder(
+  coverage_by_group,
+  c(
+    "outcome",
+    "outcome_label",
+    "analysis_group",
+    "total_rows",
+    "ratio_rows",
+    "missing_ratio_rows",
+    "availability_rate",
+    "positive_denominator_rows",
+    "zero_denominator_rows",
+    "denominator_sum"
+  )
+)
+
+print(coverage_by_group)
+fwrite(
+  coverage_by_group,
+  file.path(out_dir, "borusyak_agc_changed_block_ratio_coverage_by_group.csv")
+)
+
+coverage_by_event_time <- panel_raw[dataset_source == "treatment", .(
+  total_rows = .N,
+  primary_ratio_rows = sum(!is.na(agc_changed_top_level_block_ratio)),
+  primary_ratio_missing_rows = sum(is.na(agc_changed_top_level_block_ratio)),
+  primary_ratio_availability_rate = mean(!is.na(agc_changed_top_level_block_ratio)),
+  changed_top_level_blocks = sum(changed_top_level_blocks, na.rm = TRUE)
+), by = time_to_event][order(time_to_event)]
+
+print(coverage_by_event_time)
+fwrite(
+  coverage_by_event_time,
+  file.path(out_dir, "borusyak_agc_changed_block_ratio_coverage_by_event_time.csv")
+)
+```
+
+# Outcomes and Model Specifications
+
+```{r outcomes-and-specifications}
+specification_definitions <- data.frame(
+  specification = c(
+    "unadjusted",
+    "paper_ncloc",
+    "python_snapshot_ncloc"
+  ),
+  specification_label = c(
+    "Unadjusted",
+    "Paper NCLOC + Activity",
+    "Python Snapshot NCLOC + Activity"
+  ),
+  ncloc_column = c(
+    NA_character_,
+    "ncloc_paper",
+    "ncloc_python_snapshot"
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(outcome_definitions)
+print(specification_definitions)
+```
+
+# Prepare Common Outcome-Specific Samples
+
+```{r prepare-common-samples}
+common_covariates <- c(
+  "age_log",
+  "commits_log",
+  "lines_added_log",
+  "contributors_log",
+  "stars_log",
+  "issues_log",
+  "ncloc_paper",
+  "ncloc_python_snapshot"
+)
+
+common_samples <- list()
+sample_summary_rows <- list()
+
+for (outcome_index in seq_len(nrow(outcome_definitions))) {
+  outcome_var <- outcome_definitions$outcome[outcome_index]
+  outcome_label <- outcome_definitions$outcome_label[outcome_index]
+  denominator_var <- outcome_definitions$denominator[outcome_index]
+  outcome_role <- outcome_definitions$role[outcome_index]
+
+  available_data <- copy(panel_raw[!is.na(get(outcome_var))])
+  required <- c(
+    "repo_id",
+    "time_id",
+    "event_id",
+    "dataset_source",
+    outcome_var,
+    common_covariates
+  )
+
+  sample_data <- copy(panel_raw)
+  sample_data <- sample_data[complete.cases(sample_data[, ..required])]
+
+  if (nrow(sample_data) == 0) {
+    stop("No complete rows remain for outcome: ", outcome_var)
+  }
+
+  sample_data[, sample_key := paste(repo_name, time, dataset_source, sep = "|")]
+  common_samples[[outcome_var]] <- sample_data
+
+  sample_summary_rows[[length(sample_summary_rows) + 1]] <- data.frame(
+    outcome = outcome_var,
+    outcome_label = outcome_label,
+    role = outcome_role,
+    denominator = denominator_var,
+    panel_rows = nrow(panel_raw),
+    outcome_available_rows = nrow(available_data),
+    model_common_sample_rows = nrow(sample_data),
+    rows_removed_for_common_covariates = nrow(available_data) - nrow(sample_data),
+    repositories = uniqueN(sample_data$repo_id),
+    treatment_rows = sum(sample_data$dataset_source == "treatment"),
+    control_rows = sum(sample_data$dataset_source == "control"),
+    treatment_pre_rows = sum(
+      sample_data$dataset_source == "treatment" & sample_data$post_event == 0
+    ),
+    treatment_post_rows = sum(
+      sample_data$dataset_source == "treatment" & sample_data$post_event == 1
+    ),
+    treatment_repositories = uniqueN(
+      sample_data[dataset_source == "treatment", repo_id]
+    ),
+    control_repositories = uniqueN(
+      sample_data[dataset_source == "control", repo_id]
+    ),
+    min_time = min(sample_data$time),
+    max_time = max(sample_data$time),
+    changed_blocks_in_sample = sum(sample_data[[denominator_var]], na.rm = TRUE),
+    stringsAsFactors = FALSE
+  )
+}
+
+sample_summary <- bind_rows(sample_summary_rows)
+print(sample_summary)
+
+fwrite(
+  sample_summary,
+  file.path(out_dir, "borusyak_agc_changed_block_sample_by_outcome.csv")
+)
+```
+
+# Static Borusyak Effects
+
+```{r static-effects}
+static_rows <- list()
+model_error_rows <- list()
+
+for (outcome_index in seq_len(nrow(outcome_definitions))) {
+  outcome_var <- outcome_definitions$outcome[outcome_index]
+  outcome_label <- outcome_definitions$outcome_label[outcome_index]
+  outcome_role <- outcome_definitions$role[outcome_index]
+  base_sample <- common_samples[[outcome_var]]
+
+  for (spec_index in seq_len(nrow(specification_definitions))) {
+    specification <- specification_definitions$specification[spec_index]
+    specification_label <- specification_definitions$specification_label[spec_index]
+    ncloc_column <- specification_definitions$ncloc_column[spec_index]
+    first_stage_formula <- build_first_stage_formula(specification)
+
+    model_data <- copy(base_sample)
+    if (!is.na(ncloc_column)) {
+      model_data[, ncloc_model := get(ncloc_column)]
+    }
+
+    cat(
+      "Running static Borusyak model:",
+      specification,
+      "|",
+      outcome_var,
+      "| rows =",
+      nrow(model_data),
+      "\n"
+    )
+
+    result <- tryCatch(
+      run_borusyak_static(
+        data = model_data,
+        outcome_var = outcome_var,
+        first_stage_formula = first_stage_formula,
+        idname = "repo_id",
+        tname = "time_id",
+        gname = "event_id"
+      ),
+      error = function(e) {
+        model_error_rows[[length(model_error_rows) + 1]] <<- data.frame(
+          panel = panel_label,
+          specification = specification,
+          outcome = outcome_var,
+          model_type = "static",
+          error = conditionMessage(e),
+          stringsAsFactors = FALSE
+        )
+        NULL
+      }
+    )
+
+    extracted <- extract_static_result(result, outcome_var)
+    extracted$panel <- panel_label
+    extracted$specification <- specification
+    extracted$specification_label <- specification_label
+    extracted$ncloc_column <- ifelse(is.na(ncloc_column), "none", ncloc_column)
+    extracted$outcome_label <- outcome_label
+    extracted$role <- outcome_role
+    extracted$sample_rows <- nrow(model_data)
+    extracted$sample_repositories <- uniqueN(model_data$repo_id)
+    extracted$first_stage_formula <- paste(deparse(first_stage_formula), collapse = " ")
+    extracted$estimate_percentage_points <- extracted$estimate * 100
+    extracted$conf_low_percentage_points <- extracted$conf_low * 100
+    extracted$conf_high_percentage_points <- extracted$conf_high * 100
+
+    static_rows[[length(static_rows) + 1]] <- extracted
+  }
+}
+
+static_df <- bind_rows(static_rows)
+print(static_df)
+
+fwrite(
+  static_df,
+  file.path(out_dir, "borusyak_agc_changed_block_static_effects.csv")
+)
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_rows <- list()
+
+for (outcome_index in seq_len(nrow(outcome_definitions))) {
+  outcome_var <- outcome_definitions$outcome[outcome_index]
+  outcome_label <- outcome_definitions$outcome_label[outcome_index]
+  outcome_role <- outcome_definitions$role[outcome_index]
+  base_sample <- common_samples[[outcome_var]]
+
+  for (spec_index in seq_len(nrow(specification_definitions))) {
+    specification <- specification_definitions$specification[spec_index]
+    specification_label <- specification_definitions$specification_label[spec_index]
+    ncloc_column <- specification_definitions$ncloc_column[spec_index]
+    first_stage_formula <- build_first_stage_formula(specification)
+
+    model_data <- copy(base_sample)
+    if (!is.na(ncloc_column)) {
+      model_data[, ncloc_model := get(ncloc_column)]
+    }
+
+    cat(
+      "Running dynamic Borusyak model:",
+      specification,
+      "|",
+      outcome_var,
+      "| rows =",
+      nrow(model_data),
+      "\n"
+    )
+
+    result <- tryCatch(
+      run_borusyak_dynamic(
+        data = model_data,
+        outcome_var = outcome_var,
+        first_stage_formula = first_stage_formula,
+        horizon = -6:6,
+        pretrends = -6:-2,
+        idname = "repo_id",
+        tname = "time_id",
+        gname = "event_id"
+      ),
+      error = function(e) {
+        model_error_rows[[length(model_error_rows) + 1]] <<- data.frame(
+          panel = panel_label,
+          specification = specification,
+          outcome = outcome_var,
+          model_type = "dynamic",
+          error = conditionMessage(e),
+          stringsAsFactors = FALSE
+        )
+        NULL
+      }
+    )
+
+    extracted <- extract_dynamic_result(
+      result,
+      outcome = outcome_var,
+      outcome_label = outcome_label,
+      min_horizon = -6,
+      max_horizon = 6
+    )
+
+    if (nrow(extracted) > 0) {
+      extracted$panel <- panel_label
+      extracted$specification <- specification
+      extracted$specification_label <- specification_label
+      extracted$ncloc_column <- ifelse(is.na(ncloc_column), "none", ncloc_column)
+      extracted$role <- outcome_role
+      extracted$sample_rows <- nrow(model_data)
+      extracted$sample_repositories <- uniqueN(model_data$repo_id)
+      extracted$first_stage_formula <- paste(deparse(first_stage_formula), collapse = " ")
+      extracted$estimate_percentage_points <- extracted$estimate * 100
+      extracted$conf_low_percentage_points <- extracted$conf_low * 100
+      extracted$conf_high_percentage_points <- extracted$conf_high * 100
+
+      dynamic_rows[[length(dynamic_rows) + 1]] <- extracted
+    }
+  }
+}
+
+dynamic_df <- bind_rows(dynamic_rows)
+print(dynamic_df)
+
+fwrite(
+  dynamic_df,
+  file.path(out_dir, "borusyak_agc_changed_block_dynamic_effects.csv")
+)
+
+model_errors <- if (length(model_error_rows) > 0) {
+  bind_rows(model_error_rows)
+} else {
+  empty_model_error_table()
+}
+
+fwrite(
+  model_errors,
+  file.path(out_dir, "borusyak_agc_changed_block_model_errors.csv")
+)
+
+primary_outcome <- "agc_changed_top_level_block_ratio"
+primary_errors <- model_errors %>% filter(outcome == primary_outcome)
+if (nrow(primary_errors) > 0) {
+  print(primary_errors)
+  stop(
+    "One or more primary changed-block Borusyak models failed. See ",
+    "borusyak_agc_changed_block_model_errors.csv."
+  )
+}
+
+primary_static_success <- static_df %>%
+  filter(outcome == primary_outcome, is.finite(estimate)) %>%
+  distinct(specification) %>%
+  nrow()
+
+primary_dynamic_success <- dynamic_df %>%
+  filter(outcome == primary_outcome, is.finite(estimate)) %>%
+  distinct(specification) %>%
+  nrow()
+
+if (primary_static_success != nrow(specification_definitions)) {
+  stop("Not all primary static specifications produced finite estimates.")
+}
+
+if (primary_dynamic_success != nrow(specification_definitions)) {
+  stop("Not all primary dynamic specifications produced finite estimates.")
+}
+
+if (nrow(model_errors) > 0) {
+  cat("Robustness-model errors were recorded but primary models succeeded.\n")
+  print(model_errors)
+}
+```
+
+# Pre-Treatment Diagnostics
+
+```{r pretrend-diagnostics}
+if (nrow(dynamic_df) > 0) {
+  pretrend_summary <- dynamic_df %>%
+    filter(time >= -6, time <= -2) %>%
+    group_by(
+      panel,
+      specification,
+      specification_label,
+      outcome,
+      outcome_label,
+      role
+    ) %>%
+    summarise(
+      pre_periods_available = n(),
+      pre_periods_ci_excludes_zero = sum(significant %in% TRUE, na.rm = TRUE),
+      all_preperiod_cis_include_zero = all(!(significant %in% TRUE)),
+      max_absolute_pretrend_estimate = max(abs(estimate), na.rm = TRUE),
+      max_absolute_pretrend_percentage_points =
+        max(abs(estimate_percentage_points), na.rm = TRUE),
+      .groups = "drop"
+    )
+} else {
+  pretrend_summary <- data.frame()
+}
+
+print(pretrend_summary)
+
+fwrite(
+  pretrend_summary,
+  file.path(out_dir, "borusyak_agc_changed_block_pretrend_summary.csv")
+)
+```
+
+# Static Effect Table
+
+```{r static-table}
+static_display <- static_df %>%
+  select(
+    role,
+    specification_label,
+    outcome_label,
+    estimate_percentage_points,
+    conf_low_percentage_points,
+    conf_high_percentage_points,
+    sample_rows,
+    sample_repositories,
+    note
+  ) %>%
+  arrange(match(role, c("primary", "robustness")), outcome_label, specification_label)
+
+knitr::kable(
+  static_display,
+  digits = 3,
+  caption = paste(
+    "Static Borusyak Effects on AGC Changed-Block Shares",
+    "(percentage points)"
+  )
+)
+```
+
+# Coverage Table
+
+```{r coverage-table}
+coverage_display <- coverage_by_group %>%
+  filter(outcome == "agc_changed_top_level_block_ratio") %>%
+  select(
+    analysis_group,
+    total_rows,
+    ratio_rows,
+    missing_ratio_rows,
+    availability_rate,
+    denominator_sum
+  ) %>%
+  arrange(match(analysis_group, c("control", "treatment_pre", "treatment_post")))
+
+knitr::kable(
+  coverage_display,
+  digits = 3,
+  caption = "Primary Changed-Block Ratio Coverage by Analysis Group"
+)
+```
+
+# Dynamic Event-Study Plot
+
+```{r dynamic-plot, fig.width=12, fig.height=7}
+if (nrow(dynamic_df) > 0) {
+  dynamic_plot_data <- copy(as.data.table(dynamic_df))
+  dynamic_plot_data[, outcome_label := factor(
+    outcome_label,
+    levels = outcome_definitions$outcome_label
+  )]
+  dynamic_plot_data[, specification_label := factor(
+    specification_label,
+    levels = specification_definitions$specification_label
+  )]
+
+  position <- position_dodge(width = 0.45)
+
+  dynamic_plot <- ggplot(
+    dynamic_plot_data,
+    aes(
+      x = time,
+      y = estimate_percentage_points,
+      color = specification_label,
+      group = specification_label
+    )
+  ) +
+    geom_errorbar(
+      aes(
+        ymin = conf_low_percentage_points,
+        ymax = conf_high_percentage_points,
+        linetype = significant
+      ),
+      position = position,
+      width = 0.3
+    ) +
+    geom_point(
+      aes(shape = significant),
+      position = position,
+      size = 1.8
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    scale_shape_manual(
+      values = c("TRUE" = 19, "FALSE" = 1),
+      name = "CI excludes zero"
+    ) +
+    scale_linetype_manual(
+      values = c("TRUE" = "solid", "FALSE" = "dotted"),
+      name = "CI excludes zero"
+    ) +
+    facet_wrap(~ outcome_label, scales = "free_y", ncol = 1) +
+    labs(
+      title = paste("Borusyak AGC Changed-Block DiD:", panel_label),
+      subtitle = paste(
+        "Common outcome-specific samples; unadjusted and",
+        "activity-adjusted paper/snapshot NCLOC specifications"
+      ),
+      x = "Months Relative to First Observed Cursor Adoption",
+      y = "Treatment Effect (percentage points)",
+      color = "Specification",
+      caption = paste(
+        "Outcomes use only newly added or structurally modified current blocks.",
+        "Filled points indicate that the confidence interval excludes zero."
+      )
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      legend.position = "bottom",
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
+
+  print(dynamic_plot)
+
+  ggsave(
+    filename = file.path(
+      out_dir,
+      "dynamic_effects_borusyak_agc_changed_block.pdf"
+    ),
+    plot = dynamic_plot,
+    width = 12,
+    height = 7
+  )
+} else {
+  stop("No dynamic effects are available to plot.")
+}
+```
+
+# Model Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "source_notebook",
+    "helper_file",
+    "panel_label",
+    "panel_path",
+    "validation_summary_path",
+    "validation_status",
+    "validation_checks_passed",
+    "validation_checks_total",
+    "out_dir",
+    "outcomes",
+    "primary_outcome",
+    "specifications",
+    "common_model_sample",
+    "common_covariates",
+    "activity_covariates",
+    "activity_covariate_scaling",
+    "activity_adjustment_interpretation",
+    "adjusted_first_stage_formula",
+    "unadjusted_first_stage_formula",
+    "time_encoding",
+    "dynamic_horizon",
+    "pretrend_horizon",
+    "weighting",
+    "outcome_scale",
+    "agc_definition",
+    "hwc_definition",
+    "changed_block_definition",
+    "interpretation",
+    "stock_baseline",
+    "limitation"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_AGC_ChangedBlock.Rmd",
+    "DiffInDiffBorusyak_AGC.Rmd",
+    params$helper_file,
+    panel_label,
+    panel_path,
+    validation_summary_path,
+    validation_summary$status,
+    validation_summary$checks_passed,
+    validation_summary$checks_total,
+    out_dir,
+    paste(outcome_definitions$outcome, collapse = ", "),
+    "agc_changed_top_level_block_ratio",
+    paste(specification_definitions$specification, collapse = ", "),
+    paste(
+      "Each outcome uses one common complete-case sample across all three",
+      "specifications so estimates are directly comparable."
+    ),
+    paste(common_covariates, collapse = ", "),
+    "commits, lines_added",
+    "log1p(commits), log1p(lines_added)",
+    paste(
+      "Adjusted specifications condition on contemporaneous monthly",
+      "development activity. Because commits and lines_added may respond",
+      "to adoption, these estimates are interpreted as conditional",
+      "sensitivity analyses rather than the total treatment effect."
+    ),
+    paste(
+      deparse(build_first_stage_formula("paper_ncloc")),
+      collapse = " "
+    ),
+    paste(
+      deparse(build_first_stage_formula("unadjusted")),
+      collapse = " "
+    ),
+    "sequential calendar-month id",
+    "-6 through +6 months",
+    "-6 through -2 months",
+    "unweighted repository-month analysis",
+    "proportion; reported as percentage points",
+    "AGC = AI likely generated code",
+    "HWC = Human likely written code",
+    paste(
+      "Current top-level functions/classes classified as added or",
+      "structurally modified relative to the preceding monthly snapshot;",
+      "unchanged, moved-unchanged, and deleted blocks are excluded."
+    ),
+    paste(
+      "Change in the repository-month AGC-like share among newly added or",
+      "structurally modified top-level Python function and class blocks",
+      "after observed Cursor adoption."
+    ),
+    paste(
+      "The stock-based analysis of accumulated repository snapshots is",
+      "retained as a separate baseline estimand."
+    ),
+    paste(
+      "The detector outcome captures structural similarity to AI-generated",
+      "code and does not establish block provenance or tool identity."
+    )
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(metadata)
+
+fwrite(
+  metadata,
+  file.path(out_dir, "borusyak_agc_changed_block_model_metadata.csv")
+)
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```
