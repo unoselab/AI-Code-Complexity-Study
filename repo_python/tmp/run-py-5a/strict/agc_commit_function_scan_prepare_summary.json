@@ -1,0 +1,33 @@
+{
+  "checks_failed": 5,
+  "checks_passed": 13,
+  "checks_total": 18,
+  "commit_parent_pairs": 197851,
+  "committer_month_mismatch_pairs": 0,
+  "comparison_status_counts": {
+    "committer_month_count_mismatch": 205,
+    "committer_month_latest_mismatch": 16,
+    "ready": 1412
+  },
+  "cross_month_overlap_pair_rows": 0,
+  "errors": 0,
+  "first_observed_months_recovered": 170,
+  "merge_scan_pairs": 9503,
+  "month_assignment": "committer timestamp month, matching committed_at",
+  "month_end_parent_records": 1633,
+  "panel_rows": 1633,
+  "positive_commit_repo_months": 1633,
+  "primary_event_definition": "One structurally added or modified named Python function in one non-merge commit.",
+  "primary_non_merge_scan_pairs": 188348,
+  "repositories": 220,
+  "scan_pair_definition": "Each selected commit X is compared with its direct first parent X-1. Repeated function changes and later reverts remain separate events.",
+  "selected_history_ref_status_counts": {
+    "best_available_ref": 48,
+    "perfect_panel_match": 172
+  },
+  "selection_method_counts": {
+    "committer_month_from_history_ref": 1633
+  },
+  "status": "FAIL",
+  "zero_commit_repo_months": 0
+}
