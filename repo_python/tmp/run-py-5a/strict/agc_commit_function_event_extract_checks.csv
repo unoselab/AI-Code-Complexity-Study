@@ -1,0 +1,10 @@
+section,check,passed,value
+manifest,function_event_ids_unique,1,0
+manifest,change_types_valid,1,0
+manifest,function_kinds_valid,1,0
+sources,all_source_artifacts_present,1,0
+sources,source_hashes_match_manifest,1,0
+arithmetic,event_counts_nonnegative,1,0
+arithmetic,audit_event_count_matches_manifest,1,436134:436134
+processing,extraction_errors_zero,0,4366
+coverage,all_input_pairs_audited,1,188349:188349

@@ -1,0 +1,27 @@
+{
+  "script": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/proc_scripts/probe_agc_commit_month_timezone.py",
+  "input_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv",
+  "history_audit": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-5a/strict/agc_commit_function_history_ref_selection.csv",
+  "repositories": [
+    "OpenSPP/openspp-modules",
+    "LearningCircuit/local-deep-research",
+    "airweave-ai/airweave",
+    "zauberzeug/nicegui",
+    "aio-libs/aiohttp",
+    "BalancerMaxis/multisig-ops"
+  ],
+  "timezone_modes": [
+    "original_local",
+    "utc",
+    "america_chicago",
+    "commit_embedded_offset"
+  ],
+  "system_tz_environment": null,
+  "time_tzname": [
+    "CST",
+    "CDT"
+  ],
+  "time_timezone": 21600,
+  "time_altzone": 18000,
+  "max_named_refs": 5
+}

@@ -1,77 +1,15 @@
-=== Non-ready repository-months ===
-Rows: 11
-dataset_source                               repo_name   month previous_month  month_gap     selection_method      comparison_status  panel_commits  range_commits_found  selected_commits first_scan_commit last_scan_commit                         month_end_commit
-       control Hack-a-Day/2024-Supercon-8-Add-On-Badge 2024-10        2024-09        1.0 panel_count_backfill commit_count_shortfall             47                   41                42               NaN              NaN fa2d8d0fc9c69b610d8eebca14d9d54e6a23475d
-       control                    bobokun/actualtap-py 2024-07            NaN        NaN panel_count_backfill commit_count_shortfall             38                    0                36               NaN              NaN a5fcb921ad47b516b36cca41ecfe36142cb0fcd0
-       control            microsoft/semantic-link-labs 2024-05            NaN        NaN panel_count_backfill commit_count_shortfall             26                    0                12               NaN              NaN 1c01a9e709f2a7fa2371f91b24f281353de3b36b
-       control            microsoft/semantic-link-labs 2024-08        2024-07        1.0 panel_count_backfill commit_count_shortfall            145                    0               141               NaN              NaN 7c15bce2bc4c68dce4c528a7d1d5f7e40f9601c3
-       control                slopp/30_days_of_dagster 2024-11            NaN        NaN panel_count_backfill commit_count_shortfall             32                    0                28               NaN              NaN effb6b4d19242e3e0c5937ac28cc42fa2a2691e2
-     treatment            OpenMOSS/Language-Model-SAEs 2024-03            NaN        NaN panel_count_backfill commit_count_shortfall            110                    0               104               NaN              NaN 8dc3a600be9da11476d51892ee9682b545088d25
-     treatment                           cgevans/qslib 2025-02        2025-01        1.0 panel_count_backfill commit_count_shortfall             68                    0                41               NaN              NaN f231361a93b274928e71ff2cb06bee91e0bb2c11
-     treatment             gerred/mcp-server-replicate 2025-01            NaN        NaN panel_count_backfill commit_count_shortfall             25                    0                24               NaN              NaN da7c9f5b18a5a1db189315cdfb6b92d03583bf1a
-     treatment                         sbomify/sbomify 2025-01            NaN        NaN panel_count_backfill commit_count_shortfall             16                    0                13               NaN              NaN d8357a144cfc82a75a9a367fd9d51295a600a1e5
-     treatment                        tw-haiven/haiven 2024-04            NaN        NaN panel_count_backfill commit_count_shortfall            225                    0               224               NaN              NaN d4af924ba440a4249c5239f80bd44719bcd63449
-     treatment                   xzq-xu/jvm-mcp-server 2025-03            NaN        NaN panel_count_backfill commit_count_shortfall             32                    0                31               NaN              NaN 6bd46892290772bf681399797006109ac16c2d65
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ wc -l ./repo_python/run-py-5a/strict/commit_parent_pairs.csv 
+197854 ./repo_python/run-py-5a/strict/commit_parent_pairs.csv
 
-=== Cross-month overlap summary ===
-Duplicate pair rows: 7781
-Unique overlapping commits: 3749
+(aicomplexity) OISSE-IST173C01:ai-code-complexity-study$ head ./repo_python/run-py-5a/strict/commit_parent_pairs.csv 
+dataset_source,repo_name,month,previous_month,previous_month_commit,month_end_commit,commit_range,selection_method,history_ref,panel_commits,commit_order,scan_parent_commit,scan_current_commit,parent_count,is_root_commit,is_merge_commit,primary_scan_eligible,is_month_end_commit,committer_datetime,committer_month,committer_month_matches_panel_month,repo_dir
+control,2019211474/DL-NASA-SOH-CNN-BILSTM-Attention,2025-03,2025-02,5221bbfc995e48829975b34634f55d0e5936e59a,2155b95284b5e4bfb02cc6aaf00914eafbdcad07,committer-month:2025-03@HEAD,head_committer_epoch_explicit_timezone,HEAD,1,1,5221bbfc995e48829975b34634f55d0e5936e59a,2155b95284b5e4bfb02cc6aaf00914eafbdcad07,1,0,0,1,1,2025-03-05T19:12:21-06:00,2025-03,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/2019211474_DL-NASA-SOH-CNN-BILSTM-Attention
+control,AkariAsai/ScholarQABench,2024-11,,,8f63e5b270ac2eac04ba06bfe42913388087f87f,committer-month:2024-11@HEAD,head_committer_epoch_explicit_timezone,HEAD,3,1,4b825dc642cb6eb9a060e54bf8d69288fbee4904,13a98363d676528a402e82d6d5258cfb0af08826,0,1,0,1,0,2024-11-19T04:53:08-06:00,2024-11,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
+control,AkariAsai/ScholarQABench,2024-11,,,8f63e5b270ac2eac04ba06bfe42913388087f87f,committer-month:2024-11@HEAD,head_committer_epoch_explicit_timezone,HEAD,3,2,13a98363d676528a402e82d6d5258cfb0af08826,d1db92ad88f13192ac82e4561115ab2096d37b5a,1,0,0,1,0,2024-11-19T04:58:16-06:00,2024-11,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
+control,AkariAsai/ScholarQABench,2024-11,,,8f63e5b270ac2eac04ba06bfe42913388087f87f,committer-month:2024-11@HEAD,head_committer_epoch_explicit_timezone,HEAD,3,3,d1db92ad88f13192ac82e4561115ab2096d37b5a,8f63e5b270ac2eac04ba06bfe42913388087f87f,1,0,0,1,1,2024-11-19T05:11:13-06:00,2024-11,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
+control,AkariAsai/ScholarQABench,2025-02,2025-01,8f63e5b270ac2eac04ba06bfe42913388087f87f,c439fbce548b5fab5ff5304e748763e6c8b2b014,committer-month:2025-02@HEAD,head_committer_epoch_explicit_timezone,HEAD,7,1,8f63e5b270ac2eac04ba06bfe42913388087f87f,af8d0271ceeb2cb3f51bc4c4dd4b0195ee22f069,1,0,0,1,0,2025-02-07T13:26:05-06:00,2025-02,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
+control,AkariAsai/ScholarQABench,2025-02,2025-01,8f63e5b270ac2eac04ba06bfe42913388087f87f,c439fbce548b5fab5ff5304e748763e6c8b2b014,committer-month:2025-02@HEAD,head_committer_epoch_explicit_timezone,HEAD,7,2,af8d0271ceeb2cb3f51bc4c4dd4b0195ee22f069,ed9dbd8723267995bf65a448fe06f2e2fe7ca88e,1,0,0,1,0,2025-02-07T13:31:30-06:00,2025-02,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
+control,AkariAsai/ScholarQABench,2025-02,2025-01,8f63e5b270ac2eac04ba06bfe42913388087f87f,c439fbce548b5fab5ff5304e748763e6c8b2b014,committer-month:2025-02@HEAD,head_committer_epoch_explicit_timezone,HEAD,7,3,ed9dbd8723267995bf65a448fe06f2e2fe7ca88e,17e5869535e25c00f62ace7c018720a7f6e37daf,1,0,0,1,0,2025-02-24T08:52:55-06:00,2025-02,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
+control,AkariAsai/ScholarQABench,2025-02,2025-01,8f63e5b270ac2eac04ba06bfe42913388087f87f,c439fbce548b5fab5ff5304e748763e6c8b2b014,committer-month:2025-02@HEAD,head_committer_epoch_explicit_timezone,HEAD,7,4,17e5869535e25c00f62ace7c018720a7f6e37daf,16dcb89a433ff70f95e5c39ed09c792e3814ba22,1,0,0,1,0,2025-02-24T08:53:42-06:00,2025-02,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
+control,AkariAsai/ScholarQABench,2025-02,2025-01,8f63e5b270ac2eac04ba06bfe42913388087f87f,c439fbce548b5fab5ff5304e748763e6c8b2b014,committer-month:2025-02@HEAD,head_committer_epoch_explicit_timezone,HEAD,7,5,16dcb89a433ff70f95e5c39ed09c792e3814ba22,bd928d881bc029da8d9e1dfde68099f0c7618bc9,1,0,0,1,0,2025-02-24T08:54:09-06:00,2025-02,1,/home/user1-system12/project-workspace/ai_code_complexity_study_python/control-repos/AkariAsai_ScholarQABench
 
-Selection methods among overlapping rows:
-selection_method
-panel_count_backfill_after_range_mismatch    7275
-monthly_snapshot_range                        372
-first_observed_month_panel_count_backfill     134
-
-Top 50 overlapping commits:
-dataset_source          repo_name                      scan_current_commit                 assigned_months  month_count                         selection_methods
-       control   aio-libs/aiohttp 067df3bf9843abd22ae242e34c6746248c209483 2024-05;2024-06;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 12d4046e59e37e5c276538ab0694b9d69ed82904 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 17af04701211874e46b14636893054ca748bb451 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 25e3e41ad0012381f214886ff437b924a4fda2f2 2024-05;2024-06;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 37f2dd141882c69bf020169bffcea30384c7483e 2024-05;2024-06;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 3e0b88d3c84a71e9b8d1a131f1cb07a71cf73291 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 40b1b71e42a4edeffbdec6af9aa80c3e6303e68f 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 4e714c787a03f1f5856b3c8695b5dd1434fe1539 2024-05;2024-06;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 573c5ad4e24292109de65370ec2f12027149947c 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 5ccbe7702dfc91f50d371550f097f6159036b7a0 2024-05;2024-06;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 5ea0e75f916bafe462763747e895b6ffcef8876b 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 64f02b17493b935acc70f5bf3387269bb1f8db8c 2024-05;2024-06;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 9bd65fa936f6f7945f27246270251c056342263f 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp a43045a7fa49b47c3ef5ab019f18995e5c2e394b 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp a9200db60f6780c2ce331fe6c43f78809ab8be92 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp c215e56dc175e9da545e73b00531f743833e0de8 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp d81c6f0d555b2f817654e91bb0a0b9cb7e8b1dc6 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp f1eda16015a9b819eaea78f7e8ad09901b521153 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp f8daef6cb7e959239c4df08e2828b17d568ba4c4 2024-05;2024-06;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp fd9b940a01a9fb37ac07c3d360bdb44fc1a23a3b 2024-04;2024-05;2024-07;2024-08            4 panel_count_backfill_after_range_mismatch
-     treatment VRSEN/agency-swarm 4b18a7ff2faa51f5c12193db2b517ce06d346dd2 2025-03;2025-04;2025-05;2025-06            4 panel_count_backfill_after_range_mismatch
-     treatment VRSEN/agency-swarm 8233443f3e8e6302c6815f933f8bf371c0c200c0 2025-03;2025-04;2025-05;2025-06            4 panel_count_backfill_after_range_mismatch
-     treatment VRSEN/agency-swarm 885c6a41a785241726421e7dba763a5daa101ec1 2025-03;2025-04;2025-05;2025-06            4 panel_count_backfill_after_range_mismatch
-     treatment VRSEN/agency-swarm bdc65235ad19305b7c2c87fbdfcd83f6f5fd2fa6 2025-03;2025-04;2025-05;2025-06            4 panel_count_backfill_after_range_mismatch
-     treatment VRSEN/agency-swarm e8412ee0d37b35667767b31cb29d5bd19e6d73e6 2025-03;2025-04;2025-05;2025-06            4 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 00e06f038c99f1236af5f632b9d15ebf262aa679         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 0604da9f1d74a1f81d681efed10f89cf906dd9b0         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 094bf4eea616b169e585a20c4d8962870fc74a02         2025-02;2025-03;2025-05            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 0b82655f873c7c3883dc66aa3bd5ead0636a2a46         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 10e3940aff0945180b71193a45cedf927b4d448d         2024-06;2024-07;2024-08            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 13152c39f9360cef7ba1d78252afdc91cf220441         2024-11;2024-12;2025-03            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 16b4bc4e081d19a6d6ee14850ce38576d8fdef03         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 17b005a1df0b02aa31fd710858a231f98290308f         2024-11;2024-12;2025-03            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1856c5995e507e35e807469d01191e571bc329c0         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1a48a62fbbd4920a154451b99d90a2589c441512         2025-03;2025-04;2025-05            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1a6fafe8f05acb705029e16c9ba43df7aaba2473         2024-11;2024-12;2025-03            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1b5d9f6c313e81821b173fdc76edc8c23e0cbbfe         2024-06;2024-07;2024-08            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1b78cae44d97e3eb5ea15a25319d5a5a3daf8c9f         2024-11;2024-12;2025-03            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1b9fada3501360196b2951dd128fc33d243638e8         2024-12;2025-02;2025-03            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1bd7faa1008c3b959af14da382dd28d1d00a8695         2025-02;2025-03;2025-05            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1c302e985dd7e6b6c5717cd6b7d3e3f8959dc1aa         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1ca72440747618f7039bf9a8e1fde666a0aa6ea2         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1d7b0df336cf1cb35a676f56104c2e48e895ca2a         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1dda663caf32f261f0088da23a93f6bf4dc88c26         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 1ffe9faa912cca8e0a6d07dcb97d72bdb5cf5e0c         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 20b7a7b0c2463a3ae02073e13704ce4c7b478f30         2024-11;2024-12;2025-03            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 2272c2b952e87048922cb69ce6daa3a7340677c1         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 22a12cc2e2ef289d9e96fd87dfc17272177e52ac         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 255ec0281a55992c5521f449786e0f9e491b3a73         2024-09;2024-10;2024-11            3 panel_count_backfill_after_range_mismatch
-       control   aio-libs/aiohttp 25b49dceadfc318df0ad695a29b65b9b82f29925         2024-11;2024-12;2025-03            3 panel_count_backfill_after_range_mismatch

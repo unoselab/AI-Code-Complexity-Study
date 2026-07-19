@@ -85,6 +85,9 @@ EXTRACT_SUMMARY_FILE="${QC_DIR}/agc_commit_function_event_extract_summary.json"
 EXTRACT_CHECK_FILE="${QC_DIR}/agc_commit_function_event_extract_checks.csv"
 EXTRACT_ERROR_FILE="${QC_DIR}/agc_commit_function_event_extract_errors.csv"
 
+EXTRACT_AUDIT_FILE="${OUTPUT_DIR}/commit_function_event_extraction_audit.csv"
+REPO_MONTH_EVENT_COUNT_FILE="${OUTPUT_DIR}/repo_month_function_event_counts.csv"
+
 TIMESTAMP="${TIMESTAMP:-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-5a_prepare_agc_commit_function_events_${PANEL_VARIANT}_${TIMESTAMP}.log}"
 
@@ -173,6 +176,18 @@ INFO
 
 "${PYTHON_BIN}" -m py_compile "${PREPARE_SCRIPT}" "${EXTRACT_SCRIPT}"
 
+"${PYTHON_BIN}" "${PREPARE_SCRIPT}" --self-test
+
+"${PYTHON_BIN}" "${EXTRACT_SCRIPT}" --self-test
+
+rm -f \
+    "${FUNCTION_EVENT_MANIFEST}" \
+    "${EXTRACT_AUDIT_FILE}" \
+    "${REPO_MONTH_EVENT_COUNT_FILE}" \
+    "${EXTRACT_SUMMARY_FILE}" \
+    "${EXTRACT_CHECK_FILE}" \
+    "${EXTRACT_ERROR_FILE}"
+
 echo
 echo "[Stage 1/2] Preparing repository-month commit-parent pairs"
 PYTHONUNBUFFERED=1 "${PYTHON_BIN}" "${PREPARE_SCRIPT}" \
@@ -199,10 +214,13 @@ PYTHONUNBUFFERED=1 "${PYTHON_BIN}" "${EXTRACT_SCRIPT}" \
     --control-clone-dir "${CONTROL_CLONE_DIR}" \
     --output-manifest "${FUNCTION_EVENT_MANIFEST}" \
     --function-source-root "${FUNCTION_SOURCE_ROOT}" \
+    --overwrite-source-root \
     --qc-dir "${QC_DIR}" \
     --progress-every "${PROGRESS_EVERY}"
 
 require_file "${FUNCTION_EVENT_MANIFEST}" "commit-function detection manifest"
+require_file "${EXTRACT_AUDIT_FILE}" "commit-function extraction audit"
+require_file "${REPO_MONTH_EVENT_COUNT_FILE}" "repository-month function-event counts"
 require_dir "${FUNCTION_SOURCE_ROOT}" "commit-function source directory"
 require_file "${EXTRACT_SUMMARY_FILE}" "commit-function extraction summary"
 require_file "${EXTRACT_CHECK_FILE}" "commit-function extraction checks"

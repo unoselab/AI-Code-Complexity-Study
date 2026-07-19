@@ -1,33 +1,33 @@
 {
-  "checks_failed": 5,
-  "checks_passed": 13,
+  "checks_failed": 0,
+  "checks_passed": 18,
   "checks_total": 18,
-  "commit_parent_pairs": 197851,
+  "collection_timezone": "America/Chicago",
+  "commit_parent_pairs": 197853,
+  "commit_timestamp_source": "git %ct committer epoch",
+  "commit_universe": "commits reachable from HEAD",
   "committer_month_mismatch_pairs": 0,
   "comparison_status_counts": {
-    "committer_month_count_mismatch": 205,
-    "committer_month_latest_mismatch": 16,
-    "ready": 1412
+    "ready": 1633
   },
   "cross_month_overlap_pair_rows": 0,
   "errors": 0,
-  "first_observed_months_recovered": 170,
-  "merge_scan_pairs": 9503,
-  "month_assignment": "committer timestamp month, matching committed_at",
+  "first_observed_months_recovered": 190,
+  "merge_scan_pairs": 9504,
+  "month_assignment": "committer epoch converted to explicit collection timezone",
   "month_end_parent_records": 1633,
   "panel_rows": 1633,
   "positive_commit_repo_months": 1633,
   "primary_event_definition": "One structurally added or modified named Python function in one non-merge commit.",
-  "primary_non_merge_scan_pairs": 188348,
+  "primary_non_merge_scan_pairs": 188349,
   "repositories": 220,
   "scan_pair_definition": "Each selected commit X is compared with its direct first parent X-1. Repeated function changes and later reverts remain separate events.",
   "selected_history_ref_status_counts": {
-    "best_available_ref": 48,
-    "perfect_panel_match": 172
+    "perfect_panel_match": 220
   },
   "selection_method_counts": {
-    "committer_month_from_history_ref": 1633
+    "head_committer_epoch_explicit_timezone": 1633
   },
-  "status": "FAIL",
+  "status": "PASS",
   "zero_commit_repo_months": 0
 }

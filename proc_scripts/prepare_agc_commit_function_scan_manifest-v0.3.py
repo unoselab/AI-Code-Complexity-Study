@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Prepare repository-month commit/first-parent pairs for function-event analysis.
 
-This revision reproduces the original repository analyzer exactly where it
-matters for monthly Git history:
+This revision reproduces the monthly commit assignment used by the original
+repository analyzer: commits are assigned to months with their committer
+timestamp (``committed_at``), not by taking the last N commits from a monthly
+snapshot.
 
-1. The commit universe is the single history reachable from ``HEAD``.
-2. Commit months are derived from the committer epoch (``%ct``) in the explicit
-   ``America/Chicago`` timezone, reproducing the collection machine's local
-   CST/CDT behavior without depending on the current process environment.
-3. The monthly latest commit follows the original strict greater-than update
-   while preserving ``git log HEAD`` traversal order for timestamp ties.
+For each repository, the script evaluates multiple recoverable Git-history
+candidates instead of assuming that the current/default branch still matches
+the clone state used to create the panel. Candidates include current branch
+refs, local and remote branch tips, retained reflog tips, the union of panel
+snapshot anchors, and all currently advertised refs. Each candidate enumerates
+every reachable commit exactly once, groups commits by committer month, and is
+validated against both the panel commit count and panel latest commit.
 
 Each selected commit X is paired with its direct first parent X-1. Repeated
 changes to the same function and later reverts therefore remain separate
@@ -33,7 +36,6 @@ import sys
 import tempfile
 from dataclasses import dataclass
 from datetime import datetime
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
@@ -184,6 +186,15 @@ class CommitRecord:
 
 
 @dataclass(frozen=True)
+class HistorySpec:
+    label: str
+    kind: str
+    priority: int
+    revisions: tuple[str, ...]
+    use_all_refs: bool = False
+
+
+@dataclass(frozen=True)
 class HistoryCandidate:
     ref: str
     kind: str
@@ -242,14 +253,6 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("repo_python/tmp/run-py-5a/strict"),
     )
-    parser.add_argument(
-        "--collection-timezone",
-        default="America/Chicago",
-        help=(
-            "Explicit timezone used to reproduce the original local-time "
-            "month assignment. Default: America/Chicago."
-        ),
-    )
     parser.add_argument("--progress-every", type=int, default=100)
     parser.add_argument("--self-test", action="store_true")
     return parser.parse_args()
@@ -275,6 +278,12 @@ def valid_commit_text(value: Any) -> bool:
     return bool(FULL_SHA_RE.fullmatch(str(value).strip()))
 
 
+def commit_exists(repo_dir: Path, commit: str) -> bool:
+    if not valid_commit_text(commit):
+        return False
+    return run_git(repo_dir, ["cat-file", "-e", f"{commit}^{{commit}}"]).returncode == 0
+
+
 def resolve_ref_commit(repo_dir: Path, ref: str) -> str:
     result = run_git(repo_dir, ["rev-parse", "--verify", f"{ref}^{{commit}}"])
     if result.returncode != 0:
@@ -283,20 +292,175 @@ def resolve_ref_commit(repo_dir: Path, ref: str) -> str:
     return commit if valid_commit_text(commit) else ""
 
 
+def symbolic_ref(repo_dir: Path, ref: str) -> str:
+    result = run_git(repo_dir, ["symbolic-ref", "--quiet", ref])
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def list_named_refs(repo_dir: Path) -> list[str]:
+    result = run_git(
+        repo_dir,
+        [
+            "for-each-ref",
+            "--format=%(refname)",
+            "refs/heads",
+            "refs/remotes",
+        ],
+    )
+    if result.returncode != 0:
+        return []
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def list_reflog_tips(repo_dir: Path, max_tips: int = 200) -> list[str]:
+    result = run_git(
+        repo_dir,
+        [
+            "reflog",
+            "--all",
+            "--format=%H",
+        ],
+    )
+    if result.returncode != 0:
+        return []
+    tips: list[str] = []
+    seen: set[str] = set()
+    for line in result.stdout.splitlines():
+        commit = line.strip()
+        if valid_commit_text(commit) and commit not in seen:
+            tips.append(commit)
+            seen.add(commit)
+        if len(tips) >= max_tips:
+            break
+    return tips
+
+
+def commit_contains_all_anchors(
+    repo_dir: Path,
+    tip_commit: str,
+    panel_anchors: Sequence[str],
+) -> bool:
+    for anchor in panel_anchors:
+        result = run_git(
+            repo_dir,
+            ["merge-base", "--is-ancestor", anchor, tip_commit],
+        )
+        if result.returncode != 0:
+            return False
+    return True
+
+
+def candidate_history_specs(
+    repo_dir: Path,
+    repo_panel: pd.DataFrame,
+) -> list[HistorySpec]:
+    panel_anchors = tuple(
+        dict.fromkeys(
+            str(value).strip()
+            for value in repo_panel["latest_commit"].tolist()
+            if valid_commit_text(value)
+        )
+    )
+    specs: list[HistorySpec] = []
+    seen_identity: set[tuple[bool, tuple[str, ...]]] = set()
+    priority = 1
+
+    def add_spec(
+        label: str,
+        kind: str,
+        revisions: Sequence[str],
+        use_all_refs: bool = False,
+    ) -> None:
+        nonlocal priority
+        normalized = tuple(str(value).strip() for value in revisions if str(value).strip())
+        identity = (use_all_refs, normalized)
+        if (not use_all_refs and not normalized) or identity in seen_identity:
+            return
+        specs.append(
+            HistorySpec(
+                label=label,
+                kind=kind,
+                priority=priority,
+                revisions=normalized,
+                use_all_refs=use_all_refs,
+            )
+        )
+        seen_identity.add(identity)
+        priority += 1
+
+    # The panel anchors are immutable commit hashes from the validated panel.
+    # Their union is robust to current-branch drift and force-pushed refs.
+    add_spec(
+        "panel_anchor_union",
+        "panel_anchor_union",
+        panel_anchors,
+    )
+
+    origin_head = symbolic_ref(repo_dir, "refs/remotes/origin/HEAD")
+    local_head = symbolic_ref(repo_dir, "HEAD")
+    ordered_refs = [
+        origin_head,
+        local_head,
+        "refs/remotes/origin/main",
+        "refs/remotes/origin/master",
+        "refs/heads/main",
+        "refs/heads/master",
+        "HEAD",
+        *list_named_refs(repo_dir),
+    ]
+
+    seen_tips: set[str] = set()
+    for ref in ordered_refs:
+        ref_text = str(ref).strip()
+        tip = resolve_ref_commit(repo_dir, ref_text) if ref_text else ""
+        if not tip or tip in seen_tips:
+            continue
+        if panel_anchors and not commit_contains_all_anchors(
+            repo_dir,
+            tip,
+            panel_anchors,
+        ):
+            continue
+        add_spec(ref_text, "named_ref", [tip])
+        seen_tips.add(tip)
+
+    # Reflog candidates can recover the exact branch tip used by the earlier
+    # panel analysis even when the current branch has since advanced.
+    for tip in list_reflog_tips(repo_dir):
+        if tip in seen_tips:
+            continue
+        if panel_anchors and not commit_contains_all_anchors(
+            repo_dir,
+            tip,
+            panel_anchors,
+        ):
+            continue
+        add_spec(f"reflog:{tip}", "reflog_tip", [tip])
+        seen_tips.add(tip)
+
+    # Keep --all as a final diagnostic candidate. Candidate scoring prevents it
+    # from being selected unless it reproduces the panel better than other
+    # recoverable histories.
+    add_spec("all_refs_union", "all_refs_union", [], use_all_refs=True)
+    return specs
+
+
+def parse_iso_epoch(value: str) -> float:
+    return datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp()
+
+
 def load_history(
     repo_dir: Path,
     revisions: Sequence[str],
-    collection_timezone: ZoneInfo,
     use_all_refs: bool = False,
     label: str = "history",
 ) -> tuple[CommitRecord, ...]:
-    """Load commits with the original epoch-to-local-time month semantics."""
     command = ["log"]
     if use_all_refs:
         command.append("--all")
     else:
         command.extend(revisions)
-    command.append("--format=%H%x1f%ct%x1f%P")
+    command.append("--format=%H%x1f%cI%x1f%P")
 
     output = require_git_ok(
         run_git(repo_dir, command),
@@ -313,32 +477,21 @@ def load_history(
             raise RuntimeError(
                 f"Unexpected git log record for {label}: {raw_line!r}"
             )
-        commit, epoch_text, parent_text = fields
+        commit, committer_datetime, parent_text = fields
         commit = commit.strip()
-        epoch_text = epoch_text.strip()
+        committer_datetime = committer_datetime.strip()
         parents = tuple(value for value in parent_text.strip().split() if value)
         if not valid_commit_text(commit):
             raise RuntimeError(f"Invalid commit in git log for {label}: {commit!r}")
         if commit in seen_commits:
             continue
-        try:
-            committer_epoch = int(epoch_text)
-        except ValueError as exc:
-            raise RuntimeError(
-                f"Invalid committer epoch for {label}: {epoch_text!r}"
-            ) from exc
-
-        local_datetime = datetime.fromtimestamp(
-            committer_epoch,
-            tz=collection_timezone,
-        )
         seen_commits.add(commit)
         records.append(
             CommitRecord(
                 commit=commit,
-                committer_datetime=local_datetime.isoformat(),
-                committer_month=f"{local_datetime.year:04d}-{local_datetime.month:02d}",
-                committer_epoch=float(committer_epoch),
+                committer_datetime=committer_datetime,
+                committer_month=committer_datetime[:7],
+                committer_epoch=parse_iso_epoch(committer_datetime),
                 parents=parents,
                 history_order=history_order,
             )
@@ -382,21 +535,16 @@ def group_history(
     return by_commit, by_month, reproduced_latest
 
 
-def build_head_history_candidate(
+def evaluate_history_candidate(
     repo_dir: Path,
+    spec: HistorySpec,
     repo_panel: pd.DataFrame,
-    collection_timezone: ZoneInfo,
 ) -> HistoryCandidate:
-    """Evaluate the single HEAD history used by the original analyzer."""
-    tip_commit = resolve_ref_commit(repo_dir, "HEAD")
-    if not tip_commit:
-        raise RuntimeError("Unable to resolve HEAD")
-
     records = load_history(
         repo_dir,
-        revisions=("HEAD",),
-        collection_timezone=collection_timezone,
-        label="HEAD",
+        revisions=spec.revisions,
+        use_all_refs=spec.use_all_refs,
+        label=spec.label,
     )
     by_commit, by_month, reproduced_latest = group_history(records)
 
@@ -419,15 +567,15 @@ def build_head_history_candidate(
         latest_matches += int(latest_match)
         count_and_latest_matches += int(count_match and latest_match)
 
+    tip_commit = spec.revisions[0] if len(spec.revisions) == 1 else ""
+    contains_all = int(all(anchor in by_commit for anchor in panel_anchors))
     return HistoryCandidate(
-        ref="HEAD",
-        kind="head",
-        priority=1,
+        ref=spec.label,
+        kind=spec.kind,
+        priority=spec.priority,
         tip_commit=tip_commit,
-        revision_count=1,
-        contains_all_panel_anchors=int(
-            all(anchor in by_commit for anchor in panel_anchors)
-        ),
+        revision_count=len(spec.revisions),
+        contains_all_panel_anchors=contains_all,
         records=records,
         by_commit=by_commit,
         by_month=by_month,
@@ -441,43 +589,61 @@ def build_head_history_candidate(
 def choose_history_candidate(
     repo_dir: Path,
     repo_panel: pd.DataFrame,
-    collection_timezone: ZoneInfo,
 ) -> tuple[HistoryCandidate | None, list[dict[str, Any]], str]:
-    """Select HEAD only; never substitute another ref for primary data."""
-    candidate = build_head_history_candidate(
-        repo_dir=repo_dir,
-        repo_panel=repo_panel,
-        collection_timezone=collection_timezone,
+    specs = candidate_history_specs(repo_dir, repo_panel)
+    if not specs:
+        return None, [], "no_history_candidate"
+
+    candidates: list[HistoryCandidate] = []
+    audit_rows: list[dict[str, Any]] = []
+    for spec in specs:
+        candidate = evaluate_history_candidate(
+            repo_dir=repo_dir,
+            spec=spec,
+            repo_panel=repo_panel,
+        )
+        candidates.append(candidate)
+
+    selected = max(
+        candidates,
+        key=lambda item: (
+            item.count_and_latest_matches,
+            item.count_matches,
+            item.latest_matches,
+            item.contains_all_panel_anchors,
+            -item.priority,
+        ),
     )
-    perfect = candidate.count_and_latest_matches == len(repo_panel)
-    selection_status = "perfect_panel_match" if perfect else "head_panel_mismatch"
+    perfect = selected.count_and_latest_matches == len(repo_panel)
+    selection_status = "perfect_panel_match" if perfect else "best_available_history"
 
     source = str(repo_panel.iloc[0]["dataset_source"])
     repo_name = str(repo_panel.iloc[0]["repo_name"])
-    audit_rows = [
-        {
-            "dataset_source": source,
-            "repo_name": repo_name,
-            "repo_dir": str(repo_dir),
-            "candidate_ref": candidate.ref,
-            "candidate_priority": candidate.priority,
-            "candidate_tip_commit": candidate.tip_commit,
-            "candidate_kind": candidate.kind,
-            "candidate_revision_count": candidate.revision_count,
-            "candidate_contains_all_panel_anchors": (
-                candidate.contains_all_panel_anchors
-            ),
-            "history_commits": len(candidate.records),
-            "panel_months": len(repo_panel),
-            "count_matches": candidate.count_matches,
-            "latest_matches": candidate.latest_matches,
-            "count_and_latest_matches": candidate.count_and_latest_matches,
-            "selected": 1,
-            "selection_status": selection_status,
-        }
-    ]
-    return candidate, audit_rows, selection_status
+    for candidate in candidates:
+        audit_rows.append(
+            {
+                "dataset_source": source,
+                "repo_name": repo_name,
+                "repo_dir": str(repo_dir),
+                "candidate_ref": candidate.ref,
+                "candidate_priority": candidate.priority,
+                "candidate_tip_commit": candidate.tip_commit,
+                "candidate_kind": candidate.kind,
+                "candidate_revision_count": candidate.revision_count,
+                "candidate_contains_all_panel_anchors": (
+                    candidate.contains_all_panel_anchors
+                ),
+                "history_commits": len(candidate.records),
+                "panel_months": len(repo_panel),
+                "count_matches": candidate.count_matches,
+                "latest_matches": candidate.latest_matches,
+                "count_and_latest_matches": candidate.count_and_latest_matches,
+                "selected": int(candidate.ref == selected.ref),
+                "selection_status": selection_status,
+            }
+        )
 
+    return selected, audit_rows, selection_status
 
 def month_number(period: pd.Period) -> int:
     return period.year * 12 + period.month
@@ -598,7 +764,6 @@ def prepare(
     joined: pd.DataFrame,
     treatment_clone_dir: Path,
     control_clone_dir: Path,
-    collection_timezone: ZoneInfo,
     progress_every: int,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     roots = {"treatment": treatment_clone_dir, "control": control_clone_dir}
@@ -627,7 +792,6 @@ def prepare(
                 history, ref_audit, history_selection_status = choose_history_candidate(
                     repo_dir=repo_dir,
                     repo_panel=repo_panel,
-                    collection_timezone=collection_timezone,
                 )
                 history_ref_rows.extend(ref_audit)
         except Exception as exc:
@@ -662,7 +826,7 @@ def prepare(
             month_gap: int | str = "" if pd.isna(row.month_gap) else int(row.month_gap)
 
             status = "ready"
-            method = "head_committer_epoch_explicit_timezone"
+            method = "committer_month_from_history_ref"
             selected_records: tuple[CommitRecord, ...] = ()
             reproduced_latest = ""
             history_ref = history.ref if history is not None else ""
@@ -991,7 +1155,6 @@ def build_summary(
     history_refs: pd.DataFrame,
     errors: pd.DataFrame,
     checks: pd.DataFrame,
-    collection_timezone_name: str,
 ) -> dict[str, Any]:
     status_counts = {
         str(key): int(value)
@@ -1039,10 +1202,7 @@ def build_summary(
         "errors": int(len(errors)),
         "comparison_status_counts": status_counts,
         "selection_method_counts": method_counts,
-        "month_assignment": "committer epoch converted to explicit collection timezone",
-        "collection_timezone": collection_timezone_name,
-        "commit_timestamp_source": "git %ct committer epoch",
-        "commit_universe": "commits reachable from HEAD",
+        "month_assignment": "committer timestamp month, matching committed_at",
         "scan_pair_definition": (
             "Each selected commit X is compared with its direct first parent X-1. "
             "Repeated function changes and later reverts remain separate events."
@@ -1074,8 +1234,7 @@ def commit_file(
 
 
 def self_test() -> None:
-    collection_timezone = ZoneInfo("America/Chicago")
-    with tempfile.TemporaryDirectory(prefix="agc-commit-scan-v5-") as temp_dir:
+    with tempfile.TemporaryDirectory(prefix="agc-commit-scan-v4-") as temp_dir:
         repo = Path(temp_dir) / "repo"
         repo.mkdir()
         subprocess.run(["git", "init", "-q", str(repo)], check=True)
@@ -1088,79 +1247,74 @@ def self_test() -> None:
             check=True,
         )
 
-        july: list[str] = []
-        august: list[str] = []
-        july.append(
-            commit_file(
-                repo,
-                "july-1",
-                "def f():\n    return 1\n",
-                "2025-07-10T12:00:00-05:00",
-            )
+        january: list[str] = []
+        february: list[str] = []
+        january.append(
+            commit_file(repo, "jan-1", "def f():\n    return 1\n", "2025-01-05T12:00:00+00:00")
         )
-        # This is August 1 in UTC but July 31 in America/Chicago.
-        july.append(
-            commit_file(
-                repo,
-                "july-boundary",
-                "def f():\n    return 2\n",
-                "2025-08-01T00:30:00+00:00",
-            )
+        january.append(
+            commit_file(repo, "jan-2", "def f():\n    return 2\n", "2025-01-10T12:00:00+00:00")
         )
-        august.append(
-            commit_file(
-                repo,
-                "august-1",
-                "def f():\n    return 3\n",
-                "2025-08-02T12:00:00-05:00",
-            )
+        january.append(
+            commit_file(repo, "jan-3", "def f():\n    return 3\n", "2025-01-20T12:00:00+00:00")
+        )
+        february.append(
+            commit_file(repo, "feb-1", "def f():\n    return 4\n", "2025-02-03T12:00:00+00:00")
+        )
+        february.append(
+            commit_file(repo, "feb-2", "def f():\n    return 5\n", "2025-02-25T12:00:00+00:00")
         )
 
-        records = load_history(
-            repo,
-            ["HEAD"],
-            collection_timezone=collection_timezone,
-            label="HEAD",
-        )
+        records = load_history(repo, ["HEAD"], label="HEAD")
         _, by_month, reproduced_latest = group_history(records)
-        if [record.commit for record in by_month["2025-07"]] != july:
-            raise AssertionError("Chicago July reconstruction failed")
-        if [record.commit for record in by_month["2025-08"]] != august:
-            raise AssertionError("Chicago August reconstruction failed")
-        if reproduced_latest["2025-07"] != july[-1]:
-            raise AssertionError("July latest commit reconstruction failed")
-        if reproduced_latest["2025-08"] != august[-1]:
-            raise AssertionError("August latest commit reconstruction failed")
+        if [record.commit for record in by_month["2025-01"]] != january:
+            raise AssertionError("January committer-month reconstruction failed")
+        if [record.commit for record in by_month["2025-02"]] != february:
+            raise AssertionError("February committer-month reconstruction failed")
+        if reproduced_latest["2025-01"] != january[-1]:
+            raise AssertionError("January latest commit reconstruction failed")
+        if reproduced_latest["2025-02"] != february[-1]:
+            raise AssertionError("February latest commit reconstruction failed")
+
+        selected = january + february
+        if len(selected) != len(set(selected)):
+            raise AssertionError("Commit assigned to more than one month")
+        for record in by_month["2025-01"] + by_month["2025-02"]:
+            if not record.first_parent:
+                raise AssertionError("Direct first parent missing")
 
         panel = pd.DataFrame(
             [
                 {
                     "dataset_source": "treatment",
                     "repo_name": "owner/repo",
-                    "time": "2025-07",
-                    "latest_commit": july[-1],
-                    "commits": len(july),
+                    "time": "2025-01",
+                    "latest_commit": january[-1],
+                    "commits": len(january),
                 },
                 {
                     "dataset_source": "treatment",
                     "repo_name": "owner/repo",
-                    "time": "2025-08",
-                    "latest_commit": august[-1],
-                    "commits": len(august),
+                    "time": "2025-02",
+                    "latest_commit": february[-1],
+                    "commits": len(february),
                 },
             ]
         )
-        selected_candidate, audit_rows, status = choose_history_candidate(
+
+        # Advance HEAD with a backdated commit. The current HEAD history no
+        # longer reproduces the panel, but the previous tip remains in reflog.
+        commit_file(
             repo,
-            panel,
-            collection_timezone,
+            "later-backdated",
+            "def f():\n    return 6\n",
+            "2025-02-20T12:00:00+00:00",
         )
+        selected_candidate, _, status = choose_history_candidate(repo, panel)
         if selected_candidate is None or status != "perfect_panel_match":
-            raise AssertionError("HEAD panel reconstruction failed")
-        if selected_candidate.ref != "HEAD":
-            raise AssertionError("Primary history is not HEAD")
-        if len(audit_rows) != 1 or int(audit_rows[0]["selected"]) != 1:
-            raise AssertionError("HEAD audit row is invalid")
+            raise AssertionError("Historical panel-tip recovery failed")
+        if selected_candidate.count_and_latest_matches != len(panel):
+            raise AssertionError("Recovered candidate does not match all months")
 
     print("Self-test: PASS")
 
@@ -1177,12 +1331,6 @@ def main() -> int:
     control_clone_dir = args.control_clone_dir.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve()
     qc_dir = args.qc_dir.expanduser().resolve()
-    try:
-        collection_timezone = ZoneInfo(args.collection_timezone)
-    except ZoneInfoNotFoundError as exc:
-        raise ValueError(
-            f"Unknown collection timezone: {args.collection_timezone}"
-        ) from exc
 
     for path, label in [
         (input_panel, "input panel"),
@@ -1202,8 +1350,7 @@ def main() -> int:
 
     print("=" * 72)
     print("Prepare repository-month direct first-parent scan pairs")
-    print("Commit universe:     HEAD")
-    print(f"Month assignment:    git %ct -> {args.collection_timezone}")
+    print("Month assignment:    committer timestamp (committed_at)")
     print(f"Input panel:          {input_panel}")
     print(f"Snapshot manifest:    {snapshot_manifest}")
     print(f"Treatment clones:     {treatment_clone_dir}")
@@ -1219,7 +1366,6 @@ def main() -> int:
         joined,
         treatment_clone_dir,
         control_clone_dir,
-        collection_timezone,
         args.progress_every,
     )
     checks = build_checks(
@@ -1239,7 +1385,6 @@ def main() -> int:
         history_refs,
         errors,
         checks,
-        args.collection_timezone,
     )
 
     boundary_path = output_dir / "repo_month_commit_scan_boundaries.csv"
@@ -1271,7 +1416,6 @@ def main() -> int:
     print(f"Merge pairs flagged:        {summary['merge_scan_pairs']}")
     print(f"Cross-month overlap rows:   {summary['cross_month_overlap_pair_rows']}")
     print(f"Committer-month mismatches: {summary['committer_month_mismatch_pairs']}")
-    print(f"Collection timezone:        {summary['collection_timezone']}")
     print(f"Errors:                     {summary['errors']}")
     print(f"Boundary manifest:          {boundary_path}")
     print(f"Month-end parent records:   {month_end_path}")

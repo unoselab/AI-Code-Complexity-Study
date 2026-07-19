@@ -1,0 +1,21 @@
+{
+  "added_function_events": 190857,
+  "checks_failed": 1,
+  "checks_passed": 8,
+  "checks_total": 9,
+  "commit_pairs_scanned": 188349,
+  "downstream_outcomes": {
+    "composition_ratio": "agc_function_change_event_ratio",
+    "velocity_like_count": "agc_function_change_events"
+  },
+  "extraction_errors": 4366,
+  "function_change_events": 436134,
+  "method_events": 275279,
+  "modified_function_events": 245277,
+  "module_function_events": 141160,
+  "nested_function_events": 19695,
+  "primary_event_definition": "One structurally added or modified named Python function in one commit; repeated edits and later reverts remain separate events.",
+  "python_files_audited": 212024,
+  "repository_months": 1623,
+  "status": "FAIL"
+}
