@@ -1,0 +1,11 @@
+dataset_source,stage,error_type,error_records,unique_blob_revisions,affected_commit_pairs,affected_repositories,affected_repository_months
+treatment,current_file_parse,SyntaxError,115,115,98,21,47
+control,parent_file_parse,SyntaxError,46,46,31,13,26
+treatment,parent_file_parse,SyntaxError,36,36,35,18,25
+control,current_file_parse,SyntaxError,34,34,31,13,23
+control,current_file_parse,IndentationError,30,30,30,9,13
+treatment,current_file_parse,IndentationError,20,20,20,9,13
+treatment,parent_file_parse,IndentationError,15,15,15,8,9
+control,parent_file_parse,IndentationError,13,13,13,8,11
+control,current_file_parse,TabError,10,10,10,1,2
+control,parent_file_parse,TabError,3,3,3,1,2
