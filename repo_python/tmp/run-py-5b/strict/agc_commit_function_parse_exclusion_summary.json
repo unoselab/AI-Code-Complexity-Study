@@ -1,0 +1,337 @@
+{
+  "affected_commit_pairs": 926,
+  "affected_repositories": 52,
+  "affected_repository_months": 163,
+  "allowed_parse_stages": [
+    "current_file_parse",
+    "parent_file_parse"
+  ],
+  "audited_parse_exclusion_records": 1197,
+  "checks_failed": 0,
+  "checks_passed": 24,
+  "checks_total": 24,
+  "control": {
+    "blob_parse_attempts": 73726,
+    "blob_parse_exclusion_record_rate": 0.0034994438868241867,
+    "commit_pair_parse_exclusion_rate": 0.0019765780145134648,
+    "commit_pairs_with_parse_exclusions": 213,
+    "current_blob_attempts": 40808,
+    "current_file_parse_exclusion_rate": 0.004116839835326407,
+    "current_file_parse_exclusions": 168,
+    "eligible_commit_pairs": 107762,
+    "input_commit_pairs": 111950,
+    "parent_blob_attempts": 32918,
+    "parent_file_parse_exclusion_rate": 0.0027340664681936933,
+    "parent_file_parse_exclusions": 90,
+    "parse_exclusion_records": 258,
+    "python_file_change_audits": 40808,
+    "repository_month_parse_exclusion_rate": 0.0782051282051282,
+    "repository_months": 780,
+    "repository_months_with_parse_exclusions": 61,
+    "unique_blob_parse_exclusion_rate": 0.0033647771018836875,
+    "unique_blob_revisions_attempted": 68058,
+    "unique_excluded_blob_revisions": 229
+  },
+  "error_stage_counts": {
+    "current_file_parse": 1010,
+    "parent_file_parse": 187
+  },
+  "error_type_counts": {
+    "IndentationError": 78,
+    "SyntaxError": 1106,
+    "TabError": 13
+  },
+  "fatal_or_unexpected_error_records": 0,
+  "global_unique_blob_parse_exclusion_rate": 0.0030134280259398426,
+  "global_unique_blob_revisions_attempted": 377643,
+  "input_extractor_python_version": "3.11.15",
+  "input_extractor_summary_status": "FAIL",
+  "inputs": {
+    "audit": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5a/strict/commit_function_event_extraction_audit.csv",
+    "commit_pairs": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5a/strict/commit_parent_pairs.csv",
+    "errors": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-5a/strict/agc_commit_function_event_extract_errors.csv",
+    "extract_summary": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-5a/strict/agc_commit_function_event_extract_summary.json",
+    "panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv"
+  },
+  "interpretation": "All observed extraction errors are historical current/parent Python file parse exclusions. No unexpected pipeline-error stage was observed. Rates are descriptive and must be interpreted with repository clustering and treatment/control denominators.",
+  "outputs": {
+    "by_dataset_source": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_by_dataset_source.csv",
+    "by_error_type": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_by_error_type.csv",
+    "by_event_time": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_by_event_time.csv",
+    "by_repo": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_by_repo.csv",
+    "by_repo_month": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_by_repo_month.csv",
+    "by_treatment_period": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_by_treatment_period.csv",
+    "checks": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-5b/strict/agc_commit_function_parse_exclusion_checks.csv",
+    "summary": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/tmp/run-py-5b/strict/agc_commit_function_parse_exclusion_summary.json",
+    "top_repo_sensitivity": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_top_repo_sensitivity.csv",
+    "top_treatment_repo_sensitivity_by_event_time": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_top_treatment_repo_sensitivity_by_event_time.csv",
+    "top_treatment_repo_sensitivity_by_period": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_top_treatment_repo_sensitivity_by_period.csv",
+    "unique_exclusions": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_unique.csv"
+  },
+  "overall": {
+    "blob_parse_attempts": 396286,
+    "blob_parse_exclusion_record_rate": 0.0030205457674507804,
+    "commit_pair_parse_exclusion_rate": 0.004916405183993544,
+    "commit_pairs_with_parse_exclusions": 926,
+    "current_blob_attempts": 212024,
+    "current_file_parse_exclusion_rate": 0.004763611666603781,
+    "current_file_parse_exclusions": 1010,
+    "eligible_commit_pairs": 188349,
+    "input_commit_pairs": 197853,
+    "parent_blob_attempts": 184262,
+    "parent_file_parse_exclusion_rate": 0.0010148592764650335,
+    "parent_file_parse_exclusions": 187,
+    "parse_exclusion_records": 1197,
+    "python_file_change_audits": 212024,
+    "repository_month_parse_exclusion_rate": 0.0998162890385793,
+    "repository_months": 1633,
+    "repository_months_with_parse_exclusions": 163,
+    "unique_blob_parse_exclusion_rate": 0.0030134280259398426,
+    "unique_blob_revisions_attempted": 377643,
+    "unique_excluded_blob_revisions": 1138
+  },
+  "recommended_extractor_status": "PASS_WITH_EXCLUSIONS",
+  "repository_concentration": {
+    "top_10_repository_share": 0.8028404344193818,
+    "top_1_repository_share": 0.4143692564745196,
+    "top_20_repository_share": 0.8972431077694235,
+    "top_3_repository_share": 0.6616541353383458,
+    "top_5_repository_share": 0.7309941520467836
+  },
+  "status": "PASS_WITH_EXCLUSIONS",
+  "top_repositories": [
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 496,
+      "repo_name": "getsentry/sentry"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 190,
+      "repo_name": "allthingslinux/tux"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 106,
+      "repo_name": "pieces-app/cli-agent"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 54,
+      "repo_name": "trycua/cua"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 29,
+      "repo_name": "ilanbenb/wa_llm"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 19,
+      "repo_name": "HelpingAI/Webscout"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 19,
+      "repo_name": "OpenMOSS/Language-Model-SAEs"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 17,
+      "repo_name": "ArpiarSaundersLab/annsql"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 16,
+      "repo_name": "ericyuegu/hal"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 15,
+      "repo_name": "BalancerMaxis/multisig-ops"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 14,
+      "repo_name": "MalevichAI/malevich"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 14,
+      "repo_name": "yeagerai/genlayer-studio"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 13,
+      "repo_name": "airweave-ai/airweave"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 12,
+      "repo_name": "golemfoundation/octant"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 11,
+      "repo_name": "TextGeneratorio/text-generator.io"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 10,
+      "repo_name": "ITSpecialist111/ai_automation_suggester"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 10,
+      "repo_name": "aj47/100x-orchestrator"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 10,
+      "repo_name": "ezyang/codemcp"
+    },
+    {
+      "dataset_source": "treatment",
+      "parse_exclusion_records": 10,
+      "repo_name": "whiteducksoftware/flock"
+    },
+    {
+      "dataset_source": "control",
+      "parse_exclusion_records": 9,
+      "repo_name": "believethehype/nostrdvm"
+    }
+  ],
+  "treatment": {
+    "blob_parse_attempts": 322560,
+    "blob_parse_exclusion_record_rate": 0.0029110863095238096,
+    "commit_pair_parse_exclusion_rate": 0.008847580875327285,
+    "commit_pairs_with_parse_exclusions": 713,
+    "current_blob_attempts": 171216,
+    "current_file_parse_exclusion_rate": 0.004917764694888328,
+    "current_file_parse_exclusions": 842,
+    "eligible_commit_pairs": 80587,
+    "input_commit_pairs": 85903,
+    "parent_blob_attempts": 151344,
+    "parent_file_parse_exclusion_rate": 0.0006409239877365472,
+    "parent_file_parse_exclusions": 97,
+    "parse_exclusion_records": 939,
+    "python_file_change_audits": 171216,
+    "repository_month_parse_exclusion_rate": 0.11957796014067995,
+    "repository_months": 853,
+    "repository_months_with_parse_exclusions": 102,
+    "unique_blob_parse_exclusion_rate": 0.0029361887688356993,
+    "unique_blob_revisions_attempted": 309585,
+    "unique_excluded_blob_revisions": 909
+  },
+  "treatment_event_and_post": {
+    "blob_parse_attempts": 156809,
+    "blob_parse_exclusion_record_rate": 0.005057107691522808,
+    "commit_pair_parse_exclusion_rate": 0.015489690721649485,
+    "commit_pairs_with_parse_exclusions": 601,
+    "current_blob_attempts": 83775,
+    "current_file_parse_exclusion_rate": 0.008797373918233363,
+    "current_file_parse_exclusions": 737,
+    "eligible_commit_pairs": 38800,
+    "input_commit_pairs": 41824,
+    "parent_blob_attempts": 73034,
+    "parent_file_parse_exclusion_rate": 0.0007667661637045759,
+    "parent_file_parse_exclusions": 56,
+    "parse_exclusion_records": 793,
+    "python_file_change_audits": 83775,
+    "repository_month_parse_exclusion_rate": 0.16203703703703703,
+    "repository_months": 432,
+    "repository_months_with_parse_exclusions": 70,
+    "unique_blob_parse_exclusion_rate": 0.005173524438360577,
+    "unique_blob_revisions_attempted": 149028,
+    "unique_excluded_blob_revisions": 771
+  },
+  "treatment_event_month": {
+    "blob_parse_attempts": 29161,
+    "blob_parse_exclusion_record_rate": 0.002606220637152361,
+    "commit_pair_parse_exclusion_rate": 0.008577646908206376,
+    "commit_pairs_with_parse_exclusions": 67,
+    "current_blob_attempts": 16047,
+    "current_file_parse_exclusion_rate": 0.004237552190440581,
+    "current_file_parse_exclusions": 68,
+    "eligible_commit_pairs": 7811,
+    "input_commit_pairs": 8288,
+    "parent_blob_attempts": 13114,
+    "parent_file_parse_exclusion_rate": 0.0006100350770169285,
+    "parent_file_parse_exclusions": 8,
+    "parse_exclusion_records": 76,
+    "python_file_change_audits": 16047,
+    "repository_month_parse_exclusion_rate": 0.13,
+    "repository_months": 100,
+    "repository_months_with_parse_exclusions": 13,
+    "unique_blob_parse_exclusion_rate": 0.002740038817216577,
+    "unique_blob_revisions_attempted": 26277,
+    "unique_excluded_blob_revisions": 72
+  },
+  "treatment_post_event": {
+    "blob_parse_attempts": 127648,
+    "blob_parse_exclusion_record_rate": 0.005617009275507646,
+    "commit_pair_parse_exclusion_rate": 0.017231921004227307,
+    "commit_pairs_with_parse_exclusions": 534,
+    "current_blob_attempts": 67728,
+    "current_file_parse_exclusion_rate": 0.009877746279234585,
+    "current_file_parse_exclusions": 669,
+    "eligible_commit_pairs": 30989,
+    "input_commit_pairs": 33536,
+    "parent_blob_attempts": 59920,
+    "parent_file_parse_exclusion_rate": 0.0008010680907877169,
+    "parent_file_parse_exclusions": 48,
+    "parse_exclusion_records": 717,
+    "python_file_change_audits": 67728,
+    "repository_month_parse_exclusion_rate": 0.1716867469879518,
+    "repository_months": 332,
+    "repository_months_with_parse_exclusions": 57,
+    "unique_blob_parse_exclusion_rate": 0.005692414186245368,
+    "unique_blob_revisions_attempted": 122795,
+    "unique_excluded_blob_revisions": 699
+  },
+  "treatment_pre_event": {
+    "blob_parse_attempts": 165751,
+    "blob_parse_exclusion_record_rate": 0.0008808393312860857,
+    "commit_pair_parse_exclusion_rate": 0.0026802594108215473,
+    "commit_pairs_with_parse_exclusions": 112,
+    "current_blob_attempts": 87441,
+    "current_file_parse_exclusion_rate": 0.0012008096888187463,
+    "current_file_parse_exclusions": 105,
+    "eligible_commit_pairs": 41787,
+    "input_commit_pairs": 44079,
+    "parent_blob_attempts": 78310,
+    "parent_file_parse_exclusion_rate": 0.0005235602094240838,
+    "parent_file_parse_exclusions": 41,
+    "parse_exclusion_records": 146,
+    "python_file_change_audits": 87441,
+    "repository_month_parse_exclusion_rate": 0.07600950118764846,
+    "repository_months": 421,
+    "repository_months_with_parse_exclusions": 32,
+    "unique_blob_parse_exclusion_rate": 0.0008593365672617677,
+    "unique_blob_revisions_attempted": 160589,
+    "unique_excluded_blob_revisions": 138
+  },
+  "treatment_unknown_event_time": {
+    "blob_parse_attempts": 0,
+    "blob_parse_exclusion_record_rate": null,
+    "commit_pair_parse_exclusion_rate": null,
+    "commit_pairs_with_parse_exclusions": 0,
+    "current_blob_attempts": 0,
+    "current_file_parse_exclusion_rate": null,
+    "current_file_parse_exclusions": 0,
+    "eligible_commit_pairs": 0,
+    "input_commit_pairs": 0,
+    "parent_blob_attempts": 0,
+    "parent_file_parse_exclusion_rate": null,
+    "parent_file_parse_exclusions": 0,
+    "parse_exclusion_records": 0,
+    "python_file_change_audits": 0,
+    "repository_month_parse_exclusion_rate": null,
+    "repository_months": 0,
+    "repository_months_with_parse_exclusions": 0,
+    "unique_blob_parse_exclusion_rate": null,
+    "unique_blob_revisions_attempted": 0,
+    "unique_excluded_blob_revisions": 0
+  },
+  "unique_excluded_blob_revisions": 1138
+}

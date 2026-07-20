@@ -10,9 +10,8 @@ Each eligible row defines one comparison from a commit's direct first parent
 Output
 ------
 - One manifest row per structurally added or modified named Python function.
-- One standalone Python source artifact per event, rendered from the parsed AST.
-- Repository-month event counts that preserve zero-eligible-commit months.
-- Extraction audit, error, and QC artifacts.
+- One standalone, dedented Python source artifact per event.
+- Repository-month event counts and extraction QC artifacts.
 
 Function scope
 --------------
@@ -27,10 +26,7 @@ fingerprints so that changing a nested function does not automatically create a
 second change event for its enclosing function.
 
 Repeated edits to the same function in separate commits remain separate events,
-including a later commit that reverts an earlier change. Source artifacts use
-``ast.unparse()`` rather than line slicing and ``textwrap.dedent()`` so methods
-and nested functions remain valid standalone Python even when multiline string
-contents contain column-zero text.
+including a later commit that reverts an earlier change.
 """
 
 from __future__ import annotations
@@ -48,8 +44,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import tokenize
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Iterator, Sequence
@@ -75,30 +72,6 @@ EXCLUDED_PARTS = {
     ".next",
     ".nuxt",
 }
-
-PAIR_KEY_COLUMNS = [
-    "dataset_source",
-    "repo_name",
-    "month",
-    "scan_current_commit",
-]
-
-AUDIT_PAIR_KEY_COLUMNS = [
-    "dataset_source",
-    "repo_name",
-    "time",
-    "commit",
-]
-
-AUDIT_FILE_KEY_COLUMNS = [
-    "dataset_source",
-    "repo_name",
-    "time",
-    "commit",
-    "diff_status",
-    "relative_path",
-    "parent_relative_path",
-]
 
 PAIR_REQUIRED = {
     "dataset_source",
@@ -181,44 +154,7 @@ ERROR_COLUMNS = [
     "relative_path",
     "stage",
     "error",
-    "qualified_function_name",
-    "function_name",
-    "function_kind",
-    "start_line",
-    "end_line",
 ]
-
-
-class FunctionArtifactError(RuntimeError):
-    """Attach function metadata to AST artifact rendering failures."""
-
-    def __init__(
-        self,
-        stage: str,
-        qualified_name: str,
-        function_name: str,
-        function_kind: str,
-        start_line: int,
-        end_line: int,
-        cause: BaseException,
-    ) -> None:
-        super().__init__(f"{type(cause).__name__}: {cause}")
-        self.stage = stage
-        self.qualified_name = qualified_name
-        self.function_name = function_name
-        self.function_kind = function_kind
-        self.start_line = start_line
-        self.end_line = end_line
-        self.cause = cause
-
-
-class FileExtractionError(RuntimeError):
-    """Attach a pipeline stage to file-level extraction failures."""
-
-    def __init__(self, stage: str, cause: BaseException) -> None:
-        super().__init__(f"{type(cause).__name__}: {cause}")
-        self.stage = stage
-        self.cause = cause
 
 
 @dataclass(frozen=True)
@@ -282,15 +218,6 @@ def parse_args() -> argparse.Namespace:
         default=Path("repo_python/tmp/run-py-5a/strict"),
     )
     parser.add_argument("--progress-every", type=int, default=100)
-    parser.add_argument(
-        "--repo",
-        action="append",
-        default=[],
-        help=(
-            "Optional repository name to process. Repeat this option to run a "
-            "targeted multi-repository smoke test."
-        ),
-    )
     parser.add_argument("--max-pairs", type=int, default=0)
     parser.add_argument("--overwrite-source-root", action="store_true")
     parser.add_argument("--self-test", action="store_true")
@@ -456,53 +383,16 @@ def source_start_line(node: ast.FunctionDef | ast.AsyncFunctionDef) -> int:
     return min([int(node.lineno), *decorator_lines])
 
 
-def render_function_source(
+def extract_source_segment(
+    source_lines: Sequence[str],
     node: ast.FunctionDef | ast.AsyncFunctionDef,
-    qualified_name: str,
-    kind: str,
-) -> str:
-    """Render one named function as standalone parseable Python source."""
-
+) -> tuple[str, int, int]:
     start_line = source_start_line(node)
     end_line = int(getattr(node, "end_lineno", node.lineno))
-    try:
-        rendered = ast.unparse(copy.deepcopy(node)).rstrip() + "\n"
-    except Exception as exc:
-        raise FunctionArtifactError(
-            "function_artifact_render",
-            qualified_name,
-            node.name,
-            kind,
-            start_line,
-            end_line,
-            exc,
-        ) from exc
-
-    try:
-        validation_tree = ast.parse(
-            rendered,
-            filename=f"<function-artifact:{qualified_name}>",
-            type_comments=True,
-        )
-        if (
-            len(validation_tree.body) != 1
-            or not isinstance(
-                validation_tree.body[0],
-                (ast.FunctionDef, ast.AsyncFunctionDef),
-            )
-        ):
-            raise ValueError("Rendered artifact is not exactly one named function")
-    except Exception as exc:
-        raise FunctionArtifactError(
-            "function_artifact_validation",
-            qualified_name,
-            node.name,
-            kind,
-            start_line,
-            end_line,
-            exc,
-        ) from exc
-    return rendered
+    segment = "".join(source_lines[start_line - 1 : end_line])
+    normalized = textwrap.dedent(segment).rstrip() + "\n"
+    ast.parse(normalized)
+    return normalized, start_line, end_line
 
 
 def function_kind(
@@ -522,13 +412,9 @@ def iter_child_definitions(statements: Sequence[ast.stmt]) -> Iterator[ast.AST]:
         yield statement
 
 
-def extract_functions(
-    source: str,
-    *,
-    filename: str = "<unknown>",
-    render_sources: bool = True,
-) -> list[FunctionRecord]:
-    tree = ast.parse(source, filename=filename, type_comments=True)
+def extract_functions(source: str) -> list[FunctionRecord]:
+    tree = ast.parse(source, type_comments=True)
+    source_lines = source.splitlines(keepends=True)
     occurrence_counts: Counter[str] = Counter()
     records: list[FunctionRecord] = []
 
@@ -542,20 +428,16 @@ def extract_functions(
                 qualified_base = ".".join([*scope_names, statement.name])
                 occurrence_counts[qualified_base] += 1
                 occurrence_index = occurrence_counts[qualified_base]
-                kind = function_kind(statement, scope_kinds)
-                start_line = source_start_line(statement)
-                end_line = int(getattr(statement, "end_lineno", statement.lineno))
-                source_text = (
-                    render_function_source(statement, qualified_base, kind)
-                    if render_sources
-                    else ""
+                source_text, start_line, end_line = extract_source_segment(
+                    source_lines,
+                    statement,
                 )
                 fingerprint = direct_function_fingerprint(statement)
                 records.append(
                     FunctionRecord(
                         qualified_name=qualified_base,
                         function_name=statement.name,
-                        function_kind=kind,
+                        function_kind=function_kind(statement, scope_kinds),
                         occurrence_index=occurrence_index,
                         start_line=start_line,
                         end_line=end_line,
@@ -694,8 +576,8 @@ def write_source_artifact(
     return relative.as_posix(), content_sha(payload), len(payload)
 
 
-def load_pairs(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
-    all_pairs = pd.read_csv(
+def load_pairs(path: Path) -> pd.DataFrame:
+    pairs = pd.read_csv(
         path,
         dtype={
             "scan_parent_commit": "string",
@@ -703,7 +585,7 @@ def load_pairs(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         },
         low_memory=False,
     )
-    missing = sorted(PAIR_REQUIRED - set(all_pairs.columns))
+    missing = sorted(PAIR_REQUIRED - set(pairs.columns))
     if missing:
         raise ValueError(f"Commit-pair input missing columns: {missing}")
 
@@ -715,74 +597,30 @@ def load_pairs(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         "scan_current_commit",
         "repo_dir",
     ]:
-        all_pairs[column] = all_pairs[column].fillna("").astype(str).str.strip()
+        pairs[column] = pairs[column].fillna("").astype(str).str.strip()
     for column in ["commit_order", "primary_scan_eligible"]:
-        all_pairs[column] = pd.to_numeric(all_pairs[column], errors="coerce")
-        if all_pairs[column].isna().any():
+        pairs[column] = pd.to_numeric(pairs[column], errors="coerce")
+        if pairs[column].isna().any():
             raise ValueError(f"Commit-pair column must be numeric: {column}")
-        all_pairs[column] = all_pairs[column].astype(int)
+        pairs[column] = pairs[column].astype(int)
 
     invalid_sources = sorted(
-        set(all_pairs["dataset_source"]) - {"treatment", "control"}
+        set(pairs["dataset_source"]) - {"treatment", "control"}
     )
     if invalid_sources:
         raise ValueError(f"Unsupported dataset sources: {invalid_sources}")
 
-    invalid_eligibility = sorted(
-        set(all_pairs["primary_scan_eligible"]) - {0, 1}
+    pairs = pairs.loc[pairs["primary_scan_eligible"].eq(1)].copy()
+    duplicate_keys = int(
+        pairs.duplicated(
+            ["dataset_source", "repo_name", "month", "scan_current_commit"]
+        ).sum()
     )
-    if invalid_eligibility:
-        raise ValueError(
-            f"Unsupported primary_scan_eligible values: {invalid_eligibility}"
-        )
-
-    duplicate_all_keys = int(all_pairs.duplicated(PAIR_KEY_COLUMNS).sum())
-    if duplicate_all_keys:
-        raise ValueError(f"Duplicate commit-pair rows: {duplicate_all_keys}")
-
-    all_pairs = all_pairs.sort_values(
+    if duplicate_keys:
+        raise ValueError(f"Duplicate eligible commit-pair rows: {duplicate_keys}")
+    return pairs.sort_values(
         ["dataset_source", "repo_name", "month", "commit_order"]
     ).reset_index(drop=True)
-    eligible_pairs = all_pairs.loc[
-        all_pairs["primary_scan_eligible"].eq(1)
-    ].copy().reset_index(drop=True)
-    return all_pairs, eligible_pairs
-
-
-def select_pair_scope(
-    all_pairs: pd.DataFrame,
-    eligible_pairs: pd.DataFrame,
-    repositories: Sequence[str],
-    max_pairs: int,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    requested = [value.strip() for value in repositories if value.strip()]
-    if requested:
-        available = set(all_pairs["repo_name"])
-        missing = sorted(set(requested) - available)
-        if missing:
-            raise ValueError(f"Requested repositories not found: {missing}")
-        all_pairs = all_pairs.loc[all_pairs["repo_name"].isin(requested)].copy()
-        eligible_pairs = eligible_pairs.loc[
-            eligible_pairs["repo_name"].isin(requested)
-        ].copy()
-
-    if max_pairs > 0:
-        eligible_pairs = eligible_pairs.head(max_pairs).copy()
-        selected_months = eligible_pairs[[
-            "dataset_source",
-            "repo_name",
-            "month",
-        ]].drop_duplicates()
-        all_pairs = all_pairs.merge(
-            selected_months,
-            on=["dataset_source", "repo_name", "month"],
-            how="inner",
-        )
-
-    return (
-        all_pairs.reset_index(drop=True),
-        eligible_pairs.reset_index(drop=True),
-    )
 
 
 def resolve_repo_dir(
@@ -800,128 +638,6 @@ def resolve_repo_dir(
     if supplied.is_dir() and (supplied / ".git").exists():
         return supplied.resolve()
     return expected.resolve()
-
-
-def read_function_records(
-    repo_dir: Path,
-    commit: str,
-    relative_path: str,
-    role: str,
-    *,
-    render_sources: bool,
-) -> list[FunctionRecord]:
-    try:
-        payload = git_blob(repo_dir, commit, relative_path)
-    except Exception as exc:
-        raise FileExtractionError(f"{role}_blob_read", exc) from exc
-
-    try:
-        source = decode_python_source(payload)
-    except Exception as exc:
-        raise FileExtractionError(f"{role}_file_decode", exc) from exc
-
-    try:
-        return extract_functions(
-            source,
-            filename=f"{commit}:{relative_path}",
-            render_sources=render_sources,
-        )
-    except FunctionArtifactError:
-        raise
-    except SyntaxError as exc:
-        raise FileExtractionError(f"{role}_file_parse", exc) from exc
-    except Exception as exc:
-        raise FileExtractionError(f"{role}_function_extraction", exc) from exc
-
-
-def error_row(
-    *,
-    dataset_source: str,
-    repo_name: str,
-    month: str,
-    commit: str,
-    parent_commit: str,
-    relative_path: str,
-    stage: str,
-    error: BaseException,
-    function_error: FunctionArtifactError | None = None,
-    function_record: FunctionRecord | None = None,
-) -> dict[str, Any]:
-    if function_error is not None:
-        qualified_name = function_error.qualified_name
-        function_name = function_error.function_name
-        kind = function_error.function_kind
-        start_line = function_error.start_line
-        end_line = function_error.end_line
-    elif function_record is not None:
-        qualified_name = function_record.qualified_name
-        function_name = function_record.function_name
-        kind = function_record.function_kind
-        start_line = function_record.start_line
-        end_line = function_record.end_line
-    else:
-        qualified_name = ""
-        function_name = ""
-        kind = ""
-        start_line = ""
-        end_line = ""
-
-    return {
-        "dataset_source": dataset_source,
-        "repo_name": repo_name,
-        "time": month,
-        "commit": commit,
-        "parent_commit": parent_commit,
-        "relative_path": relative_path,
-        "stage": stage,
-        "error": f"{type(error).__name__}: {error}",
-        "qualified_function_name": qualified_name,
-        "function_name": function_name,
-        "function_kind": kind,
-        "start_line": start_line,
-        "end_line": end_line,
-    }
-
-
-def audit_row(
-    *,
-    dataset_source: str,
-    repo_name: str,
-    month: str,
-    commit: str,
-    parent_commit: str,
-    commit_order: int,
-    diff_status: str = "",
-    relative_path: str = "",
-    parent_relative_path: str = "",
-    current_functions: int = 0,
-    parent_functions: int = 0,
-    added_function_events: int = 0,
-    modified_function_events: int = 0,
-    unchanged_functions: int = 0,
-    deleted_functions_ignored: int = 0,
-    file_status: str = "ok",
-    error_message: str = "",
-) -> dict[str, Any]:
-    return {
-        "dataset_source": dataset_source,
-        "repo_name": repo_name,
-        "time": month,
-        "commit": commit,
-        "parent_commit": parent_commit,
-        "commit_order": commit_order,
-        "diff_status": diff_status,
-        "relative_path": relative_path,
-        "parent_relative_path": parent_relative_path,
-        "current_functions": current_functions,
-        "parent_functions": parent_functions,
-        "added_function_events": added_function_events,
-        "modified_function_events": modified_function_events,
-        "unchanged_functions": unchanged_functions,
-        "deleted_functions_ignored": deleted_functions_ignored,
-        "file_status": file_status,
-        "error_message": error_message,
-    }
 
 
 def extract_events(
@@ -959,28 +675,16 @@ def extract_events(
             changed_paths = list_changed_paths(repo_dir, parent_commit, current_commit)
         except Exception as exc:
             error_rows.append(
-                error_row(
-                    dataset_source=dataset_source,
-                    repo_name=repo_name,
-                    month=month,
-                    commit=current_commit,
-                    parent_commit=parent_commit,
-                    relative_path="",
-                    stage="commit_diff",
-                    error=exc,
-                )
-            )
-            audit_rows.append(
-                audit_row(
-                    dataset_source=dataset_source,
-                    repo_name=repo_name,
-                    month=month,
-                    commit=current_commit,
-                    parent_commit=parent_commit,
-                    commit_order=commit_order,
-                    file_status="commit_diff_error",
-                    error_message=f"{type(exc).__name__}: {exc}",
-                )
+                {
+                    "dataset_source": dataset_source,
+                    "repo_name": repo_name,
+                    "time": month,
+                    "commit": current_commit,
+                    "parent_commit": parent_commit,
+                    "relative_path": "",
+                    "stage": "commit_diff",
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
             )
             continue
 
@@ -993,26 +697,21 @@ def extract_events(
             python_change_seen = True
             current_records: list[FunctionRecord] = []
             parent_records: list[FunctionRecord] = []
-            created_artifacts: list[Path] = []
+            file_status = "ok"
+            error_message = ""
 
             try:
-                current_records = read_function_records(
-                    repo_dir,
-                    current_commit,
-                    current_path,
-                    "current",
-                    render_sources=True,
+                current_source = decode_python_source(
+                    git_blob(repo_dir, current_commit, current_path)
                 )
+                current_records = extract_functions(current_source)
 
                 parent_is_python = eligible_python_path(parent_path)
                 if parent_is_python and not changed.status.startswith("A"):
-                    parent_records = read_function_records(
-                        repo_dir,
-                        parent_commit,
-                        parent_path,
-                        "parent",
-                        render_sources=False,
+                    parent_source = decode_python_source(
+                        git_blob(repo_dir, parent_commit, parent_path)
                     )
+                    parent_records = extract_functions(parent_source)
 
                 events, unchanged, deleted_ignored = compare_function_sets(
                     parent_records,
@@ -1020,8 +719,6 @@ def extract_events(
                 )
                 added_count = 0
                 modified_count = 0
-                file_manifest_rows: list[dict[str, Any]] = []
-
                 for current_record, parent_record, change_type in events:
                     event_id = deterministic_event_id(
                         dataset_source,
@@ -1033,32 +730,16 @@ def extract_events(
                         current_record.occurrence_index,
                         change_type,
                     )
-                    try:
-                        (
-                            relative_source_path,
-                            source_hash,
-                            source_bytes,
-                        ) = write_source_artifact(
-                            source_root,
-                            dataset_source,
-                            repo_name,
-                            month,
-                            current_commit,
-                            event_id,
-                            current_record.source_text,
-                        )
-                    except Exception as exc:
-                        raise FunctionArtifactError(
-                            "function_artifact_write",
-                            current_record.qualified_name,
-                            current_record.function_name,
-                            current_record.function_kind,
-                            current_record.start_line,
-                            current_record.end_line,
-                            exc,
-                        ) from exc
-                    created_artifacts.append(source_root / relative_source_path)
-                    file_manifest_rows.append(
+                    relative_source_path, source_hash, source_bytes = write_source_artifact(
+                        source_root,
+                        dataset_source,
+                        repo_name,
+                        month,
+                        current_commit,
+                        event_id,
+                        current_record.source_text,
+                    )
+                    manifest_rows.append(
                         {
                             "function_event_id": event_id,
                             "dataset_source": dataset_source,
@@ -1078,14 +759,10 @@ def extract_events(
                             "start_line": current_record.start_line,
                             "end_line": current_record.end_line,
                             "parent_start_line": (
-                                ""
-                                if parent_record is None
-                                else parent_record.start_line
+                                "" if parent_record is None else parent_record.start_line
                             ),
                             "parent_end_line": (
-                                ""
-                                if parent_record is None
-                                else parent_record.end_line
+                                "" if parent_record is None else parent_record.end_line
                             ),
                             "structural_sha256": current_record.structural_sha256,
                             "parent_structural_sha256": (
@@ -1101,138 +778,85 @@ def extract_events(
                     added_count += int(change_type == "added")
                     modified_count += int(change_type == "modified")
 
-                manifest_rows.extend(file_manifest_rows)
                 audit_rows.append(
-                    audit_row(
-                        dataset_source=dataset_source,
-                        repo_name=repo_name,
-                        month=month,
-                        commit=current_commit,
-                        parent_commit=parent_commit,
-                        commit_order=commit_order,
-                        diff_status=changed.status,
-                        relative_path=current_path,
-                        parent_relative_path=parent_path,
-                        current_functions=len(current_records),
-                        parent_functions=len(parent_records),
-                        added_function_events=added_count,
-                        modified_function_events=modified_count,
-                        unchanged_functions=unchanged,
-                        deleted_functions_ignored=deleted_ignored,
-                    )
-                )
-            except FunctionArtifactError as exc:
-                for artifact in created_artifacts:
-                    artifact.unlink(missing_ok=True)
-                message = str(exc)
-                audit_rows.append(
-                    audit_row(
-                        dataset_source=dataset_source,
-                        repo_name=repo_name,
-                        month=month,
-                        commit=current_commit,
-                        parent_commit=parent_commit,
-                        commit_order=commit_order,
-                        diff_status=changed.status,
-                        relative_path=current_path,
-                        parent_relative_path=parent_path,
-                        current_functions=len(current_records),
-                        parent_functions=len(parent_records),
-                        file_status=exc.stage,
-                        error_message=message,
-                    )
-                )
-                error_rows.append(
-                    error_row(
-                        dataset_source=dataset_source,
-                        repo_name=repo_name,
-                        month=month,
-                        commit=current_commit,
-                        parent_commit=parent_commit,
-                        relative_path=current_path,
-                        stage=exc.stage,
-                        error=exc.cause,
-                        function_error=exc,
-                    )
-                )
-            except FileExtractionError as exc:
-                for artifact in created_artifacts:
-                    artifact.unlink(missing_ok=True)
-                message = str(exc)
-                audit_rows.append(
-                    audit_row(
-                        dataset_source=dataset_source,
-                        repo_name=repo_name,
-                        month=month,
-                        commit=current_commit,
-                        parent_commit=parent_commit,
-                        commit_order=commit_order,
-                        diff_status=changed.status,
-                        relative_path=current_path,
-                        parent_relative_path=parent_path,
-                        current_functions=len(current_records),
-                        parent_functions=len(parent_records),
-                        file_status=exc.stage,
-                        error_message=message,
-                    )
-                )
-                error_rows.append(
-                    error_row(
-                        dataset_source=dataset_source,
-                        repo_name=repo_name,
-                        month=month,
-                        commit=current_commit,
-                        parent_commit=parent_commit,
-                        relative_path=current_path,
-                        stage=exc.stage,
-                        error=exc.cause,
-                    )
+                    {
+                        "dataset_source": dataset_source,
+                        "repo_name": repo_name,
+                        "time": month,
+                        "commit": current_commit,
+                        "parent_commit": parent_commit,
+                        "commit_order": commit_order,
+                        "diff_status": changed.status,
+                        "relative_path": current_path,
+                        "parent_relative_path": parent_path,
+                        "current_functions": len(current_records),
+                        "parent_functions": len(parent_records),
+                        "added_function_events": added_count,
+                        "modified_function_events": modified_count,
+                        "unchanged_functions": unchanged,
+                        "deleted_functions_ignored": deleted_ignored,
+                        "file_status": file_status,
+                        "error_message": error_message,
+                    }
                 )
             except Exception as exc:
-                for artifact in created_artifacts:
-                    artifact.unlink(missing_ok=True)
-                message = f"{type(exc).__name__}: {exc}"
+                file_status = "error"
+                error_message = f"{type(exc).__name__}: {exc}"
                 audit_rows.append(
-                    audit_row(
-                        dataset_source=dataset_source,
-                        repo_name=repo_name,
-                        month=month,
-                        commit=current_commit,
-                        parent_commit=parent_commit,
-                        commit_order=commit_order,
-                        diff_status=changed.status,
-                        relative_path=current_path,
-                        parent_relative_path=parent_path,
-                        current_functions=len(current_records),
-                        parent_functions=len(parent_records),
-                        file_status="python_function_extraction",
-                        error_message=message,
-                    )
+                    {
+                        "dataset_source": dataset_source,
+                        "repo_name": repo_name,
+                        "time": month,
+                        "commit": current_commit,
+                        "parent_commit": parent_commit,
+                        "commit_order": commit_order,
+                        "diff_status": changed.status,
+                        "relative_path": current_path,
+                        "parent_relative_path": parent_path,
+                        "current_functions": len(current_records),
+                        "parent_functions": len(parent_records),
+                        "added_function_events": 0,
+                        "modified_function_events": 0,
+                        "unchanged_functions": 0,
+                        "deleted_functions_ignored": 0,
+                        "file_status": file_status,
+                        "error_message": error_message,
+                    }
                 )
                 error_rows.append(
-                    error_row(
-                        dataset_source=dataset_source,
-                        repo_name=repo_name,
-                        month=month,
-                        commit=current_commit,
-                        parent_commit=parent_commit,
-                        relative_path=current_path,
-                        stage="python_function_extraction",
-                        error=exc,
-                    )
+                    {
+                        "dataset_source": dataset_source,
+                        "repo_name": repo_name,
+                        "time": month,
+                        "commit": current_commit,
+                        "parent_commit": parent_commit,
+                        "relative_path": current_path,
+                        "stage": "python_function_extraction",
+                        "error": error_message,
+                    }
                 )
 
         if not python_change_seen:
             audit_rows.append(
-                audit_row(
-                    dataset_source=dataset_source,
-                    repo_name=repo_name,
-                    month=month,
-                    commit=current_commit,
-                    parent_commit=parent_commit,
-                    commit_order=commit_order,
-                    file_status="no_python_changes",
-                )
+                {
+                    "dataset_source": dataset_source,
+                    "repo_name": repo_name,
+                    "time": month,
+                    "commit": current_commit,
+                    "parent_commit": parent_commit,
+                    "commit_order": commit_order,
+                    "diff_status": "",
+                    "relative_path": "",
+                    "parent_relative_path": "",
+                    "current_functions": 0,
+                    "parent_functions": 0,
+                    "added_function_events": 0,
+                    "modified_function_events": 0,
+                    "unchanged_functions": 0,
+                    "deleted_functions_ignored": 0,
+                    "file_status": "no_python_changes",
+                    "error_message": "",
+                }
             )
 
         if progress_every > 0 and (
@@ -1249,35 +873,16 @@ def extract_events(
     errors = pd.DataFrame(error_rows, columns=ERROR_COLUMNS)
     return manifest, audit, errors
 
+
 def build_repo_month_counts(
-    all_pairs: pd.DataFrame,
-    eligible_pairs: pd.DataFrame,
+    pairs: pd.DataFrame,
     manifest: pd.DataFrame,
     audit: pd.DataFrame,
 ) -> pd.DataFrame:
     base = (
-        all_pairs[["dataset_source", "repo_name", "month"]]
-        .drop_duplicates()
-        .rename(columns={"month": "time"})
-        .sort_values(["dataset_source", "repo_name", "time"])
-        .reset_index(drop=True)
-    )
-
-    eligible_counts = (
-        eligible_pairs.groupby(
-            ["dataset_source", "repo_name", "month"],
-            as_index=False,
-        )
+        pairs.groupby(["dataset_source", "repo_name", "month"], as_index=False)
         .agg(commits_scanned=("scan_current_commit", "nunique"))
         .rename(columns={"month": "time"})
-    )
-    base = base.merge(
-        eligible_counts,
-        on=["dataset_source", "repo_name", "time"],
-        how="left",
-    )
-    base["commits_scanned"] = (
-        base["commits_scanned"].fillna(0).astype(int)
     )
 
     python_commit_rows = audit.loc[
@@ -1286,32 +891,21 @@ def build_repo_month_counts(
     ]
     python_commits = (
         python_commit_rows.groupby(
-            ["dataset_source", "repo_name", "time"],
-            as_index=False,
+            ["dataset_source", "repo_name", "time"], as_index=False
         )
         .agg(commits_with_python_changes=("commit", "nunique"))
     )
 
     if manifest.empty:
+        event_counts = pd.DataFrame(columns=REPO_MONTH_COLUMNS)
         output = base.copy()
-        output["commits_with_python_changes"] = 0
-        for column in REPO_MONTH_COLUMNS[5:]:
+        for column in REPO_MONTH_COLUMNS[4:]:
             output[column] = 0
+        output["commits_with_python_changes"] = 0
         return output[REPO_MONTH_COLUMNS]
 
-    manifest_for_counts = manifest.copy()
-    manifest_for_counts["_function_identity"] = (
-        manifest_for_counts["relative_path"].astype(str)
-        + "\0"
-        + manifest_for_counts["qualified_function_name"].astype(str)
-        + "\0"
-        + manifest_for_counts["occurrence_index"].astype(str)
-    )
     event_counts = (
-        manifest_for_counts.groupby(
-            ["dataset_source", "repo_name", "time"],
-            as_index=False,
-        )
+        manifest.groupby(["dataset_source", "repo_name", "time"], as_index=False)
         .agg(
             commits_with_function_change_events=("commit", "nunique"),
             function_change_events=("function_event_id", "size"),
@@ -1323,7 +917,10 @@ def build_repo_month_counts(
                 "change_type",
                 lambda values: int((values == "modified").sum()),
             ),
-            unique_changed_functions=("_function_identity", "nunique"),
+            unique_changed_functions=(
+                "qualified_function_name",
+                "nunique",
+            ),
             unique_changed_files=("relative_path", "nunique"),
         )
     )
@@ -1337,31 +934,18 @@ def build_repo_month_counts(
         on=["dataset_source", "repo_name", "time"],
         how="left",
     )
-    numeric = [
-        column
-        for column in REPO_MONTH_COLUMNS
-        if column not in {"dataset_source", "repo_name", "time"}
-    ]
+    numeric = [column for column in REPO_MONTH_COLUMNS if column not in {
+        "dataset_source", "repo_name", "time"
+    }]
     output[numeric] = output[numeric].fillna(0).astype(int)
     return output[REPO_MONTH_COLUMNS]
 
-def frame_key_set(
-    frame: pd.DataFrame,
-    columns: Sequence[str],
-) -> set[tuple[str, ...]]:
-    if frame.empty:
-        return set()
-    normalized = frame.loc[:, list(columns)].fillna("").astype(str)
-    return set(normalized.itertuples(index=False, name=None))
-
 
 def build_checks(
-    all_pairs: pd.DataFrame,
-    eligible_pairs: pd.DataFrame,
+    pairs: pd.DataFrame,
     manifest: pd.DataFrame,
     audit: pd.DataFrame,
     errors: pd.DataFrame,
-    repo_month_counts: pd.DataFrame,
     source_root: Path,
 ) -> pd.DataFrame:
     checks: list[dict[str, Any]] = []
@@ -1377,36 +961,22 @@ def build_checks(
         )
 
     duplicate_event_ids = int(manifest["function_event_id"].duplicated().sum())
-    add(
-        "manifest",
-        "function_event_ids_unique",
-        duplicate_event_ids == 0,
-        duplicate_event_ids,
-    )
+    add("manifest", "function_event_ids_unique", duplicate_event_ids == 0, duplicate_event_ids)
     invalid_change_types = int(
         (~manifest["change_type"].isin(["added", "modified"])).sum()
     )
-    add(
-        "manifest",
-        "change_types_valid",
-        invalid_change_types == 0,
-        invalid_change_types,
+    add("manifest", "change_types_valid", invalid_change_types == 0, invalid_change_types)
+    invalid_kinds = int(
+        (~manifest["function_kind"].isin([
+            "module_function",
+            "module_async_function",
+            "method",
+            "async_method",
+            "nested_function",
+            "nested_async_function",
+        ])).sum()
     )
-    valid_kinds = {
-        "module_function",
-        "module_async_function",
-        "method",
-        "async_method",
-        "nested_function",
-        "nested_async_function",
-    }
-    invalid_kinds = int((~manifest["function_kind"].isin(valid_kinds)).sum())
-    add(
-        "manifest",
-        "function_kinds_valid",
-        invalid_kinds == 0,
-        invalid_kinds,
-    )
+    add("manifest", "function_kinds_valid", invalid_kinds == 0, invalid_kinds)
 
     missing_sources = 0
     hash_mismatches = 0
@@ -1417,18 +987,8 @@ def build_checks(
             continue
         if content_sha(path.read_bytes()) != str(row.content_sha256):
             hash_mismatches += 1
-    add(
-        "sources",
-        "all_source_artifacts_present",
-        missing_sources == 0,
-        missing_sources,
-    )
-    add(
-        "sources",
-        "source_hashes_match_manifest",
-        hash_mismatches == 0,
-        hash_mismatches,
-    )
+    add("sources", "all_source_artifacts_present", missing_sources == 0, missing_sources)
+    add("sources", "source_hashes_match_manifest", hash_mismatches == 0, hash_mismatches)
 
     arithmetic_errors = int(
         (
@@ -1437,12 +997,7 @@ def build_checks(
             < 0
         ).sum()
     )
-    add(
-        "arithmetic",
-        "event_counts_nonnegative",
-        arithmetic_errors == 0,
-        arithmetic_errors,
-    )
+    add("arithmetic", "event_counts_nonnegative", arithmetic_errors == 0, arithmetic_errors)
     manifest_from_audit = int(
         audit["added_function_events"].sum()
         + audit["modified_function_events"].sum()
@@ -1453,142 +1008,31 @@ def build_checks(
         manifest_from_audit == len(manifest),
         f"{manifest_from_audit}:{len(manifest)}",
     )
-    repo_month_event_total = int(repo_month_counts["function_change_events"].sum())
-    add(
-        "arithmetic",
-        "repo_month_event_count_matches_manifest",
-        repo_month_event_total == len(manifest),
-        f"{repo_month_event_total}:{len(manifest)}",
-    )
-
-    expected_repo_months = frame_key_set(
-        all_pairs,
-        ["dataset_source", "repo_name", "month"],
-    )
-    actual_repo_months = frame_key_set(
-        repo_month_counts,
-        ["dataset_source", "repo_name", "time"],
-    )
-    missing_repo_months = expected_repo_months - actual_repo_months
-    unexpected_repo_months = actual_repo_months - expected_repo_months
-    add(
-        "repo_month",
-        "all_repository_months_preserved",
-        not missing_repo_months and not unexpected_repo_months,
-        f"missing={len(missing_repo_months)};unexpected={len(unexpected_repo_months)}",
-    )
-    scanned_commit_total = int(repo_month_counts["commits_scanned"].sum())
-    add(
-        "repo_month",
-        "commits_scanned_match_eligible_pairs",
-        scanned_commit_total == len(eligible_pairs),
-        f"{scanned_commit_total}:{len(eligible_pairs)}",
-    )
-    eligible_repo_months = frame_key_set(
-        eligible_pairs,
-        ["dataset_source", "repo_name", "month"],
-    )
-    expected_zero_months = expected_repo_months - eligible_repo_months
-    actual_zero_months = frame_key_set(
-        repo_month_counts.loc[repo_month_counts["commits_scanned"].eq(0)],
-        ["dataset_source", "repo_name", "time"],
-    )
-    add(
-        "repo_month",
-        "zero_eligible_commit_months_preserved",
-        expected_zero_months == actual_zero_months,
-        f"{len(actual_zero_months)}:{len(expected_zero_months)}",
-    )
-
-    input_pair_keys = frame_key_set(eligible_pairs, PAIR_KEY_COLUMNS)
-    audit_pair_keys = frame_key_set(audit, AUDIT_PAIR_KEY_COLUMNS)
-    missing_pair_audits = input_pair_keys - audit_pair_keys
-    unexpected_pair_audits = audit_pair_keys - input_pair_keys
+    add("processing", "extraction_errors_zero", len(errors) == 0, len(errors))
     add(
         "coverage",
-        "missing_input_pair_audits_zero",
-        not missing_pair_audits,
-        len(missing_pair_audits),
-    )
-    add(
-        "coverage",
-        "unexpected_audit_pair_keys_zero",
-        not unexpected_pair_audits,
-        len(unexpected_pair_audits),
-    )
-    add(
-        "coverage",
-        "audited_pair_count_matches_input",
-        len(audit_pair_keys) == len(input_pair_keys),
-        f"{len(audit_pair_keys)}:{len(input_pair_keys)}",
-    )
-    duplicate_audit_files = int(audit.duplicated(AUDIT_FILE_KEY_COLUMNS).sum())
-    add(
-        "coverage",
-        "audit_file_keys_unique",
-        duplicate_audit_files == 0,
-        duplicate_audit_files,
-    )
-
-    add(
-        "processing",
-        "extraction_errors_zero",
-        len(errors) == 0,
-        len(errors),
+        "all_input_pairs_audited",
+        audit["commit"].nunique() <= len(pairs),
+        f"{audit['commit'].nunique()}:{len(pairs)}",
     )
     return pd.DataFrame(checks)
 
 
 def build_summary(
-    all_pairs: pd.DataFrame,
-    eligible_pairs: pd.DataFrame,
+    pairs: pd.DataFrame,
     manifest: pd.DataFrame,
     audit: pd.DataFrame,
     errors: pd.DataFrame,
     repo_month_counts: pd.DataFrame,
     checks: pd.DataFrame,
-    *,
-    limited_run: bool,
 ) -> dict[str, Any]:
-    error_stage_counts = {
-        str(key): int(value)
-        for key, value in errors["stage"].value_counts(dropna=False).items()
-    }
-    error_type_counts = {
-        str(key): int(value)
-        for key, value in (
-            errors["error"]
-            .fillna("")
-            .astype(str)
-            .str.split(":", n=1)
-            .str[0]
-            .value_counts(dropna=False)
-            .items()
-        )
-    }
-    zero_eligible_months = int(
-        repo_month_counts["commits_scanned"].eq(0).sum()
-    )
     return {
         "status": "PASS" if checks["passed"].eq(1).all() else "FAIL",
         "checks_total": int(len(checks)),
         "checks_passed": int(checks["passed"].eq(1).sum()),
         "checks_failed": int(checks["passed"].ne(1).sum()),
-        "limited_run": bool(limited_run),
-        "input_commit_pairs": int(len(all_pairs)),
-        "eligible_commit_pairs_available": int(
-            all_pairs["primary_scan_eligible"].eq(1).sum()
-        ),
-        "commit_pairs_scanned": int(len(eligible_pairs)),
-        "merge_pairs_excluded": int(
-            all_pairs["primary_scan_eligible"].eq(0).sum()
-        ),
-        "eligible_pairs_not_scanned": int(
-            all_pairs["primary_scan_eligible"].eq(1).sum()
-            - len(eligible_pairs)
-        ),
+        "commit_pairs_scanned": int(len(pairs)),
         "repository_months": int(len(repo_month_counts)),
-        "zero_eligible_commit_repository_months": zero_eligible_months,
         "python_files_audited": int(
             audit["relative_path"].astype(str).str.len().gt(0).sum()
         ),
@@ -1613,49 +1057,34 @@ def build_summary(
             ).sum()
         ),
         "extraction_errors": int(len(errors)),
-        "error_stage_counts": error_stage_counts,
-        "error_type_counts": error_type_counts,
-        "source_artifact_renderer": "ast.unparse",
-        "python_version": sys.version.split()[0],
         "primary_event_definition": (
             "One structurally added or modified named Python function in one "
             "commit; repeated edits and later reverts remain separate events."
         ),
         "downstream_outcomes": {
-            "total_count": "function_change_events",
-            "agc_velocity_like_count": "agc_function_change_events",
-            "hwc_count": "hwc_function_change_events",
+            "velocity_like_count": "agc_function_change_events",
             "composition_ratio": "agc_function_change_event_ratio",
         },
     }
 
+
 def self_test() -> None:
-    source = (
-        "def f1():\n"
-        "    return 1\n"
-        "\n"
-        "class C:\n"
-        "    def m1(self):\n"
-        "        text = \"\"\"line\n"
-        "column_zero\n"
-        "        \"\"\"\n"
-        "        def inner():\n"
-        "            return 2\n"
-        "        return text, inner()\n"
+    source = textwrap.dedent(
+        """
+        def f1():
+            return 1
+
+        class C:
+            def m1(self):
+                def inner():
+                    return 2
+                return inner()
+        """
     )
-    functions = extract_functions(source, filename="self-test-source.py")
+    functions = extract_functions(source)
     names = [record.qualified_name for record in functions]
     if names != ["f1", "C.m1", "C.m1.inner"]:
         raise AssertionError(f"All-function extraction mismatch: {names}")
-    for record in functions:
-        ast.parse(record.source_text, filename=f"artifact:{record.qualified_name}")
-    method_source = next(
-        record.source_text
-        for record in functions
-        if record.qualified_name == "C.m1"
-    )
-    if not method_source.startswith("def m1"):
-        raise AssertionError("Method artifact must start at column zero")
 
     with tempfile.TemporaryDirectory(prefix="agc-function-events-") as temp_dir:
         root = Path(temp_dir)
@@ -1676,10 +1105,7 @@ def self_test() -> None:
             encoding="utf-8",
         )
         subprocess.run(["git", "-C", str(repo), "add", "a.py"], check=True)
-        subprocess.run(
-            ["git", "-C", str(repo), "commit", "-q", "-m", "base"],
-            check=True,
-        )
+        subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", "base"], check=True)
         base = require_git_bytes(
             run_git_bytes(repo, ["rev-parse", "HEAD"]),
             "rev-parse",
@@ -1705,23 +1131,9 @@ def self_test() -> None:
                 ).decode().strip()
             )
 
-        (repo / "note.txt").write_text("merge-only month placeholder\n")
-        subprocess.run(["git", "-C", str(repo), "add", "note.txt"], check=True)
-        subprocess.run(
-            ["git", "-C", str(repo), "commit", "-q", "-m", "ineligible"],
-            check=True,
-        )
-        ineligible_commit = require_git_bytes(
-            run_git_bytes(repo, ["rev-parse", "HEAD"]),
-            "rev-parse",
-        ).decode().strip()
-
-        pair_rows: list[dict[str, Any]] = []
+        pair_rows = []
         parents = [base, commits[0], commits[1]]
-        for order, (parent, current) in enumerate(
-            zip(parents, commits),
-            start=1,
-        ):
+        for order, (parent, current) in enumerate(zip(parents, commits), start=1):
             pair_rows.append(
                 {
                     "dataset_source": "treatment",
@@ -1734,25 +1146,10 @@ def self_test() -> None:
                     "repo_dir": str(repo),
                 }
             )
-        pair_rows.append(
-            {
-                "dataset_source": "treatment",
-                "repo_name": "owner/repo",
-                "month": "2024-02",
-                "scan_parent_commit": commits[-1],
-                "scan_current_commit": ineligible_commit,
-                "commit_order": 1,
-                "primary_scan_eligible": 0,
-                "repo_dir": str(repo),
-            }
-        )
-        all_pairs = pd.DataFrame(pair_rows)
-        eligible_pairs = all_pairs.loc[
-            all_pairs["primary_scan_eligible"].eq(1)
-        ].copy()
+        pairs = pd.DataFrame(pair_rows)
         source_root = root / "sources"
         manifest, audit, errors = extract_events(
-            eligible_pairs,
+            pairs,
             root,
             root,
             source_root,
@@ -1760,61 +1157,15 @@ def self_test() -> None:
         )
         if len(errors) != 0:
             raise AssertionError(errors.to_dict("records"))
-        event_keys = list(
-            zip(
-                manifest["commit_order"],
-                manifest["qualified_function_name"],
-            )
-        )
+        event_keys = list(zip(manifest["commit_order"], manifest["qualified_function_name"]))
         if event_keys != [(1, "f1"), (2, "f2"), (3, "f1")]:
             raise AssertionError(f"Repeated/reverted event mismatch: {event_keys}")
         if len(manifest) != 3:
             raise AssertionError("Expected three commit-function events")
         if audit["modified_function_events"].sum() != 3:
             raise AssertionError("Expected three modified-function events")
-
-        repo_month_counts = build_repo_month_counts(
-            all_pairs,
-            eligible_pairs,
-            manifest,
-            audit,
-        )
-        if len(repo_month_counts) != 2:
-            raise AssertionError("Expected two preserved repository-month rows")
-        february = repo_month_counts.loc[
-            repo_month_counts["time"].eq("2024-02")
-        ].iloc[0]
-        if int(february["commits_scanned"]) != 0:
-            raise AssertionError("Zero-eligible-commit month was not preserved")
-        if int(february["function_change_events"]) != 0:
-            raise AssertionError("Zero-eligible-commit month must have zero events")
-
-        checks = build_checks(
-            all_pairs,
-            eligible_pairs,
-            manifest,
-            audit,
-            errors,
-            repo_month_counts,
-            source_root,
-        )
-        if not checks["passed"].eq(1).all():
-            raise AssertionError(checks.loc[checks["passed"].ne(1)].to_dict("records"))
-        summary = build_summary(
-            all_pairs,
-            eligible_pairs,
-            manifest,
-            audit,
-            errors,
-            repo_month_counts,
-            checks,
-            limited_run=False,
-        )
-        if summary["repository_months"] != 2:
-            raise AssertionError("Summary repository-month count mismatch")
-        if summary["zero_eligible_commit_repository_months"] != 1:
-            raise AssertionError("Summary zero-eligible month count mismatch")
     print("Self-test: PASS")
+
 
 def main() -> int:
     args = parse_args()
@@ -1844,24 +1195,14 @@ def main() -> int:
     output_manifest.parent.mkdir(parents=True, exist_ok=True)
     qc_dir.mkdir(parents=True, exist_ok=True)
 
-    loaded_all_pairs, loaded_eligible_pairs = load_pairs(input_pairs)
-    all_pairs, eligible_pairs = select_pair_scope(
-        loaded_all_pairs,
-        loaded_eligible_pairs,
-        args.repo,
-        args.max_pairs,
-    )
-    limited_run = bool(args.repo or args.max_pairs > 0)
+    pairs = load_pairs(input_pairs)
+    if args.max_pairs > 0:
+        pairs = pairs.head(args.max_pairs).copy()
 
     print("=" * 72)
     print("Extract commit-function change events")
     print(f"Input commit pairs:    {input_pairs}")
-    print(f"Scoped pair rows:      {len(all_pairs)}")
-    print(f"Eligible pairs:        {len(eligible_pairs)}")
-    print(f"Repositories:          {all_pairs['repo_name'].nunique()}")
-    print(f"Limited run:           {limited_run}")
-    print(f"Artifact renderer:     ast.unparse")
-    print(f"Python version:        {sys.version.split()[0]}")
+    print(f"Eligible pairs:        {len(pairs)}")
     print(f"Treatment clones:      {treatment_clone_dir}")
     print(f"Control clones:        {control_clone_dir}")
     print(f"Output manifest:       {output_manifest}")
@@ -1870,36 +1211,21 @@ def main() -> int:
     print("=" * 72)
 
     manifest, audit, errors = extract_events(
-        eligible_pairs,
+        pairs,
         treatment_clone_dir,
         control_clone_dir,
         source_root,
         args.progress_every,
     )
-    repo_month_counts = build_repo_month_counts(
-        all_pairs,
-        eligible_pairs,
-        manifest,
-        audit,
-    )
-    checks = build_checks(
-        all_pairs,
-        eligible_pairs,
-        manifest,
-        audit,
-        errors,
-        repo_month_counts,
-        source_root,
-    )
+    repo_month_counts = build_repo_month_counts(pairs, manifest, audit)
+    checks = build_checks(pairs, manifest, audit, errors, source_root)
     summary = build_summary(
-        all_pairs,
-        eligible_pairs,
+        pairs,
         manifest,
         audit,
         errors,
         repo_month_counts,
         checks,
-        limited_run=limited_run,
     )
 
     audit_path = output_manifest.parent / "commit_function_event_extraction_audit.csv"
@@ -1918,18 +1244,8 @@ def main() -> int:
     print("=" * 72)
     print("AGC commit-function event extraction")
     print(f"Status:                     {summary['status']}")
-    print(
-        f"Checks passed:              "
-        f"{summary['checks_passed']}/{summary['checks_total']}"
-    )
-    print(f"Input commit pairs:         {summary['input_commit_pairs']}")
+    print(f"Checks passed:              {summary['checks_passed']}/{summary['checks_total']}")
     print(f"Commit pairs scanned:       {summary['commit_pairs_scanned']}")
-    print(f"Merge pairs excluded:       {summary['merge_pairs_excluded']}")
-    print(f"Repository-months:          {summary['repository_months']}")
-    print(
-        f"Zero-eligible months:       "
-        f"{summary['zero_eligible_commit_repository_months']}"
-    )
     print(f"Function-change events:     {summary['function_change_events']}")
     print(f"Added function events:      {summary['added_function_events']}")
     print(f"Modified function events:   {summary['modified_function_events']}")

@@ -1,0 +1,25 @@
+section,check,passed,value
+classification,unexpected_error_stages_zero,1,
+classification,all_error_records_are_audited_parse_exclusions,1,1197:1197
+joins,error_records_match_audit_rows,1,0
+joins,excluded_blob_revisions_were_attempted,1,0
+repo_month,all_panel_repository_months_preserved,1,missing=0;unexpected=0
+repo_month,commit_pair_repository_months_exist_in_panel,1,0
+treatment,treatment_group_matches_dataset_source,1,853
+treatment,treatment_period_partition_complete,1,pre=421;event=100;post=332;unknown=0;total=853
+treatment,treatment_event_time_missing_zero,1,0
+arithmetic,eligible_commit_pairs_match,1,188349:188349
+arithmetic,python_file_audits_match,1,212024:212024
+arithmetic,parse_exclusion_records_match_input_errors,1,1197:1197
+arithmetic,parse_stage_counts_match_total,1,1197:1197
+arithmetic,dataset_source_error_counts_preserved,1,"repo_month={'control': 258, 'treatment': 939};raw={'control': 258, 'treatment': 939}"
+uniqueness,global_unique_exclusion_count_matches_unique_table,1,1138:1138
+uniqueness,unique_exclusion_blob_keys_unique,1,0
+rates,all_repo_month_rates_bounded_zero_one,1,0
+source_summary,extract_summary_commit_pairs_scanned_matches,1,188349:188349
+source_summary,extract_summary_python_files_audited_matches,1,212024:212024
+source_summary,extract_summary_extraction_errors_matches,1,1197:1197
+source_summary,extract_summary_repository_months_matches,1,1633:1633
+sensitivity,cutoff_zero_period_matches_baseline,1,expected_rows=5;observed_rows=5
+sensitivity,cutoff_zero_event_time_matches_baseline,1,expected_rows=26;observed_rows=26
+sensitivity,excluded_repository_names_are_treatment_repositories,1,651
