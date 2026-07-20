@@ -1,0 +1,17 @@
+section,check,passed,value
+manifest,function_event_ids_unique,1,0
+manifest,change_types_valid,1,0
+manifest,function_kinds_valid,1,0
+sources,all_source_artifacts_present,1,0
+sources,source_hashes_match_manifest,1,0
+arithmetic,event_counts_nonnegative,1,0
+arithmetic,audit_event_count_matches_manifest,1,450548:450548
+arithmetic,repo_month_event_count_matches_manifest,1,450548:450548
+repo_month,all_repository_months_preserved,1,missing=0;unexpected=0
+repo_month,commits_scanned_match_eligible_pairs,1,188349:188349
+repo_month,zero_eligible_commit_months_preserved,1,10:10
+coverage,missing_input_pair_audits_zero,1,0
+coverage,unexpected_audit_pair_keys_zero,1,0
+coverage,audited_pair_count_matches_input,1,188349:188349
+coverage,audit_file_keys_unique,1,0
+processing,extraction_errors_zero,0,322

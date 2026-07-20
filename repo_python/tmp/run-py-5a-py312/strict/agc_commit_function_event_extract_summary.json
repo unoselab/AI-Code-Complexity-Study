@@ -1,0 +1,40 @@
+{
+  "added_function_events": 198702,
+  "checks_failed": 1,
+  "checks_passed": 15,
+  "checks_total": 16,
+  "commit_pairs_scanned": 188349,
+  "downstream_outcomes": {
+    "agc_velocity_like_count": "agc_function_change_events",
+    "composition_ratio": "agc_function_change_event_ratio",
+    "hwc_count": "hwc_function_change_events",
+    "total_count": "function_change_events"
+  },
+  "eligible_commit_pairs_available": 188349,
+  "eligible_pairs_not_scanned": 0,
+  "error_stage_counts": {
+    "current_file_parse": 209,
+    "parent_file_parse": 113
+  },
+  "error_type_counts": {
+    "IndentationError": 78,
+    "SyntaxError": 231,
+    "TabError": 13
+  },
+  "extraction_errors": 322,
+  "function_change_events": 450548,
+  "input_commit_pairs": 197853,
+  "limited_run": false,
+  "merge_pairs_excluded": 9504,
+  "method_events": 287452,
+  "modified_function_events": 251846,
+  "module_function_events": 142422,
+  "nested_function_events": 20674,
+  "primary_event_definition": "One structurally added or modified named Python function in one commit; repeated edits and later reverts remain separate events.",
+  "python_files_audited": 212024,
+  "python_version": "3.12.13",
+  "repository_months": 1633,
+  "source_artifact_renderer": "ast.unparse",
+  "status": "FAIL",
+  "zero_eligible_commit_repository_months": 10
+}

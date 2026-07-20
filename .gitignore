@@ -202,3 +202,5 @@ repo_python/tmp/run-py-5a/strict/extract-v2-error-heavy-smoke/
 repo_python/tmp/run-py-5a/strict/extract-v2-smoke/
 **/commit_function_sources/
 **/commit_parent_pairs.csv
+**/commit_function_detection_manifest.csv
+**/commit_function_event_extraction_audit.csv
