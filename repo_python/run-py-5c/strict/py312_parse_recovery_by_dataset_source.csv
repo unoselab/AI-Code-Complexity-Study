@@ -1,0 +1,3 @@
+dataset_source,error_records,recovered_error_records,remaining_error_records,record_recovery_rate,unique_blob_revisions,recovered_unique_blob_revisions,remaining_unique_blob_revisions,unique_blob_recovery_rate,py311_fstring_error_records,py311_fstring_recovered_records,py311_fstring_record_recovery_rate
+control,258,122,136,0.4728682170542636,229,116,113,0.5065502183406113,83,83,1.0
+treatment,939,753,186,0.8019169329073482,909,748,161,0.8228822882288229,377,377,1.0

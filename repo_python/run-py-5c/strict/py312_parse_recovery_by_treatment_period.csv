@@ -1,0 +1,5 @@
+treatment_period,error_records,recovered_error_records,remaining_error_records,record_recovery_rate,unique_blob_revisions,recovered_unique_blob_revisions,remaining_unique_blob_revisions,unique_blob_recovery_rate,py311_fstring_error_records,py311_fstring_recovered_records,py311_fstring_record_recovery_rate
+control,258,122,136,0.4728682170542636,229,116,113,0.5065502183406113,83,83,1.0
+treatment_event_month,76,50,26,0.6578947368421053,72,49,23,0.6805555555555556,30,30,1.0
+treatment_post_event,717,617,100,0.8605299860529986,699,613,86,0.876967095851216,283,283,1.0
+treatment_pre_event,146,86,60,0.589041095890411,138,86,52,0.6231884057971014,64,64,1.0
