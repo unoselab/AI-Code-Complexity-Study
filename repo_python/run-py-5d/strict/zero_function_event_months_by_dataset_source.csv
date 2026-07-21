@@ -1,0 +1,3 @@
+dataset_source,repo_months,zero_event_months,event_positive_months,total_function_change_events,total_agc_function_change_events,total_hwc_function_change_events,zero_event_month_ratio,event_positive_month_ratio
+control,780,209,571,101530,27539.0,73991.0,0.26794871794871794,0.732051282051282
+treatment,853,135,718,349018,70064.0,278954.0,0.15826494724501758,0.8417350527549824

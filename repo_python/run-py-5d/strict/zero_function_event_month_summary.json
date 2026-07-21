@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "complete_repo_months": 1633,
+  "detector_summary_repo_months": 1289,
+  "event_positive_repo_months": 1289,
+  "zero_event_repo_months": 344,
+  "conditional_ratio_repo_months": 1289,
+  "parse_exclusion_affected_repo_months": 97,
+  "outputs": {
+    "complete_analysis_table": "repo_python/run-py-5d/strict/repo_month_agc_function_event_analysis_complete.csv",
+    "by_dataset_source": "repo_python/run-py-5d/strict/zero_function_event_months_by_dataset_source.csv",
+    "by_treatment_period": "repo_python/run-py-5d/strict/zero_function_event_months_by_treatment_period.csv",
+    "by_event_time": "repo_python/run-py-5d/strict/zero_function_event_months_by_event_time.csv",
+    "parse_exclusion_overlap": "repo_python/run-py-5d/strict/zero_function_event_parse_exclusion_overlap.csv",
+    "checks": "repo_python/run-py-5d/strict/zero_function_event_month_checks.csv"
+  }
+}

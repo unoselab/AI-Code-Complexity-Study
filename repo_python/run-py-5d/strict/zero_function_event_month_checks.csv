@@ -1,0 +1,8 @@
+check,passed,observed
+complete_panel_row_count,True,1633
+detector_summary_row_count,True,1289
+zero_event_month_count,True,344
+all_event_positive_months_have_detector_summary,True,0
+all_detector_missing_months_are_zero_event,True,344
+zero_event_ratio_is_missing,True,0
+event_arithmetic,True,1633

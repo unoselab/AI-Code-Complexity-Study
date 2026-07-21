@@ -1,53 +1,124 @@
-cat repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_top_repo_sensitivity.csv
+이제 344 zero-event months가 treatment/control 및 pre/event/post에 어떻게 분포하는지 확인해야 합니다. 먼저 다음 파일들을 출력하세요.
 
-excluded_top_repositories,excluded_repository_names,analysis_group,input_commit_pairs,eligible_commit_pairs,python_file_change_audits,current_blob_attempts,parent_blob_attempts,blob_parse_attempts,parse_exclusion_records,current_file_parse_exclusions,parent_file_parse_exclusions,commit_pairs_with_parse_exclusions,repository_months,repository_months_with_parse_exclusions,unique_blob_revisions_attempted,unique_excluded_blob_revisions,repository_month_parse_exclusion_rate,commit_pair_parse_exclusion_rate,current_file_parse_exclusion_rate,parent_file_parse_exclusion_rate,blob_parse_exclusion_record_rate,unique_blob_parse_exclusion_rate
-0,,overall,197853,188349,212024,212024,184262,396286,1197,1010,187,926,1633,163,377643,1138,0.0998162890385793,0.004916405183993544,0.004763611666603781,0.0010148592764650335,0.0030205457674507804,0.0030134280259398426
-0,,control,111950,107762,40808,40808,32918,73726,258,168,90,213,780,61,68058,229,0.0782051282051282,0.0019765780145134648,0.004116839835326407,0.0027340664681936933,0.0034994438868241867,0.0033647771018836875
-0,,treatment,85903,80587,171216,171216,151344,322560,939,842,97,713,853,102,309585,909,0.11957796014067995,0.008847580875327285,0.004917764694888328,0.0006409239877365472,0.0029110863095238096,0.0029361887688356993
-1,treatment|getsentry/sentry,overall,170323,160852,149858,149858,125682,275540,701,527,174,584,1613,153,257535,642,0.09485430874147552,0.0036306666998234404,0.0035166624404436198,0.00138444646011362,0.0025440952311824054,0.002492865047469276
-1,treatment|getsentry/sentry,control,111950,107762,40808,40808,32918,73726,258,168,90,213,780,61,68058,229,0.0782051282051282,0.0019765780145134648,0.004116839835326407,0.0027340664681936933,0.0034994438868241867,0.0033647771018836875
-1,treatment|getsentry/sentry,treatment,58373,53090,109050,109050,92764,201814,443,359,84,371,833,92,189477,413,0.11044417767106843,0.006988133358447919,0.003292067858780376,0.0009055236945366737,0.002195090528902851,0.0021796840777508616
-3,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent,overall,166357,157757,142245,142245,120505,262750,405,290,115,360,1574,126,245770,359,0.08005082592121983,0.002281990656516034,0.0020387359836901123,0.0009543172482469607,0.0015413891531874406,0.0014607153029254994
-3,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent,control,110705,106806,37176,37176,31103,68279,152,90,62,125,760,49,63052,132,0.06447368421052632,0.0011703462352302305,0.002420916720464816,0.001993376844677362,0.002226160312834107,0.00209351011863224
-3,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent,treatment,55652,50951,105069,105069,89402,194471,253,200,53,235,814,77,182718,227,0.0945945945945946,0.004612274538281879,0.0019035110260876187,0.0005928279009418134,0.0013009651824693656,0.0012423516019220875
-5,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm,overall,164887,156521,140473,140473,119173,259646,322,211,111,284,1557,114,242972,277,0.07321772639691715,0.0018144530126947822,0.0015020680130701273,0.0009314190294781536,0.0012401500504533095,0.0011400490591508487
-5,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm,control,110705,106806,37176,37176,31103,68279,152,90,62,125,760,49,63052,132,0.06447368421052632,0.0011703462352302305,0.002420916720464816,0.001993376844677362,0.002226160312834107,0.00209351011863224
-5,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm,treatment,54182,49715,103297,103297,88070,191367,170,121,49,159,797,65,179920,145,0.08155583437892096,0.003198229910489792,0.001171379614122385,0.0005563756103099807,0.0008883454305078723,0.000805913739439751
-10,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm;control|HelpingAI/Webscout;treatment|OpenMOSS/Language-Model-SAEs;control|ArpiarSaundersLab/annsql;treatment|ericyuegu/hal;control|BalancerMaxis/multisig-ops,overall,156126,149577,132538,132538,112465,245003,236,144,92,201,1481,89,230001,199,0.06009453072248481,0.0013437894863515113,0.001086480858319878,0.0008180322767083093,0.0009632535111814957,0.0008652136295059586
-10,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm;control|HelpingAI/Webscout;treatment|OpenMOSS/Language-Model-SAEs;control|ArpiarSaundersLab/annsql;treatment|ericyuegu/hal;control|BalancerMaxis/multisig-ops,control,103534,101349,32938,32938,27651,60589,101,54,47,76,712,36,56092,87,0.05056179775280899,0.0007498840639769509,0.001639443803509624,0.0016997576941159452,0.0016669692518443942,0.0015510233188333453
-10,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm;control|HelpingAI/Webscout;treatment|OpenMOSS/Language-Model-SAEs;control|ArpiarSaundersLab/annsql;treatment|ericyuegu/hal;control|BalancerMaxis/multisig-ops,treatment,52592,48228,99600,99600,84814,184414,135,90,45,125,769,53,173909,112,0.06892067620286085,0.0025918553537364187,0.0009036144578313253,0.0005305727827952932,0.0007320485429522704,0.0006440149733481303
-20,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm;control|HelpingAI/Webscout;treatment|OpenMOSS/Language-Model-SAEs;control|ArpiarSaundersLab/annsql;treatment|ericyuegu/hal;control|BalancerMaxis/multisig-ops;control|MalevichAI/malevich;treatment|yeagerai/genlayer-studio;treatment|airweave-ai/airweave;control|golemfoundation/octant;treatment|TextGeneratorio/text-generator.io;control|ITSpecialist111/ai_automation_suggester;control|aj47/100x-orchestrator;treatment|ezyang/codemcp;treatment|whiteducksoftware/flock;control|believethehype/nostrdvm,overall,146516,141687,114873,114873,97725,212598,123,85,38,110,1366,58,200517,108,0.0424597364568082,0.000776359157862048,0.0007399475942997919,0.00038884625223842414,0.0005785567126689809,0.0005386076990978321
-20,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm;control|HelpingAI/Webscout;treatment|OpenMOSS/Language-Model-SAEs;control|ArpiarSaundersLab/annsql;treatment|ericyuegu/hal;control|BalancerMaxis/multisig-ops;control|MalevichAI/malevich;treatment|yeagerai/genlayer-studio;treatment|airweave-ai/airweave;control|golemfoundation/octant;treatment|TextGeneratorio/text-generator.io;control|ITSpecialist111/ai_automation_suggester;control|aj47/100x-orchestrator;treatment|ezyang/codemcp;treatment|whiteducksoftware/flock;control|believethehype/nostrdvm,control,98153,97205,25129,25129,20899,46028,46,33,13,39,650,21,42827,41,0.03230769230769231,0.0004012139293246232,0.0013132237653706873,0.0006220393320254558,0.000999391674632832,0.0009573399957970439
-20,treatment|getsentry/sentry;treatment|allthingslinux/tux;control|pieces-app/cli-agent;treatment|trycua/cua;treatment|ilanbenb/wa_llm;control|HelpingAI/Webscout;treatment|OpenMOSS/Language-Model-SAEs;control|ArpiarSaundersLab/annsql;treatment|ericyuegu/hal;control|BalancerMaxis/multisig-ops;control|MalevichAI/malevich;treatment|yeagerai/genlayer-studio;treatment|airweave-ai/airweave;control|golemfoundation/octant;treatment|TextGeneratorio/text-generator.io;control|ITSpecialist111/ai_automation_suggester;control|aj47/100x-orchestrator;treatment|ezyang/codemcp;treatment|whiteducksoftware/flock;control|believethehype/nostrdvm,treatment,48363,44482,89744,89744,76826,166570,77,52,25,71,716,37,157690,67,0.051675977653631286,0.0015961512521918979,0.0005794259226243537,0.00032541066826334835,0.00046226811550699405,0.0004248842665990234
+dataset_source  repo_months  zero_event_months  event_positive_months  total_function_change_events  total_agc_function_change_events  total_hwc_function_change_events  zero_event_month_ratio  event_positive_month_ratio
+control         780          209                571                    101530                        27539.0                           73991.0                           0.26794871794871794     0.732051282051282
+treatment       853          135                718                    349018                        70064.0                           278954.0                          0.15826494724501758     0.8417350527549824
+treatment_group  treatment_period  repo_months  zero_event_months  event_positive_months  total_function_change_events  total_agc_function_change_events  total_hwc_function_change_events  zero_event_month_ratio  event_positive_month_ratio
+control          control           1201         274                927                    256706                        59446.0                           197260.0                          0.22814321398834306     0.771856786011657
+treatment        event             100          6                  94                     36224                         8759.0                            27465.0                           0.06                    0.94
+treatment        post              332          64                 268                    157618                        29398.0                           128220.0                          0.1927710843373494      0.8072289156626506
+parse_exclusion_input_supplied  parse_exclusion_affected_months  zero_event_and_parse_exclusion_months  event_positive_and_parse_exclusion_months
+True                            97                               0                                      97
 
+그리고 QC 전체:
+check                                            passed  observed
+complete_panel_row_count                         True    1633
+detector_summary_row_count                       True    1289
+zero_event_month_count                           True    344
+all_event_positive_months_have_detector_summary  True    0
+all_detector_missing_months_are_zero_event       True    344
+zero_event_ratio_is_missing                      True    0
+event_arithmetic                                 True    1633
 
-cat repo_python/run-py-5b/strict/agc_commit_function_parse_exclusions_by_event_time.csv
+---
 
+python - <<'PY'
+import pandas as pd
 
-time_to_event,input_commit_pairs,eligible_commit_pairs,python_file_change_audits,current_blob_attempts,parent_blob_attempts,blob_parse_attempts,parse_exclusion_records,current_file_parse_exclusions,parent_file_parse_exclusions,commit_pairs_with_parse_exclusions,repository_months,repository_months_with_parse_exclusions,unique_blob_revisions_attempted,unique_excluded_blob_revisions,repository_month_parse_exclusion_rate,commit_pair_parse_exclusion_rate,current_file_parse_exclusion_rate,parent_file_parse_exclusion_rate,blob_parse_exclusion_record_rate,unique_blob_parse_exclusion_rate
--14.0,746,692,1349,1349,1190,2539,3,2,1,3,14,2,2461,3,0.14285714285714285,0.004335260115606936,0.0014825796886582653,0.0008403361344537816,0.0011815675462780622,0.001219016659894352
--13.0,2828,2736,5072,5072,4650,9722,3,1,2,3,18,1,9455,2,0.05555555555555555,0.0010964912280701754,0.0001971608832807571,0.00043010752688172043,0.00030857848179386956,0.00021152829190904283
--12.0,2691,2599,8691,8691,8252,16943,4,2,2,4,20,2,16787,3,0.1,0.0015390534821085034,0.00023012311586698885,0.0002423654871546292,0.00023608569910877649,0.0001787097158515518
--11.0,2864,2760,6715,6715,6105,12820,1,1,0,1,21,1,12487,1,0.047619047619047616,0.00036231884057971015,0.0001489203276247208,0.0,7.800312012480499e-05,8.008328661808281e-05
--10.0,3428,3260,6994,6994,6409,13403,3,2,1,3,22,3,13150,3,0.13636363636363635,0.0009202453987730061,0.00028595939376608524,0.00015603058199407084,0.00022383048571215399,0.00022813688212927757
--9.0,3212,3066,6186,6186,5774,11960,0,0,0,0,30,0,11560,0,0.0,0.0,0.0,0.0,0.0,0.0
--8.0,3295,3066,6638,6638,6050,12688,7,5,2,7,31,3,12364,5,0.0967741935483871,0.00228310502283105,0.0007532389273877674,0.00033057851239669424,0.0005517023959646911,0.0004043998705920414
--7.0,3921,3685,7862,7862,7196,15058,10,8,2,9,31,2,14609,10,0.06451612903225806,0.0024423337856173677,0.0010175527855507504,0.00027793218454697053,0.0006640988179041042,0.0006845095489082072
--6.0,3226,2987,6695,6695,5970,12665,12,7,5,10,31,4,12144,11,0.12903225806451613,0.0033478406427854034,0.0010455563853622107,0.0008375209380234506,0.0009474930911962101,0.0009057971014492754
--5.0,3530,3330,6808,6808,6144,12952,13,10,3,9,33,1,12409,10,0.030303030303030304,0.002702702702702703,0.0014688601645123384,0.00048828125,0.001003705991352687,0.0008058667096462245
--4.0,3204,3046,5442,5442,4812,10254,34,28,6,24,35,2,9997,34,0.05714285714285714,0.007879185817465528,0.005145167217934583,0.0012468827930174563,0.003315779208113907,0.0034010203060918275
--3.0,3070,2961,5844,5844,4614,10458,15,12,3,12,40,5,9991,15,0.125,0.004052684903748734,0.002053388090349076,0.0006501950585175553,0.001434308663224326,0.0015013512160944851
--2.0,3280,3081,5677,5677,5032,10709,18,18,0,15,42,2,10353,18,0.047619047619047616,0.004868549172346641,0.0031706887440549588,0.0,0.0016808292090764777,0.0017386264850767893
--1.0,4784,4518,7468,7468,6112,13580,23,9,14,12,53,4,12968,23,0.07547169811320754,0.0026560424966799467,0.001205141938939475,0.0022905759162303663,0.0016936671575846834,0.0017735965453423812
-0.0,8288,7811,16047,16047,13114,29161,76,68,8,67,100,13,26277,72,0.13,0.008577646908206376,0.004237552190440581,0.0006100350770169285,0.002606220637152361,0.002740038817216577
-1.0,7225,6738,10473,10473,9124,19597,78,72,6,76,71,13,18454,75,0.18309859154929578,0.011279311368358563,0.006874820968203953,0.000657606313020605,0.003980201051181303,0.004064159531808822
-2.0,5862,5372,9520,9520,8301,17821,86,72,14,78,60,8,17005,81,0.13333333333333333,0.014519731943410276,0.007563025210084034,0.0016865437899048308,0.00482576735312272,0.004763304910320494
-3.0,4461,4143,7858,7858,6634,14492,66,65,1,62,59,9,13954,66,0.15254237288135594,0.014965001206854936,0.008271824891829982,0.00015073861923424781,0.004554236820314656,0.004729826573025656
-4.0,5121,4854,9757,9757,8333,18090,181,171,10,121,55,10,17549,177,0.18181818181818182,0.024927894519983517,0.017525878856205802,0.0012000480019200767,0.010005527915975677,0.010086044788876859
-5.0,5665,5233,13578,13578,12284,25862,132,124,8,100,48,8,25230,130,0.16666666666666666,0.01910949742021785,0.0091324200913242,0.0006512536633018561,0.005104013610702962,0.005152596115735236
-6.0,3276,3092,13187,13187,12215,25402,162,158,4,86,18,5,24889,161,0.2777777777777778,0.0278137128072445,0.011981496928793509,0.0003274662300450266,0.006377450594441382,0.006468721121780706
-7.0,925,746,1468,1468,1318,2786,10,6,4,9,9,3,2488,8,0.3333333333333333,0.012064343163538873,0.004087193460490463,0.0030349013657056147,0.003589375448671931,0.003215434083601286
-8.0,398,341,693,693,638,1331,0,0,0,0,5,0,1224,0,0.0,0.0,0.0,0.0,0.0,0.0
-9.0,159,122,300,300,266,566,0,0,0,0,3,0,515,0,0.0,0.0,0.0,0.0,0.0,0.0
-10.0,390,294,844,844,760,1604,2,1,1,2,3,1,1471,2,0.3333333333333333,0.006802721088435374,0.001184834123222749,0.0013157894736842105,0.0012468827930174563,0.0013596193065941536
-11.0,54,54,50,50,47,97,0,0,0,0,1,0,84,0,0.0,0.0,0.0,0.0,0.0,0.0
+df = pd.read_csv("repo_python/run-py-5d/strict/repo_month_agc_function_event_analysis_complete.csv")
+
+# dataset_source(static, 항상 신뢰 가능) 기준으로 재확인
+print("dataset_source counts (ground truth):")
+print(df["dataset_source"].value_counts().to_dict())
+# 기대: control=780, treatment=853
+
+print()
+print("treatment_group vs dataset_source cross-tab:")
+print(pd.crosstab(df["dataset_source"], df["treatment_group"]))
+# 기대: dataset_source=treatment인데 treatment_group=control인 행이 421개 나와야 버그 확정
+PY
+
+dataset_source counts (ground truth):
+{'treatment': 853, 'control': 780}
+
+treatment_group vs dataset_source cross-tab:
+treatment_group  control  treatment
+dataset_source                     
+control              780          0
+treatment            421        432
+
+---
+
+comments after reviewing 3 files.
+repo_python/run-py-5d/strict/repo_month_agc_function_event_analysis_complete.csv
+repo_python/run-py-5d/strict/zero_function_event_month_checks.csv
+repo_python/run-py-5d/strict/zero_function_event_month_summary.json
+
+---
+지금까지 검증한 것과 별개로, 실제 CSV를 열어보니 **두 가지 실질적 문제**를 발견했습니다. 하나는 예상했던 dtype 문제가 실제로 데이터를 오염시킨 것이고, 다른 하나는 훨씬 더 중요한 문제입니다.
+
+## 🚩 문제 1: `detection_complete` 컬럼이 실제로 오염됐습니다 (경고가 현실화됨)
+
+```
+detection_complete value counts: {'1.0': 1289, 'True': 344}
+```
+
+지난 turn에서 우려했던 FutureWarning이 단순 경고로 끝나지 않고, **실제로 컬럼에 두 가지 다른 문자열 표현이 섞였습니다.** CSV로 저장되면서 detector-merge된 1,289행은 `"1.0"`(float가 문자열화), zero-event로 채운 344행은 `"True"`(Python bool이 문자열화)가 됐습니다. 이후 누군가 `df["detection_complete"] == True`나 `== 1`로 필터링하면 **절반이 조용히 틀린 결과**를 낼 수 있습니다. 지난 turn에서 드린 수정을 꼭 반영해서 재실행하시길 권합니다.
+
+## 🚩 문제 2: `treatment_group`이 훨씬 더 심각합니다 — 이전에 고쳤던 버그가 재발했습니다
+
+```
+treatment_group counts: {'control': 1201, 'treatment': 432}
+```
+
+**이 숫자, 어디서 보셨는지 기억하시나요?** 바로 며칠 전 `analyze_agc_commit_function_parse_exclusions.py` **v1의 버그**에서 정확히 이 숫자(`control 1201, treatment 432`)가 나왔었고, 그때 `run-py-3b` 기준 실제 값(`treatment 853 = pre 421 + post 432`, `control 780`)과 대조해서 **"`is_treatment`는 static membership이 아니라 dynamic post_event 값이라 treatment pre-event 421개 row가 잘못 control로 분류됐다"**는 걸 확정하고 v2로 고쳤던 바로 그 버그입니다.
+
+이번 `analyze_agc_zero_event_months.py`가 **같은 함정에 다시 걸렸습니다.** `treatment_column`으로 `is_treatment`(dynamic)를 그대로 쓰고 있고, 그 결과:
+
+* `control: 1201` = 실제 control(780) + treatment pre-event(421) — **잘못 합쳐짐**
+* `treatment: 432` = 실제 treatment의 post-event만 — **pre-event 421개가 통째로 빠짐**
+
+## 검증
+
+```python
+import pandas as pd
+
+df = pd.read_csv("repo_month_agc_function_event_analysis_complete.csv")
+
+# dataset_source(static, 항상 신뢰 가능) 기준으로 재확인
+print("dataset_source counts (ground truth):")
+print(df["dataset_source"].value_counts().to_dict())
+# 기대: control=780, treatment=853
+
+print()
+print("treatment_group vs dataset_source cross-tab:")
+print(pd.crosstab(df["dataset_source"], df["treatment_group"]))
+# 기대: dataset_source=treatment인데 treatment_group=control인 행이 421개 나와야 버그 확정
+```
+
+`dataset_source`가 `control 780 / treatment 853`으로 나오는데 `treatment_group`은 `control 1201 / treatment 432`로 나온다면, 정확히 이 버그입니다.
+
+## 영향 범위
+
+`by_treatment_period.csv`, `by_event_time.csv` 등 **`treatment_group`을 기준으로 만든 모든 breakdown 파일이 지금 전부 왜곡되어 있을 가능성이 높습니다.** 다행히 `complete` 테이블 자체는 `is_treatment`, `time_to_event`, `post_event`, `event`, `cursor` 원본 컬럼을 그대로 보존하고 있으니(컬럼 목록에서 확인됨), **원본 데이터는 안전**하고 파생 컬럼(`treatment_group`, 그리고 이를 기반으로 만든 groupby 파일들)만 다시 계산하면 됩니다.
+
+## 수정 방향
+
+```python
+# The static treatment/control cohort membership must come from dataset_source
+# (or the panel's ever_treated column, if present), never from is_treatment,
+# which in this project's run-py-4a/run-py-3b panel lineage represents the
+# dynamic post-adoption indicator (post_event), not static group membership.
+# This exact confusion was already identified and fixed in
+# analyze_agc_commit_function_parse_exclusions.py v1 -> v2.
+complete["treatment_group"] = complete["dataset_source"].map(
+    {"control": "control", "treatment": "treatment"}
+)
+```
+
+`ever_treated` 컬럼이 panel에 있다면 그걸 써도 되지만, 지금 이 스크립트가 읽는 `run-py-4a` panel에는 `ever_treated`가 없을 수 있으니(이전 확인 시 `is_treatment`/`time_to_event`/`post_event`/`event`/`cursor`만 언급됨) `dataset_source`가 가장 안전한 static 기준입니다.
+
+## 다행인 점
+
+* `zero_function_event_ratio_is_missing`, `event_arithmetic`, `all_event_positive_months_have_detector_summary` 등 **핵심 QC 6개는 전부 정상 통과**했고, `zero + positive == 1633` 산술도 맞습니다 — 이 부분들은 `treatment_group` 버그와 무관하게 건전합니다.
+* `parse_exclusion_records`, `has_parse_exclusion`, `log1p_*` 컬럼들도 정상적으로 붙어있습니다.
