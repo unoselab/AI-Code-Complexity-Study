@@ -179,19 +179,6 @@ def assert_unique_keys(frame: pd.DataFrame, label: str) -> None:
         )
 
 
-def infer_treatment_column(panel: pd.DataFrame) -> str:
-    candidates = ["is_treatment", "treat", "treatment"]
-
-    for column in candidates:
-        if column in panel.columns:
-            return column
-
-    raise ValueError(
-        "Could not identify a treatment indicator. "
-        f"Tried: {candidates}. Available columns: {list(panel.columns)}"
-    )
-
-
 def infer_event_time_column(panel: pd.DataFrame) -> str:
     candidates = ["time_to_event", "event_time", "relative_month"]
 
@@ -319,15 +306,23 @@ def main() -> int:
     assert_unique_keys(detector, "Detector summary")
     assert_unique_keys(panel, "Matched panel")
 
-    treatment_column = infer_treatment_column(panel)
     event_time_column = infer_event_time_column(panel)
 
-    panel_columns = KEY_COLUMNS + [
-        treatment_column,
-        event_time_column,
-    ]
+    panel_columns = KEY_COLUMNS + [event_time_column]
 
-    for optional_column in ["post_event", "event", "cursor"]:
+    # is_treatment (or its aliases) is no longer required: static cohort
+    # membership is derived from dataset_source, not from this dynamic
+    # post-adoption indicator. Keep it in the output only if present, purely
+    # as diagnostic context, so the script still runs against panels that
+    # omit it.
+    for optional_column in [
+        "is_treatment",
+        "treat",
+        "treatment",
+        "post_event",
+        "event",
+        "cursor",
+    ]:
         if optional_column in panel.columns:
             panel_columns.append(optional_column)
 
@@ -468,11 +463,12 @@ def main() -> int:
     )
 
     # Use dataset_source as the static treatment/control cohort membership.
-    # The panel column identified by infer_treatment_column() (is_treatment)
-    # is a dynamic post-adoption indicator in this project's run-py-4a /
-    # run-py-3b panel lineage, not static group membership. Using it here
-    # previously misclassified 421 treatment pre-event repository-months as
-    # "control" -- the exact bug already found and fixed once before in
+    # The panel's is_treatment column (formerly resolved via the now-removed
+    # infer_treatment_column()) is a dynamic post-adoption indicator in this
+    # project's run-py-4a / run-py-3b panel lineage, not static group
+    # membership. Using it here previously misclassified 421 treatment
+    # pre-event repository-months as "control" -- the exact bug already
+    # found and fixed once before in
     # analyze_agc_commit_function_parse_exclusions.py (v1 -> v2). Do not
     # reintroduce that confusion here.
     complete["treatment_group"] = complete["dataset_source"].map(
@@ -772,6 +768,17 @@ def main() -> int:
             and complete["detection_complete"].notna().all()
         ),
         str(complete["detection_complete"].dtype),
+    )
+    add_check(
+        "detection_complete_all_true",
+        bool(complete["detection_complete"].eq(True).all()),
+        int(complete["detection_complete"].eq(False).sum()),
+    )
+    add_check(
+        "treatment_group_matches_dataset_source",
+        int(complete["treatment_group"].ne(complete["dataset_source"]).sum())
+        == 0,
+        int(complete["treatment_group"].ne(complete["dataset_source"]).sum()),
     )
 
     checks_frame = pd.DataFrame(checks)

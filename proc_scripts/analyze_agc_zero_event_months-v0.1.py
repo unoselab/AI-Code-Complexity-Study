@@ -179,19 +179,6 @@ def assert_unique_keys(frame: pd.DataFrame, label: str) -> None:
         )
 
 
-def infer_treatment_column(panel: pd.DataFrame) -> str:
-    candidates = ["is_treatment", "treat", "treatment"]
-
-    for column in candidates:
-        if column in panel.columns:
-            return column
-
-    raise ValueError(
-        "Could not identify a treatment indicator. "
-        f"Tried: {candidates}. Available columns: {list(panel.columns)}"
-    )
-
-
 def infer_event_time_column(panel: pd.DataFrame) -> str:
     candidates = ["time_to_event", "event_time", "relative_month"]
 
@@ -319,15 +306,23 @@ def main() -> int:
     assert_unique_keys(detector, "Detector summary")
     assert_unique_keys(panel, "Matched panel")
 
-    treatment_column = infer_treatment_column(panel)
     event_time_column = infer_event_time_column(panel)
 
-    panel_columns = KEY_COLUMNS + [
-        treatment_column,
-        event_time_column,
-    ]
+    panel_columns = KEY_COLUMNS + [event_time_column]
 
-    for optional_column in ["post_event", "event", "cursor"]:
+    # is_treatment (or its aliases) is no longer required: static cohort
+    # membership is derived from dataset_source, not from this dynamic
+    # post-adoption indicator. Keep it in the output only if present, purely
+    # as diagnostic context, so the script still runs against panels that
+    # omit it.
+    for optional_column in [
+        "is_treatment",
+        "treat",
+        "treatment",
+        "post_event",
+        "event",
+        "cursor",
+    ]:
         if optional_column in panel.columns:
             panel_columns.append(optional_column)
 
@@ -424,24 +419,78 @@ def main() -> int:
         "agc_function_change_event_ratio",
     ] = pd.NA
 
+    # Normalize detection_complete to a nullable boolean dtype before
+    # assigning True to the zero-event rows. Without this, the column can
+    # arrive from the detector merge as float64 (e.g. 1.0) and mixing in a
+    # Python bool True produces a pandas FutureWarning during assignment
+    # and, worse, an object column that round-trips through CSV as mixed
+    # "1.0"/"True" string literals -- a real downstream correctness bug,
+    # not just a cosmetic warning.
+    complete["detection_complete"] = (
+        complete["detection_complete"]
+        .map(
+            {
+                True: True,
+                False: False,
+                1: True,
+                0: False,
+                1.0: True,
+                0.0: False,
+                "True": True,
+                "False": False,
+                "1": True,
+                "0": False,
+                "1.0": True,
+                "0.0": False,
+            }
+        )
+        .astype("boolean")
+    )
+
     complete.loc[
         zero_event,
         "detection_complete",
     ] = True
+
+    if complete["detection_complete"].isna().any():
+        raise ValueError(
+            "detection_complete contains unresolved missing values."
+        )
 
     complete["agc_function_change_event_ratio"] = pd.to_numeric(
         complete["agc_function_change_event_ratio"],
         errors="coerce",
     )
 
-    complete["treatment_group"] = (
-        pd.to_numeric(
-            complete[treatment_column],
-            errors="raise",
-        )
-        .map({0: "control", 1: "treatment"})
-        .fillna("unknown")
+    # Use dataset_source as the static treatment/control cohort membership.
+    # The panel's is_treatment column (formerly resolved via the now-removed
+    # infer_treatment_column()) is a dynamic post-adoption indicator in this
+    # project's run-py-4a / run-py-3b panel lineage, not static group
+    # membership. Using it here previously misclassified 421 treatment
+    # pre-event repository-months as "control" -- the exact bug already
+    # found and fixed once before in
+    # analyze_agc_commit_function_parse_exclusions.py (v1 -> v2). Do not
+    # reintroduce that confusion here.
+    complete["treatment_group"] = complete["dataset_source"].map(
+        {
+            "control": "control",
+            "treatment": "treatment",
+        }
     )
+
+    if complete["treatment_group"].isna().any():
+        unexpected = sorted(
+            complete.loc[
+                complete["treatment_group"].isna(),
+                "dataset_source",
+            ]
+            .dropna()
+            .unique()
+            .tolist()
+        )
+        raise ValueError(
+            f"Unexpected dataset_source values: {unexpected}"
+        )
 
     event_time_numeric = pd.to_numeric(
         complete[event_time_column],
@@ -677,8 +726,73 @@ def main() -> int:
         int(len(complete)),
     )
 
+    # These checks lock in the static dataset_source-based cohort counts and
+    # the fixed treatment_period partition, so that a future regression back
+    # to the dynamic is_treatment column (the bug this revision fixes) fails
+    # loudly instead of silently reproducing incorrect downstream summaries.
+    add_check(
+        "static_control_repo_month_count",
+        int(complete["dataset_source"].eq("control").sum()) == 780,
+        int(complete["dataset_source"].eq("control").sum()),
+    )
+    add_check(
+        "static_treatment_repo_month_count",
+        int(complete["dataset_source"].eq("treatment").sum()) == 853,
+        int(complete["dataset_source"].eq("treatment").sum()),
+    )
+    add_check(
+        "treatment_pre_month_count",
+        int(complete["treatment_period"].eq("pre").sum()) == 421,
+        int(complete["treatment_period"].eq("pre").sum()),
+    )
+    add_check(
+        "treatment_event_month_count",
+        int(complete["treatment_period"].eq("event").sum()) == 100,
+        int(complete["treatment_period"].eq("event").sum()),
+    )
+    add_check(
+        "treatment_post_month_count",
+        int(complete["treatment_period"].eq("post").sum()) == 332,
+        int(complete["treatment_period"].eq("post").sum()),
+    )
+    add_check(
+        "treatment_period_partition",
+        int(complete["treatment_period"].isin(["pre", "event", "post"]).sum())
+        == 853,
+        int(complete["treatment_period"].isin(["pre", "event", "post"]).sum()),
+    )
+    add_check(
+        "detection_complete_boolean_nonmissing",
+        bool(
+            complete["detection_complete"].dtype.name == "boolean"
+            and complete["detection_complete"].notna().all()
+        ),
+        str(complete["detection_complete"].dtype),
+    )
+    add_check(
+        "detection_complete_all_true",
+        bool(complete["detection_complete"].eq(True).all()),
+        int(complete["detection_complete"].eq(False).sum()),
+    )
+    add_check(
+        "treatment_group_matches_dataset_source",
+        int(complete["treatment_group"].ne(complete["dataset_source"]).sum())
+        == 0,
+        int(complete["treatment_group"].ne(complete["dataset_source"]).sum()),
+    )
+
     checks_frame = pd.DataFrame(checks)
     overall_pass = bool(checks_frame["passed"].all())
+
+    treatment_group_validation = (
+        complete.groupby(["dataset_source", "treatment_group"])
+        .size()
+        .reset_index(name="rows")
+        .sort_values(["dataset_source", "treatment_group"])
+    )
+    treatment_group_validation_output = (
+        args.output_dir / "zero_function_event_treatment_group_validation.csv"
+    )
 
     complete_output = (
         args.output_dir
@@ -715,6 +829,9 @@ def main() -> int:
     by_event_time.to_csv(event_time_output, index=False)
     parse_overlap_summary.to_csv(overlap_output, index=False)
     checks_frame.to_csv(checks_output, index=False)
+    treatment_group_validation.to_csv(
+        treatment_group_validation_output, index=False
+    )
 
     summary = {
         "status": "PASS" if overall_pass else "FAIL",
@@ -738,6 +855,7 @@ def main() -> int:
             "by_treatment_period": str(period_output),
             "by_event_time": str(event_time_output),
             "parse_exclusion_overlap": str(overlap_output),
+            "treatment_group_validation": str(treatment_group_validation_output),
             "checks": str(checks_output),
         },
     }

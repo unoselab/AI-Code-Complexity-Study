@@ -1,0 +1,16 @@
+check,passed,observed
+full_panel_row_count,True,1633
+positive_event_panel_row_count,True,1289
+zero_event_row_count,True,344
+control_row_count,True,780
+treatment_row_count,True,853
+parse_exclusion_month_count,True,97
+event_count_partition,True,1633
+positive_event_ratio_nonmissing,True,0
+zero_event_ratio_missing,True,0
+ratio_bounds,True,0
+detection_complete_all_true,True,0
+treat_matches_dataset_source,True,0
+full_sample_outcomes_nonmissing,True,0
+parse_clean_full_has_no_exclusions,True,0
+parse_clean_ratio_has_no_exclusions,True,0

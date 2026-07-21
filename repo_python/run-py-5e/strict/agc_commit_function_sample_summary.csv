@@ -1,0 +1,5 @@
+sample,repo_months,repositories,control_repo_months,treatment_repo_months,zero_event_months,event_positive_months,parse_exclusion_months
+full,1633,220,780,853,344,1289,97
+ratio_positive_event,1289,206,571,718,0,1289,97
+parse_clean_full,1536,220,740,796,344,1192,0
+parse_clean_ratio_positive_event,1192,203,531,661,0,1192,0

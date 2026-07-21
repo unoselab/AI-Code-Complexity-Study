@@ -1,0 +1,6 @@
+outcome,total_repo_months,nonmissing_repo_months,missing_repo_months,zero_values,analysis_scope
+has_function_change_event,1633,1633,0,344,full_sample
+log1p_function_change_events,1633,1633,0,344,full_sample
+log1p_agc_function_change_events,1633,1633,0,489,full_sample
+log1p_hwc_function_change_events,1633,1633,0,359,full_sample
+agc_function_change_event_ratio,1633,1289,344,145,positive_event_months_only

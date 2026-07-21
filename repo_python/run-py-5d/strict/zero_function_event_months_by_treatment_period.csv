@@ -1,4 +1,5 @@
 treatment_group,treatment_period,repo_months,zero_event_months,event_positive_months,total_function_change_events,total_agc_function_change_events,total_hwc_function_change_events,zero_event_month_ratio,event_positive_month_ratio
-control,control,1201,274,927,256706,59446.0,197260.0,0.22814321398834306,0.771856786011657
+control,control,780,209,571,101530,27539.0,73991.0,0.26794871794871794,0.732051282051282
 treatment,event,100,6,94,36224,8759.0,27465.0,0.06,0.94
 treatment,post,332,64,268,157618,29398.0,128220.0,0.1927710843373494,0.8072289156626506
+treatment,pre,421,65,356,155176,31907.0,123269.0,0.1543942992874109,0.8456057007125891

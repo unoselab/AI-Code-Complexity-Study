@@ -12,6 +12,7 @@
     "by_treatment_period": "repo_python/run-py-5d/strict/zero_function_event_months_by_treatment_period.csv",
     "by_event_time": "repo_python/run-py-5d/strict/zero_function_event_months_by_event_time.csv",
     "parse_exclusion_overlap": "repo_python/run-py-5d/strict/zero_function_event_parse_exclusion_overlap.csv",
+    "treatment_group_validation": "repo_python/run-py-5d/strict/zero_function_event_treatment_group_validation.csv",
     "checks": "repo_python/run-py-5d/strict/zero_function_event_month_checks.csv"
   }
 }

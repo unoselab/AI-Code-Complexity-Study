@@ -6,3 +6,12 @@ all_event_positive_months_have_detector_summary,True,0
 all_detector_missing_months_are_zero_event,True,344
 zero_event_ratio_is_missing,True,0
 event_arithmetic,True,1633
+static_control_repo_month_count,True,780
+static_treatment_repo_month_count,True,853
+treatment_pre_month_count,True,421
+treatment_event_month_count,True,100
+treatment_post_month_count,True,332
+treatment_period_partition,True,853
+detection_complete_boolean_nonmissing,True,boolean
+detection_complete_all_true,True,0
+treatment_group_matches_dataset_source,True,0
