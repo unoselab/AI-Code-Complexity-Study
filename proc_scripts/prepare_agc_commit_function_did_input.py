@@ -425,7 +425,29 @@ def main() -> int:
     ]:
         panel[column] = pd.to_numeric(panel[column], errors="raise")
 
-    for column in REQUIRED_EVENT_COLUMNS + COVARIATE_COLUMNS + LEAD_LAG_COLUMNS:
+    # 'event' is a YYYY-MM adoption-month string (e.g. "2024-09"), not a
+    # numeric indicator. Coercing it with pd.to_numeric(errors="coerce")
+    # silently turns every treatment repository-month's adoption month into
+    # NaN, since none of them parse as numbers -- this previously passed
+    # every QC check because no check inspected event's actual content, only
+    # its presence and dtype. Only time_to_event and post_event are genuinely
+    # numeric event variables and belong in this coercion loop.
+    panel["event"] = (
+        panel["event"]
+        .astype("string")
+        .str.strip()
+        .replace(
+            {
+                "": pd.NA,
+                "nan": pd.NA,
+                "NaN": pd.NA,
+                "None": pd.NA,
+                "<NA>": pd.NA,
+            }
+        )
+    )
+
+    for column in ["time_to_event", "post_event"] + COVARIATE_COLUMNS + LEAD_LAG_COLUMNS:
         panel[column] = pd.to_numeric(panel[column], errors="coerce")
 
     for outcome in FULL_SAMPLE_OUTCOMES + CONDITIONAL_OUTCOMES:
@@ -758,6 +780,50 @@ def main() -> int:
                 )
             ).sum()
         ),
+    )
+    # These three checks guard against the event-month string being
+    # silently zeroed out by numeric coercion (the exact bug fixed in this
+    # revision): every treatment repository-month must carry its adoption
+    # month, every control repository-month must have none, and each
+    # treatment repository must report exactly one distinct adoption month
+    # across all of its repository-months.
+    treatment_event_missing_rows = int(
+        full_panel.loc[
+            full_panel["dataset_source"].eq("treatment"), "event"
+        ]
+        .isna()
+        .sum()
+    )
+    add_check(
+        checks,
+        "treatment_event_month_nonmissing",
+        treatment_event_missing_rows == 0,
+        treatment_event_missing_rows,
+    )
+    control_event_nonmissing_rows = int(
+        full_panel.loc[full_panel["dataset_source"].eq("control"), "event"]
+        .notna()
+        .sum()
+    )
+    add_check(
+        checks,
+        "control_event_month_missing",
+        control_event_nonmissing_rows == 0,
+        control_event_nonmissing_rows,
+    )
+    treatment_event_counts = (
+        full_panel.loc[
+            full_panel["dataset_source"].eq("treatment"),
+            ["repo_name", "event"],
+        ]
+        .groupby("repo_name")["event"]
+        .nunique(dropna=True)
+    )
+    add_check(
+        checks,
+        "one_event_month_per_treatment_repository",
+        bool(treatment_event_counts.eq(1).all()),
+        int(treatment_event_counts.ne(1).sum()),
     )
     add_check(
         checks,

@@ -1,0 +1,2 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,panel,sample_type,ncloc_spec,time_mode,parse_exclusion_mode
+agc_function_change_event_ratio,treat,-0.0225342277942062,0.0218490726679226,-0.0653584102233346,0.0202899546349221,,Borusyak static treatment effect,AGC-Like Event Share | Positive-Event Month,strict_ratio_python_snapshot_ncloc,ratio,python_snapshot,calendar_month,all

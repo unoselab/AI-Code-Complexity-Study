@@ -1,0 +1,11 @@
+check,passed,observed
+function_event_id_unique,True,0
+analysis_status_values_known,True,{'ok': 450548}
+ok_events_positive,True,"{'total_rows': 450548, 'ok_rows': 450548, 'non_ok_rows': 0}"
+ast_sequence_token_count_nonnegative,True,0
+ast_sequence_token_count_nonmissing_for_ok_events,True,0
+predicted_agc_xor_predicted_hwc,True,0
+every_ok_event_assigned_a_size_bin,True,0
+retained_events_monotonic_nonincreasing_in_threshold,True,"[{'threshold': 0, 'retained_events': 450548}, {'threshold': 20, 'retained_events': 448905}, {'threshold': 50, 'retained_events': 425835}, {'threshold': 100, 'retained_events': 358100}]"
+zero_threshold_retains_all_ok_events,True,"{'retained_at_zero': 450548, 'ok_rows': 450548}"
+all_events_matched_to_panel,True,0

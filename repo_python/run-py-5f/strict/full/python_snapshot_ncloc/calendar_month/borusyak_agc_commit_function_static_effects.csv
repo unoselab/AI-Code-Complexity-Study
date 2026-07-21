@@ -1,0 +1,5 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,panel,sample_type,ncloc_spec,time_mode,parse_exclusion_mode
+has_function_change_event,treat,-0.0016868365129992,0.05004812544472,-0.0997811623846504,0.096407489358652,,Borusyak static treatment effect,Any Function-Change Event,strict_full_python_snapshot_ncloc,full,python_snapshot,calendar_month,all
+log1p_function_change_events,treat,0.276912350952587,0.254850486657243,-0.22259460289561,0.776419304800784,,Borusyak static treatment effect,Total Function-Change Events (log1p),strict_full_python_snapshot_ncloc,full,python_snapshot,calendar_month,all
+log1p_agc_function_change_events,treat,0.202814642692964,0.226235700814911,-0.24060733090426,0.646236616290189,,Borusyak static treatment effect,AGC-Like Function-Change Events (log1p),strict_full_python_snapshot_ncloc,full,python_snapshot,calendar_month,all
+log1p_hwc_function_change_events,treat,0.286273638056527,0.239651174495849,-0.183442663955337,0.755989940068391,,Borusyak static treatment effect,HWC-Like Function-Change Events (log1p),strict_full_python_snapshot_ncloc,full,python_snapshot,calendar_month,all

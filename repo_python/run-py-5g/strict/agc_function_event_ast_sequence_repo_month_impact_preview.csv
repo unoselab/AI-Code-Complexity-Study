@@ -1,0 +1,5 @@
+threshold,is_primary,baseline_event_positive_repo_months,retained_event_positive_repo_months,newly_zero_eligible_repo_months
+0,False,1289,1289,0
+20,False,1289,1289,0
+50,True,1289,1288,1
+100,False,1289,1280,9

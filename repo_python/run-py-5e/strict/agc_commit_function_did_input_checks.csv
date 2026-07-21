@@ -14,6 +14,9 @@ zero_event_ratio_missing,True,0
 ratio_bounds,True,0
 detection_complete_all_true,True,0
 treat_matches_dataset_source,True,0
+treatment_event_month_nonmissing,True,0
+control_event_month_missing,True,0
+one_event_month_per_treatment_repository,True,0
 full_sample_outcomes_nonmissing,True,0
 raw_covariates_missing_counts_informational,True,"{'age': 15, 'ncloc_paper': 37, 'ncloc_python_snapshot': 0, 'contributors': 0, 'stars': 15, 'issues': 15}"
 known_covariate_missing_counts_match_run_py_3b,True,"{'age_missing': 15, 'contributors_missing': 0, 'stars_missing': 15, 'issues_missing': 15, 'ncloc_paper_missing': 37}"
