@@ -1,0 +1,5 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,panel,sample_type,ncloc_spec,time_mode
+has_function_change_event,treat,,,,,,treat term not found,Any Function-Change Event,strict_full_paper_ncloc,full,paper,calendar_month
+log1p_function_change_events,treat,,,,,,treat term not found,Total Function-Change Events (log1p),strict_full_paper_ncloc,full,paper,calendar_month
+log1p_agc_function_change_events,treat,,,,,,treat term not found,AGC-Like Function-Change Events (log1p),strict_full_paper_ncloc,full,paper,calendar_month
+log1p_hwc_function_change_events,treat,,,,,,treat term not found,HWC-Like Function-Change Events (log1p),strict_full_paper_ncloc,full,paper,calendar_month

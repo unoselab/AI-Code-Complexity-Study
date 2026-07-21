@@ -1,0 +1,5 @@
+stage,outcome,error
+dynamic,has_function_change_event,Pretrends not found in event_time. Event_time has values
+dynamic,log1p_function_change_events,Pretrends not found in event_time. Event_time has values
+dynamic,log1p_agc_function_change_events,Pretrends not found in event_time. Event_time has values
+dynamic,log1p_hwc_function_change_events,Pretrends not found in event_time. Event_time has values

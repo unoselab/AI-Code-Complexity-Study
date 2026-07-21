@@ -1,4 +1,7 @@
 check,passed,observed
+covariate_join_row_count_unchanged,True,1633
+covariate_join_key_order_unchanged,True,1633
+covariate_join_outcomes_unchanged,True,1633
 full_panel_row_count,True,1633
 positive_event_panel_row_count,True,1289
 zero_event_row_count,True,344
@@ -12,5 +15,13 @@ ratio_bounds,True,0
 detection_complete_all_true,True,0
 treat_matches_dataset_source,True,0
 full_sample_outcomes_nonmissing,True,0
+raw_covariates_missing_counts_informational,True,"{'age': 15, 'ncloc_paper': 37, 'ncloc_python_snapshot': 0, 'contributors': 0, 'stars': 15, 'issues': 15}"
+known_covariate_missing_counts_match_run_py_3b,True,"{'age_missing': 15, 'contributors_missing': 0, 'stars_missing': 15, 'issues_missing': 15, 'ncloc_paper_missing': 37}"
+transformed_covariates_missing_matches_raw,True,45
+lead_lag_columns_missing_count_informational,True,0
+readiness_flags_never_exceed_nonmissing_covariates,True,"{'paper_ncloc_ready': 1596, 'paper_ncloc_nonmissing': 1596, 'snapshot_ncloc_ready': 1618, 'snapshot_ncloc_nonmissing': 1633}"
+ratio_readiness_flags_subset_of_full_readiness,True,0
+diagnostic_analysis_ready_agc_changed_block_paper_ncloc_vs_analysis_ready_paper_ncloc_agreement,True,"{'agree': 1160, 'disagree': 473, 'existing_missing': 0}"
+diagnostic_analysis_ready_agc_changed_block_python_snapshot_ncloc_vs_analysis_ready_python_snapshot_ncloc_agreement,True,"{'agree': 1138, 'disagree': 495, 'existing_missing': 0}"
 parse_clean_full_has_no_exclusions,True,0
 parse_clean_ratio_has_no_exclusions,True,0

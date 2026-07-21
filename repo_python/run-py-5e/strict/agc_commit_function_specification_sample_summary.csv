@@ -1,0 +1,5 @@
+sample,paper_ncloc_analysis_ready_rows,python_snapshot_ncloc_analysis_ready_rows,paper_ncloc_ratio_analysis_ready_rows,python_snapshot_ncloc_ratio_analysis_ready_rows
+full,1596,1618,1284,1284
+ratio_positive_event,1284,1284,1284,1284
+parse_clean_full,1499,1521,1187,1187
+parse_clean_ratio_positive_event,1187,1187,1187,1187

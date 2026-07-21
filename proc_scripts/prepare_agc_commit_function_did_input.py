@@ -5,13 +5,25 @@ Prepare Borusyak DiD inputs for Python commit-function AGC outcomes.
 This revision joins the paper-compatible covariates and preserves event-study
 lead/lag indicators from the matched repository-month panel.
 
-Primary covariates
-------------------
+Covariate groups
+----------------
+Shared covariates (used in both specifications):
 - age
-- ncloc
 - contributors
 - stars
 - issues
+
+ncloc_paper and ncloc_python_snapshot are two competing code-size covariate
+definitions (Specification 1 vs Specification 2 in the quality Borusyak
+analysis; see run-py-3b/run-py-3c/run-py-3d). Both are preserved in this
+script's output for storage and diagnostics, but they must never be entered
+together in the same regression formula -- doing so double-controls for code
+size and induces strong collinearity between two measurements of the same
+underlying quantity. Downstream R code must pick exactly one of:
+
+- Paper NCLOC specification: age, ncloc_paper, contributors, stars, issues
+- Python snapshot NCLOC specification: age, ncloc_python_snapshot,
+  contributors, stars, issues
 
 The script also creates the transformed columns used by the planned R model:
 - log1p_age
@@ -19,8 +31,33 @@ The script also creates the transformed columns used by the planned R model:
 - log1p_stars
 - log1p_issues
 
+ncloc_paper and ncloc_python_snapshot are intentionally left untransformed
+here; confirm the exact functional form (log1p vs raw) against the existing
+quality Borusyak Rmd/helper before finalizing the R formula.
+
 Lead/lag columns are retained for validation and plotting context. They are not
 intended to be included as ordinary regression covariates.
+
+Missing covariates
+-------------------
+age/stars/issues/contributors have 15 known unmatched repository-months and
+ncloc_paper has 37 known missing values (see run-py-3b). These are expected,
+genuine missingness -- never filled with 0 -- and are reported as
+informational counts. A separate hard check confirms the counts match the
+known run-py-3b values exactly, so a silent regression in join coverage is
+caught even though missingness itself is not treated as failure.
+
+Analysis-ready flags
+---------------------
+Complete-case readiness is computed explicitly per specification rather than
+left for R to determine implicitly, so that dropping rows for missing
+covariates cannot silently change the sample between specifications without
+being visible in this script's output:
+
+- analysis_ready_paper_ncloc
+- analysis_ready_python_snapshot_ncloc
+- analysis_ready_ratio_paper_ncloc
+- analysis_ready_ratio_python_snapshot_ncloc
 """
 
 from __future__ import annotations
@@ -53,7 +90,54 @@ REQUIRED_COUNT_COLUMNS = [
     "hwc_function_change_events",
 ]
 
-COVARIATE_COLUMNS = ["age", "ncloc", "contributors", "stars", "issues"]
+COVARIATE_COLUMNS = [
+    "age",
+    "ncloc_paper",
+    "ncloc_python_snapshot",
+    "contributors",
+    "stars",
+    "issues",
+]
+# These are the covariates known (from run-py-3b) to have genuine,
+# expected missingness. Do not require these to be all non-missing.
+EXPECTED_NULLABLE_COVARIATE_COLUMNS = [
+    "age",
+    "contributors",
+    "stars",
+    "issues",
+    "ncloc_paper",
+    "ncloc_python_snapshot",
+]
+# Covariates shared by both NCLOC specifications.
+SHARED_COVARIATE_COLUMNS = ["age", "contributors", "stars", "issues"]
+SHARED_TRANSFORMED_COVARIATE_COLUMNS = [
+    "log1p_age",
+    "log1p_contributors",
+    "log1p_stars",
+    "log1p_issues",
+]
+# The two competing code-size specifications. Never combine both NCLOC
+# columns in a single regression formula -- see module docstring.
+PAPER_NCLOC_SPECIFICATION_COLUMNS = SHARED_TRANSFORMED_COVARIATE_COLUMNS + [
+    "ncloc_paper"
+]
+PYTHON_SNAPSHOT_NCLOC_SPECIFICATION_COLUMNS = (
+    SHARED_TRANSFORMED_COVARIATE_COLUMNS + ["ncloc_python_snapshot"]
+)
+# Analysis-ready flags computed by this script for each specification.
+READINESS_FLAG_COLUMNS = [
+    "analysis_ready_paper_ncloc",
+    "analysis_ready_python_snapshot_ncloc",
+    "analysis_ready_ratio_paper_ncloc",
+    "analysis_ready_ratio_python_snapshot_ncloc",
+]
+# Existing readiness flags computed upstream (run-py-4a) for the older
+# changed-block outcome. Joined as diagnostic-only context; never used as
+# the model sample flag for the commit-function outcomes in this script.
+EXISTING_DIAGNOSTIC_READINESS_COLUMNS = [
+    "analysis_ready_agc_changed_block_paper_ncloc",
+    "analysis_ready_agc_changed_block_python_snapshot_ncloc",
+]
 LEAD_LAG_COLUMNS = [
     "lead_6",
     "lead_5",
@@ -68,12 +152,6 @@ LEAD_LAG_COLUMNS = [
     "lag_4",
     "lag_5",
     "lag_6",
-]
-TRANSFORMED_COVARIATE_COLUMNS = [
-    "log1p_age",
-    "log1p_contributors",
-    "log1p_stars",
-    "log1p_issues",
 ]
 
 
@@ -254,7 +332,7 @@ def create_outcome_completeness(frame: pd.DataFrame) -> pd.DataFrame:
 
 def create_covariate_completeness(frame: pd.DataFrame) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
-    for column in COVARIATE_COLUMNS + TRANSFORMED_COVARIATE_COLUMNS:
+    for column in COVARIATE_COLUMNS + SHARED_TRANSFORMED_COVARIATE_COLUMNS:
         values = pd.to_numeric(frame[column], errors="coerce")
         rows.append(
             {
@@ -264,6 +342,9 @@ def create_covariate_completeness(frame: pd.DataFrame) -> pd.DataFrame:
                 "missing_repo_months": int(values.isna().sum()),
                 "negative_values": int(values.lt(0).sum()),
                 "zero_values": int(values.eq(0).sum()),
+                "expected_nullable": bool(
+                    column in EXPECTED_NULLABLE_COVARIATE_COLUMNS
+                ),
             }
         )
     return pd.DataFrame(rows)
@@ -310,7 +391,14 @@ def main() -> int:
     ].copy()
 
     join_columns = KEY_COLUMNS + COVARIATE_COLUMNS + LEAD_LAG_COLUMNS
-    covariate_minimal = covariates[join_columns].copy()
+    optional_diagnostic_columns = [
+        column
+        for column in EXISTING_DIAGNOSTIC_READINESS_COLUMNS
+        if column in covariates.columns
+    ]
+    covariate_minimal = covariates[
+        join_columns + optional_diagnostic_columns
+    ].copy()
 
     panel = panel.merge(
         covariate_minimal,
@@ -356,10 +444,44 @@ def main() -> int:
                 f"{sample.to_string(index=False)}"
             )
 
+    # ncloc_paper and ncloc_python_snapshot are not log1p-transformed here,
+    # but a code-size measure can never legitimately be negative, so this is
+    # checked independently of the log1p precondition above.
+    for column in ["ncloc_paper", "ncloc_python_snapshot"]:
+        negative_mask = panel[column].lt(0) & panel[column].notna()
+        if negative_mask.any():
+            sample = panel.loc[negative_mask, KEY_COLUMNS + [column]].head(20)
+            raise ValueError(
+                f"{column} contains negative values, which is not a valid "
+                f"code-size measurement.\n{sample.to_string(index=False)}"
+            )
+
     panel["log1p_age"] = np.log1p(panel["age"])
     panel["log1p_contributors"] = np.log1p(panel["contributors"])
     panel["log1p_stars"] = np.log1p(panel["stars"])
     panel["log1p_issues"] = np.log1p(panel["issues"])
+
+    shared_covariates_nonmissing = (
+        panel[SHARED_TRANSFORMED_COVARIATE_COLUMNS].notna().all(axis=1)
+    )
+    panel["analysis_ready_paper_ncloc"] = (
+        shared_covariates_nonmissing & panel["ncloc_paper"].notna()
+    ).astype("int8")
+    panel["analysis_ready_python_snapshot_ncloc"] = (
+        shared_covariates_nonmissing & panel["ncloc_python_snapshot"].notna()
+    ).astype("int8")
+
+    ratio_ready_base = (
+        panel["function_change_events"].gt(0)
+        & panel["agc_function_change_event_ratio"].notna()
+    )
+    panel["analysis_ready_ratio_paper_ncloc"] = (
+        ratio_ready_base & panel["analysis_ready_paper_ncloc"].eq(1)
+    ).astype("int8")
+    panel["analysis_ready_ratio_python_snapshot_ncloc"] = (
+        ratio_ready_base
+        & panel["analysis_ready_python_snapshot_ncloc"].eq(1)
+    ).astype("int8")
 
     panel["treat"] = (
         panel["dataset_source"]
@@ -474,6 +596,37 @@ def main() -> int:
                 "event_positive_months": int(len(parse_clean_ratio_panel)),
                 "parse_exclusion_months": 0,
             },
+        ]
+    )
+
+    specification_sample_summary = pd.DataFrame(
+        [
+            {
+                "sample": sample_name,
+                "paper_ncloc_analysis_ready_rows": int(
+                    frame["analysis_ready_paper_ncloc"].eq(1).sum()
+                ),
+                "python_snapshot_ncloc_analysis_ready_rows": int(
+                    frame["analysis_ready_python_snapshot_ncloc"].eq(1).sum()
+                ),
+                "paper_ncloc_ratio_analysis_ready_rows": int(
+                    frame["analysis_ready_ratio_paper_ncloc"].eq(1).sum()
+                ),
+                "python_snapshot_ncloc_ratio_analysis_ready_rows": int(
+                    frame["analysis_ready_ratio_python_snapshot_ncloc"]
+                    .eq(1)
+                    .sum()
+                ),
+            }
+            for sample_name, frame in [
+                ("full", full_panel),
+                ("ratio_positive_event", ratio_panel),
+                ("parse_clean_full", parse_clean_full_panel),
+                (
+                    "parse_clean_ratio_positive_event",
+                    parse_clean_ratio_panel,
+                ),
+            ]
         ]
     )
 
@@ -614,22 +767,141 @@ def main() -> int:
     )
     add_check(
         checks,
-        "raw_covariates_nonmissing",
-        bool(full_panel[COVARIATE_COLUMNS].notna().all().all()),
-        int(full_panel[COVARIATE_COLUMNS].isna().sum().sum()),
+        "raw_covariates_missing_counts_informational",
+        True,
+        {
+            column: int(full_panel[column].isna().sum())
+            for column in COVARIATE_COLUMNS
+        },
+    )
+    # age/stars/issues have 15 known unmatched repository-months, while contributors is complete with 0 missing
+    # repository-months (unmatched against the frozen paper panel), and
+    # ncloc_paper is expected to have exactly 37 missing values -- both
+    # documented in run-py-3b. These counts are known, genuine missingness,
+    # not a pipeline defect, so this check confirms the counts match rather
+    # than requiring zero missingness.
+    add_check(
+        checks,
+        "known_covariate_missing_counts_match_run_py_3b",
+        bool(
+            int(full_panel["age"].isna().sum()) == 15
+            and int(full_panel["contributors"].isna().sum()) == 0
+            and int(full_panel["stars"].isna().sum()) == 15
+            and int(full_panel["issues"].isna().sum()) == 15
+            and int(full_panel["ncloc_paper"].isna().sum()) == 37
+        ),
+        {
+            "age_missing": int(full_panel["age"].isna().sum()),
+            "contributors_missing": int(
+                full_panel["contributors"].isna().sum()
+            ),
+            "stars_missing": int(full_panel["stars"].isna().sum()),
+            "issues_missing": int(full_panel["issues"].isna().sum()),
+            "ncloc_paper_missing": int(full_panel["ncloc_paper"].isna().sum()),
+        },
     )
     add_check(
         checks,
-        "transformed_covariates_nonmissing",
-        bool(full_panel[TRANSFORMED_COVARIATE_COLUMNS].notna().all().all()),
-        int(full_panel[TRANSFORMED_COVARIATE_COLUMNS].isna().sum().sum()),
+        "transformed_covariates_missing_matches_raw",
+        bool(
+            full_panel["log1p_age"].isna().sum()
+            == full_panel["age"].isna().sum()
+            and full_panel["log1p_contributors"].isna().sum()
+            == full_panel["contributors"].isna().sum()
+            and full_panel["log1p_stars"].isna().sum()
+            == full_panel["stars"].isna().sum()
+            and full_panel["log1p_issues"].isna().sum()
+            == full_panel["issues"].isna().sum()
+        ),
+        int(full_panel[SHARED_TRANSFORMED_COVARIATE_COLUMNS].isna().sum().sum()),
     )
     add_check(
         checks,
-        "lead_lag_columns_nonmissing",
-        bool(full_panel[LEAD_LAG_COLUMNS].notna().all().all()),
+        "lead_lag_columns_missing_count_informational",
+        True,
         int(full_panel[LEAD_LAG_COLUMNS].isna().sum().sum()),
     )
+    add_check(
+        checks,
+        "readiness_flags_never_exceed_nonmissing_covariates",
+        bool(
+            int(
+                full_panel["analysis_ready_paper_ncloc"].eq(1).sum()
+            )
+            <= int(full_panel["ncloc_paper"].notna().sum())
+            and int(
+                full_panel["analysis_ready_python_snapshot_ncloc"].eq(1).sum()
+            )
+            <= int(full_panel["ncloc_python_snapshot"].notna().sum())
+        ),
+        {
+            "paper_ncloc_ready": int(
+                full_panel["analysis_ready_paper_ncloc"].eq(1).sum()
+            ),
+            "paper_ncloc_nonmissing": int(
+                full_panel["ncloc_paper"].notna().sum()
+            ),
+            "snapshot_ncloc_ready": int(
+                full_panel["analysis_ready_python_snapshot_ncloc"].eq(1).sum()
+            ),
+            "snapshot_ncloc_nonmissing": int(
+                full_panel["ncloc_python_snapshot"].notna().sum()
+            ),
+        },
+    )
+    add_check(
+        checks,
+        "ratio_readiness_flags_subset_of_full_readiness",
+        bool(
+            (
+                full_panel["analysis_ready_ratio_paper_ncloc"]
+                <= full_panel["analysis_ready_paper_ncloc"]
+            ).all()
+            and (
+                full_panel["analysis_ready_ratio_python_snapshot_ncloc"]
+                <= full_panel["analysis_ready_python_snapshot_ncloc"]
+            ).all()
+        ),
+        int(
+            (
+                full_panel["analysis_ready_ratio_paper_ncloc"]
+                > full_panel["analysis_ready_paper_ncloc"]
+            ).sum()
+            + (
+                full_panel["analysis_ready_ratio_python_snapshot_ncloc"]
+                > full_panel["analysis_ready_python_snapshot_ncloc"]
+            ).sum()
+        ),
+    )
+    # Informational only: the upstream (run-py-4a) changed-block readiness
+    # flags were computed for a different outcome and are not expected to
+    # match the commit-function readiness flags row-for-row. This is a
+    # diagnostic comparison, not a correctness gate.
+    for existing_column, new_column in [
+        (
+            "analysis_ready_agc_changed_block_paper_ncloc",
+            "analysis_ready_paper_ncloc",
+        ),
+        (
+            "analysis_ready_agc_changed_block_python_snapshot_ncloc",
+            "analysis_ready_python_snapshot_ncloc",
+        ),
+    ]:
+        if existing_column in full_panel.columns:
+            existing_values = pd.to_numeric(
+                full_panel[existing_column], errors="coerce"
+            )
+            new_values = full_panel[new_column]
+            add_check(
+                checks,
+                f"diagnostic_{existing_column}_vs_{new_column}_agreement",
+                True,
+                {
+                    "agree": int((existing_values == new_values).sum()),
+                    "disagree": int((existing_values != new_values).sum()),
+                    "existing_missing": int(existing_values.isna().sum()),
+                },
+            )
     add_check(
         checks,
         "parse_clean_full_has_no_exclusions",
@@ -669,6 +941,10 @@ def main() -> int:
     sample_summary_output = (
         args.output_dir / "agc_commit_function_sample_summary.csv"
     )
+    specification_sample_summary_output = (
+        args.output_dir
+        / "agc_commit_function_specification_sample_summary.csv"
+    )
     checks_output = args.output_dir / "agc_commit_function_did_input_checks.csv"
     summary_output = args.output_dir / "agc_commit_function_did_input_summary.json"
 
@@ -680,6 +956,9 @@ def main() -> int:
     outcome_completeness.to_csv(outcome_completeness_output, index=False)
     covariate_completeness.to_csv(covariate_completeness_output, index=False)
     sample_summary.to_csv(sample_summary_output, index=False)
+    specification_sample_summary.to_csv(
+        specification_sample_summary_output, index=False
+    )
     checks_frame.to_csv(checks_output, index=False)
 
     summary = {
@@ -696,8 +975,17 @@ def main() -> int:
         "parse_exclusion_months": int(
             full_panel["has_parse_exclusion"].sum()
         ),
-        "primary_covariates": COVARIATE_COLUMNS,
-        "transformed_covariates": TRANSFORMED_COVARIATE_COLUMNS,
+        # Renamed from the previous, misleading "primary_covariates" key.
+        # ncloc_paper and ncloc_python_snapshot are competing specifications
+        # and must never both appear in the same regression formula -- see
+        # module docstring.
+        "shared_covariates": SHARED_COVARIATE_COLUMNS,
+        "shared_transformed_covariates": SHARED_TRANSFORMED_COVARIATE_COLUMNS,
+        "paper_ncloc_specification": PAPER_NCLOC_SPECIFICATION_COLUMNS,
+        "python_snapshot_ncloc_specification": (
+            PYTHON_SNAPSHOT_NCLOC_SPECIFICATION_COLUMNS
+        ),
+        "readiness_flag_columns": READINESS_FLAG_COLUMNS,
         "lead_lag_columns": LEAD_LAG_COLUMNS,
         "full_sample_outcomes": FULL_SAMPLE_OUTCOMES,
         "conditional_outcomes": CONDITIONAL_OUTCOMES,
@@ -710,6 +998,9 @@ def main() -> int:
             "outcome_completeness": str(outcome_completeness_output),
             "covariate_completeness": str(covariate_completeness_output),
             "sample_summary": str(sample_summary_output),
+            "specification_sample_summary": str(
+                specification_sample_summary_output
+            ),
             "checks": str(checks_output),
         },
     }

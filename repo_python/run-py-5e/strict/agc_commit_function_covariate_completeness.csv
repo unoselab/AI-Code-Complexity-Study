@@ -1,0 +1,11 @@
+covariate,repo_months,nonmissing_repo_months,missing_repo_months,negative_values,zero_values,expected_nullable
+age,1633,1618,15,0,300,True
+ncloc_paper,1633,1596,37,0,0,True
+ncloc_python_snapshot,1633,1633,0,0,29,True
+contributors,1633,1633,0,0,0,True
+stars,1633,1618,15,0,444,True
+issues,1633,1618,15,0,764,True
+log1p_age,1633,1618,15,0,300,False
+log1p_contributors,1633,1633,0,0,0,False
+log1p_stars,1633,1618,15,0,444,False
+log1p_issues,1633,1618,15,0,764,False
