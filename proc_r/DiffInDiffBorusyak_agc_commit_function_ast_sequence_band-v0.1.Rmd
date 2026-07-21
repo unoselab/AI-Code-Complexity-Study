@@ -1,0 +1,1409 @@
+---
+title: "Diff-in-Diff Borusyak: Python Commit-Function AGC Outcomes by AST Sequence Token Band"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- Sys.getenv(
+  "PROJECT_ROOT",
+  unset = normalizePath(".", mustWork = TRUE)
+)
+project_root <- normalizePath(project_root, mustWork = TRUE)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || path_value == "") {
+    return("")
+  }
+
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(Sys.getenv("PANEL_PATH", unset = ""))
+out_dir <- resolve_project_path(Sys.getenv("OUT_DIR", unset = ""))
+panel_label <- Sys.getenv("PANEL_LABEL", unset = "panel")
+ncloc_spec <- tolower(Sys.getenv("NCLOC_SPEC", unset = "paper"))
+sample_type <- tolower(Sys.getenv("SAMPLE_TYPE", unset = "full"))
+time_mode <- tolower(Sys.getenv("TIME_MODE", unset = "original_yyyymm"))
+parse_exclusion_mode <- tolower(
+  Sys.getenv("PARSE_EXCLUSION_MODE", unset = "all")
+)
+helper_path <- resolve_project_path(
+  Sys.getenv(
+    "HELPER_FILE",
+    unset = "proc_r/diff_in_diff_borusyak_helpers.R"
+  )
+)
+ast_sequence_token_band <- Sys.getenv(
+  "AST_SEQUENCE_TOKEN_BAND",
+  unset = ""
+)
+ast_sequence_token_lower <- suppressWarnings(as.integer(Sys.getenv(
+  "AST_SEQUENCE_TOKEN_LOWER",
+  unset = ""
+)))
+ast_sequence_token_upper_exclusive <- suppressWarnings(as.integer(Sys.getenv(
+  "AST_SEQUENCE_TOKEN_UPPER_EXCLUSIVE",
+  unset = ""
+)))
+
+valid_ncloc_specs <- c("paper", "python_snapshot")
+valid_sample_types <- c("full", "ratio")
+valid_time_modes <- c("original_yyyymm", "calendar_month")
+valid_parse_exclusion_modes <- c("all", "parse_clean")
+
+if (!(ncloc_spec %in% valid_ncloc_specs)) {
+  stop("NCLOC_SPEC must be paper or python_snapshot. Got: ", ncloc_spec)
+}
+if (!(sample_type %in% valid_sample_types)) {
+  stop("SAMPLE_TYPE must be full or ratio. Got: ", sample_type)
+}
+if (!(time_mode %in% valid_time_modes)) {
+  stop(
+    "TIME_MODE must be original_yyyymm or calendar_month. Got: ",
+    time_mode
+  )
+}
+if (!(parse_exclusion_mode %in% valid_parse_exclusion_modes)) {
+  stop(
+    "PARSE_EXCLUSION_MODE must be all or parse_clean. Got: ",
+    parse_exclusion_mode
+  )
+}
+if (panel_path == "") {
+  stop("PANEL_PATH environment variable is required.")
+}
+if (ast_sequence_token_band == "") {
+  stop("AST_SEQUENCE_TOKEN_BAND environment variable is required.")
+}
+if (is.na(ast_sequence_token_lower)) {
+  stop("AST_SEQUENCE_TOKEN_LOWER must be an integer.")
+}
+if (is.na(ast_sequence_token_upper_exclusive)) {
+  stop("AST_SEQUENCE_TOKEN_UPPER_EXCLUSIVE must be an integer.")
+}
+if (ast_sequence_token_lower < 0L ||
+    ast_sequence_token_upper_exclusive <= ast_sequence_token_lower) {
+  stop(
+    "Invalid AST sequence token bounds: lower=",
+    ast_sequence_token_lower,
+    ", upper_exclusive=",
+    ast_sequence_token_upper_exclusive
+  )
+}
+expected_band_label <- paste0(
+  ast_sequence_token_lower,
+  "-",
+  ast_sequence_token_upper_exclusive - 1L
+)
+if (ast_sequence_token_band != expected_band_label) {
+  stop(
+    "AST_SEQUENCE_TOKEN_BAND must match the inclusive/exclusive bounds. ",
+    "Expected ", expected_band_label, ", got ", ast_sequence_token_band
+  )
+}
+ast_sequence_token_band_slug <- gsub("-", "_", ast_sequence_token_band)
+
+if (out_dir == "") {
+  out_dir <- file.path(
+    project_root,
+    "repo_python/run-py-6b/strict/bands",
+    ast_sequence_token_band,
+    sample_type,
+    paste0(ncloc_spec, "_ncloc"),
+    time_mode,
+    parse_exclusion_mode
+  )
+}
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+
+output_prefix <- paste0(
+  "borusyak_agc_commit_function_ast_band_",
+  ast_sequence_token_band_slug
+)
+output_file <- function(suffix, extension = "csv") {
+  file.path(out_dir, paste0(output_prefix, suffix, ".", extension))
+}
+
+run_metadata <- list(
+  ast_sequence_token_band = ast_sequence_token_band,
+  ast_sequence_token_lower_bound_inclusive = ast_sequence_token_lower,
+  ast_sequence_token_upper_bound_exclusive =
+    ast_sequence_token_upper_exclusive,
+  ast_sequence_token_specification = "bounded_band",
+  sample_type = sample_type,
+  ncloc_spec = ncloc_spec,
+  time_mode = time_mode,
+  parse_exclusion_mode = parse_exclusion_mode,
+  panel = panel_label
+)
+```
+
+# Purpose
+
+This notebook runs Borusyak imputation DiD models for one pre-specified,
+bounded AST sequence token band produced by run-py-6a. The wrapper passes
+one of the ten bands from 50-59 through 140-149 and renders this notebook
+independently for the full zero-inclusive panel and the conditional
+ratio-positive panel.
+
+The notebook estimates the Heterogeneity RQ. The Primary RQ uses the separate
+minimum-threshold specification `ast_sequence_token_count >= 50` with no
+upper bound and is not estimated here.
+
+The notebook deliberately separates:
+
+1. Full repository-month occurrence and count outcomes.
+2. The conditional AGC event ratio among positive-event repository-months.
+3. Paper NCLOC and Python-snapshot NCLOC specifications.
+4. Full and parse-clean samples, selected through `PARSE_EXCLUSION_MODE`.
+5. The ten bounded AST sequence token bands, verified against input metadata.
+
+For each band, the canonical arithmetic is:
+
+- `function_change_events = agc_function_change_events + hwc_function_change_events`
+- `agc_function_change_event_ratio = agc_function_change_events / function_change_events`
+
+The ratio remains missing when the denominator is zero. Count outcomes use
+`log1p()` transformations. Repository-month activity outcomes
+`log1p_commits` and `log1p_lines_added` are retained and validated as common
+reference outcomes, but are not re-estimated separately in every band because
+they do not vary by AST sequence token band.
+
+The two NCLOC variables are never included in the same first-stage formula.
+Lead/lag columns retained by run-py-5e are validation fields only; dynamic
+coefficients are requested from `didimputation::did_imputation()` using
+`horizon = -6:6` and `pretrends = -6:-2`.
+
+Regression guards carried over from the validated run-py-5f notebook are
+retained. Additional band-specific guards verify the label and inclusive /
+exclusive bounds, bounded-band specification, AGC/HWC partition, log1p
+transformations, zero-denominator ratio handling, and ratio bounds.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+
+if (!file.exists(helper_path)) {
+  stop("Helper file not found: ", helper_path)
+}
+
+source(helper_path)
+```
+
+# Utility Functions
+
+```{r utility-functions}
+normalize_yyyymm <- function(x) {
+  x <- as.character(x)
+  x[x %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+  x <- gsub("-", "", x)
+  suppressWarnings(as.integer(x))
+}
+
+yyyymm_to_month_id <- function(x) {
+  x <- as.integer(x)
+  year <- x %/% 100L
+  month <- x %% 100L
+  out <- year * 12L + month
+  out[is.na(x) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+count_nonmissing <- function(data, column_name) {
+  if (!(column_name %in% names(data))) {
+    return(NA_integer_)
+  }
+  sum(!is.na(data[[column_name]]))
+}
+
+write_error_table <- function(errors, stage, output_path, metadata) {
+  if (length(errors) == 0) {
+    error_df <- data.frame(
+      stage = character(),
+      outcome = character(),
+      error = character(),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    error_df <- data.frame(
+      stage = stage,
+      outcome = names(errors),
+      error = unlist(errors),
+      row.names = NULL,
+      stringsAsFactors = FALSE
+    )
+  }
+
+  for (metadata_name in names(metadata)) {
+    error_df[[metadata_name]] <- rep(
+      as.character(metadata[[metadata_name]]),
+      nrow(error_df)
+    )
+  }
+  fwrite(error_df, output_path)
+}
+
+add_run_metadata <- function(data, metadata) {
+  for (metadata_name in names(metadata)) {
+    data[[metadata_name]] <- metadata[[metadata_name]]
+  }
+  data
+}
+```
+
+# Load and Validate Input Panel
+
+```{r load-panel}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Panel label:", panel_label, "\n")
+cat("Output directory:", out_dir, "\n")
+cat("NCLOC specification:", ncloc_spec, "\n")
+cat("Sample type:", sample_type, "\n")
+cat("Time mode:", time_mode, "\n")
+cat("Parse-exclusion mode:", parse_exclusion_mode, "\n")
+cat("AST sequence token band:", ast_sequence_token_band, "\n")
+cat("AST sequence token lower bound (inclusive):",
+    ast_sequence_token_lower, "\n")
+cat("AST sequence token upper bound (exclusive):",
+    ast_sequence_token_upper_exclusive, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+
+base_required <- c(
+  "dataset_source",
+  "repo_name",
+  "time",
+  "event",
+  "time_to_event",
+  "function_change_events",
+  "agc_function_change_events",
+  "hwc_function_change_events",
+  "has_function_change_event",
+  "zero_function_event_month",
+  "agc_function_change_event_ratio",
+  "log1p_function_change_events",
+  "log1p_agc_function_change_events",
+  "log1p_hwc_function_change_events",
+  "commits",
+  "lines_added",
+  "log1p_commits",
+  "log1p_lines_added",
+  "ast_sequence_token_lower_bound_inclusive",
+  "ast_sequence_token_upper_bound_exclusive",
+  "ast_sequence_token_band",
+  "ast_sequence_token_specification",
+  "log1p_age",
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues",
+  "ncloc_paper",
+  "ncloc_python_snapshot",
+  "analysis_ready_paper_ncloc",
+  "analysis_ready_python_snapshot_ncloc",
+  "analysis_ready_ratio_paper_ncloc",
+  "analysis_ready_ratio_python_snapshot_ncloc",
+  "has_parse_exclusion",
+  "detection_complete",
+  "treatment_group"
+)
+require_columns(panel_raw, base_required, "Input panel")
+
+band_labels_in_input <- unique(as.character(panel_raw$ast_sequence_token_band))
+band_lower_values_in_input <- unique(
+  as.integer(panel_raw$ast_sequence_token_lower_bound_inclusive)
+)
+band_upper_values_in_input <- unique(
+  as.integer(panel_raw$ast_sequence_token_upper_bound_exclusive)
+)
+band_specs_in_input <- unique(
+  as.character(panel_raw$ast_sequence_token_specification)
+)
+
+band_label_mismatch_rows <- sum(
+  as.character(panel_raw$ast_sequence_token_band) != ast_sequence_token_band |
+    is.na(panel_raw$ast_sequence_token_band)
+)
+band_lower_mismatch_rows <- sum(
+  as.integer(panel_raw$ast_sequence_token_lower_bound_inclusive) !=
+    ast_sequence_token_lower |
+    is.na(panel_raw$ast_sequence_token_lower_bound_inclusive)
+)
+band_upper_mismatch_rows <- sum(
+  as.integer(panel_raw$ast_sequence_token_upper_bound_exclusive) !=
+    ast_sequence_token_upper_exclusive |
+    is.na(panel_raw$ast_sequence_token_upper_bound_exclusive)
+)
+band_specification_mismatch_rows <- sum(
+  as.character(panel_raw$ast_sequence_token_specification) != "bounded_band" |
+    is.na(panel_raw$ast_sequence_token_specification)
+)
+
+if (length(band_labels_in_input) != 1L || band_label_mismatch_rows > 0) {
+  stop(
+    "Input panel AST band label does not match the requested band. Values: ",
+    paste(band_labels_in_input, collapse = ", ")
+  )
+}
+if (length(band_lower_values_in_input) != 1L || band_lower_mismatch_rows > 0) {
+  stop("Input panel AST lower bound does not match the requested lower bound.")
+}
+if (length(band_upper_values_in_input) != 1L || band_upper_mismatch_rows > 0) {
+  stop("Input panel AST upper bound does not match the requested upper bound.")
+}
+if (length(band_specs_in_input) != 1L ||
+    band_specification_mismatch_rows > 0) {
+  stop("Input panel must use ast_sequence_token_specification=bounded_band.")
+}
+
+count_na_rows <- sum(
+  is.na(panel_raw$function_change_events) |
+    is.na(panel_raw$agc_function_change_events) |
+    is.na(panel_raw$hwc_function_change_events)
+)
+count_negative_rows <- sum(
+  panel_raw$function_change_events < 0 |
+    panel_raw$agc_function_change_events < 0 |
+    panel_raw$hwc_function_change_events < 0,
+  na.rm = TRUE
+)
+log1p_count_missing_rows <- sum(
+  is.na(panel_raw$log1p_function_change_events) |
+    is.na(panel_raw$log1p_agc_function_change_events) |
+    is.na(panel_raw$log1p_hwc_function_change_events)
+)
+activity_missing_rows <- sum(
+  is.na(panel_raw$commits) | is.na(panel_raw$lines_added)
+)
+log1p_activity_missing_rows <- sum(
+  is.na(panel_raw$log1p_commits) | is.na(panel_raw$log1p_lines_added)
+)
+function_event_partition_mismatch_rows <- sum(
+  panel_raw$function_change_events !=
+    panel_raw$agc_function_change_events +
+    panel_raw$hwc_function_change_events,
+  na.rm = TRUE
+)
+log1p_function_mismatch_rows <- sum(
+  abs(
+    panel_raw$log1p_function_change_events -
+      log1p(panel_raw$function_change_events)
+  ) > 1e-12,
+  na.rm = TRUE
+)
+log1p_agc_mismatch_rows <- sum(
+  abs(
+    panel_raw$log1p_agc_function_change_events -
+      log1p(panel_raw$agc_function_change_events)
+  ) > 1e-12,
+  na.rm = TRUE
+)
+log1p_hwc_mismatch_rows <- sum(
+  abs(
+    panel_raw$log1p_hwc_function_change_events -
+      log1p(panel_raw$hwc_function_change_events)
+  ) > 1e-12,
+  na.rm = TRUE
+)
+activity_negative_rows <- sum(
+  panel_raw$commits < 0 | panel_raw$lines_added < 0,
+  na.rm = TRUE
+)
+log1p_commits_mismatch_rows <- sum(
+  abs(panel_raw$log1p_commits - log1p(panel_raw$commits)) > 1e-12,
+  na.rm = TRUE
+)
+log1p_lines_added_mismatch_rows <- sum(
+  abs(panel_raw$log1p_lines_added - log1p(panel_raw$lines_added)) > 1e-12,
+  na.rm = TRUE
+)
+positive_event_rows <- panel_raw$function_change_events > 0
+zero_event_rows <- panel_raw$function_change_events == 0
+positive_ratio_missing_rows <- sum(
+  positive_event_rows & is.na(panel_raw$agc_function_change_event_ratio)
+)
+zero_ratio_nonmissing_rows <- sum(
+  zero_event_rows & !is.na(panel_raw$agc_function_change_event_ratio)
+)
+ratio_formula_mismatch_rows <- sum(
+  positive_event_rows &
+    abs(
+      panel_raw$agc_function_change_event_ratio -
+        panel_raw$agc_function_change_events /
+        panel_raw$function_change_events
+    ) > 1e-12,
+  na.rm = TRUE
+)
+ratio_out_of_bounds_input_rows <- sum(
+  !is.na(panel_raw$agc_function_change_event_ratio) &
+    !panel_raw$agc_function_change_event_ratio %between% c(0, 1),
+  na.rm = TRUE
+)
+
+if (count_na_rows > 0 || count_negative_rows > 0 ||
+    log1p_count_missing_rows > 0 || activity_missing_rows > 0 ||
+    log1p_activity_missing_rows > 0 ||
+    function_event_partition_mismatch_rows > 0 ||
+    log1p_function_mismatch_rows > 0 || log1p_agc_mismatch_rows > 0 ||
+    log1p_hwc_mismatch_rows > 0 || activity_negative_rows > 0 ||
+    log1p_commits_mismatch_rows > 0 ||
+    log1p_lines_added_mismatch_rows > 0 ||
+    positive_ratio_missing_rows > 0 || zero_ratio_nonmissing_rows > 0 ||
+    ratio_formula_mismatch_rows > 0 || ratio_out_of_bounds_input_rows > 0) {
+  stop(
+    "Band outcome contract violated. See the band-specific arithmetic, ",
+    "log1p, activity, and ratio mismatch counters in the source."
+  )
+}
+
+if (anyDuplicated(panel_raw[, .(dataset_source, repo_name, time)]) > 0) {
+  stop("Input panel has duplicate dataset_source/repo_name/time keys.")
+}
+
+if (!all(panel_raw$dataset_source %in% c("control", "treatment"))) {
+  stop("dataset_source contains unexpected values.")
+}
+
+# Regression guard 1 (run-py-5d bug history): static cohort membership must
+# come from dataset_source, never from the dynamic is_treatment indicator.
+# treatment_group is required to match dataset_source on every row.
+treatment_group_mismatch_rows <- sum(
+  as.character(panel_raw$treatment_group) !=
+    as.character(panel_raw$dataset_source),
+  na.rm = TRUE
+) + sum(is.na(panel_raw$treatment_group))
+
+if (treatment_group_mismatch_rows > 0) {
+  stop(
+    "treatment_group does not match dataset_source on ",
+    treatment_group_mismatch_rows,
+    " rows. Static membership must be derived from dataset_source."
+  )
+}
+
+# Regression guard 2 (run-py-5d dtype history): detection_complete must be a
+# clean all-true indicator. Accept boolean or normalized text/numeric forms,
+# but reject any missing or false value.
+detection_complete_true <- panel_raw$detection_complete %in%
+  c(TRUE, 1L, 1.0, "True", "TRUE", "true", "1", "1.0")
+detection_incomplete_rows <- sum(!detection_complete_true)
+
+if (detection_incomplete_rows > 0) {
+  stop(
+    "detection_complete is not uniformly true: ",
+    detection_incomplete_rows,
+    " rows are missing, false, or malformed."
+  )
+}
+
+# Regression guard 3: zero-event arithmetic from the run-py-5d complete
+# table must hold exactly on the full input panel. NA values in these three
+# columns are contract violations, not skippable rows.
+event_core_na_rows <- sum(
+  is.na(panel_raw$function_change_events) |
+    is.na(panel_raw$has_function_change_event) |
+    is.na(panel_raw$zero_function_event_month)
+)
+if (event_core_na_rows > 0) {
+  stop(
+    "Missing values in core event columns on ",
+    event_core_na_rows,
+    " rows; run-py-5e must deliver a zero-inclusive complete panel."
+  )
+}
+
+occurrence_mismatch_rows <- sum(
+  as.integer(panel_raw$has_function_change_event) !=
+    as.integer(panel_raw$function_change_events > 0),
+  na.rm = TRUE
+)
+zero_flag_mismatch_rows <- sum(
+  as.integer(panel_raw$zero_function_event_month) !=
+    (1L - as.integer(panel_raw$has_function_change_event)),
+  na.rm = TRUE
+)
+
+if (occurrence_mismatch_rows > 0 || zero_flag_mismatch_rows > 0) {
+  stop(
+    "Zero-event arithmetic violated. Occurrence mismatches: ",
+    occurrence_mismatch_rows,
+    "; zero-flag mismatches: ",
+    zero_flag_mismatch_rows
+  )
+}
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repositories:", uniqueN(panel_raw$repo_name), "\n")
+cat("Treatment rows (dataset_source):",
+    sum(panel_raw$dataset_source == "treatment"), "\n")
+cat("Control rows (dataset_source):",
+    sum(panel_raw$dataset_source == "control"), "\n")
+cat("Zero-event rows in input:",
+    sum(panel_raw$zero_function_event_month == 1, na.rm = TRUE), "\n")
+
+# Regression guard 4: event-month presence must reproduce static cohort
+# membership on the full 1,633-row input, before any readiness or cohort
+# filtering removes rows. Treatment rows must carry a non-missing event
+# month; control rows must carry a missing event.
+panel_raw[, event_is_missing := is.na(event) | as.character(event) == ""]
+full_input_event_membership_mismatch_rows <- panel_raw[
+  ,
+  sum((dataset_source == "treatment") == event_is_missing)
+]
+if (full_input_event_membership_mismatch_rows > 0) {
+  stop(
+    "Event-month presence disagrees with dataset_source on ",
+    full_input_event_membership_mismatch_rows,
+    " rows of the full 1,633-row input panel."
+  )
+}
+
+# Regression guard 5: repository-level treatment consistency. A repository
+# must map to exactly one dataset_source and, if treated, exactly one
+# adoption month.
+repo_source_counts <- panel_raw[, .(n_sources = uniqueN(dataset_source)),
+                                  by = repo_name]
+repo_source_violations <- sum(repo_source_counts$n_sources > 1)
+if (repo_source_violations > 0) {
+  stop(
+    "Repository-level dataset_source is not unique for ",
+    repo_source_violations,
+    " repositories."
+  )
+}
+
+repo_event_counts <- panel_raw[
+  dataset_source == "treatment" & !event_is_missing,
+  .(n_events = uniqueN(event)),
+  by = repo_name
+]
+repo_event_violations <- sum(repo_event_counts$n_events > 1)
+if (repo_event_violations > 0) {
+  stop(
+    "Repository-level adoption month is not unique for ",
+    repo_event_violations,
+    " treatment repositories."
+  )
+}
+```
+
+# Select Outcomes, Covariates, and Explicit Analysis Sample
+
+```{r configure-model}
+if (sample_type == "full") {
+  outcome_vars <- c(
+    "has_function_change_event",
+    "log1p_function_change_events",
+    "log1p_agc_function_change_events",
+    "log1p_hwc_function_change_events"
+  )
+  outcome_names <- c(
+    "Any Function-Change Event",
+    "Total Function-Change Events (log1p)",
+    "AGC-Like Function-Change Events (log1p)",
+    "HWC-Like Function-Change Events (log1p)"
+  )
+} else {
+  outcome_vars <- c("agc_function_change_event_ratio")
+  outcome_names <- c("AGC-Like Event Share | Positive-Event Month")
+}
+
+if (ncloc_spec == "paper") {
+  ncloc_column <- "ncloc_paper"
+  readiness_column <- if (sample_type == "full") {
+    "analysis_ready_paper_ncloc"
+  } else {
+    "analysis_ready_ratio_paper_ncloc"
+  }
+} else {
+  ncloc_column <- "ncloc_python_snapshot"
+  readiness_column <- if (sample_type == "full") {
+    "analysis_ready_python_snapshot_ncloc"
+  } else {
+    "analysis_ready_ratio_python_snapshot_ncloc"
+  }
+}
+
+covariates <- c(
+  "log1p_age",
+  ncloc_column,
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues"
+)
+
+require_columns(
+  panel_raw,
+  c(outcome_vars, covariates, readiness_column),
+  "Configured model"
+)
+
+panel_data <- copy(panel_raw)
+panel_data <- panel_data[get(readiness_column) == 1]
+rows_after_readiness_filter <- nrow(panel_data)
+
+if (parse_exclusion_mode == "parse_clean") {
+  panel_data <- panel_data[has_parse_exclusion == 0]
+}
+rows_after_parse_filter <- nrow(panel_data)
+
+if (sample_type == "ratio") {
+  panel_data <- panel_data[
+    function_change_events > 0 &
+      !is.na(agc_function_change_event_ratio)
+  ]
+}
+rows_after_ratio_filter <- nrow(panel_data)
+
+if (nrow(panel_data) == 0) {
+  stop("No rows remain after the explicit analysis-ready filter.")
+}
+
+model_required <- c(outcome_vars, covariates)
+implicit_missing_rows <- sum(!complete.cases(panel_data[, ..model_required]))
+if (implicit_missing_rows > 0) {
+  stop(
+    "Analysis-ready flag allowed rows with missing model variables: ",
+    implicit_missing_rows
+  )
+}
+
+panel_data[, time_yyyymm := normalize_yyyymm(time)]
+event_yyyymm_raw <- normalize_yyyymm(panel_data$event)
+event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
+panel_data[, event_yyyymm := event_yyyymm_raw]
+
+# Regression guard (model-sample level): the event-month encoding must
+# reproduce static cohort membership on the rows that survive readiness and
+# parse-exclusion filtering. This is a second, independent check using the
+# normalized numeric YYYYMM encoding rather than raw NA/non-NA status; the
+# full-input version of this check already ran above on panel_raw.
+model_sample_event_membership_mismatch_rows <- panel_data[
+  ,
+  sum((dataset_source == "treatment") != (event_yyyymm > 0L))
+]
+if (model_sample_event_membership_mismatch_rows > 0) {
+  stop(
+    "Event encoding disagrees with dataset_source on ",
+    model_sample_event_membership_mismatch_rows,
+    " rows before the cohort filter."
+  )
+}
+
+# Match the treatment-cohort window used by the existing Python quality Rmd.
+panel_data <- panel_data[
+  event_yyyymm == 0L |
+    (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+]
+rows_after_cohort_filter <- nrow(panel_data)
+
+panel_data[, repo_name_str := as.character(repo_name)]
+panel_data[, repo_id := as.integer(factor(repo_name_str))]
+
+if (time_mode == "original_yyyymm") {
+  warning(paste(
+    "original_yyyymm is replication-only; numeric YYYYMM is not a linear",
+    "month scale (e.g. 202412 to 202501 differs by 89, not 1), which can",
+    "distort dynamic event-time horizons across calendar-year boundaries.",
+    "Use calendar_month for the primary dynamic event study."
+  ))
+  panel_data[, time_id := time_yyyymm]
+  panel_data[, event_id := event_yyyymm]
+  time_encoding_used <- "numeric_YYYYMM_original_notebook_compatible"
+} else {
+  panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+  panel_data[, event_id := fifelse(
+    event_yyyymm == 0L,
+    0L,
+    yyyymm_to_month_id(event_yyyymm)
+  )]
+  time_encoding_used <- "sequential_calendar_month_id"
+}
+
+panel_data <- panel_data[!is.na(time_id)]
+panel_data <- panel_data[event_id == 0L | !is.na(event_id)]
+panel_data[, treated := as.integer(event_id > 0L)]
+
+# Regression guard: reconstructed event time must reproduce the panel's own
+# time_to_event on treatment rows. This is the direct evidence that
+# adoption month and event-study horizon were rebuilt correctly. This check
+# is authoritative only under calendar_month, since original_yyyymm is a
+# non-linear numeric scale by design.
+treatment_rows_for_check <- panel_data[treated == 1 & !is.na(time_to_event)]
+event_time_encoding_mismatch_rows <- if (nrow(treatment_rows_for_check) > 0) {
+  sum(
+    (treatment_rows_for_check$time_id - treatment_rows_for_check$event_id) !=
+      treatment_rows_for_check$time_to_event
+  )
+} else {
+  0L
+}
+
+if (time_mode == "calendar_month" && event_time_encoding_mismatch_rows > 0) {
+  stop(
+    "time_id - event_id disagrees with time_to_event on ",
+    event_time_encoding_mismatch_rows,
+    " treatment rows under calendar_month encoding."
+  )
+}
+
+# Regression guard: panel key and group-membership contract on the final
+# model sample.
+duplicate_model_keys <- anyDuplicated(
+  panel_data[, .(repo_id, time_id)]
+)
+missing_time_id_rows <- sum(is.na(panel_data$time_id))
+treatment_zero_event_id_rows <- panel_data[
+  ,
+  sum(dataset_source == "treatment" & event_id == 0L)
+]
+control_nonzero_event_id_rows <- panel_data[
+  ,
+  sum(dataset_source == "control" & event_id != 0L)
+]
+
+if (duplicate_model_keys > 0) {
+  stop("Duplicate repo_id/time_id keys in the model sample.")
+}
+if (missing_time_id_rows > 0) {
+  stop("Missing time_id values remain in the model sample.")
+}
+if (treatment_zero_event_id_rows > 0) {
+  stop(
+    "Treatment rows with event_id == 0 remain in the model sample: ",
+    treatment_zero_event_id_rows
+  )
+}
+if (control_nonzero_event_id_rows > 0) {
+  stop(
+    "Control rows with event_id != 0 remain in the model sample: ",
+    control_nonzero_event_id_rows
+  )
+}
+
+# Regression guard: parse-clean mode must contain zero parse-exclusion rows.
+parse_clean_violation_rows <- if (parse_exclusion_mode == "parse_clean") {
+  sum(panel_data$has_parse_exclusion == 1, na.rm = TRUE)
+} else {
+  0L
+}
+if (parse_clean_violation_rows > 0) {
+  stop(
+    "PARSE_EXCLUSION_MODE=parse_clean but ",
+    parse_clean_violation_rows,
+    " rows with has_parse_exclusion == 1 remain."
+  )
+}
+
+first_stage_rhs <- paste(covariates, collapse = " + ")
+first_stage_formula <- as.formula(
+  paste0("~ ", first_stage_rhs, " | repo_id + time_id")
+)
+
+cat("Readiness column:", readiness_column, "\n")
+cat("Parse-exclusion mode:", parse_exclusion_mode, "\n")
+cat("Rows after readiness filter:", rows_after_readiness_filter, "\n")
+cat("Rows after parse-exclusion filter:", rows_after_parse_filter, "\n")
+cat("Rows after ratio filter:", rows_after_ratio_filter, "\n")
+cat("Rows after cohort filter:", rows_after_cohort_filter, "\n")
+cat("Rows used by models:", nrow(panel_data), "\n")
+cat("Repositories used:", uniqueN(panel_data$repo_id), "\n")
+cat("Treated repositories:", uniqueN(panel_data[treated == 1, repo_id]), "\n")
+cat("Control repositories:", uniqueN(panel_data[treated == 0, repo_id]), "\n")
+cat("Time encoding:", time_encoding_used, "\n")
+cat("First-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Panel Checks and Input Summary
+
+```{r panel-checks}
+panel_checks <- data.frame(
+  check = c(
+    "panel_label",
+    "ast_sequence_token_band",
+    "ast_sequence_token_lower_bound_inclusive",
+    "ast_sequence_token_upper_bound_exclusive",
+    "ast_sequence_token_specification",
+    "band_label_mismatch_rows",
+    "band_lower_mismatch_rows",
+    "band_upper_mismatch_rows",
+    "band_specification_mismatch_rows",
+    "function_event_partition_mismatch_rows",
+    "count_na_rows",
+    "count_negative_rows",
+    "log1p_count_missing_rows",
+    "activity_missing_rows",
+    "log1p_activity_missing_rows",
+    "log1p_function_mismatch_rows",
+    "log1p_agc_mismatch_rows",
+    "log1p_hwc_mismatch_rows",
+    "activity_negative_rows",
+    "log1p_commits_mismatch_rows",
+    "log1p_lines_added_mismatch_rows",
+    "positive_ratio_missing_rows",
+    "zero_ratio_nonmissing_rows",
+    "ratio_formula_mismatch_rows",
+    "ratio_out_of_bounds_input_rows",
+    "sample_type",
+    "ncloc_specification",
+    "readiness_column",
+    "time_mode",
+    "parse_exclusion_mode",
+    "input_rows",
+    "input_repositories",
+    "treatment_group_mismatch_rows",
+    "full_input_event_membership_mismatch_rows",
+    "repo_dataset_source_violations",
+    "repo_adoption_month_violations",
+    "occurrence_arithmetic_mismatch_rows",
+    "zero_flag_arithmetic_mismatch_rows",
+    "detection_incomplete_rows",
+    "rows_after_readiness_filter",
+    "rows_after_parse_filter",
+    "rows_after_ratio_filter",
+    "model_sample_event_membership_mismatch_rows",
+    "rows_after_cohort_filter",
+    "event_time_encoding_mismatch_rows",
+    "duplicate_model_keys",
+    "missing_time_id_rows",
+    "treatment_zero_event_id_rows",
+    "control_nonzero_event_id_rows",
+    "parse_clean_violation_rows",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "treated_repositories",
+    "control_repositories",
+    "zero_event_rows_in_model_sample",
+    "parse_exclusion_rows_in_model_sample",
+    "outcome_missing_sum",
+    "covariate_missing_sum",
+    "ratio_out_of_bounds"
+  ),
+  value = c(
+    panel_label,
+    ast_sequence_token_band,
+    ast_sequence_token_lower,
+    ast_sequence_token_upper_exclusive,
+    "bounded_band",
+    band_label_mismatch_rows,
+    band_lower_mismatch_rows,
+    band_upper_mismatch_rows,
+    band_specification_mismatch_rows,
+    function_event_partition_mismatch_rows,
+    count_na_rows,
+    count_negative_rows,
+    log1p_count_missing_rows,
+    activity_missing_rows,
+    log1p_activity_missing_rows,
+    log1p_function_mismatch_rows,
+    log1p_agc_mismatch_rows,
+    log1p_hwc_mismatch_rows,
+    activity_negative_rows,
+    log1p_commits_mismatch_rows,
+    log1p_lines_added_mismatch_rows,
+    positive_ratio_missing_rows,
+    zero_ratio_nonmissing_rows,
+    ratio_formula_mismatch_rows,
+    ratio_out_of_bounds_input_rows,
+    sample_type,
+    ncloc_spec,
+    readiness_column,
+    time_mode,
+    parse_exclusion_mode,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    treatment_group_mismatch_rows,
+    full_input_event_membership_mismatch_rows,
+    repo_source_violations,
+    repo_event_violations,
+    occurrence_mismatch_rows,
+    zero_flag_mismatch_rows,
+    detection_incomplete_rows,
+    rows_after_readiness_filter,
+    rows_after_parse_filter,
+    rows_after_ratio_filter,
+    model_sample_event_membership_mismatch_rows,
+    rows_after_cohort_filter,
+    event_time_encoding_mismatch_rows,
+    duplicate_model_keys,
+    missing_time_id_rows,
+    treatment_zero_event_id_rows,
+    control_nonzero_event_id_rows,
+    parse_clean_violation_rows,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    uniqueN(panel_data[treated == 1, repo_id]),
+    uniqueN(panel_data[treated == 0, repo_id]),
+    sum(panel_data$zero_function_event_month == 1, na.rm = TRUE),
+    sum(panel_data$has_parse_exclusion == 1, na.rm = TRUE),
+    sum(is.na(panel_data[, ..outcome_vars])),
+    sum(is.na(panel_data[, ..covariates])),
+    if (sample_type == "ratio") {
+      sum(
+        !panel_data$agc_function_change_event_ratio %between% c(0, 1),
+        na.rm = TRUE
+      )
+    } else {
+      NA_integer_
+    }
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(panel_checks)
+fwrite(
+  panel_checks,
+  output_file("_panel_checks")
+)
+
+input_summary <- panel_data[, .(
+  rows = .N,
+  repositories = uniqueN(repo_id),
+  mean_has_function_change_event = mean(
+    has_function_change_event,
+    na.rm = TRUE
+  ),
+  mean_log1p_function_change_events = mean(
+    log1p_function_change_events,
+    na.rm = TRUE
+  ),
+  mean_log1p_agc_function_change_events = mean(
+    log1p_agc_function_change_events,
+    na.rm = TRUE
+  ),
+  mean_log1p_hwc_function_change_events = mean(
+    log1p_hwc_function_change_events,
+    na.rm = TRUE
+  ),
+  mean_agc_function_change_event_ratio = mean(
+    agc_function_change_event_ratio,
+    na.rm = TRUE
+  ),
+  mean_log1p_commits = mean(log1p_commits, na.rm = TRUE),
+  mean_log1p_lines_added = mean(log1p_lines_added, na.rm = TRUE),
+  mean_ncloc = mean(get(ncloc_column), na.rm = TRUE)
+), by = dataset_source]
+input_summary <- add_run_metadata(input_summary, run_metadata)
+
+print(input_summary)
+fwrite(
+  input_summary,
+  output_file("_input_summary")
+)
+```
+
+# Outcomes and First Stage
+
+```{r outcomes}
+print(data.frame(outcome = outcome_vars, label = outcome_names))
+cat("NCLOC specification:", ncloc_spec, "\n")
+cat("NCLOC column:", ncloc_column, "\n")
+cat("Readiness column:", readiness_column, "\n")
+cat("First-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Static Borusyak Effects
+
+```{r static-effects}
+static_results <- list()
+static_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running static Borusyak model for:", var, "\n")
+  static_results[[var]] <- tryCatch(
+    run_borusyak_static(
+      data = panel_data,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      static_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+static_df <- bind_rows(lapply(outcome_vars, function(v) {
+  extract_static_result(static_results[[v]], v)
+}))
+static_df$outcome_label <- outcome_names[match(static_df$outcome, outcome_vars)]
+static_df <- add_run_metadata(static_df, run_metadata)
+
+print(static_df)
+fwrite(
+  static_df,
+  output_file("_static_effects")
+)
+write_error_table(
+  static_errors,
+  "static",
+  output_file("_static_errors"),
+  run_metadata
+)
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_results <- list()
+dynamic_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running dynamic Borusyak model for:", var, "\n")
+  dynamic_results[[var]] <- tryCatch(
+    run_borusyak_dynamic(
+      data = panel_data,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      horizon = -6:6,
+      pretrends = -6:-2,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      dynamic_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+dynamic_df <- bind_rows(lapply(seq_along(outcome_vars), function(i) {
+  v <- outcome_vars[i]
+  extract_dynamic_result(
+    dynamic_results[[v]],
+    outcome = v,
+    outcome_label = outcome_names[i],
+    min_horizon = -6,
+    max_horizon = 6
+  )
+}))
+
+if (nrow(dynamic_df) > 0) {
+  dynamic_df <- add_run_metadata(dynamic_df, run_metadata)
+}
+
+print(dynamic_df)
+fwrite(
+  dynamic_df,
+  output_file("_dynamic_effects")
+)
+write_error_table(
+  dynamic_errors,
+  "dynamic",
+  output_file("_dynamic_errors"),
+  run_metadata
+)
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=11, fig.height=3.5}
+if (nrow(dynamic_df) > 0) {
+  dynamic_df$outcome_label <- factor(
+    dynamic_df$outcome_label,
+    levels = outcome_names
+  )
+
+  plot_object <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_errorbar(
+      data = subset(dynamic_df, significant %in% TRUE),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "solid"
+    ) +
+    geom_errorbar(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "dotted"
+    ) +
+    geom_point(
+      data = subset(dynamic_df, significant %in% TRUE),
+      shape = 19,
+      size = 1.7
+    ) +
+    geom_point(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      shape = 21,
+      fill = "transparent",
+      size = 1.7
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
+    labs(
+      title = paste("Borusyak Commit-Function AGC DiD: AST Band", ast_sequence_token_band),
+      subtitle = paste(
+        "Panel:", panel_label,
+        "| Sample:", sample_type,
+        "| NCLOC:", ncloc_spec,
+        "| Time:", time_encoding_used,
+        "| Parse:", parse_exclusion_mode
+      ),
+      x = "Months Relative to Cursor Adoption",
+      y = "Treatment Effect",
+      caption = paste(
+        "Filled dots: CI excludes 0. Hollow dots: CI includes 0.",
+        if (sample_type == "ratio") {
+          "Ratio is conditional on at least one function-change event."
+        } else {
+          "Zero-event repository-months are retained."
+        }
+      )
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
+
+  print(plot_object)
+  ggsave(
+    filename = output_file("_dynamic_effects", "pdf"),
+    plot = plot_object,
+    width = 11,
+    height = 3.5
+  )
+} else {
+  cat("No dynamic effects to plot.\n")
+}
+```
+
+# Final Model Validation (Hard Fail)
+
+`tryCatch()` around the static and dynamic estimators only prevents a single
+outcome failure from aborting the whole run; it does not guarantee that the
+run produced usable results. This chunk turns model-fitting failures into a
+render failure instead of a silently incomplete HTML report with an exit
+code of 0.
+
+```{r final-model-validation}
+static_model_error_count <- length(static_errors)
+dynamic_model_error_count <- length(dynamic_errors)
+
+static_effects_complete <- all(outcome_vars %in% static_df$outcome) &&
+  all(!is.na(static_df$estimate[match(outcome_vars, static_df$outcome)]))
+
+dynamic_effects_nonempty <- nrow(dynamic_df) > 0 &&
+  all(outcome_vars %in% dynamic_df$outcome)
+
+dynamic_pre_period_present <- if (dynamic_effects_nonempty) {
+  all(sapply(outcome_vars, function(v) {
+    any(dynamic_df$outcome == v & dynamic_df$time < 0)
+  }))
+} else {
+  FALSE
+}
+
+dynamic_post_period_present <- if (dynamic_effects_nonempty) {
+  all(sapply(outcome_vars, function(v) {
+    any(dynamic_df$outcome == v & dynamic_df$time >= 0)
+  }))
+} else {
+  FALSE
+}
+
+final_model_validation <- data.frame(
+  check = c(
+    "static_model_error_count",
+    "dynamic_model_error_count",
+    "static_effects_complete",
+    "dynamic_effects_nonempty",
+    "dynamic_pre_period_present",
+    "dynamic_post_period_present"
+  ),
+  value = c(
+    static_model_error_count,
+    dynamic_model_error_count,
+    static_effects_complete,
+    dynamic_effects_nonempty,
+    dynamic_pre_period_present,
+    dynamic_post_period_present
+  ),
+  stringsAsFactors = FALSE
+)
+final_model_validation <- add_run_metadata(
+  final_model_validation,
+  run_metadata
+)
+
+print(final_model_validation)
+fwrite(
+  final_model_validation,
+  output_file("_final_model_validation")
+)
+
+if (static_model_error_count > 0) {
+  stop(
+    "Static model failed for ",
+    static_model_error_count,
+    " outcome(s): ",
+    paste(names(static_errors), collapse = ", ")
+  )
+}
+if (dynamic_model_error_count > 0) {
+  stop(
+    "Dynamic model failed for ",
+    dynamic_model_error_count,
+    " outcome(s): ",
+    paste(names(dynamic_errors), collapse = ", ")
+  )
+}
+if (!static_effects_complete) {
+  stop("Static effects are missing or NA for at least one outcome.")
+}
+if (!dynamic_effects_nonempty) {
+  stop("Dynamic effects are empty for at least one outcome.")
+}
+if (!dynamic_pre_period_present) {
+  stop("Dynamic effects have no pre-treatment horizon for at least one outcome.")
+}
+if (!dynamic_post_period_present) {
+  stop("Dynamic effects have no post-treatment horizon for at least one outcome.")
+}
+
+cat("Final model validation: PASS\n")
+```
+
+# Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "helper_file",
+    "panel_label",
+    "panel_path",
+    "out_dir",
+    "ast_sequence_token_band",
+    "ast_sequence_token_lower_bound_inclusive",
+    "ast_sequence_token_upper_bound_exclusive",
+    "ast_sequence_token_specification",
+    "sample_type",
+    "ncloc_specification",
+    "ncloc_column",
+    "readiness_column",
+    "parse_exclusion_mode",
+    "outcomes",
+    "activity_reference_outcomes",
+    "covariates",
+    "first_stage_formula",
+    "rows_after_readiness_filter",
+    "rows_after_parse_filter",
+    "rows_after_ratio_filter",
+    "rows_after_cohort_filter",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "estimator",
+    "time_encoding",
+    "event_time_encoding_mismatch_rows",
+    "horizon",
+    "pretrends",
+    "static_model_error_count",
+    "dynamic_model_error_count",
+    "input_source",
+    "interpretation_note",
+    "limitation_note"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_agc_commit_function_ast_sequence_band.Rmd",
+    helper_path,
+    panel_label,
+    panel_path,
+    out_dir,
+    ast_sequence_token_band,
+    ast_sequence_token_lower,
+    ast_sequence_token_upper_exclusive,
+    "bounded_band",
+    sample_type,
+    ncloc_spec,
+    ncloc_column,
+    readiness_column,
+    parse_exclusion_mode,
+    paste(outcome_vars, collapse = ", "),
+    "log1p_commits, log1p_lines_added (common reference outcomes; not re-estimated by band)",
+    paste(covariates, collapse = " + "),
+    paste(deparse(first_stage_formula), collapse = " "),
+    rows_after_readiness_filter,
+    rows_after_parse_filter,
+    rows_after_ratio_filter,
+    rows_after_cohort_filter,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    "Borusyak imputation via didimputation::did_imputation",
+    time_encoding_used,
+    event_time_encoding_mismatch_rows,
+    "-6:6",
+    "-6:-2",
+    static_model_error_count,
+    dynamic_model_error_count,
+    paste(
+      "run-py-6a bounded AST sequence token band panel derived from",
+      "event-level commit-function AGC detector predictions and the",
+      "run-py-5e covariate-complete repository-month panel"
+    ),
+    if (sample_type == "ratio") {
+      paste(
+        "Conditional composition effect among repository-months with at",
+        "least one function-change event in this AST sequence token band;",
+        "not an unconditional total effect."
+      )
+    } else {
+      paste(
+        "Occurrence and count outcomes use the full zero-inclusive",
+        "repository-month panel for this AST sequence token band."
+      )
+    },
+    paste(
+      "The outcome captures AST-based structural patterns classified as",
+      "AI-likely-generated code; it does not establish function provenance",
+      "or identify which AI tool, if any, contributed to a function."
+    )
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(metadata)
+fwrite(metadata, output_file("_metadata"))
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```

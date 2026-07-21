@@ -1,0 +1,35 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_agc_commit_function_ast_sequence_band.Rmd
+helper_file,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict_band_50_59_full_paper_ncloc_calendar_month_all
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-6a/strict/bands/50-59/panel_event_monthly_agc_commit_function_ast_50_59.csv
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-6b/strict/bands/50-59/full/paper_ncloc/calendar_month/all
+ast_sequence_token_band,50-59
+ast_sequence_token_lower_bound_inclusive,50
+ast_sequence_token_upper_bound_exclusive,60
+ast_sequence_token_specification,bounded_band
+sample_type,full
+ncloc_specification,paper
+ncloc_column,ncloc_paper
+readiness_column,analysis_ready_paper_ncloc
+parse_exclusion_mode,all
+outcomes,"has_function_change_event, log1p_function_change_events, log1p_agc_function_change_events, log1p_hwc_function_change_events"
+activity_reference_outcomes,"log1p_commits, log1p_lines_added (common reference outcomes; not re-estimated by band)"
+covariates,log1p_age + ncloc_paper + log1p_contributors + log1p_stars + log1p_issues
+first_stage_formula,~log1p_age + ncloc_paper + log1p_contributors + log1p_stars +      log1p_issues | repo_id + time_id
+rows_after_readiness_filter,1596
+rows_after_parse_filter,1596
+rows_after_ratio_filter,1596
+rows_after_cohort_filter,1596
+rows_used_by_models,1596
+repositories_used_by_models,217
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,sequential_calendar_month_id
+event_time_encoding_mismatch_rows,0
+horizon,-6:6
+pretrends,-6:-2
+static_model_error_count,0
+dynamic_model_error_count,0
+input_source,run-py-6a bounded AST sequence token band panel derived from event-level commit-function AGC detector predictions and the run-py-5e covariate-complete repository-month panel
+interpretation_note,Occurrence and count outcomes use the full zero-inclusive repository-month panel for this AST sequence token band.
+limitation_note,"The outcome captures AST-based structural patterns classified as AI-likely-generated code; it does not establish function provenance or identify which AI tool, if any, contributed to a function."

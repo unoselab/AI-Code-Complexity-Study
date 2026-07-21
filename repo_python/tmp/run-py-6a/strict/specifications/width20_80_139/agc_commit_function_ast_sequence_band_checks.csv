@@ -1,0 +1,53 @@
+check,passed,observed
+band_set_name_known,True,width20_80_139
+band_set_labels_match_bounds,True,"['80-99', '100-119', '120-139']"
+band_set_widths_expected,True,"(20, 20, 20)"
+function_event_id_unique,True,0
+all_prediction_rows_scored,True,"{'total': 450548, 'scored': 450548}"
+prediction_agc_hwc_partition,True,0
+ast_sequence_token_count_nonnegative,True,0
+base_panel_expected_rows,True,1633
+commits_activity_values_nonmissing,True,0
+commits_activity_values_nonnegative,True,0
+log1p_commits_matches_raw,True,0
+lines_added_activity_values_nonmissing,True,0
+lines_added_activity_values_nonnegative,True,0
+log1p_lines_added_matches_raw,True,0
+all_event_repo_months_in_base_panel,True,0
+80-99_row_count,True,1633
+80-99_unique_repo_month_keys,True,0
+80-99_event_partition,True,0
+80-99_zero_event_ratio_missing,True,0
+80-99_positive_event_ratio_nonmissing,True,0
+80-99_ratio_bounds,True,0
+80-99_ratio_formula,True,0
+80-99_log1p_function_change_events_matches_raw,True,0
+80-99_log1p_agc_function_change_events_matches_raw,True,0
+80-99_log1p_hwc_function_change_events_matches_raw,True,0
+80-99_totals_match_direct_event_selection,True,"{'observed': {'function_change_events': 25032, 'agc_function_change_events': 11145, 'hwc_function_change_events': 13887}, 'direct': {'function_change_events': 25032, 'agc_function_change_events': 11145, 'hwc_function_change_events': 13887}}"
+100-119_row_count,True,1633
+100-119_unique_repo_month_keys,True,0
+100-119_event_partition,True,0
+100-119_zero_event_ratio_missing,True,0
+100-119_positive_event_ratio_nonmissing,True,0
+100-119_ratio_bounds,True,0
+100-119_ratio_formula,True,0
+100-119_log1p_function_change_events_matches_raw,True,0
+100-119_log1p_agc_function_change_events_matches_raw,True,0
+100-119_log1p_hwc_function_change_events_matches_raw,True,0
+100-119_totals_match_direct_event_selection,True,"{'observed': {'function_change_events': 23456, 'agc_function_change_events': 7909, 'hwc_function_change_events': 15547}, 'direct': {'function_change_events': 23456, 'agc_function_change_events': 7909, 'hwc_function_change_events': 15547}}"
+120-139_row_count,True,1633
+120-139_unique_repo_month_keys,True,0
+120-139_event_partition,True,0
+120-139_zero_event_ratio_missing,True,0
+120-139_positive_event_ratio_nonmissing,True,0
+120-139_ratio_bounds,True,0
+120-139_ratio_formula,True,0
+120-139_log1p_function_change_events_matches_raw,True,0
+120-139_log1p_agc_function_change_events_matches_raw,True,0
+120-139_log1p_hwc_function_change_events_matches_raw,True,0
+120-139_totals_match_direct_event_selection,True,"{'observed': {'function_change_events': 21753, 'agc_function_change_events': 5390, 'hwc_function_change_events': 16363}, 'direct': {'function_change_events': 21753, 'agc_function_change_events': 5390, 'hwc_function_change_events': 16363}}"
+long_panel_row_count,True,"{'observed': 4899, 'expected': 4899}"
+long_panel_unique_repo_month_band_keys,True,0
+band_set_union_totals_match_direct_event_selection,True,"{'observed': {'function_change_events': 70241, 'agc_function_change_events': 24444, 'hwc_function_change_events': 45797}, 'direct': {'function_change_events': 70241, 'agc_function_change_events': 24444, 'hwc_function_change_events': 45797}}"
+band_set_metadata_constant_in_long_panel,True,"{'ast_sequence_token_band_set': ['width20_80_139'], 'analysis_design_status': ['post_hoc_exploratory_sensitivity'], 'ast_sequence_token_band_width': [20]}"
