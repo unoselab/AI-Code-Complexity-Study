@@ -31,16 +31,6 @@ The script also creates the transformed columns used by the planned R model:
 - log1p_stars
 - log1p_issues
 
-Repository-month activity outcomes are restored from the run-py-4a panel:
-- commits
-- lines_added
-- log1p_commits
-- log1p_lines_added
-
-The activity variables are preserved as separate outcomes for comparison with
-log1p_agc_function_change_events. They are not added to the AGC regression as
-post-treatment controls.
-
 ncloc_paper and ncloc_python_snapshot are intentionally left untransformed
 here; confirm the exact functional form (log1p vs raw) against the existing
 quality Borusyak Rmd/helper before finalizing the R formula.
@@ -99,9 +89,6 @@ REQUIRED_COUNT_COLUMNS = [
     "agc_function_change_events",
     "hwc_function_change_events",
 ]
-
-ACTIVITY_COUNT_COLUMNS = ["commits", "lines_added"]
-ACTIVITY_LOG_OUTCOMES = ["log1p_commits", "log1p_lines_added"]
 
 COVARIATE_COLUMNS = [
     "age",
@@ -322,7 +309,7 @@ def create_event_time_support(frame: pd.DataFrame) -> pd.DataFrame:
 
 def create_outcome_completeness(frame: pd.DataFrame) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
-    for outcome in FULL_SAMPLE_OUTCOMES + ACTIVITY_LOG_OUTCOMES + CONDITIONAL_OUTCOMES:
+    for outcome in FULL_SAMPLE_OUTCOMES + CONDITIONAL_OUTCOMES:
         values = frame[outcome]
         rows.append(
             {
@@ -391,10 +378,7 @@ def main() -> int:
     require_columns(panel, required_panel_columns, "run-py-5d input table")
     require_columns(
         covariates,
-        KEY_COLUMNS
-        + ACTIVITY_COUNT_COLUMNS
-        + COVARIATE_COLUMNS
-        + LEAD_LAG_COLUMNS,
+        KEY_COLUMNS + COVARIATE_COLUMNS + LEAD_LAG_COLUMNS,
         "Covariate panel",
     )
     require_unique_keys(panel, "run-py-5d input table")
@@ -406,12 +390,7 @@ def main() -> int:
         KEY_COLUMNS + FULL_SAMPLE_OUTCOMES + CONDITIONAL_OUTCOMES
     ].copy()
 
-    join_columns = (
-        KEY_COLUMNS
-        + ACTIVITY_COUNT_COLUMNS
-        + COVARIATE_COLUMNS
-        + LEAD_LAG_COLUMNS
-    )
+    join_columns = KEY_COLUMNS + COVARIATE_COLUMNS + LEAD_LAG_COLUMNS
     optional_diagnostic_columns = [
         column
         for column in EXISTING_DIAGNOSTIC_READINESS_COLUMNS
@@ -468,12 +447,7 @@ def main() -> int:
         )
     )
 
-    for column in (
-        ["time_to_event", "post_event"]
-        + ACTIVITY_COUNT_COLUMNS
-        + COVARIATE_COLUMNS
-        + LEAD_LAG_COLUMNS
-    ):
+    for column in ["time_to_event", "post_event"] + COVARIATE_COLUMNS + LEAD_LAG_COLUMNS:
         panel[column] = pd.to_numeric(panel[column], errors="coerce")
 
     for outcome in FULL_SAMPLE_OUTCOMES + CONDITIONAL_OUTCOMES:
@@ -483,12 +457,7 @@ def main() -> int:
         panel["detection_complete"], "detection_complete"
     )
 
-    for column in ACTIVITY_COUNT_COLUMNS + [
-        "age",
-        "contributors",
-        "stars",
-        "issues",
-    ]:
+    for column in ["age", "contributors", "stars", "issues"]:
         negative_mask = panel[column].lt(0) & panel[column].notna()
         if negative_mask.any():
             sample = panel.loc[negative_mask, KEY_COLUMNS + [column]].head(20)
@@ -509,8 +478,6 @@ def main() -> int:
                 f"code-size measurement.\n{sample.to_string(index=False)}"
             )
 
-    panel["log1p_commits"] = np.log1p(panel["commits"])
-    panel["log1p_lines_added"] = np.log1p(panel["lines_added"])
     panel["log1p_age"] = np.log1p(panel["age"])
     panel["log1p_contributors"] = np.log1p(panel["contributors"])
     panel["log1p_stars"] = np.log1p(panel["stars"])
@@ -866,49 +833,6 @@ def main() -> int:
     )
     add_check(
         checks,
-        "activity_outcomes_nonmissing",
-        bool(
-            full_panel[ACTIVITY_COUNT_COLUMNS + ACTIVITY_LOG_OUTCOMES]
-            .notna()
-            .all()
-            .all()
-        ),
-        {
-            column: int(full_panel[column].isna().sum())
-            for column in ACTIVITY_COUNT_COLUMNS + ACTIVITY_LOG_OUTCOMES
-        },
-    )
-    add_check(
-        checks,
-        "activity_outcomes_nonnegative",
-        bool(full_panel[ACTIVITY_COUNT_COLUMNS].ge(0).all().all()),
-        {
-            column: int(full_panel[column].lt(0).sum())
-            for column in ACTIVITY_COUNT_COLUMNS
-        },
-    )
-    add_check(
-        checks,
-        "activity_log1p_matches_raw",
-        bool(
-            np.allclose(
-                full_panel["log1p_commits"],
-                np.log1p(full_panel["commits"]),
-                equal_nan=True,
-            )
-            and np.allclose(
-                full_panel["log1p_lines_added"],
-                np.log1p(full_panel["lines_added"]),
-                equal_nan=True,
-            )
-        ),
-        {
-            "commits_rows": int(len(full_panel)),
-            "lines_added_rows": int(len(full_panel)),
-        },
-    )
-    add_check(
-        checks,
         "raw_covariates_missing_counts_informational",
         True,
         {
@@ -1129,8 +1053,6 @@ def main() -> int:
         ),
         "readiness_flag_columns": READINESS_FLAG_COLUMNS,
         "lead_lag_columns": LEAD_LAG_COLUMNS,
-        "activity_count_columns": ACTIVITY_COUNT_COLUMNS,
-        "activity_log_outcomes": ACTIVITY_LOG_OUTCOMES,
         "full_sample_outcomes": FULL_SAMPLE_OUTCOMES,
         "conditional_outcomes": CONDITIONAL_OUTCOMES,
         "outputs": {
@@ -1160,7 +1082,6 @@ def main() -> int:
     print(f"Control rows:              {summary['control_rows']}")
     print(f"Treatment rows:            {summary['treatment_rows']}")
     print(f"Parse-exclusion months:    {summary['parse_exclusion_months']}")
-    print("Activity outcomes:         commits, lines_added, log1p variants")
     print(f"Covariate panel:           {args.covariate_panel}")
     print(f"Full panel:                {full_output}")
     print(f"Conditional ratio panel:   {ratio_output}")

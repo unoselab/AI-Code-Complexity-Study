@@ -18,6 +18,9 @@ treatment_event_month_nonmissing,True,0
 control_event_month_missing,True,0
 one_event_month_per_treatment_repository,True,0
 full_sample_outcomes_nonmissing,True,0
+activity_outcomes_nonmissing,True,"{'commits': 0, 'lines_added': 0, 'log1p_commits': 0, 'log1p_lines_added': 0}"
+activity_outcomes_nonnegative,True,"{'commits': 0, 'lines_added': 0}"
+activity_log1p_matches_raw,True,"{'commits_rows': 1633, 'lines_added_rows': 1633}"
 raw_covariates_missing_counts_informational,True,"{'age': 15, 'ncloc_paper': 37, 'ncloc_python_snapshot': 0, 'contributors': 0, 'stars': 15, 'issues': 15}"
 known_covariate_missing_counts_match_run_py_3b,True,"{'age_missing': 15, 'contributors_missing': 0, 'stars_missing': 15, 'issues_missing': 15, 'ncloc_paper_missing': 37}"
 transformed_covariates_missing_matches_raw,True,45

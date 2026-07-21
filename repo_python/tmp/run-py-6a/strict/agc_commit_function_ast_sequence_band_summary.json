@@ -1,0 +1,121 @@
+{
+  "arithmetic": "function_change_events = agc_function_change_events + hwc_function_change_events",
+  "bands": [
+    {
+      "label": "50-59",
+      "lower_bound_inclusive": 50,
+      "upper_bound_exclusive": 60
+    },
+    {
+      "label": "60-69",
+      "lower_bound_inclusive": 60,
+      "upper_bound_exclusive": 70
+    },
+    {
+      "label": "70-79",
+      "lower_bound_inclusive": 70,
+      "upper_bound_exclusive": 80
+    },
+    {
+      "label": "80-89",
+      "lower_bound_inclusive": 80,
+      "upper_bound_exclusive": 90
+    },
+    {
+      "label": "90-99",
+      "lower_bound_inclusive": 90,
+      "upper_bound_exclusive": 100
+    },
+    {
+      "label": "100-109",
+      "lower_bound_inclusive": 100,
+      "upper_bound_exclusive": 110
+    },
+    {
+      "label": "110-119",
+      "lower_bound_inclusive": 110,
+      "upper_bound_exclusive": 120
+    },
+    {
+      "label": "120-129",
+      "lower_bound_inclusive": 120,
+      "upper_bound_exclusive": 130
+    },
+    {
+      "label": "130-139",
+      "lower_bound_inclusive": 130,
+      "upper_bound_exclusive": 140
+    },
+    {
+      "label": "140-149",
+      "lower_bound_inclusive": 140,
+      "upper_bound_exclusive": 150
+    }
+  ],
+  "base_did_panel_path": "repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function.csv",
+  "base_panel_rows": 1633,
+  "long_panel_rows": 16330,
+  "long_ratio_positive_rows": 8420,
+  "outcomes": [
+    "has_function_change_event",
+    "zero_function_event_month",
+    "function_change_events",
+    "agc_function_change_events",
+    "hwc_function_change_events",
+    "agc_function_change_event_ratio",
+    "log1p_function_change_events",
+    "log1p_agc_function_change_events",
+    "log1p_hwc_function_change_events"
+  ],
+  "outputs": {
+    "band_panels": {
+      "100-109": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/100-109/panel_event_monthly_agc_commit_function_ast_100_109.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/100-109/panel_event_monthly_agc_commit_function_ast_100_109_ratio_positive.csv"
+      },
+      "110-119": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/110-119/panel_event_monthly_agc_commit_function_ast_110_119.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/110-119/panel_event_monthly_agc_commit_function_ast_110_119_ratio_positive.csv"
+      },
+      "120-129": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/120-129/panel_event_monthly_agc_commit_function_ast_120_129.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/120-129/panel_event_monthly_agc_commit_function_ast_120_129_ratio_positive.csv"
+      },
+      "130-139": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/130-139/panel_event_monthly_agc_commit_function_ast_130_139.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/130-139/panel_event_monthly_agc_commit_function_ast_130_139_ratio_positive.csv"
+      },
+      "140-149": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/140-149/panel_event_monthly_agc_commit_function_ast_140_149.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/140-149/panel_event_monthly_agc_commit_function_ast_140_149_ratio_positive.csv"
+      },
+      "50-59": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/50-59/panel_event_monthly_agc_commit_function_ast_50_59.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/50-59/panel_event_monthly_agc_commit_function_ast_50_59_ratio_positive.csv"
+      },
+      "60-69": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/60-69/panel_event_monthly_agc_commit_function_ast_60_69.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/60-69/panel_event_monthly_agc_commit_function_ast_60_69_ratio_positive.csv"
+      },
+      "70-79": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/70-79/panel_event_monthly_agc_commit_function_ast_70_79.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/70-79/panel_event_monthly_agc_commit_function_ast_70_79_ratio_positive.csv"
+      },
+      "80-89": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/80-89/panel_event_monthly_agc_commit_function_ast_80_89.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/80-89/panel_event_monthly_agc_commit_function_ast_80_89_ratio_positive.csv"
+      },
+      "90-99": {
+        "full_panel": "repo_python/run-py-6a/strict/bands/90-99/panel_event_monthly_agc_commit_function_ast_90_99.csv",
+        "ratio_positive_panel": "repo_python/run-py-6a/strict/bands/90-99/panel_event_monthly_agc_commit_function_ast_90_99_ratio_positive.csv"
+      }
+    },
+    "checks": "repo_python/tmp/run-py-6a/strict/agc_commit_function_ast_sequence_band_checks.csv",
+    "long_panel": "repo_python/run-py-6a/strict/panel_event_monthly_agc_commit_function_ast_sequence_bands_long.csv",
+    "long_ratio_positive_panel": "repo_python/run-py-6a/strict/panel_event_monthly_agc_commit_function_ast_sequence_bands_ratio_positive.csv",
+    "support": "repo_python/run-py-6a/strict/agc_commit_function_ast_sequence_band_support.csv"
+  },
+  "predictions_path": "../python_commit_function_detect/codellama-7b_4500_complexity_stratified_maxlen2048_svm_ast/strict/py312-full-450548-fresh/function_event_predictions_all.csv",
+  "ratio_definition": "agc_function_change_event_ratio = agc_function_change_events / function_change_events",
+  "status": "PASS"
+}

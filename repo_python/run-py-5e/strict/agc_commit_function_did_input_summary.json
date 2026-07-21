@@ -55,6 +55,14 @@
     "lag_5",
     "lag_6"
   ],
+  "activity_count_columns": [
+    "commits",
+    "lines_added"
+  ],
+  "activity_log_outcomes": [
+    "log1p_commits",
+    "log1p_lines_added"
+  ],
   "full_sample_outcomes": [
     "has_function_change_event",
     "log1p_function_change_events",

@@ -3,4 +3,6 @@ has_function_change_event,1633,1633,0,344,full_sample
 log1p_function_change_events,1633,1633,0,344,full_sample
 log1p_agc_function_change_events,1633,1633,0,489,full_sample
 log1p_hwc_function_change_events,1633,1633,0,359,full_sample
+log1p_commits,1633,1633,0,0,positive_event_months_only
+log1p_lines_added,1633,1633,0,17,positive_event_months_only
 agc_function_change_event_ratio,1633,1289,344,145,positive_event_months_only
