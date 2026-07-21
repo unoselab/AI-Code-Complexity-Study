@@ -1,5 +1,4 @@
 {
-  "max_len": 2048,
   "non_ok_rows": 0,
   "ok_rows": 450548,
   "outputs": {
@@ -20,7 +19,6 @@
   "primary_retained_share": 0.9451490185285475,
   "primary_threshold": 50,
   "status": "PASS",
-  "subword_truncation_lower_bound_events": 7219,
   "thresholds_evaluated": [
     0,
     20,

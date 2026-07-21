@@ -16,9 +16,16 @@ This is NOT a CodeT5+ subword tokenizer count. It is the number of
 whitespace-delimited elements in the AST traversal string produced by
 agc_detector.generate_ast_sequence(), computed with
 ``len(ast_sequence.split())`` in analyze_did_python_commit_functions.py.
-This measure is used only to describe structural AST-sequence size and to
-evaluate minimum-size thresholds. It is intentionally kept separate from
-embedding-model tokenizer limits because the two measures use different units.
+This value is stored before any --max-len truncation is applied to the
+CodeT5+ embedding input, so it is unaffected by that truncation and safe to
+use for a minimum-size filter.
+
+Separately, agc_detector.embed_text() truncates the CodeT5+ tokenizer input
+to --max-len (subword tokens, not AST-sequence tokens). Since subword token
+counts are always >= whitespace-token counts for the same text,
+ast_sequence_token_count > max-len is a safe (conservative) lower bound for
+"this event's embedding was truncated." This script reports that as a
+separate diagnostic, independent of the minimum-size question.
 
 Primary candidate (per README-0720c-CheckDiD): ast_sequence_token_count >= 50
 Sensitivity candidates: >= 20, >= 100
@@ -31,7 +38,8 @@ python proc_scripts/analyze_agc_commit_function_ast_sequence_size.py \
   --predictions ../python_commit_function_detect/codellama-7b_4500_complexity_stratified_maxlen2048_svm_ast/strict/py312-full-450548-fresh/function_event_predictions_all.csv \
   --panel repo_python/run-py-5d/strict/repo_month_agc_function_event_analysis_complete.csv \
   --output-dir repo_python/run-py-5g/strict \
-  --qc-dir repo_python/tmp/run-py-5g/strict
+  --qc-dir repo_python/tmp/run-py-5g/strict \
+  --max-len 2048
 
 Inputs
 ------
@@ -89,9 +97,8 @@ SIZE_BINS = [
     (20, 50, "20-49"),
     (50, 100, "50-99"),
     (100, 200, "100-199"),
-    (200, 500, "200-499"),
-    (500, 1000, "500-999"),
-    (1000, None, ">=1000"),
+    (200, 2048, "200-2047"),
+    (2048, None, ">=2048 (subword-truncation lower bound)"),
 ]
 
 # Primary + sensitivity + diagnostic-baseline thresholds, per README-0720c.
@@ -111,6 +118,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--panel", type=Path, default=None)
     parser.add_argument("--output-dir", type=Path, required=False)
     parser.add_argument("--qc-dir", type=Path, required=False)
+    parser.add_argument(
+        "--max-len",
+        type=int,
+        default=2048,
+        help=(
+            "The --max-len value used for the fresh inference run, i.e. the "
+            "CodeT5+ subword-token truncation length. Used only to report "
+            "the conservative ast_sequence_token_count > max-len lower "
+            "bound on truncated events; does not affect the size filter."
+        ),
+    )
     parser.add_argument("--self-test", action="store_true")
     return parser.parse_args()
 
@@ -337,6 +355,7 @@ def analyze(
     panel_path: Path | None,
     output_dir: Path,
     qc_dir: Path,
+    max_len: int,
 ) -> dict[str, Any]:
     predictions = pd.read_csv(predictions_path, low_memory=False)
     require_columns(predictions, PREDICTIONS_REQUIRED_COLUMNS, "Predictions file")
@@ -426,6 +445,14 @@ def analyze(
         },
     )
 
+    # Conservative lower bound on subword-token truncation: whitespace-split
+    # AST-sequence tokens are always <= subword tokens for the same text, so
+    # this count under-estimates (never over-estimates) how many events were
+    # actually truncated by --max-len during embedding.
+    truncation_lower_bound = int(
+        events["ast_sequence_token_count"].gt(max_len).sum()
+    )
+
     by_period: pd.DataFrame | None = None
     panel_join_performed = False
     if panel_path is not None:
@@ -483,6 +510,7 @@ def analyze(
         "predictions_path": str(predictions_path),
         "panel_path": str(panel_path) if panel_path is not None else None,
         "panel_join_performed": panel_join_performed,
+        "max_len": max_len,
         "total_rows": total_rows,
         "ok_rows": ok_rows,
         "non_ok_rows": non_ok_rows,
@@ -496,6 +524,7 @@ def analyze(
             if pd.notna(primary_row["retained_agc_ratio"])
             else None
         ),
+        "subword_truncation_lower_bound_events": truncation_lower_bound,
         "outputs": {
             "size_distribution": str(size_distribution_output),
             "threshold_summary": str(threshold_summary_output),
@@ -533,7 +562,8 @@ def self_test() -> None:
                     "ast_sequence_token_count": token_count,
                 }
             )
-        # A repository-month with a healthy mix of AST-sequence sizes.
+        # A repository-month with a healthy mix, including one event above
+        # max_len to exercise the truncation lower-bound diagnostic.
         for i, (token_count, agc) in enumerate(
             [(60, 1), (150, 0), (3000, 1)]
         ):
@@ -596,6 +626,7 @@ def self_test() -> None:
             panel_path=panel_path,
             output_dir=output_dir,
             qc_dir=qc_dir,
+            max_len=2048,
         )
 
         if summary["status"] != "PASS":
@@ -617,10 +648,21 @@ def self_test() -> None:
         if summary["primary_dropped_events"] != 3:
             raise AssertionError("Expected 3 dropped events at threshold=50")
 
+        # Exactly one event (3000 tokens) exceeds max_len=2048.
+        if summary["subword_truncation_lower_bound_events"] != 1:
+            raise AssertionError(
+                "Expected exactly 1 event above the max_len lower bound"
+            )
+
         threshold_summary = pd.read_csv(
             output_dir / "agc_function_event_ast_sequence_threshold_summary.csv"
         )
-        # Retained-event counts must be non-increasing as thresholds rise.
+        # Retained events must be strictly monotonic non-increasing here:
+        # threshold 0 -> 6, 20 -> 5 (drops the 1-token, 5-token events... wait
+        # 15 stays at threshold 20? No: 15 < 20, so threshold 20 drops
+        # (1, 5, 15) -> retains 3 (60, 150, 3000)). Confirm shape only,
+        # exact values are re-derived independently by the impact-preview
+        # check below rather than duplicated here.
         if not threshold_summary["retained_events"].is_monotonic_decreasing:
             raise AssertionError(
                 "retained_events must be non-increasing across thresholds"
@@ -676,6 +718,7 @@ def main() -> int:
     print(f"Panel:             {args.panel if args.panel else '<none>'}")
     print(f"Output directory:  {args.output_dir}")
     print(f"QC directory:      {args.qc_dir}")
+    print(f"Max length:        {args.max_len}")
     print(f"Primary threshold: {PRIMARY_THRESHOLD}")
     print("=" * 72)
 
@@ -684,6 +727,7 @@ def main() -> int:
         panel_path=args.panel,
         output_dir=args.output_dir,
         qc_dir=args.qc_dir,
+        max_len=args.max_len,
     )
 
     print("=" * 72)
@@ -705,6 +749,11 @@ def main() -> int:
             "Primary retained AGC ratio:     "
             f"{summary['primary_retained_agc_ratio']:.4%}"
         )
+    print(
+        "Subword-truncation lower bound: "
+        f"{summary['subword_truncation_lower_bound_events']} events "
+        f"(ast_sequence_token_count > {summary['max_len']})"
+    )
     print(f"Panel join performed:            {summary['panel_join_performed']}")
     print(f"Size distribution:  {summary['outputs']['size_distribution']}")
     print(f"Threshold summary:  {summary['outputs']['threshold_summary']}")
