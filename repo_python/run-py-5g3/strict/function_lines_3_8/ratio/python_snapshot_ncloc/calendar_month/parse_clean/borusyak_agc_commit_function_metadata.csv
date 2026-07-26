@@ -1,0 +1,29 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_agc_commit_function.Rmd
+helper_file,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict_function_lines_3_8_ratio_python_snapshot_ncloc_calendar_month_parse_clean
+panel_path,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5g2/strict/function_lines_3_8/panel_event_monthly_agc_commit_function_lines_3_8_ratio_positive_parse_clean.csv
+out_dir,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5g3/strict/function_lines_3_8/ratio/python_snapshot_ncloc/calendar_month/parse_clean
+sample_type,ratio
+ncloc_specification,python_snapshot
+ncloc_column,ncloc_python_snapshot
+readiness_column,analysis_ready_ratio_python_snapshot_ncloc
+parse_exclusion_mode,parse_clean
+outcomes,agc_function_change_event_ratio
+covariates,log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars + log1p_issues
+first_stage_formula,~log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars +      log1p_issues | repo_id + time_id
+rows_after_readiness_filter,1009
+rows_after_parse_filter,1009
+rows_after_ratio_filter,1009
+rows_after_cohort_filter,1009
+rows_used_by_models,1009
+repositories_used_by_models,194
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,sequential_calendar_month_id
+event_time_encoding_mismatch_rows,0
+horizon,-6:6
+pretrends,-6:-2
+static_model_error_count,0
+dynamic_model_error_count,0
+input_source,run-py-5e covariate-complete commit-function AGC DiD panel derived from run-py-5d repo_month_agc_function_event_analysis_complete.csv
+interpretation_note,"Conditional composition effect among repository-months with at least one function-change event; not an unconditional total effect. If the occurrence outcome shows a nonzero treatment effect, this conditional sample is subject to post-treatment selection and must be reported as conditional on observing at least one structurally changed function in a repository-month."

@@ -1,0 +1,3 @@
+dataset_source,rows,repositories,mean_has_function_change_event,mean_log1p_function_change_events,mean_log1p_agc_function_change_events,mean_log1p_hwc_function_change_events,mean_agc_function_change_event_ratio,mean_ncloc
+control,730,118,0.595890410958904,1.75796229858504,1.42475838886035,1.30694517110229,0.558154170032955,14085.7219178082
+treatment,791,100,0.739570164348925,2.61591368637568,2.22150137077494,1.97098702557954,0.587820637176586,54422.9860935525

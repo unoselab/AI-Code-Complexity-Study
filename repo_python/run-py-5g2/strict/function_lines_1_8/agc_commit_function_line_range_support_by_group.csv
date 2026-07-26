@@ -1,0 +1,5 @@
+dataset_source,treatment_period,repo_months,repositories,event_positive_repo_months,zero_event_repo_months,event_positive_repo_month_share,function_change_events,agc_function_change_events,hwc_function_change_events,pooled_agc_ratio
+control,control,780,120,474,306,0.6076923076923076,32973,19593,13380,0.5942134473660268
+treatment,event,100,100,90,10,0.9,8000,4667,3333,0.583375
+treatment,post,332,80,238,94,0.7168674698795181,36117,19560,16557,0.5415732203671402
+treatment,pre,421,62,319,102,0.7577197149643705,37380,21443,15937,0.5736490101658641
