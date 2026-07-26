@@ -1,0 +1,16 @@
+check,passed,observed
+function_event_id_unique,True,0
+analysis_status_nonmissing,True,0
+ok_events_positive,True,"{'total_rows': 450548, 'ok_rows': 450548, 'non_ok_rows': 0}"
+start_line_nonmissing_for_ok_events,True,0
+end_line_nonmissing_for_ok_events,True,0
+start_and_end_lines_are_integer_valued,True,"{'noninteger_start_lines': 0, 'noninteger_end_lines': 0}"
+valid_inclusive_line_spans,True,0
+function_line_count_positive,True,0
+predicted_agc_xor_predicted_hwc,True,0
+every_ok_event_assigned_a_line_size_bin,True,0
+retained_events_monotonic_nonincreasing_in_threshold,True,"[{'min_function_lines': 1, 'retained_events': 450548}, {'min_function_lines': 2, 'retained_events': 450241}, {'min_function_lines': 3, 'retained_events': 431604}, {'min_function_lines': 4, 'retained_events': 409346}, {'min_function_lines': 5, 'retained_events': 391337}, {'min_function_lines': 6, 'retained_events': 376855}, {'min_function_lines': 10, 'retained_events': 323299}, {'min_function_lines': 20, 'retained_events': 219828}]"
+minimum_one_line_retains_all_ok_events,True,"{'retained_at_one': 450548, 'ok_rows': 450548}"
+all_events_matched_to_panel,True,0
+all_expected_plot_groups_created,True,"{'expected': ['by_period', 'by_treatment', 'descriptive_summary', 'exact_distribution', 'grouped_distribution', 'repo_month_impact_preview', 'threshold_summary'], 'created': ['by_period', 'by_treatment', 'descriptive_summary', 'exact_distribution', 'grouped_distribution', 'repo_month_impact_preview', 'threshold_summary']}"
+all_plot_files_nonempty,True,"{'plot_file_count': 14, 'missing_or_empty': []}"

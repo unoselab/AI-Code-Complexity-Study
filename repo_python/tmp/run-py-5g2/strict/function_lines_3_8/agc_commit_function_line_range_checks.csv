@@ -1,0 +1,29 @@
+check,passed,observed
+line_range_valid,True,"{'min_inclusive': 3, 'max_inclusive': 8}"
+base_panel_expected_rows,True,1633
+function_event_id_unique,True,0
+analysis_status_nonmissing,True,0
+all_prediction_rows_scored,True,"{'total': 450548, 'scored': 450548}"
+valid_inclusive_function_line_spans,True,0
+prediction_agc_hwc_partition,True,0
+function_line_count_positive,True,0
+all_event_repo_months_in_base_panel,True,0
+selected_events_nonempty,True,95526
+selected_events_within_requested_range,True,"{'observed_min': 3, 'observed_max': 8}"
+full_panel_row_count_preserved,True,1633
+full_panel_repo_month_key_order_preserved,True,1633
+full_panel_unique_repo_month_keys,True,0
+line_range_event_partition,True,0
+line_range_occurrence_matches_count,True,0
+line_range_zero_flag_matches_count,True,0
+line_range_zero_event_ratio_missing,True,0
+line_range_positive_event_ratio_nonmissing,True,0
+line_range_ratio_bounds,True,0
+line_range_ratio_formula,True,0
+log1p_function_change_events_matches_line_range_raw_count,True,0
+log1p_agc_function_change_events_matches_line_range_raw_count,True,0
+log1p_hwc_function_change_events_matches_line_range_raw_count,True,0
+panel_totals_match_direct_event_selection,True,"{'panel': {'function_change_events': 95526, 'agc_function_change_events': 47707, 'hwc_function_change_events': 47819}, 'direct': {'function_change_events': 95526, 'agc_function_change_events': 47707, 'hwc_function_change_events': 47819}}"
+ratio_panel_contains_only_positive_event_months,True,0
+parse_clean_full_has_no_parse_exclusions,True,0
+parse_clean_ratio_has_no_parse_exclusions,True,0

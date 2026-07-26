@@ -1,0 +1,78 @@
+{
+  "analysis_status_counts": {
+    "ok": 450548
+  },
+  "line_count_definition": "end_line - start_line + 1",
+  "line_count_scope": "Inclusive source span; may include decorators, multiline signature, docstring, blank lines, and function body.",
+  "non_ok_rows": 0,
+  "ok_rows": 450548,
+  "outputs": {
+    "by_period": "repo_python/run-py-5g1/strict/agc_function_event_line_size_by_period.csv",
+    "by_treatment": "repo_python/run-py-5g1/strict/agc_function_event_line_size_by_treatment.csv",
+    "checks": "repo_python/tmp/run-py-5g1/strict/agc_function_event_line_size_qc.csv",
+    "descriptive_summary": "repo_python/run-py-5g1/strict/agc_function_event_line_size_descriptive_summary.csv",
+    "exact_distribution": "repo_python/run-py-5g1/strict/agc_function_event_line_size_exact_distribution.csv",
+    "grouped_distribution": "repo_python/run-py-5g1/strict/agc_function_event_line_size_grouped_distribution.csv",
+    "repo_month_impact_preview": "repo_python/run-py-5g1/strict/agc_function_event_line_size_repo_month_impact_preview.csv",
+    "summary": "repo_python/tmp/run-py-5g1/strict/agc_function_event_line_size_summary.json",
+    "threshold_summary": "repo_python/run-py-5g1/strict/agc_function_event_line_size_threshold_summary.csv"
+  },
+  "panel_join_performed": true,
+  "panel_path": "repo_python/run-py-5d/strict/repo_month_agc_function_event_analysis_complete.csv",
+  "plot_dir": "repo_python/run-py-5g1/strict/plots",
+  "plot_formats": [
+    "png",
+    "pdf"
+  ],
+  "plot_generation_enabled": true,
+  "plot_outputs": {
+    "by_period": [
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_by_period.png",
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_by_period.pdf"
+    ],
+    "by_treatment": [
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_by_treatment.png",
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_by_treatment.pdf"
+    ],
+    "descriptive_summary": [
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_descriptive_summary.png",
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_descriptive_summary.pdf"
+    ],
+    "exact_distribution": [
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_exact_distribution.png",
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_exact_distribution.pdf"
+    ],
+    "grouped_distribution": [
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_grouped_distribution.png",
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_grouped_distribution.pdf"
+    ],
+    "repo_month_impact_preview": [
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_repo_month_impact_preview.png",
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_repo_month_impact_preview.pdf"
+    ],
+    "threshold_summary": [
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_threshold_summary.png",
+      "repo_python/run-py-5g1/strict/plots/agc_function_event_line_size_threshold_summary.pdf"
+    ]
+  },
+  "predictions_path": "../python_commit_function_detect/codellama-7b_4500_complexity_stratified_maxlen2048_svm_ast/strict/py312-full-450548-fresh/function_event_predictions_all.csv",
+  "primary_dropped_events": 73693,
+  "primary_excludes_line_spans_at_most": 5,
+  "primary_min_function_lines": 6,
+  "primary_retained_agc_ratio": 0.12286953868198644,
+  "primary_retained_events": 376855,
+  "primary_retained_share": 0.83643696121168,
+  "status": "PASS",
+  "thresholds_evaluated": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    10,
+    20
+  ],
+  "total_rows": 450548,
+  "unmatched_events": 0
+}

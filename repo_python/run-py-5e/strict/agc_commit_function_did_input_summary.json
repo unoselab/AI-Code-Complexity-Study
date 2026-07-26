@@ -1,7 +1,7 @@
 {
   "status": "PASS",
-  "input_table": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5d/strict/repo_month_agc_function_event_analysis_complete.csv",
-  "covariate_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv",
+  "input_table": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5d/strict/repo_month_agc_function_event_analysis_complete.csv",
+  "covariate_panel": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-4a/strict/panel_event_monthly_agc_changed_block_py.csv",
   "full_panel_rows": 1633,
   "ratio_panel_rows": 1289,
   "zero_event_rows": 344,
@@ -73,15 +73,15 @@
     "agc_function_change_event_ratio"
   ],
   "outputs": {
-    "full_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function.csv",
-    "ratio_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_ratio_positive.csv",
-    "parse_clean_full_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_parse_clean.csv",
-    "parse_clean_ratio_panel": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_ratio_positive_parse_clean.csv",
-    "event_time_support": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_event_time_support.csv",
-    "outcome_completeness": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_outcome_completeness.csv",
-    "covariate_completeness": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_covariate_completeness.csv",
-    "sample_summary": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_sample_summary.csv",
-    "specification_sample_summary": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_specification_sample_summary.csv",
-    "checks": "/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_did_input_checks.csv"
+    "full_panel": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function.csv",
+    "ratio_panel": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_ratio_positive.csv",
+    "parse_clean_full_panel": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_parse_clean.csv",
+    "parse_clean_ratio_panel": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_ratio_positive_parse_clean.csv",
+    "event_time_support": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_event_time_support.csv",
+    "outcome_completeness": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_outcome_completeness.csv",
+    "covariate_completeness": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_covariate_completeness.csv",
+    "sample_summary": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_sample_summary.csv",
+    "specification_sample_summary": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_specification_sample_summary.csv",
+    "checks": "/home/user1-selab3/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/agc_commit_function_did_input_checks.csv"
   }
 }

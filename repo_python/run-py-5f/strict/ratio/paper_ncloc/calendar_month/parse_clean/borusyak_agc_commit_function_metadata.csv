@@ -1,23 +1,23 @@
 key,value
 script,proc_r/DiffInDiffBorusyak_agc_commit_function.Rmd
 helper_file,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/proc_r/diff_in_diff_borusyak_helpers.R
-panel_label,strict_ratio_python_snapshot_ncloc
-panel_path,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_ratio_positive.csv
-out_dir,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5f/strict/ratio/python_snapshot_ncloc/calendar_month
+panel_label,strict_ratio_paper_ncloc_calendar_month_parse_clean
+panel_path,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_ratio_positive_parse_clean.csv
+out_dir,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5f/strict/ratio/paper_ncloc/calendar_month/parse_clean
 sample_type,ratio
-ncloc_specification,python_snapshot
-ncloc_column,ncloc_python_snapshot
-readiness_column,analysis_ready_ratio_python_snapshot_ncloc
-parse_exclusion_mode,all
+ncloc_specification,paper
+ncloc_column,ncloc_paper
+readiness_column,analysis_ready_ratio_paper_ncloc
+parse_exclusion_mode,parse_clean
 outcomes,agc_function_change_event_ratio
-covariates,log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars + log1p_issues
-first_stage_formula,~log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars +      log1p_issues | repo_id + time_id
-rows_after_readiness_filter,1284
-rows_after_parse_filter,1284
-rows_after_ratio_filter,1284
-rows_after_cohort_filter,1284
-rows_used_by_models,1284
-repositories_used_by_models,206
+covariates,log1p_age + ncloc_paper + log1p_contributors + log1p_stars + log1p_issues
+first_stage_formula,~log1p_age + ncloc_paper + log1p_contributors + log1p_stars +      log1p_issues | repo_id + time_id
+rows_after_readiness_filter,1187
+rows_after_parse_filter,1187
+rows_after_ratio_filter,1187
+rows_after_cohort_filter,1187
+rows_used_by_models,1187
+repositories_used_by_models,203
 estimator,Borusyak imputation via didimputation::did_imputation
 time_encoding,sequential_calendar_month_id
 event_time_encoding_mismatch_rows,0

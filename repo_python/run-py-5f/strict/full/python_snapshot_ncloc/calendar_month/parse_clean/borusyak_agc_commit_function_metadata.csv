@@ -1,0 +1,29 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_agc_commit_function.Rmd
+helper_file,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict_full_python_snapshot_ncloc_calendar_month_parse_clean
+panel_path,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5e/strict/panel_event_monthly_agc_commit_function_parse_clean.csv
+out_dir,/home/user1-selab3/project-workspaces/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-5f/strict/full/python_snapshot_ncloc/calendar_month/parse_clean
+sample_type,full
+ncloc_specification,python_snapshot
+ncloc_column,ncloc_python_snapshot
+readiness_column,analysis_ready_python_snapshot_ncloc
+parse_exclusion_mode,parse_clean
+outcomes,"has_function_change_event, log1p_function_change_events, log1p_agc_function_change_events, log1p_hwc_function_change_events"
+covariates,log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars + log1p_issues
+first_stage_formula,~log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars +      log1p_issues | repo_id + time_id
+rows_after_readiness_filter,1521
+rows_after_parse_filter,1521
+rows_after_ratio_filter,1521
+rows_after_cohort_filter,1521
+rows_used_by_models,1521
+repositories_used_by_models,218
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,sequential_calendar_month_id
+event_time_encoding_mismatch_rows,0
+horizon,-6:6
+pretrends,-6:-2
+static_model_error_count,0
+dynamic_model_error_count,0
+input_source,run-py-5e covariate-complete commit-function AGC DiD panel derived from run-py-5d repo_month_agc_function_event_analysis_complete.csv
+interpretation_note,Occurrence and count outcomes use the full zero-inclusive repository-month panel.

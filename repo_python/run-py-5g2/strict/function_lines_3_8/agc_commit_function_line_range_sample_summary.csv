@@ -1,0 +1,5 @@
+sample,repo_months,repositories,control_repo_months,treatment_repo_months,event_positive_repo_months,zero_event_repo_months,parse_exclusion_months,paper_ncloc_ready_rows,python_snapshot_ncloc_ready_rows,ratio_paper_ncloc_ready_rows,ratio_python_snapshot_ncloc_ready_rows
+full,1633,220,780,853,1109,524,97,1596,1618,1104,1104
+ratio_positive_event,1109,197,466,643,1109,0,95,1104,1104,1104,1104
+parse_clean_full,1536,220,740,796,1014,522,0,1499,1521,1009,1009
+parse_clean_ratio_positive_event,1014,194,428,586,1014,0,0,1009,1009,1009,1009
