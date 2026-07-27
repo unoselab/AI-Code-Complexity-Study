@@ -1,0 +1,27 @@
+didimputation      version=0.5.1        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/didimputation
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+fixest             version=0.14.1       library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/fixest
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+data.table         version=1.17.8       library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/data.table
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+knitr              version=1.50         library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/knitr
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+rmarkdown          version=2.29         library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+dplyr              version=1.1.4        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/dplyr
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+ggplot2            version=3.5.2        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ggplot2
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+tidyr              version=1.3.1        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tidyr
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+readr              version=2.1.5        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/readr
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+modelsummary       version=2.6.0        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/modelsummary
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+sandwich           version=3.1.1        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/sandwich
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+zoo                version=1.8.15       library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/zoo
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+plm                version=2.6.7        library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/plm
+  Repository=CRAN RemoteType= RemoteRepo= RemoteRef=
+remotes            MISSING

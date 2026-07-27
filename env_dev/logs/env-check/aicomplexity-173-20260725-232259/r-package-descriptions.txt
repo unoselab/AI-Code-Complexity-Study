@@ -1,0 +1,2250 @@
+Package=abind
+Version=1.4.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/abind
+Built=R 4.3.3; ; 2024-06-30 14:49:23 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=askpass
+Version=1.2.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/askpass
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-10-04 11:02:07 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=assertthat
+Version=0.2.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/assertthat
+Built=R 4.3.3; ; 2024-06-30 09:23:27 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=backports
+Version=1.5.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/backports
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 09:13:01 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bacondecomp
+Version=0.1.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bacondecomp
+Built=R 4.3.3; ; 2026-06-15 19:37:53 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=base
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/base
+Built=R 4.3.3; ; 2025-11-21 17:00:30 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=base64enc
+Version=0.1.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/base64enc
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 09:15:09 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bayestestR
+Version=0.18.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bayestestR
+Built=R 4.3.3; ; 2026-06-15 19:29:25 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bdsmatrix
+Version=1.3.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bdsmatrix
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:26:01 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=BH
+Version=1.87.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/BH
+Built=R 4.3.3; ; 2024-12-19 09:50:12 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bigmemory
+Version=4.6.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bigmemory
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-22 07:55:01 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bigmemory.sri
+Version=0.1.8
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bigmemory.sri
+Built=R 4.3.3; ; 2024-07-01 13:58:26 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bit
+Version=4.6.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bit
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-06 20:19:05 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bit64
+Version=4.6.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bit64
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-12 15:12:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=blob
+Version=1.2.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/blob
+Built=R 4.3.3; ; 2024-07-17 18:34:18 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=BMisc
+Version=1.4.8
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/BMisc
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-02-04 19:39:18 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=boot
+Version=1.3.32
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/boot
+Built=R 4.3.3; ; 2025-08-29 19:27:17 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=brew
+Version=1.0.10
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/brew
+Built=R 4.3.3; ; 2026-06-15 19:21:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=broom
+Version=1.0.9
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/broom
+Built=R 4.3.3; ; 2025-07-28 19:16:00 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=bslib
+Version=0.9.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/bslib
+Built=R 4.3.3; ; 2025-01-31 20:00:36 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=cachem
+Version=1.1.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/cachem
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 11:06:44 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=Cairo
+Version=1.6.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/Cairo
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-20 09:02:56 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=callr
+Version=3.7.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/callr
+Built=R 4.3.3; ; 2024-06-30 10:50:24 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=car
+Version=3.1.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/car
+Built=R 4.3.3; ; 2024-09-29 20:00:49 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=carData
+Version=3.0.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/carData
+Built=R 4.3.3; ; 2024-06-30 20:43:32 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=caret
+Version=6.0.94
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/caret
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-28 12:44:58 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=cellranger
+Version=1.1.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/cellranger
+Built=R 4.3.3; ; 2024-07-18 07:14:51 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=checkmate
+Version=2.3.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/checkmate
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:29:08 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=class
+Version=7.3.23
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/class
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-01-01 12:26:06 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=cli
+Version=3.6.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/cli
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-23 15:40:30 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=clipr
+Version=0.8.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/clipr
+Built=R 4.3.3; ; 2024-06-30 12:59:14 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=clock
+Version=0.7.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/clock
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-01 12:07:36 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=codetools
+Version=0.2.20
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/codetools
+Built=R 4.3.3; ; 2024-06-30 07:02:54 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=collapse
+Version=2.1.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/collapse
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:28:18 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=collections
+Version=0.3.12
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/collections
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:22:18 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=colorspace
+Version=2.1.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/colorspace
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-27 01:07:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=commonmark
+Version=2.0.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/commonmark
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:21:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=compiler
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/compiler
+Built=R 4.3.3; ; 2025-11-21 16:58:58 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=conflicted
+Version=1.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/conflicted
+Built=R 4.3.3; ; 2024-07-17 00:47:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=conquer
+Version=1.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/conquer
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-08-03 19:26:33 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=corrplot
+Version=0.95
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/corrplot
+Built=R 4.3.3; ; 2024-10-14 19:51:01 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=cowplot
+Version=1.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/cowplot
+Built=R 4.3.3; ; 2025-07-21 14:34:05 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=cpp11
+Version=0.5.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/cpp11
+Built=R 4.3.3; ; 2025-03-19 08:39:15 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=crayon
+Version=1.5.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/crayon
+Built=R 4.3.3; ; 2024-06-30 06:56:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=curl
+Version=7.0.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/curl
+Built=R 4.3.2; x86_64-conda-linux-gnu; 2025-08-20 05:35:48 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=data.table
+Version=1.17.8
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/data.table
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-07-29 07:46:28 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=datasets
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/datasets
+Built=R 4.3.3; ; 2025-11-21 17:00:08 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=datawizard
+Version=1.3.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/datawizard
+Built=R 4.3.3; ; 2026-06-15 19:27:41 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=DBI
+Version=1.2.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/DBI
+Built=R 4.3.3; ; 2024-06-30 16:42:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=dbplyr
+Version=2.5.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/dbplyr
+Built=R 4.3.3; ; 2025-09-10 13:16:39 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=Deriv
+Version=4.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/Deriv
+Built=R 4.3.3; ; 2025-06-21 00:44:54 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=desc
+Version=1.4.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/desc
+Built=R 4.3.3; ; 2026-06-15 19:21:46 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=diagram
+Version=1.6.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/diagram
+Built=R 4.3.3; ; 2024-06-30 18:21:22 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=did
+Version=2.1.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/did
+Built=R 4.3.3; ; 2024-10-25 12:09:26 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=didimputation
+Version=0.5.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/didimputation
+Built=R 4.3.3; ; 2026-06-15 19:38:20 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=digest
+Version=0.6.37
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/digest
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-08-19 20:43:01 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=doBy
+Version=4.7.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/doBy
+Built=R 4.3.3; ; 2025-06-30 05:55:09 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=dplyr
+Version=1.1.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/dplyr
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-18 07:43:34 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=DRDID
+Version=1.2.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/DRDID
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-05-30 17:37:28 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=dreamerr
+Version=1.5.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/dreamerr
+Built=R 4.3.3; ; 2026-06-15 19:29:47 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=dtplyr
+Version=1.3.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/dtplyr
+Built=R 4.3.3; ; 2025-09-11 00:16:27 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=e1071
+Version=1.7.16
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/e1071
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-09-16 14:00:39 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ellipsis
+Version=0.3.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ellipsis
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 07:18:07 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=essentials
+Version=0.1.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/essentials
+Built=R 4.3.1; x86_64-conda-linux-gnu; 2023-09-23 01:17:55 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=evaluate
+Version=1.0.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/evaluate
+Built=R 4.3.3; ; 2025-08-27 20:56:45 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=fansi
+Version=1.0.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/fansi
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 07:18:27 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=farver
+Version=2.1.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/farver
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 09:40:29 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=fastglm
+Version=0.0.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/fastglm
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-14 17:17:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=fastmap
+Version=1.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/fastmap
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 07:14:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=fixest
+Version=0.14.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/fixest
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:37:20 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=fontawesome
+Version=0.5.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/fontawesome
+Built=R 4.3.3; ; 2024-11-16 22:11:37 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=forcats
+Version=1.0.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/forcats
+Built=R 4.3.3; ; 2024-07-18 07:15:06 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=foreach
+Version=1.5.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/foreach
+Built=R 4.3.3; ; 2024-06-30 16:25:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=Formula
+Version=1.2.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/Formula
+Built=R 4.3.3; ; 2024-06-30 18:21:24 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=fs
+Version=1.6.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/fs
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-12 12:32:05 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=future
+Version=1.67.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/future
+Built=R 4.3.3; ; 2025-07-29 20:03:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=future.apply
+Version=1.20.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/future.apply
+Built=R 4.3.3; ; 2025-06-06 13:52:52 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=gargle
+Version=1.6.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/gargle
+Built=R 4.3.3; ; 2025-09-03 11:45:47 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=gbRd
+Version=0.4.12
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/gbRd
+Built=R 4.3.3; ; 2024-06-30 22:41:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=generics
+Version=0.1.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/generics
+Built=R 4.3.3; ; 2025-05-10 07:20:53 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ggfx
+Version=1.0.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ggfx
+Built=R 4.3.3; ; 2025-09-03 22:07:38 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ggplot2
+Version=3.5.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ggplot2
+Built=R 4.3.3; ; 2025-04-09 12:13:38 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ggpubr
+Version=0.6.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ggpubr
+Built=R 4.3.3; ; 2025-06-27 18:17:38 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ggrepel
+Version=0.9.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ggrepel
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-07 09:39:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ggsci
+Version=3.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ggsci
+Built=R 4.3.3; ; 2024-07-18 18:38:29 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ggsignif
+Version=0.6.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ggsignif
+Built=R 4.3.3; ; 2024-07-18 16:09:09 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=globals
+Version=0.18.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/globals
+Built=R 4.3.3; ; 2025-05-08 19:30:56 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=glue
+Version=1.8.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/glue
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-10-01 03:54:21 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=googledrive
+Version=2.1.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/googledrive
+Built=R 4.3.3; ; 2025-09-11 03:00:26 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=googlesheets4
+Version=1.1.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/googlesheets4
+Built=R 4.3.3; ; 2025-09-04 21:08:28 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=gower
+Version=1.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/gower
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 17:00:56 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=graphics
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/graphics
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 16:59:36 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=grDevices
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/grDevices
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 16:59:29 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=grid
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/grid
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 17:00:20 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=gridExtra
+Version=2.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/gridExtra
+Built=R 4.3.3; ; 2024-07-17 18:27:28 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=gtable
+Version=0.3.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/gtable
+Built=R 4.3.3; ; 2024-10-25 17:47:45 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=hardhat
+Version=1.4.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/hardhat
+Built=R 4.3.3; ; 2025-08-20 08:37:00 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=haven
+Version=2.5.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/haven
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-04 09:43:15 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=highr
+Version=0.11
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/highr
+Built=R 4.3.3; ; 2024-06-30 06:46:14 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=hms
+Version=1.1.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/hms
+Built=R 4.3.3; ; 2024-07-17 15:11:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=htmltools
+Version=0.5.8.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/htmltools
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 13:10:37 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=httr
+Version=1.4.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/httr
+Built=R 4.3.3; ; 2024-07-20 11:46:15 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ids
+Version=1.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ids
+Built=R 4.3.3; ; 2024-07-20 11:47:06 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=insight
+Version=1.5.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/insight
+Built=R 4.3.3; ; 2026-06-15 19:26:09 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ipred
+Version=0.9.15
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ipred
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-27 11:01:46 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=isoband
+Version=0.2.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/isoband
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 09:28:12 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=iterators
+Version=1.0.14
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/iterators
+Built=R 4.3.3; ; 2024-06-30 12:55:32 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=jquerylib
+Version=0.1.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/jquerylib
+Built=R 4.3.3; ; 2024-06-30 16:25:25 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=jsonlite
+Version=2.0.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/jsonlite
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-28 05:14:56 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=kableExtra
+Version=1.4.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/kableExtra
+Built=R 4.3.3; ; 2024-08-03 05:22:39 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=KernSmooth
+Version=2.23.26
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/KernSmooth
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-01-01 16:34:29 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=knitr
+Version=1.50
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/knitr
+Built=R 4.3.3; ; 2025-03-17 09:23:11 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=labeling
+Version=0.4.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/labeling
+Built=R 4.3.3; ; 2024-06-30 09:12:19 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=languageserver
+Version=0.3.18
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/languageserver
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:38:24 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=lattice
+Version=0.22.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/lattice
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-02 22:31:43 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=lava
+Version=1.8.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/lava
+Built=R 4.3.3; ; 2025-01-12 13:50:25 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=lifecycle
+Version=1.0.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/lifecycle
+Built=R 4.3.3; ; 2024-07-17 00:39:53 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=lintr
+Version=3.3.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/lintr
+Built=R 4.3.3; ; 2026-06-15 19:38:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=listenv
+Version=0.9.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/listenv
+Built=R 4.3.3; ; 2024-06-30 14:44:16 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=lme4
+Version=1.1.37
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/lme4
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-09-01 21:15:16 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=lmtest
+Version=0.9.40
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/lmtest
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:29:49 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=lubridate
+Version=1.9.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/lubridate
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-12-09 19:57:03 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=magick
+Version=2.9.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/magick
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-09-08 19:00:36 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=magrittr
+Version=2.0.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/magrittr
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 05:41:25 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=MASS
+Version=7.3.60.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/MASS
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 09:20:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=Matrix
+Version=1.6.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/Matrix
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-12 20:32:33 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=MatrixModels
+Version=0.5.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/MatrixModels
+Built=R 4.3.3; ; 2025-03-26 12:17:14 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=matrixStats
+Version=1.5.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/matrixStats
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-01-07 23:47:54 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=maxLik
+Version=1.5.2.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/maxLik
+Built=R 4.3.3; ; 2026-06-15 19:30:13 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=memoise
+Version=2.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/memoise
+Built=R 4.3.3; ; 2024-06-30 14:32:22 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=methods
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/methods
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 17:00:09 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=mgcv
+Version=1.9.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/mgcv
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-04 09:51:03 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=microbenchmark
+Version=1.5.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/microbenchmark
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-09-05 14:05:39 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=mime
+Version=0.13
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/mime
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-17 23:33:46 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=minqa
+Version=1.2.8
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/minqa
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-08 14:56:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=miscTools
+Version=0.6.30
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/miscTools
+Built=R 4.3.3; ; 2026-06-15 19:22:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ModelMetrics
+Version=1.2.2.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ModelMetrics
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-27 04:33:58 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=modelr
+Version=0.1.11
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/modelr
+Built=R 4.3.3; ; 2024-07-19 20:40:46 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=modelsummary
+Version=2.6.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/modelsummary
+Built=R 4.3.3; ; 2026-06-15 19:38:21 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=munsell
+Version=0.5.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/munsell
+Built=R 4.3.3; ; 2024-06-30 12:47:54 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=nlme
+Version=3.1.168
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/nlme
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-31 18:56:23 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=nloptr
+Version=2.2.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/nloptr
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-17 07:40:33 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=nnet
+Version=7.3.20
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/nnet
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-01-01 18:06:34 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=numDeriv
+Version=2016.8.1.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/numDeriv
+Built=R 4.3.3; ; 2024-06-30 12:55:20 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=openssl
+Version=2.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/openssl
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-05-27 15:34:07 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=otel
+Version=0.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/otel
+Built=R 4.3.3; ; 2026-06-15 19:21:36 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=parallel
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/parallel
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 17:00:29 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=parallelly
+Version=1.45.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/parallelly
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-07-25 20:34:48 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=parameters
+Version=0.29.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/parameters
+Built=R 4.3.3; ; 2026-06-15 19:30:14 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=parglm
+Version=0.1.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/parglm
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-10-24 07:41:29 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=pbapply
+Version=1.7.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/pbapply
+Built=R 4.3.3; ; 2025-07-21 16:13:53 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=pbkrtest
+Version=0.5.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/pbkrtest
+Built=R 4.3.3; ; 2025-07-18 13:58:16 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=performance
+Version=0.17.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/performance
+Built=R 4.3.3; ; 2026-06-15 19:30:21 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=pillar
+Version=1.11.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/pillar
+Built=R 4.3.3; ; 2025-07-04 21:28:02 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=pkgbuild
+Version=1.4.8
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/pkgbuild
+Built=R 4.3.3; ; 2026-06-15 19:29:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=pkgconfig
+Version=2.0.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/pkgconfig
+Built=R 4.3.3; ; 2024-06-30 05:29:17 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=pkgload
+Version=1.5.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/pkgload
+Built=R 4.3.3; ; 2026-06-15 19:31:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=plm
+Version=2.6.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/plm
+Built=R 4.3.3; ; 2026-06-15 19:37:48 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=plyr
+Version=1.8.9
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/plyr
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-07-29 08:47:29 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=polynom
+Version=1.4.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/polynom
+Built=R 4.3.3; ; 2024-07-01 00:35:41 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=prettyunits
+Version=1.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/prettyunits
+Built=R 4.3.3; ; 2024-06-30 12:40:18 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=pROC
+Version=1.19.0.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/pROC
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-07-31 14:07:46 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=processx
+Version=3.8.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/processx
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-02-21 20:13:06 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=prodlim
+Version=2025.4.28
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/prodlim
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-29 14:57:13 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=progress
+Version=1.2.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/progress
+Built=R 4.3.3; ; 2024-07-17 21:29:12 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=progressr
+Version=0.15.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/progressr
+Built=R 4.3.3; ; 2024-11-22 19:01:49 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=proxy
+Version=0.4.27
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/proxy
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 13:13:11 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ps
+Version=1.9.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ps
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-12 21:12:16 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=purrr
+Version=1.1.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/purrr
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-07-11 07:45:54 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=quantreg
+Version=6.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/quantreg
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-10 12:44:35 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=R.cache
+Version=0.17.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/R.cache
+Built=R 4.3.3; ; 2026-06-15 19:29:58 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=R.methodsS3
+Version=1.8.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/R.methodsS3
+Built=R 4.3.3; ; 2026-06-15 19:21:33 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=R.oo
+Version=1.27.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/R.oo
+Built=R 4.3.3; ; 2026-06-15 19:26:42 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=R.utils
+Version=2.13.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/R.utils
+Built=R 4.3.3; ; 2026-06-15 19:29:16 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=R6
+Version=2.6.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/R6
+Built=R 4.3.3; ; 2025-02-15 07:31:18 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=ragg
+Version=1.5.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/ragg
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-09-02 11:16:24 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rappdirs
+Version=0.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rappdirs
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 11:09:15 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rbibutils
+Version=2.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rbibutils
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-10-04 12:40:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=RColorBrewer
+Version=1.1.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/RColorBrewer
+Built=R 4.3.3; ; 2024-06-30 09:06:25 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=Rcpp
+Version=1.1.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/Rcpp
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-07-03 09:00:27 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=RcppArmadillo
+Version=15.0.2.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/RcppArmadillo
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-09-09 00:48:18 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=RcppEigen
+Version=0.3.4.0.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/RcppEigen
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-08-24 10:25:06 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=Rdpack
+Version=2.6.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/Rdpack
+Built=R 4.3.3; ; 2025-04-09 05:59:49 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=readr
+Version=2.1.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/readr
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-18 16:18:08 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=readxl
+Version=1.4.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/readxl
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-07 21:02:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=recipes
+Version=1.3.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/recipes
+Built=R 4.3.3; ; 2025-05-21 22:31:50 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=reformulas
+Version=0.4.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/reformulas
+Built=R 4.3.3; ; 2025-05-02 09:36:27 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rematch
+Version=2.0.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rematch
+Built=R 4.3.3; ; 2024-06-30 18:28:51 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rematch2
+Version=2.1.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rematch2
+Built=R 4.3.3; ; 2024-07-18 07:08:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=reprex
+Version=2.1.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/reprex
+Built=R 4.3.3; ; 2024-07-20 09:47:05 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=reshape2
+Version=1.4.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/reshape2
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-14 13:03:47 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rex
+Version=1.2.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rex
+Built=R 4.3.3; ; 2026-06-15 19:26:52 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rlang
+Version=1.1.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rlang
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-11 15:50:54 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rmarkdown
+Version=2.29
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rmarkdown
+Built=R 4.3.3; ; 2024-11-04 18:59:09 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=roxygen2
+Version=8.0.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/roxygen2
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:38:07 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rpart
+Version=4.1.24
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rpart
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-01-07 09:33:53 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rprojroot
+Version=2.1.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rprojroot
+Built=R 4.3.3; ; 2026-06-15 19:21:47 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rstatix
+Version=0.7.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rstatix
+Built=R 4.3.3; ; 2024-08-04 07:19:01 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rstudioapi
+Version=0.17.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rstudioapi
+Built=R 4.3.3; ; 2024-10-23 00:20:13 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=rvest
+Version=1.0.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/rvest
+Built=R 4.3.3; ; 2025-08-30 05:59:42 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=S7
+Version=0.2.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/S7
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:25:25 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=sandwich
+Version=3.1.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/sandwich
+Built=R 4.3.3; ; 2026-06-15 19:29:46 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=sass
+Version=0.4.10
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/sass
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-04-11 22:21:47 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=scales
+Version=1.4.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/scales
+Built=R 4.3.3; ; 2025-04-24 16:07:38 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=selectr
+Version=0.4.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/selectr
+Built=R 4.3.3; ; 2024-07-17 21:34:44 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=shape
+Version=1.4.6.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/shape
+Built=R 4.3.3; ; 2024-06-30 14:44:27 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=showtext
+Version=0.9.8
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/showtext
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:38:30 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=showtextdb
+Version=3.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/showtextdb
+Built=R 4.3.3; ; 2026-06-15 19:38:16 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=SparseM
+Version=1.84.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/SparseM
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-20 07:18:40 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=sparsevctrs
+Version=0.3.4
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/sparsevctrs
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-05-26 20:15:21 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=splines
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/splines
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 17:00:26 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=SQUAREM
+Version=2021.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/SQUAREM
+Built=R 4.3.3; ; 2024-06-30 16:36:49 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=stats
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/stats
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 16:59:43 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=stats4
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/stats4
+Built=R 4.3.3; ; 2025-11-21 17:00:27 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=stringi
+Version=1.8.7
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/stringi
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-03-27 16:30:45 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=stringmagic
+Version=1.2.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/stringmagic
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:28:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=stringr
+Version=1.5.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/stringr
+Built=R 4.3.3; ; 2025-09-09 03:36:19 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=styler
+Version=1.11.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/styler
+Built=R 4.3.3; ; 2026-06-15 19:31:13 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=survival
+Version=3.8.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/survival
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-12-18 18:10:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=svglite
+Version=2.2.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/svglite
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-14 11:48:33 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=sys
+Version=3.4.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/sys
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-10-04 14:50:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=sysfonts
+Version=0.8.9
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/sysfonts
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:37:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=systemfonts
+Version=1.2.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/systemfonts
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-05 07:08:05 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tables
+Version=0.9.35
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tables
+Built=R 4.3.3; ; 2026-06-15 19:29:11 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tcltk
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tcltk
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 17:00:28 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=textshaping
+Version=1.0.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/textshaping
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-09-02 20:28:29 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tibble
+Version=3.3.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tibble
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-06-08 19:56:12 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tidyr
+Version=1.3.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tidyr
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-18 16:32:42 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tidyselect
+Version=1.2.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tidyselect
+Built=R 4.3.3; ; 2024-07-17 15:07:10 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tidyverse
+Version=2.0.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tidyverse
+Built=R 4.3.3; ; 2024-08-03 07:07:14 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=timechange
+Version=0.3.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/timechange
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-06-30 15:02:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=timeDate
+Version=4041.110
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/timeDate
+Built=R 4.3.3; ; 2024-09-22 15:50:00 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tinytable
+Version=0.16.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tinytable
+Built=R 4.3.3; ; 2026-06-15 19:26:17 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tinytex
+Version=0.57
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tinytex
+Built=R 4.3.3; ; 2025-04-15 22:11:28 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tools
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tools
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 16:58:57 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=trust
+Version=0.1.8
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/trust
+Built=R 4.3.3; ; 2024-07-01 18:27:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=tzdb
+Version=0.5.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/tzdb
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-30 08:16:54 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=utf8
+Version=1.2.6
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/utf8
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-06-09 00:34:02 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=utils
+Version=4.3.3
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/utils
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-11-21 16:59:22 UTC; unix
+Repository=
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=uuid
+Version=1.2.1
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/uuid
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-29 11:00:06 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=vctrs
+Version=0.6.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/vctrs
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-17 04:53:58 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=viridisLite
+Version=0.4.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/viridisLite
+Built=R 4.3.3; ; 2024-06-30 09:11:51 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=vroom
+Version=1.6.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/vroom
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-18 07:24:57 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=webshot
+Version=0.5.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/webshot
+Built=R 4.3.3; ; 2024-07-01 08:30:36 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=withr
+Version=3.0.2
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/withr
+Built=R 4.3.3; ; 2024-10-28 18:00:38 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=xfun
+Version=0.53
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/xfun
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-19 06:37:45 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=xml2
+Version=1.4.0
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/xml2
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2025-08-20 23:49:20 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=xmlparsedata
+Version=1.0.5
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/xmlparsedata
+Built=R 4.3.3; ; 2026-06-15 19:25:22 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=yaml
+Version=2.3.10
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/yaml
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2024-07-26 21:04:59 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+
+Package=zoo
+Version=1.8.15
+LibPath=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library/zoo
+Built=R 4.3.3; x86_64-conda-linux-gnu; 2026-06-15 19:29:04 UTC; unix
+Repository=CRAN
+RemoteType=
+RemoteRepo=
+RemoteRef=
+

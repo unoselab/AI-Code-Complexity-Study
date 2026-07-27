@@ -1,0 +1,10 @@
+r_version=4.3.3
+reference_packages=250
+installed_packages=250
+matched_packages=245
+missing_packages=0
+version_mismatches=5
+validation_failures=5
+r_home=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R
+primary_library=/home/user1-system12/miniconda3/envs/aicomplexity/lib/R/library
+timezone=America/Chicago
