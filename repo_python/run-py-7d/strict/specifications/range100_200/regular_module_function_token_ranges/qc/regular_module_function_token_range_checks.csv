@@ -1,0 +1,40 @@
+check_name,passed,observed,expected,note
+events_within_range100_200,True,0,0,Every analyzed row must remain inside the frozen range100_200 specification.
+bodies_within_range100_200,True,0,0,Every analyzed row must remain inside the frozen range100_200 specification.
+body_classifications_unique_by_sha,True,0,0,Body classifications must contain one row per SHA-256 body.
+all_regular_events_map_to_body_classifications,True,0,0,Every regular-function event must map to one frozen body classification.
+regular_event_body_token_counts_match,True,0,0,Event and body token counts must agree.
+regular_event_body_agc_labels_match,True,0,0,Event and body AGC labels must agree.
+regular_event_body_hwc_labels_match,True,0,0,Event and body HWC labels must agree.
+regular_event_body_npr_scores_match,True,0,0,Event and body NPR scores must agree.
+all_regular_events_assigned_to_token_band,True,0,0,Every regular event must map to one frozen pilot token band.
+regular_unique_body_agc_hwc_partition,True,0,0,Each regular unique body must be exactly AGC-like or HWC-like.
+regular_event_agc_hwc_partition,True,0,0,Each regular event must be exactly AGC-like or HWC-like.
+regular_event_rows_match_expected,True,22360,22360,Observed values must reproduce the prior xrun1 diagnostic.
+regular_unique_bodies_match_expected,True,18673,18673,Observed values must reproduce the prior xrun1 diagnostic.
+regular_agc_unique_bodies_match_expected,True,2463,2463,Observed values must reproduce the prior xrun1 diagnostic.
+regular_hwc_unique_bodies_match_expected,True,16210,16210,Observed values must reproduce the prior xrun1 diagnostic.
+matched_panel_unique_by_repo_month,True,0,0,Matched panel must have one row per repository-month.
+all_regular_events_map_to_matched_panel,True,0,0,Every regular event must map to the matched repository-month panel.
+all_treatment_events_have_event_time,True,0,0,Every treatment regular-function event must have a relative event month.
+unique_body_control_exposure_nonzero_each_event_month,True,0,0,Every aligned event month must contain matched control repository-month exposure.
+unique_body_control_post_month_counts_not_all_zero,True,902,> 0,Matched control observations must not collapse to all zero after calendar alignment.
+unique_body_treatment_token_bands_reconstruct_classification_totals,True,0,0,Ten token bands must reconstruct each AGC/HWC monthly total.
+unique_body_control_token_bands_reconstruct_classification_totals,True,0,0,Ten token bands must reconstruct each AGC/HWC monthly total.
+unique_body_treatment_agc_hwc_partition_monthly_all,True,0,0,Monthly AGC-like plus HWC-like counts must reconstruct ALL.
+unique_body_control_agc_hwc_partition_monthly_all,True,0,0,Monthly AGC-like plus HWC-like counts must reconstruct ALL.
+event_row_control_exposure_nonzero_each_event_month,True,0,0,Every aligned event month must contain matched control repository-month exposure.
+event_row_control_post_month_counts_not_all_zero,True,1091,> 0,Matched control observations must not collapse to all zero after calendar alignment.
+event_row_treatment_token_bands_reconstruct_classification_totals,True,0,0,Ten token bands must reconstruct each AGC/HWC monthly total.
+event_row_control_token_bands_reconstruct_classification_totals,True,0,0,Ten token bands must reconstruct each AGC/HWC monthly total.
+event_row_treatment_agc_hwc_partition_monthly_all,True,0,0,Monthly AGC-like plus HWC-like counts must reconstruct ALL.
+event_row_control_agc_hwc_partition_monthly_all,True,0,0,Monthly AGC-like plus HWC-like counts must reconstruct ALL.
+period_event_totals_reconstruct_regular_events,True,22360,22360,"Control, pre, event, and post rows must reconstruct all regular events."
+treatment_pre_event_post_reconstruct_treatment_events,True,16874,16874,"Treatment pre, adoption-month, and post rows must reconstruct treatment events."
+pre_post_overlap_union_reconstructs_treatment_unique_bodies,True,14305,14305,The pre versus adoption-and-after union must equal all treatment unique bodies.
+unique_body_bands_reconstruct_regular_unique_bodies,True,18673,18673,Token bands must reconstruct all regular unique bodies.
+event_bands_reconstruct_regular_events,True,22360,22360,Token bands must reconstruct all regular event rows.
+monthly_unique_body_treatment_control_has_complete_grid,True,429,429,"Every event month must contain ALL, AGC-like, and HWC-like rows for ALL and ten token bands."
+monthly_event_treatment_control_has_complete_grid,True,429,429,"Every event month must contain ALL, AGC-like, and HWC-like rows for ALL and ten token bands."
+post_month_unique_body_treatment_control_has_requested_grid,True,132,132,The focused post-adoption output must contain AGC-like and HWC-like rows for ALL and ten token bands.
+post_month_event_treatment_control_has_requested_grid,True,132,132,The focused post-adoption output must contain AGC-like and HWC-like rows for ALL and ten token bands.

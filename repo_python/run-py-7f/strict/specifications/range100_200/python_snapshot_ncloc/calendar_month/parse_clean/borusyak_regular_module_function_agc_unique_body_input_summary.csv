@@ -1,0 +1,3 @@
+dataset_source,rows,repositories,total_agc_unique_body_count,mean_agc_unique_body_count,median_agc_unique_body_count,maximum_agc_unique_body_count,positive_month_share,zero_month_share,mean_ncloc
+treatment,791,100,1702,2.15170670037927,0,55,0.40834386852086,0.59165613147914,54422.9860935525
+control,730,118,547,0.749315068493151,0,41,0.223287671232877,0.776712328767123,14085.7219178082

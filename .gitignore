@@ -204,3 +204,5 @@ repo_python/tmp/run-py-5a/strict/extract-v2-smoke/
 **/commit_parent_pairs.csv
 **/commit_function_detection_manifest.csv
 **/commit_function_event_extraction_audit.csv
+repo_python/run-py-7a
+repo_python/run-py-7b

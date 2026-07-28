@@ -1,0 +1,32 @@
+{
+  "agc_regular_event_rows": 2994,
+  "agc_regular_unique_bodies_global": 2463,
+  "agc_unique_body_repo_month_occurrences": 2620,
+  "base_panel": "repo_python/run-py-7b/strict/specifications/range100_200/panel_event_monthly_agc_commit_function_npr.csv",
+  "base_panel_sha256": "9410587dc4d052b59a92b9776331bc19ab473f194620d7c7c29ab484a1b9aeb2",
+  "classification": "AGC-like",
+  "control_rows": 780,
+  "count_unit": "distinct_function_body_sha256_per_repository_month",
+  "event_classifications": "repo_python/run-py-7a/strict/specifications/range100_200/agc_commit_function_npr_event_classifications.csv",
+  "event_classifications_sha256": "cf8b9bc8b8498151e9b5d988cd4047dc33f2e2854238122ef85f5b7e827c0b72",
+  "failed_checks": 0,
+  "function_kind": "module_function",
+  "outputs": {
+    "checks": "repo_python/run-py-7e/strict/specifications/range100_200/qc/regular_module_function_agc_unique_body_did_input_checks.csv",
+    "panel": "repo_python/run-py-7e/strict/specifications/range100_200/panel_event_monthly_regular_module_function_agc_unique_body.csv",
+    "parse_clean_panel": "repo_python/run-py-7e/strict/specifications/range100_200/panel_event_monthly_regular_module_function_agc_unique_body_parse_clean.csv",
+    "repo_month_counts": "repo_python/run-py-7e/strict/specifications/range100_200/regular_module_function_agc_unique_body_repo_month_counts.csv"
+  },
+  "panel_rows": 1633,
+  "parse_clean_rows": 1536,
+  "parse_exclusion_rows": 97,
+  "positive_outcome_rows": 553,
+  "primary_outcome": "npr_agc_regular_module_function_unique_bodies",
+  "regular_event_rows": 22360,
+  "regular_unique_bodies": 18673,
+  "script_version": "run-py-7e-v1",
+  "specification": "range100_200",
+  "status": "PASS",
+  "treatment_rows": 853,
+  "zero_outcome_rows": 1080
+}

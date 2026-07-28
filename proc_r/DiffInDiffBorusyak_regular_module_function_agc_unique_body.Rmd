@@ -1,0 +1,956 @@
+---
+title: "Diff-in-Diff Borusyak: AGC-Like Regular-Function Unique Bodies"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- Sys.getenv(
+  "PROJECT_ROOT",
+  unset = normalizePath(".", mustWork = TRUE)
+)
+project_root <- normalizePath(project_root, mustWork = TRUE)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || path_value == "") {
+    return("")
+  }
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(Sys.getenv("PANEL_PATH", unset = ""))
+out_dir <- resolve_project_path(Sys.getenv("OUT_DIR", unset = ""))
+panel_label <- Sys.getenv("PANEL_LABEL", unset = "panel")
+specification_name <- Sys.getenv(
+  "SPECIFICATION_NAME",
+  unset = "range100_200"
+)
+ncloc_spec <- tolower(Sys.getenv("NCLOC_SPEC", unset = "python_snapshot"))
+time_mode <- tolower(Sys.getenv("TIME_MODE", unset = "calendar_month"))
+parse_exclusion_mode <- tolower(
+  Sys.getenv("PARSE_EXCLUSION_MODE", unset = "parse_clean")
+)
+helper_path <- resolve_project_path(
+  Sys.getenv(
+    "HELPER_FILE",
+    unset = "proc_r/diff_in_diff_borusyak_helpers.R"
+  )
+)
+
+valid_ncloc_specs <- c("paper", "python_snapshot")
+valid_time_modes <- c("original_yyyymm", "calendar_month")
+valid_parse_exclusion_modes <- c("all", "parse_clean")
+
+if (!(ncloc_spec %in% valid_ncloc_specs)) {
+  stop("NCLOC_SPEC must be paper or python_snapshot. Got: ", ncloc_spec)
+}
+if (!(time_mode %in% valid_time_modes)) {
+  stop(
+    "TIME_MODE must be original_yyyymm or calendar_month. Got: ",
+    time_mode
+  )
+}
+if (!(parse_exclusion_mode %in% valid_parse_exclusion_modes)) {
+  stop(
+    "PARSE_EXCLUSION_MODE must be all or parse_clean. Got: ",
+    parse_exclusion_mode
+  )
+}
+if (panel_path == "") {
+  stop("PANEL_PATH environment variable is required.")
+}
+if (out_dir == "") {
+  out_dir <- file.path(
+    project_root,
+    "repo_python/run-py-7f/strict/specifications",
+    specification_name,
+    paste0(ncloc_spec, "_ncloc"),
+    time_mode,
+    parse_exclusion_mode
+  )
+}
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+# Purpose
+
+This notebook estimates the effect of Cursor adoption on the monthly number of
+**distinct AGC-like regular-function implementation bodies**.
+
+The focused estimand is intentionally narrow:
+
+1. Only synchronous module-level Python functions are included
+   (`function_kind == "module_function"`).
+2. Only bodies classified as AGC-like by the frozen NPR detector are counted.
+3. The counting unit is a distinct `function_body_sha256` within a
+   repository-month.
+4. Zero-count repository-months are retained.
+5. HWC outcomes and AGC/HWC ratios are excluded.
+
+The dynamic coefficient at event month `X` is interpreted in raw count units:
+the estimated average change in AGC-like regular-function unique bodies per
+repository-month at month `X` relative to Cursor adoption.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+
+if (!file.exists(helper_path)) {
+  stop("Helper file not found: ", helper_path)
+}
+source(helper_path)
+```
+
+# Utility Functions
+
+```{r utility-functions}
+normalize_yyyymm <- function(x) {
+  x <- as.character(x)
+  x[x %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+  x <- gsub("-", "", x)
+  suppressWarnings(as.integer(x))
+}
+
+yyyymm_to_month_id <- function(x) {
+  x <- as.integer(x)
+  year <- x %/% 100L
+  month <- x %% 100L
+  out <- year * 12L + month
+  out[is.na(x) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+write_error_table <- function(errors, stage, output_path) {
+  if (length(errors) == 0) {
+    fwrite(
+      data.frame(
+        stage = character(),
+        outcome = character(),
+        error = character()
+      ),
+      output_path
+    )
+    return(invisible(NULL))
+  }
+
+  fwrite(
+    data.frame(
+      stage = stage,
+      outcome = names(errors),
+      error = unlist(errors),
+      row.names = NULL,
+      stringsAsFactors = FALSE
+    ),
+    output_path
+  )
+}
+```
+
+# Load and Validate Input Panel
+
+```{r load-panel}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Panel label:", panel_label, "\n")
+cat("Specification:", specification_name, "\n")
+cat("Output directory:", out_dir, "\n")
+cat("NCLOC specification:", ncloc_spec, "\n")
+cat("Time mode:", time_mode, "\n")
+cat("Parse-exclusion mode:", parse_exclusion_mode, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+
+outcome_var <- "npr_agc_regular_module_function_unique_bodies"
+outcome_label <- "AGC-Like Regular-Function Unique Bodies"
+occurrence_var <- "has_npr_agc_regular_module_function_unique_body"
+zero_var <- "zero_npr_agc_regular_module_function_unique_body_month"
+
+base_required <- c(
+  "dataset_source",
+  "repo_name",
+  "time",
+  "event",
+  "time_to_event",
+  outcome_var,
+  occurrence_var,
+  zero_var,
+  "log1p_age",
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues",
+  "ncloc_paper",
+  "ncloc_python_snapshot",
+  "analysis_ready_regular_module_function_agc_unique_body_paper_ncloc",
+  "analysis_ready_regular_module_function_agc_unique_body_python_snapshot_ncloc",
+  "has_parse_exclusion",
+  "npr_detection_complete",
+  "npr_specification",
+  "npr_agc_threshold",
+  "npr_algorithm_version",
+  "npr_decision_rule",
+  "npr_window_policy",
+  "npr_function_aggregation",
+  "npr_partial_body_policy",
+  "npr_scoring_model",
+  "npr_window_size_literal_space_tokens",
+  "npr_perturbations_per_window",
+  "npr_random_seed",
+  "treatment_group",
+  "regular_function_scope",
+  "agc_count_unit",
+  "agc_outcome_scale"
+)
+require_columns(panel_raw, base_required, "Input panel")
+
+if (anyDuplicated(panel_raw[, .(dataset_source, repo_name, time)]) > 0) {
+  stop("Input panel has duplicate dataset_source/repo_name/time keys.")
+}
+if (!all(panel_raw$dataset_source %in% c("control", "treatment"))) {
+  stop("dataset_source contains unexpected values.")
+}
+
+forbidden_columns <- names(panel_raw)[
+  grepl("hwc|ratio", names(panel_raw), ignore.case = TRUE)
+]
+if (length(forbidden_columns) > 0) {
+  stop(
+    "Focused input panel unexpectedly contains HWC or ratio columns: ",
+    paste(forbidden_columns, collapse = ", ")
+  )
+}
+
+specification_mismatch_rows <- sum(
+  as.character(panel_raw$npr_specification) != specification_name,
+  na.rm = TRUE
+) + sum(is.na(panel_raw$npr_specification))
+if (specification_mismatch_rows > 0) {
+  stop(
+    "npr_specification does not match the requested specification on ",
+    specification_mismatch_rows,
+    " rows."
+  )
+}
+
+scope_mismatch_rows <- sum(
+  as.character(panel_raw$regular_function_scope) != "module_function",
+  na.rm = TRUE
+) + sum(is.na(panel_raw$regular_function_scope))
+if (scope_mismatch_rows > 0) {
+  stop("Regular-function scope mismatch on ", scope_mismatch_rows, " rows.")
+}
+
+count_unit_expected <- "distinct_function_body_sha256_per_repository_month"
+count_unit_mismatch_rows <- sum(
+  as.character(panel_raw$agc_count_unit) != count_unit_expected,
+  na.rm = TRUE
+) + sum(is.na(panel_raw$agc_count_unit))
+if (count_unit_mismatch_rows > 0) {
+  stop("AGC count-unit mismatch on ", count_unit_mismatch_rows, " rows.")
+}
+
+outcome_scale_mismatch_rows <- sum(
+  as.character(panel_raw$agc_outcome_scale) != "raw_count",
+  na.rm = TRUE
+) + sum(is.na(panel_raw$agc_outcome_scale))
+if (outcome_scale_mismatch_rows > 0) {
+  stop("AGC outcome-scale mismatch on ", outcome_scale_mismatch_rows, " rows.")
+}
+
+treatment_group_mismatch_rows <- sum(
+  as.character(panel_raw$treatment_group) !=
+    as.character(panel_raw$dataset_source),
+  na.rm = TRUE
+) + sum(is.na(panel_raw$treatment_group))
+if (treatment_group_mismatch_rows > 0) {
+  stop(
+    "treatment_group does not match dataset_source on ",
+    treatment_group_mismatch_rows,
+    " rows."
+  )
+}
+
+detection_complete_true <- panel_raw$npr_detection_complete %in%
+  c(TRUE, 1L, 1.0, "True", "TRUE", "true", "1", "1.0")
+detection_incomplete_rows <- sum(!detection_complete_true)
+if (detection_incomplete_rows > 0) {
+  stop(
+    "npr_detection_complete is not uniformly true: ",
+    detection_incomplete_rows,
+    " rows are false, missing, or malformed."
+  )
+}
+
+outcome_values <- panel_raw[[outcome_var]]
+outcome_missing_rows <- sum(is.na(outcome_values))
+outcome_negative_rows <- sum(outcome_values < 0, na.rm = TRUE)
+outcome_noninteger_rows <- sum(
+  !is.na(outcome_values) & abs(outcome_values - round(outcome_values)) > 1e-12
+)
+occurrence_mismatch_rows <- sum(
+  as.integer(panel_raw[[occurrence_var]]) !=
+    as.integer(outcome_values > 0),
+  na.rm = TRUE
+)
+zero_flag_mismatch_rows <- sum(
+  as.integer(panel_raw[[zero_var]]) !=
+    as.integer(outcome_values == 0),
+  na.rm = TRUE
+)
+
+if (
+  outcome_missing_rows > 0 ||
+    outcome_negative_rows > 0 ||
+    outcome_noninteger_rows > 0 ||
+    occurrence_mismatch_rows > 0 ||
+    zero_flag_mismatch_rows > 0
+) {
+  stop(
+    "Focused outcome contract violated. Missing: ", outcome_missing_rows,
+    "; negative: ", outcome_negative_rows,
+    "; noninteger: ", outcome_noninteger_rows,
+    "; occurrence mismatches: ", occurrence_mismatch_rows,
+    "; zero-flag mismatches: ", zero_flag_mismatch_rows
+  )
+}
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repositories:", uniqueN(panel_raw$repo_name), "\n")
+cat("Zero-outcome rows:", sum(outcome_values == 0), "\n")
+cat("Positive-outcome rows:", sum(outcome_values > 0), "\n")
+cat("Total AGC unique-body repository-month occurrences:", sum(outcome_values), "\n")
+```
+
+# Configure Model
+
+```{r configure-model}
+if (ncloc_spec == "paper") {
+  ncloc_column <- "ncloc_paper"
+  readiness_column <-
+    "analysis_ready_regular_module_function_agc_unique_body_paper_ncloc"
+} else {
+  ncloc_column <- "ncloc_python_snapshot"
+  readiness_column <-
+    "analysis_ready_regular_module_function_agc_unique_body_python_snapshot_ncloc"
+}
+
+covariates <- c(
+  "log1p_age",
+  ncloc_column,
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues"
+)
+require_columns(
+  panel_raw,
+  c(outcome_var, covariates, readiness_column),
+  "Configured model"
+)
+
+panel_data <- copy(panel_raw)
+panel_data <- panel_data[get(readiness_column) == 1]
+rows_after_readiness_filter <- nrow(panel_data)
+
+if (parse_exclusion_mode == "parse_clean") {
+  panel_data <- panel_data[has_parse_exclusion == 0]
+}
+rows_after_parse_filter <- nrow(panel_data)
+
+if (nrow(panel_data) == 0) {
+  stop("No rows remain after the explicit analysis filters.")
+}
+
+model_required <- c(outcome_var, covariates)
+implicit_missing_rows <- sum(!complete.cases(panel_data[, ..model_required]))
+if (implicit_missing_rows > 0) {
+  stop(
+    "Analysis-ready flag allowed rows with missing model variables: ",
+    implicit_missing_rows
+  )
+}
+
+panel_data[, time_yyyymm := normalize_yyyymm(time)]
+event_yyyymm_raw <- normalize_yyyymm(panel_data$event)
+event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
+panel_data[, event_yyyymm := event_yyyymm_raw]
+
+event_membership_mismatch_rows <- panel_data[
+  ,
+  sum((dataset_source == "treatment") != (event_yyyymm > 0L))
+]
+if (event_membership_mismatch_rows > 0) {
+  stop(
+    "Event encoding disagrees with dataset_source on ",
+    event_membership_mismatch_rows,
+    " rows."
+  )
+}
+
+panel_data <- panel_data[
+  event_yyyymm == 0L |
+    (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+]
+rows_after_cohort_filter <- nrow(panel_data)
+
+panel_data[, repo_name_str := as.character(repo_name)]
+panel_data[, repo_id := as.integer(factor(repo_name_str))]
+
+if (time_mode == "original_yyyymm") {
+  panel_data[, time_id := time_yyyymm]
+  panel_data[, event_id := event_yyyymm]
+  time_encoding_used <- "numeric_YYYYMM_original_notebook_compatible"
+} else {
+  panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+  panel_data[, event_id := fifelse(
+    event_yyyymm == 0L,
+    0L,
+    yyyymm_to_month_id(event_yyyymm)
+  )]
+  time_encoding_used <- "sequential_calendar_month_id"
+}
+
+panel_data <- panel_data[!is.na(time_id)]
+panel_data <- panel_data[event_id == 0L | !is.na(event_id)]
+panel_data[, treated := as.integer(event_id > 0L)]
+
+first_stage_rhs <- paste(covariates, collapse = " + ")
+first_stage_formula <- as.formula(
+  paste0("~ ", first_stage_rhs, " | repo_id + time_id")
+)
+
+cat("Outcome:", outcome_var, "\n")
+cat("Outcome unit: raw distinct-body count per repository-month\n")
+cat("Readiness column:", readiness_column, "\n")
+cat("Rows after readiness filter:", rows_after_readiness_filter, "\n")
+cat("Rows after parse filter:", rows_after_parse_filter, "\n")
+cat("Rows after cohort filter:", rows_after_cohort_filter, "\n")
+cat("Rows used by models:", nrow(panel_data), "\n")
+cat("Repositories used:", uniqueN(panel_data$repo_id), "\n")
+cat("Time encoding:", time_encoding_used, "\n")
+cat("First-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Panel Checks and Input Summary
+
+```{r panel-checks}
+panel_checks <- data.frame(
+  check = c(
+    "panel_label",
+    "specification_name",
+    "ncloc_specification",
+    "readiness_column",
+    "time_mode",
+    "parse_exclusion_mode",
+    "input_rows",
+    "input_repositories",
+    "forbidden_hwc_or_ratio_columns",
+    "specification_mismatch_rows",
+    "regular_function_scope_mismatch_rows",
+    "count_unit_mismatch_rows",
+    "outcome_scale_mismatch_rows",
+    "treatment_group_mismatch_rows",
+    "event_membership_mismatch_rows",
+    "detection_incomplete_rows",
+    "outcome_missing_rows",
+    "outcome_negative_rows",
+    "outcome_noninteger_rows",
+    "occurrence_arithmetic_mismatch_rows",
+    "zero_flag_arithmetic_mismatch_rows",
+    "rows_after_readiness_filter",
+    "rows_after_parse_filter",
+    "rows_after_cohort_filter",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "treated_repositories",
+    "control_repositories",
+    "zero_outcome_rows_in_model_sample",
+    "positive_outcome_rows_in_model_sample",
+    "total_outcome_count_in_model_sample",
+    "parse_exclusion_rows_in_model_sample",
+    "outcome_missing_sum",
+    "covariate_missing_sum",
+    "npr_agc_threshold",
+    "npr_algorithm_version",
+    "npr_decision_rule",
+    "npr_window_policy",
+    "npr_function_aggregation",
+    "npr_partial_body_policy",
+    "npr_scoring_model",
+    "npr_window_size_literal_space_tokens",
+    "npr_perturbations_per_window",
+    "npr_random_seed"
+  ),
+  value = c(
+    panel_label,
+    specification_name,
+    ncloc_spec,
+    readiness_column,
+    time_mode,
+    parse_exclusion_mode,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    length(forbidden_columns),
+    specification_mismatch_rows,
+    scope_mismatch_rows,
+    count_unit_mismatch_rows,
+    outcome_scale_mismatch_rows,
+    treatment_group_mismatch_rows,
+    event_membership_mismatch_rows,
+    detection_incomplete_rows,
+    outcome_missing_rows,
+    outcome_negative_rows,
+    outcome_noninteger_rows,
+    occurrence_mismatch_rows,
+    zero_flag_mismatch_rows,
+    rows_after_readiness_filter,
+    rows_after_parse_filter,
+    rows_after_cohort_filter,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    uniqueN(panel_data[treated == 1, repo_id]),
+    uniqueN(panel_data[treated == 0, repo_id]),
+    sum(panel_data[[outcome_var]] == 0, na.rm = TRUE),
+    sum(panel_data[[outcome_var]] > 0, na.rm = TRUE),
+    sum(panel_data[[outcome_var]], na.rm = TRUE),
+    sum(panel_data$has_parse_exclusion == 1, na.rm = TRUE),
+    sum(is.na(panel_data[[outcome_var]])),
+    sum(is.na(panel_data[, ..covariates])),
+    paste(unique(panel_raw$npr_agc_threshold), collapse = ";"),
+    paste(unique(panel_raw$npr_algorithm_version), collapse = ";"),
+    paste(unique(panel_raw$npr_decision_rule), collapse = ";"),
+    paste(unique(panel_raw$npr_window_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_function_aggregation), collapse = ";"),
+    paste(unique(panel_raw$npr_partial_body_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_scoring_model), collapse = ";"),
+    paste(unique(panel_raw$npr_window_size_literal_space_tokens), collapse = ";"),
+    paste(unique(panel_raw$npr_perturbations_per_window), collapse = ";"),
+    paste(unique(panel_raw$npr_random_seed), collapse = ";")
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(panel_checks)
+fwrite(
+  panel_checks,
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_panel_checks.csv"
+  )
+)
+
+input_summary <- panel_data[, .(
+  rows = .N,
+  repositories = uniqueN(repo_id),
+  total_agc_unique_body_count = sum(get(outcome_var), na.rm = TRUE),
+  mean_agc_unique_body_count = mean(get(outcome_var), na.rm = TRUE),
+  # median_agc_unique_body_count = median(get(outcome_var), na.rm = TRUE),
+  median_agc_unique_body_count = as.numeric(median(get(outcome_var), na.rm = TRUE)),
+  maximum_agc_unique_body_count = max(get(outcome_var), na.rm = TRUE),
+  positive_month_share = mean(get(outcome_var) > 0, na.rm = TRUE),
+  zero_month_share = mean(get(outcome_var) == 0, na.rm = TRUE),
+  mean_ncloc = mean(get(ncloc_column), na.rm = TRUE)
+), by = dataset_source]
+
+print(input_summary)
+fwrite(
+  input_summary,
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_input_summary.csv"
+  )
+)
+```
+
+# Static Borusyak Effect
+
+```{r static-effect}
+static_errors <- list()
+static_result <- tryCatch(
+  run_borusyak_static(
+    data = panel_data,
+    outcome_var = outcome_var,
+    first_stage_formula = first_stage_formula,
+    idname = "repo_id",
+    tname = "time_id",
+    gname = "event_id"
+  ),
+  error = function(e) {
+    static_errors[[outcome_var]] <<- conditionMessage(e)
+    NULL
+  }
+)
+
+static_df <- extract_static_result(static_result, outcome_var)
+static_df$outcome_label <- outcome_label
+static_df$outcome_unit <- "distinct bodies per repository-month"
+static_df$panel <- panel_label
+static_df$specification <- specification_name
+static_df$ncloc_spec <- ncloc_spec
+static_df$time_mode <- time_mode
+static_df$parse_exclusion_mode <- parse_exclusion_mode
+
+print(static_df)
+fwrite(
+  static_df,
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_static_effects.csv"
+  )
+)
+write_error_table(
+  static_errors,
+  "static",
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_static_errors.csv"
+  )
+)
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_errors <- list()
+dynamic_result <- tryCatch(
+  run_borusyak_dynamic(
+    data = panel_data,
+    outcome_var = outcome_var,
+    first_stage_formula = first_stage_formula,
+    horizon = -6:6,
+    pretrends = -6:-2,
+    idname = "repo_id",
+    tname = "time_id",
+    gname = "event_id"
+  ),
+  error = function(e) {
+    dynamic_errors[[outcome_var]] <<- conditionMessage(e)
+    NULL
+  }
+)
+
+dynamic_df <- extract_dynamic_result(
+  dynamic_result,
+  outcome = outcome_var,
+  outcome_label = outcome_label,
+  min_horizon = -6,
+  max_horizon = 6
+)
+
+if (nrow(dynamic_df) > 0) {
+  dynamic_df$outcome_unit <- "distinct bodies per repository-month"
+  dynamic_df$panel <- panel_label
+  dynamic_df$specification <- specification_name
+  dynamic_df$ncloc_spec <- ncloc_spec
+  dynamic_df$time_mode <- time_mode
+  dynamic_df$parse_exclusion_mode <- parse_exclusion_mode
+}
+
+print(dynamic_df)
+fwrite(
+  dynamic_df,
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_dynamic_effects.csv"
+  )
+)
+write_error_table(
+  dynamic_errors,
+  "dynamic",
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_dynamic_errors.csv"
+  )
+)
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=10, fig.height=4.5}
+if (nrow(dynamic_df) > 0) {
+  plot_object <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_errorbar(
+      data = subset(dynamic_df, significant %in% TRUE),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "solid"
+    ) +
+    geom_errorbar(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "dotted"
+    ) +
+    geom_point(
+      data = subset(dynamic_df, significant %in% TRUE),
+      shape = 19,
+      size = 1.8
+    ) +
+    geom_point(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      shape = 21,
+      fill = "transparent",
+      size = 1.8
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    labs(
+      title = paste(
+        "Borusyak DiD: AGC-Like Regular-Function Unique Bodies",
+        panel_label
+      ),
+      subtitle = paste(
+        "Raw count outcome | NCLOC:", ncloc_spec,
+        "| Time:", time_encoding_used,
+        "| Parse:", parse_exclusion_mode
+      ),
+      x = "Months Relative to Cursor Adoption",
+      y = "Estimated Change in Distinct AGC-Like Bodies per Repository-Month",
+      caption = paste(
+        "Filled dots: confidence interval excludes 0.",
+        "Zero-count repository-months are retained."
+      )
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
+
+  print(plot_object)
+  ggsave(
+    filename = file.path(
+      out_dir,
+      "dynamic_effects_borusyak_regular_module_function_agc_unique_body.pdf"
+    ),
+    plot = plot_object,
+    width = 10,
+    height = 4.5
+  )
+} else {
+  cat("No dynamic effects to plot.\n")
+}
+```
+
+# Final Model Validation
+
+```{r final-model-validation}
+static_model_error_count <- length(static_errors)
+dynamic_model_error_count <- length(dynamic_errors)
+
+static_effect_complete <- nrow(static_df) == 1 &&
+  static_df$outcome[1] == outcome_var &&
+  !is.na(static_df$estimate[1])
+
+dynamic_effects_nonempty <- nrow(dynamic_df) > 0 &&
+  all(dynamic_df$outcome == outcome_var)
+
+dynamic_pre_period_present <- if (dynamic_effects_nonempty) {
+  any(dynamic_df$time < 0)
+} else {
+  FALSE
+}
+
+dynamic_post_period_present <- if (dynamic_effects_nonempty) {
+  any(dynamic_df$time >= 0)
+} else {
+  FALSE
+}
+
+significant_pre_period_count <- if (dynamic_effects_nonempty) {
+  sum(dynamic_df$time <= -2 & dynamic_df$significant %in% TRUE)
+} else {
+  NA_integer_
+}
+
+final_model_validation <- data.frame(
+  check = c(
+    "static_model_error_count",
+    "dynamic_model_error_count",
+    "static_effect_complete",
+    "dynamic_effects_nonempty",
+    "dynamic_pre_period_present",
+    "dynamic_post_period_present",
+    "significant_pre_period_count"
+  ),
+  value = c(
+    static_model_error_count,
+    dynamic_model_error_count,
+    static_effect_complete,
+    dynamic_effects_nonempty,
+    dynamic_pre_period_present,
+    dynamic_post_period_present,
+    significant_pre_period_count
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(final_model_validation)
+fwrite(
+  final_model_validation,
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_final_model_validation.csv"
+  )
+)
+
+if (static_model_error_count > 0) {
+  stop("Static model failure: ", paste(names(static_errors), collapse = ", "))
+}
+if (dynamic_model_error_count > 0) {
+  stop("Dynamic model failure: ", paste(names(dynamic_errors), collapse = ", "))
+}
+if (!static_effect_complete) {
+  stop("Static effect is incomplete or contains a missing estimate.")
+}
+if (!dynamic_effects_nonempty) {
+  stop("Dynamic effects are empty or missing the focused outcome.")
+}
+if (!dynamic_pre_period_present || !dynamic_post_period_present) {
+  stop("Dynamic effects do not contain both pre- and post-treatment periods.")
+}
+```
+
+# Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "helper_file",
+    "panel_label",
+    "panel_path",
+    "out_dir",
+    "specification_name",
+    "ncloc_specification",
+    "ncloc_column",
+    "readiness_column",
+    "time_mode",
+    "parse_exclusion_mode",
+    "outcome",
+    "outcome_label",
+    "outcome_scale",
+    "outcome_unit",
+    "function_scope",
+    "classification",
+    "count_unit",
+    "covariates",
+    "first_stage_formula",
+    "rows_after_readiness_filter",
+    "rows_after_parse_filter",
+    "rows_after_cohort_filter",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "estimator",
+    "time_encoding",
+    "horizon",
+    "pretrends",
+    "static_model_error_count",
+    "dynamic_model_error_count",
+    "significant_pre_period_count",
+    "npr_agc_threshold",
+    "npr_algorithm_version",
+    "npr_decision_rule",
+    "npr_window_policy",
+    "npr_function_aggregation",
+    "npr_partial_body_policy",
+    "npr_scoring_model",
+    "npr_window_size_literal_space_tokens",
+    "npr_perturbations_per_window",
+    "npr_random_seed",
+    "interpretation_note"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_regular_module_function_agc_unique_body-v1.Rmd",
+    helper_path,
+    panel_label,
+    panel_path,
+    out_dir,
+    specification_name,
+    ncloc_spec,
+    ncloc_column,
+    readiness_column,
+    time_mode,
+    parse_exclusion_mode,
+    outcome_var,
+    outcome_label,
+    "raw_count",
+    "distinct bodies per repository-month",
+    "module_function",
+    "AGC-like only",
+    count_unit_expected,
+    paste(covariates, collapse = " + "),
+    paste(deparse(first_stage_formula), collapse = " "),
+    rows_after_readiness_filter,
+    rows_after_parse_filter,
+    rows_after_cohort_filter,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    "Borusyak imputation via didimputation::did_imputation",
+    time_encoding_used,
+    "-6:6",
+    "-6:-2",
+    static_model_error_count,
+    dynamic_model_error_count,
+    significant_pre_period_count,
+    paste(unique(panel_raw$npr_agc_threshold), collapse = ";"),
+    paste(unique(panel_raw$npr_algorithm_version), collapse = ";"),
+    paste(unique(panel_raw$npr_decision_rule), collapse = ";"),
+    paste(unique(panel_raw$npr_window_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_function_aggregation), collapse = ";"),
+    paste(unique(panel_raw$npr_partial_body_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_scoring_model), collapse = ";"),
+    paste(unique(panel_raw$npr_window_size_literal_space_tokens), collapse = ";"),
+    paste(unique(panel_raw$npr_perturbations_per_window), collapse = ";"),
+    paste(unique(panel_raw$npr_random_seed), collapse = ";"),
+    paste(
+      "A dynamic coefficient at month X is the estimated average change",
+      "in distinct AGC-like synchronous module-function bodies per",
+      "repository-month. The AGC-like label is a detector classification,",
+      "not verified AI provenance."
+    )
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(metadata)
+fwrite(
+  metadata,
+  file.path(
+    out_dir,
+    "borusyak_regular_module_function_agc_unique_body_metadata.csv"
+  )
+)
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```

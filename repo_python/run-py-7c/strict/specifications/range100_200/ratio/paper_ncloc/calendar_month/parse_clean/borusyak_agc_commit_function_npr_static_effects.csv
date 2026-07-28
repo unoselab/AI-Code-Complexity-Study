@@ -1,0 +1,2 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,panel,specification,sample_type,ncloc_spec,time_mode,parse_exclusion_mode
+npr_agc_function_change_event_ratio,treat,0.0355190838153484,0.0258795913359525,-0.0152049152031185,0.0862430828338153,,Borusyak static treatment effect,NPR AGC-Like Event Share | Positive NPR-Event Month,strict_range100_200_ratio_paper_ncloc_calendar_month_parse_clean,range100_200,ratio,paper,calendar_month,parse_clean

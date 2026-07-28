@@ -1,0 +1,2 @@
+outcome,term,estimate,std_error,conf_low,conf_high,p_value,note,outcome_label,outcome_unit,panel,specification,ncloc_spec,time_mode,parse_exclusion_mode
+npr_agc_regular_module_function_unique_bodies,treat,1.09627701368853,0.556669323656667,0.00520513932146338,2.1873488880556,,Borusyak static treatment effect,AGC-Like Regular-Function Unique Bodies,distinct bodies per repository-month,strict_range100_200_regular_module_function_agc_unique_body_python_snapshot_ncloc_calendar_month_parse_clean,range100_200,python_snapshot,calendar_month,parse_clean

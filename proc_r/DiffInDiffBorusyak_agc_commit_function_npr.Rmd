@@ -1,0 +1,1017 @@
+---
+title: "Diff-in-Diff Borusyak: NPR-Based Python Commit-Function AGC Outcomes"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- Sys.getenv(
+  "PROJECT_ROOT",
+  unset = normalizePath(".", mustWork = TRUE)
+)
+project_root <- normalizePath(project_root, mustWork = TRUE)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || path_value == "") {
+    return("")
+  }
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(Sys.getenv("PANEL_PATH", unset = ""))
+out_dir <- resolve_project_path(Sys.getenv("OUT_DIR", unset = ""))
+panel_label <- Sys.getenv("PANEL_LABEL", unset = "panel")
+specification_name <- Sys.getenv(
+  "SPECIFICATION_NAME",
+  unset = "range100_200"
+)
+ncloc_spec <- tolower(Sys.getenv("NCLOC_SPEC", unset = "paper"))
+sample_type <- tolower(Sys.getenv("SAMPLE_TYPE", unset = "full"))
+time_mode <- tolower(Sys.getenv("TIME_MODE", unset = "calendar_month"))
+parse_exclusion_mode <- tolower(
+  Sys.getenv("PARSE_EXCLUSION_MODE", unset = "parse_clean")
+)
+helper_path <- resolve_project_path(
+  Sys.getenv(
+    "HELPER_FILE",
+    unset = "proc_r/diff_in_diff_borusyak_helpers.R"
+  )
+)
+
+valid_ncloc_specs <- c("paper", "python_snapshot")
+valid_sample_types <- c("full", "ratio")
+valid_time_modes <- c("original_yyyymm", "calendar_month")
+valid_parse_exclusion_modes <- c("all", "parse_clean")
+
+if (!(ncloc_spec %in% valid_ncloc_specs)) {
+  stop("NCLOC_SPEC must be paper or python_snapshot. Got: ", ncloc_spec)
+}
+if (!(sample_type %in% valid_sample_types)) {
+  stop("SAMPLE_TYPE must be full or ratio. Got: ", sample_type)
+}
+if (!(time_mode %in% valid_time_modes)) {
+  stop(
+    "TIME_MODE must be original_yyyymm or calendar_month. Got: ",
+    time_mode
+  )
+}
+if (!(parse_exclusion_mode %in% valid_parse_exclusion_modes)) {
+  stop(
+    "PARSE_EXCLUSION_MODE must be all or parse_clean. Got: ",
+    parse_exclusion_mode
+  )
+}
+if (panel_path == "") {
+  stop("PANEL_PATH environment variable is required.")
+}
+if (out_dir == "") {
+  out_dir <- file.path(
+    project_root,
+    "repo_python/run-py-7c/strict/specifications",
+    specification_name,
+    sample_type,
+    paste0(ncloc_spec, "_ncloc"),
+    time_mode,
+    parse_exclusion_mode
+  )
+}
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+# Purpose
+
+This notebook estimates Borusyak imputation Difference-in-Differences models
+for NPR-based commit-function AGC outcomes prepared by run-py-7b.
+
+The default `range100_200` specification includes only function-change events
+whose implementation bodies contain 100--200 literal-space tokens and were
+successfully scored by the frozen StarCoder2-7B perturbation detector.
+
+The notebook separates:
+
+1. Full zero-inclusive repository-month occurrence and count outcomes.
+2. The conditional AGC-like event ratio among months with at least one
+   NPR-scored function-change event.
+3. Paper NCLOC and Python-snapshot NCLOC covariate specifications.
+4. All and parse-clean samples.
+
+The detector specification is fixed before the causal analysis. The notebook
+validates the NPR specification name, threshold, scoring-completeness flag,
+zero-event arithmetic, and AGC/HWC event partition before estimating models.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+
+if (!file.exists(helper_path)) {
+  stop("Helper file not found: ", helper_path)
+}
+source(helper_path)
+```
+
+# Utility Functions
+
+```{r utility-functions}
+normalize_yyyymm <- function(x) {
+  x <- as.character(x)
+  x[x %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+  x <- gsub("-", "", x)
+  suppressWarnings(as.integer(x))
+}
+
+yyyymm_to_month_id <- function(x) {
+  x <- as.integer(x)
+  year <- x %/% 100L
+  month <- x %% 100L
+  out <- year * 12L + month
+  out[is.na(x) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+write_error_table <- function(errors, stage, output_path) {
+  if (length(errors) == 0) {
+    fwrite(
+      data.frame(
+        stage = character(),
+        outcome = character(),
+        error = character()
+      ),
+      output_path
+    )
+    return(invisible(NULL))
+  }
+
+  fwrite(
+    data.frame(
+      stage = stage,
+      outcome = names(errors),
+      error = unlist(errors),
+      row.names = NULL,
+      stringsAsFactors = FALSE
+    ),
+    output_path
+  )
+}
+```
+
+# Load and Validate Input Panel
+
+```{r load-panel}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Panel label:", panel_label, "\n")
+cat("Specification:", specification_name, "\n")
+cat("Output directory:", out_dir, "\n")
+cat("NCLOC specification:", ncloc_spec, "\n")
+cat("Sample type:", sample_type, "\n")
+cat("Time mode:", time_mode, "\n")
+cat("Parse-exclusion mode:", parse_exclusion_mode, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+
+base_required <- c(
+  "dataset_source",
+  "repo_name",
+  "time",
+  "event",
+  "time_to_event",
+  "npr_scored_function_change_events",
+  "has_npr_scored_function_change_event",
+  "zero_npr_scored_function_event_month",
+  "npr_agc_function_change_events",
+  "npr_hwc_function_change_events",
+  "npr_agc_function_change_event_ratio",
+  "log1p_npr_scored_function_change_events",
+  "log1p_npr_agc_function_change_events",
+  "log1p_npr_hwc_function_change_events",
+  "log1p_age",
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues",
+  "ncloc_paper",
+  "ncloc_python_snapshot",
+  "analysis_ready_npr_paper_ncloc",
+  "analysis_ready_npr_python_snapshot_ncloc",
+  "analysis_ready_npr_ratio_paper_ncloc",
+  "analysis_ready_npr_ratio_python_snapshot_ncloc",
+  "has_parse_exclusion",
+  "npr_detection_complete",
+  "npr_specification",
+  "npr_agc_threshold",
+  "npr_algorithm_version",
+  "npr_decision_rule",
+  "npr_window_policy",
+  "npr_function_aggregation",
+  "npr_partial_body_policy",
+  "npr_scoring_model",
+  "npr_window_size_literal_space_tokens",
+  "npr_perturbations_per_window",
+  "npr_random_seed",
+  "treatment_group"
+)
+require_columns(panel_raw, base_required, "Input panel")
+
+if (anyDuplicated(panel_raw[, .(dataset_source, repo_name, time)]) > 0) {
+  stop("Input panel has duplicate dataset_source/repo_name/time keys.")
+}
+if (!all(panel_raw$dataset_source %in% c("control", "treatment"))) {
+  stop("dataset_source contains unexpected values.")
+}
+
+specification_mismatch_rows <- sum(
+  as.character(panel_raw$npr_specification) != specification_name,
+  na.rm = TRUE
+) + sum(is.na(panel_raw$npr_specification))
+if (specification_mismatch_rows > 0) {
+  stop(
+    "npr_specification does not match the requested specification on ",
+    specification_mismatch_rows,
+    " rows."
+  )
+}
+
+treatment_group_mismatch_rows <- sum(
+  as.character(panel_raw$treatment_group) !=
+    as.character(panel_raw$dataset_source),
+  na.rm = TRUE
+) + sum(is.na(panel_raw$treatment_group))
+if (treatment_group_mismatch_rows > 0) {
+  stop(
+    "treatment_group does not match dataset_source on ",
+    treatment_group_mismatch_rows,
+    " rows."
+  )
+}
+
+detection_complete_true <- panel_raw$npr_detection_complete %in%
+  c(TRUE, 1L, 1.0, "True", "TRUE", "true", "1", "1.0")
+detection_incomplete_rows <- sum(!detection_complete_true)
+if (detection_incomplete_rows > 0) {
+  stop(
+    "npr_detection_complete is not uniformly true: ",
+    detection_incomplete_rows,
+    " rows are false, missing, or malformed."
+  )
+}
+
+core_na_rows <- sum(
+  is.na(panel_raw$npr_scored_function_change_events) |
+    is.na(panel_raw$has_npr_scored_function_change_event) |
+    is.na(panel_raw$zero_npr_scored_function_event_month) |
+    is.na(panel_raw$npr_agc_function_change_events) |
+    is.na(panel_raw$npr_hwc_function_change_events)
+)
+if (core_na_rows > 0) {
+  stop("Missing NPR event values on ", core_na_rows, " rows.")
+}
+
+occurrence_mismatch_rows <- sum(
+  as.integer(panel_raw$has_npr_scored_function_change_event) !=
+    as.integer(panel_raw$npr_scored_function_change_events > 0),
+  na.rm = TRUE
+)
+zero_flag_mismatch_rows <- sum(
+  as.integer(panel_raw$zero_npr_scored_function_event_month) !=
+    (1L - as.integer(panel_raw$has_npr_scored_function_change_event)),
+  na.rm = TRUE
+)
+partition_mismatch_rows <- sum(
+  panel_raw$npr_agc_function_change_events +
+    panel_raw$npr_hwc_function_change_events !=
+    panel_raw$npr_scored_function_change_events,
+  na.rm = TRUE
+)
+
+if (
+  occurrence_mismatch_rows > 0 ||
+    zero_flag_mismatch_rows > 0 ||
+    partition_mismatch_rows > 0
+) {
+  stop(
+    "NPR event arithmetic violated. Occurrence mismatches: ",
+    occurrence_mismatch_rows,
+    "; zero-flag mismatches: ",
+    zero_flag_mismatch_rows,
+    "; AGC/HWC partition mismatches: ",
+    partition_mismatch_rows
+  )
+}
+
+positive_event_mask <- panel_raw$npr_scored_function_change_events > 0
+zero_event_mask <- !positive_event_mask
+ratio_missing_positive_rows <- sum(
+  is.na(panel_raw$npr_agc_function_change_event_ratio[positive_event_mask])
+)
+ratio_nonmissing_zero_rows <- sum(
+  !is.na(panel_raw$npr_agc_function_change_event_ratio[zero_event_mask])
+)
+ratio_out_of_bounds_rows <- sum(
+  !panel_raw$npr_agc_function_change_event_ratio[positive_event_mask] %between%
+    c(0, 1),
+  na.rm = TRUE
+)
+if (
+  ratio_missing_positive_rows > 0 ||
+    ratio_nonmissing_zero_rows > 0 ||
+    ratio_out_of_bounds_rows > 0
+) {
+  stop(
+    "Conditional NPR ratio contract violated. Missing-positive: ",
+    ratio_missing_positive_rows,
+    "; nonmissing-zero: ",
+    ratio_nonmissing_zero_rows,
+    "; out-of-bounds: ",
+    ratio_out_of_bounds_rows
+  )
+}
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repositories:", uniqueN(panel_raw$repo_name), "\n")
+cat("Zero NPR-event rows:", sum(zero_event_mask), "\n")
+cat("NPR-positive rows:", sum(positive_event_mask), "\n")
+```
+
+# Select Outcomes, Covariates, and Analysis Sample
+
+```{r configure-model}
+if (sample_type == "full") {
+  outcome_vars <- c(
+    "has_npr_scored_function_change_event",
+    "log1p_npr_scored_function_change_events",
+    "log1p_npr_agc_function_change_events",
+    "log1p_npr_hwc_function_change_events"
+  )
+  outcome_names <- c(
+    "Any NPR-Scored Function-Change Event",
+    "NPR-Scored Function-Change Events (log1p)",
+    "NPR AGC-Like Function-Change Events (log1p)",
+    "NPR HWC-Like Function-Change Events (log1p)"
+  )
+} else {
+  outcome_vars <- c("npr_agc_function_change_event_ratio")
+  outcome_names <- c(
+    "NPR AGC-Like Event Share | Positive NPR-Event Month"
+  )
+}
+
+if (ncloc_spec == "paper") {
+  ncloc_column <- "ncloc_paper"
+  readiness_column <- if (sample_type == "full") {
+    "analysis_ready_npr_paper_ncloc"
+  } else {
+    "analysis_ready_npr_ratio_paper_ncloc"
+  }
+} else {
+  ncloc_column <- "ncloc_python_snapshot"
+  readiness_column <- if (sample_type == "full") {
+    "analysis_ready_npr_python_snapshot_ncloc"
+  } else {
+    "analysis_ready_npr_ratio_python_snapshot_ncloc"
+  }
+}
+
+covariates <- c(
+  "log1p_age",
+  ncloc_column,
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues"
+)
+require_columns(
+  panel_raw,
+  c(outcome_vars, covariates, readiness_column),
+  "Configured model"
+)
+
+panel_data <- copy(panel_raw)
+panel_data <- panel_data[get(readiness_column) == 1]
+rows_after_readiness_filter <- nrow(panel_data)
+
+if (parse_exclusion_mode == "parse_clean") {
+  panel_data <- panel_data[has_parse_exclusion == 0]
+}
+rows_after_parse_filter <- nrow(panel_data)
+
+if (sample_type == "ratio") {
+  panel_data <- panel_data[
+    npr_scored_function_change_events > 0 &
+      !is.na(npr_agc_function_change_event_ratio)
+  ]
+}
+rows_after_ratio_filter <- nrow(panel_data)
+
+if (nrow(panel_data) == 0) {
+  stop("No rows remain after the explicit analysis filters.")
+}
+
+model_required <- c(outcome_vars, covariates)
+implicit_missing_rows <- sum(!complete.cases(panel_data[, ..model_required]))
+if (implicit_missing_rows > 0) {
+  stop(
+    "Analysis-ready flag allowed rows with missing model variables: ",
+    implicit_missing_rows
+  )
+}
+
+panel_data[, time_yyyymm := normalize_yyyymm(time)]
+event_yyyymm_raw <- normalize_yyyymm(panel_data$event)
+event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
+panel_data[, event_yyyymm := event_yyyymm_raw]
+
+event_membership_mismatch_rows <- panel_data[
+  ,
+  sum((dataset_source == "treatment") != (event_yyyymm > 0L))
+]
+if (event_membership_mismatch_rows > 0) {
+  stop(
+    "Event encoding disagrees with dataset_source on ",
+    event_membership_mismatch_rows,
+    " rows."
+  )
+}
+
+panel_data <- panel_data[
+  event_yyyymm == 0L |
+    (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+]
+rows_after_cohort_filter <- nrow(panel_data)
+
+panel_data[, repo_name_str := as.character(repo_name)]
+panel_data[, repo_id := as.integer(factor(repo_name_str))]
+
+if (time_mode == "original_yyyymm") {
+  panel_data[, time_id := time_yyyymm]
+  panel_data[, event_id := event_yyyymm]
+  time_encoding_used <- "numeric_YYYYMM_original_notebook_compatible"
+} else {
+  panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+  panel_data[, event_id := fifelse(
+    event_yyyymm == 0L,
+    0L,
+    yyyymm_to_month_id(event_yyyymm)
+  )]
+  time_encoding_used <- "sequential_calendar_month_id"
+}
+
+panel_data <- panel_data[!is.na(time_id)]
+panel_data <- panel_data[event_id == 0L | !is.na(event_id)]
+panel_data[, treated := as.integer(event_id > 0L)]
+
+first_stage_rhs <- paste(covariates, collapse = " + ")
+first_stage_formula <- as.formula(
+  paste0("~ ", first_stage_rhs, " | repo_id + time_id")
+)
+
+cat("Readiness column:", readiness_column, "\n")
+cat("Rows after readiness filter:", rows_after_readiness_filter, "\n")
+cat("Rows after parse filter:", rows_after_parse_filter, "\n")
+cat("Rows after ratio filter:", rows_after_ratio_filter, "\n")
+cat("Rows after cohort filter:", rows_after_cohort_filter, "\n")
+cat("Rows used by models:", nrow(panel_data), "\n")
+cat("Repositories used:", uniqueN(panel_data$repo_id), "\n")
+cat("Time encoding:", time_encoding_used, "\n")
+cat("First-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Panel Checks and Input Summary
+
+```{r panel-checks}
+panel_checks <- data.frame(
+  check = c(
+    "panel_label",
+    "specification_name",
+    "sample_type",
+    "ncloc_specification",
+    "readiness_column",
+    "time_mode",
+    "parse_exclusion_mode",
+    "input_rows",
+    "input_repositories",
+    "specification_mismatch_rows",
+    "treatment_group_mismatch_rows",
+    "event_membership_mismatch_rows",
+    "occurrence_arithmetic_mismatch_rows",
+    "zero_flag_arithmetic_mismatch_rows",
+    "agc_hwc_partition_mismatch_rows",
+    "detection_incomplete_rows",
+    "ratio_missing_positive_rows",
+    "ratio_nonmissing_zero_rows",
+    "ratio_out_of_bounds_rows",
+    "rows_after_readiness_filter",
+    "rows_after_parse_filter",
+    "rows_after_ratio_filter",
+    "rows_after_cohort_filter",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "treated_repositories",
+    "control_repositories",
+    "zero_npr_event_rows_in_model_sample",
+    "parse_exclusion_rows_in_model_sample",
+    "outcome_missing_sum",
+    "covariate_missing_sum",
+    "npr_agc_threshold",
+    "npr_algorithm_version",
+    "npr_decision_rule",
+    "npr_window_policy",
+    "npr_function_aggregation",
+    "npr_partial_body_policy",
+    "npr_scoring_model",
+    "npr_window_size_literal_space_tokens",
+    "npr_perturbations_per_window",
+    "npr_random_seed"
+  ),
+  value = c(
+    panel_label,
+    specification_name,
+    sample_type,
+    ncloc_spec,
+    readiness_column,
+    time_mode,
+    parse_exclusion_mode,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    specification_mismatch_rows,
+    treatment_group_mismatch_rows,
+    event_membership_mismatch_rows,
+    occurrence_mismatch_rows,
+    zero_flag_mismatch_rows,
+    partition_mismatch_rows,
+    detection_incomplete_rows,
+    ratio_missing_positive_rows,
+    ratio_nonmissing_zero_rows,
+    ratio_out_of_bounds_rows,
+    rows_after_readiness_filter,
+    rows_after_parse_filter,
+    rows_after_ratio_filter,
+    rows_after_cohort_filter,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    uniqueN(panel_data[treated == 1, repo_id]),
+    uniqueN(panel_data[treated == 0, repo_id]),
+    sum(panel_data$zero_npr_scored_function_event_month == 1, na.rm = TRUE),
+    sum(panel_data$has_parse_exclusion == 1, na.rm = TRUE),
+    sum(is.na(panel_data[, ..outcome_vars])),
+    sum(is.na(panel_data[, ..covariates])),
+    paste(unique(panel_raw$npr_agc_threshold), collapse = ";"),
+    paste(unique(panel_raw$npr_algorithm_version), collapse = ";"),
+    paste(unique(panel_raw$npr_decision_rule), collapse = ";"),
+    paste(unique(panel_raw$npr_window_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_function_aggregation), collapse = ";"),
+    paste(unique(panel_raw$npr_partial_body_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_scoring_model), collapse = ";"),
+    paste(unique(panel_raw$npr_window_size_literal_space_tokens), collapse = ";"),
+    paste(unique(panel_raw$npr_perturbations_per_window), collapse = ";"),
+    paste(unique(panel_raw$npr_random_seed), collapse = ";")
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(panel_checks)
+fwrite(
+  panel_checks,
+  file.path(out_dir, "borusyak_agc_commit_function_npr_panel_checks.csv")
+)
+
+input_summary <- panel_data[, .(
+  rows = .N,
+  repositories = uniqueN(repo_id),
+  mean_has_npr_scored_function_change_event = mean(
+    has_npr_scored_function_change_event,
+    na.rm = TRUE
+  ),
+  mean_log1p_npr_scored_function_change_events = mean(
+    log1p_npr_scored_function_change_events,
+    na.rm = TRUE
+  ),
+  mean_log1p_npr_agc_function_change_events = mean(
+    log1p_npr_agc_function_change_events,
+    na.rm = TRUE
+  ),
+  mean_log1p_npr_hwc_function_change_events = mean(
+    log1p_npr_hwc_function_change_events,
+    na.rm = TRUE
+  ),
+  mean_npr_agc_function_change_event_ratio = mean(
+    npr_agc_function_change_event_ratio,
+    na.rm = TRUE
+  ),
+  mean_ncloc = mean(get(ncloc_column), na.rm = TRUE)
+), by = dataset_source]
+
+print(input_summary)
+fwrite(
+  input_summary,
+  file.path(out_dir, "borusyak_agc_commit_function_npr_input_summary.csv")
+)
+```
+
+# Outcomes and First Stage
+
+```{r outcomes}
+print(data.frame(outcome = outcome_vars, label = outcome_names))
+cat("NCLOC column:", ncloc_column, "\n")
+cat("Readiness column:", readiness_column, "\n")
+print(first_stage_formula)
+```
+
+# Static Borusyak Effects
+
+```{r static-effects}
+static_results <- list()
+static_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running static Borusyak model for:", var, "\n")
+  static_results[[var]] <- tryCatch(
+    run_borusyak_static(
+      data = panel_data,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      static_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+static_df <- bind_rows(lapply(outcome_vars, function(v) {
+  extract_static_result(static_results[[v]], v)
+}))
+static_df$outcome_label <- outcome_names[match(static_df$outcome, outcome_vars)]
+static_df$panel <- panel_label
+static_df$specification <- specification_name
+static_df$sample_type <- sample_type
+static_df$ncloc_spec <- ncloc_spec
+static_df$time_mode <- time_mode
+static_df$parse_exclusion_mode <- parse_exclusion_mode
+
+print(static_df)
+fwrite(
+  static_df,
+  file.path(out_dir, "borusyak_agc_commit_function_npr_static_effects.csv")
+)
+write_error_table(
+  static_errors,
+  "static",
+  file.path(out_dir, "borusyak_agc_commit_function_npr_static_errors.csv")
+)
+```
+
+# Dynamic Borusyak Effects
+
+```{r dynamic-effects}
+dynamic_results <- list()
+dynamic_errors <- list()
+
+for (var in outcome_vars) {
+  cat("Running dynamic Borusyak model for:", var, "\n")
+  dynamic_results[[var]] <- tryCatch(
+    run_borusyak_dynamic(
+      data = panel_data,
+      outcome_var = var,
+      first_stage_formula = first_stage_formula,
+      horizon = -6:6,
+      pretrends = -6:-2,
+      idname = "repo_id",
+      tname = "time_id",
+      gname = "event_id"
+    ),
+    error = function(e) {
+      dynamic_errors[[var]] <<- conditionMessage(e)
+      NULL
+    }
+  )
+}
+
+dynamic_df <- bind_rows(lapply(seq_along(outcome_vars), function(i) {
+  v <- outcome_vars[i]
+  extract_dynamic_result(
+    dynamic_results[[v]],
+    outcome = v,
+    outcome_label = outcome_names[i],
+    min_horizon = -6,
+    max_horizon = 6
+  )
+}))
+
+if (nrow(dynamic_df) > 0) {
+  dynamic_df$panel <- panel_label
+  dynamic_df$specification <- specification_name
+  dynamic_df$sample_type <- sample_type
+  dynamic_df$ncloc_spec <- ncloc_spec
+  dynamic_df$time_mode <- time_mode
+  dynamic_df$parse_exclusion_mode <- parse_exclusion_mode
+}
+
+print(dynamic_df)
+fwrite(
+  dynamic_df,
+  file.path(out_dir, "borusyak_agc_commit_function_npr_dynamic_effects.csv")
+)
+write_error_table(
+  dynamic_errors,
+  "dynamic",
+  file.path(out_dir, "borusyak_agc_commit_function_npr_dynamic_errors.csv")
+)
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=11, fig.height=3.5}
+if (nrow(dynamic_df) > 0) {
+  dynamic_df$outcome_label <- factor(
+    dynamic_df$outcome_label,
+    levels = outcome_names
+  )
+
+  plot_object <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_errorbar(
+      data = subset(dynamic_df, significant %in% TRUE),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "solid"
+    ) +
+    geom_errorbar(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "dotted"
+    ) +
+    geom_point(
+      data = subset(dynamic_df, significant %in% TRUE),
+      shape = 19,
+      size = 1.7
+    ) +
+    geom_point(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      shape = 21,
+      fill = "transparent",
+      size = 1.7
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
+    labs(
+      title = paste("Borusyak NPR Commit-Function AGC DiD:", panel_label),
+      subtitle = paste(
+        "Specification:", specification_name,
+        "| Sample:", sample_type,
+        "| NCLOC:", ncloc_spec,
+        "| Time:", time_encoding_used,
+        "| Parse:", parse_exclusion_mode
+      ),
+      x = "Months Relative to Cursor Adoption",
+      y = "Treatment Effect",
+      caption = paste(
+        "Filled dots: CI excludes 0. Hollow dots: CI includes 0.",
+        if (sample_type == "ratio") {
+          paste(
+            "Ratio is conditional on at least one NPR-scored",
+            "function-change event."
+          )
+        } else {
+          "Zero NPR-event repository-months are retained."
+        }
+      )
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
+
+  print(plot_object)
+  ggsave(
+    filename = file.path(
+      out_dir,
+      "dynamic_effects_borusyak_agc_commit_function_npr.pdf"
+    ),
+    plot = plot_object,
+    width = 11,
+    height = 3.5
+  )
+} else {
+  cat("No dynamic effects to plot.\n")
+}
+```
+
+# Final Model Validation (Hard Fail)
+
+```{r final-model-validation}
+static_model_error_count <- length(static_errors)
+dynamic_model_error_count <- length(dynamic_errors)
+
+static_effects_complete <- all(outcome_vars %in% static_df$outcome) &&
+  all(!is.na(static_df$estimate[match(outcome_vars, static_df$outcome)]))
+
+dynamic_effects_nonempty <- nrow(dynamic_df) > 0 &&
+  all(outcome_vars %in% dynamic_df$outcome)
+
+dynamic_pre_period_present <- if (dynamic_effects_nonempty) {
+  all(sapply(outcome_vars, function(v) {
+    any(dynamic_df$outcome == v & dynamic_df$time < 0)
+  }))
+} else {
+  FALSE
+}
+
+dynamic_post_period_present <- if (dynamic_effects_nonempty) {
+  all(sapply(outcome_vars, function(v) {
+    any(dynamic_df$outcome == v & dynamic_df$time >= 0)
+  }))
+} else {
+  FALSE
+}
+
+final_model_validation <- data.frame(
+  check = c(
+    "static_model_error_count",
+    "dynamic_model_error_count",
+    "static_effects_complete",
+    "dynamic_effects_nonempty",
+    "dynamic_pre_period_present",
+    "dynamic_post_period_present"
+  ),
+  value = c(
+    static_model_error_count,
+    dynamic_model_error_count,
+    static_effects_complete,
+    dynamic_effects_nonempty,
+    dynamic_pre_period_present,
+    dynamic_post_period_present
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(final_model_validation)
+fwrite(
+  final_model_validation,
+  file.path(
+    out_dir,
+    "borusyak_agc_commit_function_npr_final_model_validation.csv"
+  )
+)
+
+if (static_model_error_count > 0) {
+  stop("Static model failures: ", paste(names(static_errors), collapse = ", "))
+}
+if (dynamic_model_error_count > 0) {
+  stop("Dynamic model failures: ", paste(names(dynamic_errors), collapse = ", "))
+}
+if (!static_effects_complete) {
+  stop("Static effects are incomplete or contain missing estimates.")
+}
+if (!dynamic_effects_nonempty) {
+  stop("Dynamic effects are empty or missing one or more outcomes.")
+}
+if (!dynamic_pre_period_present || !dynamic_post_period_present) {
+  stop("Dynamic effects do not contain both pre- and post-treatment periods.")
+}
+```
+
+# Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "script",
+    "helper_file",
+    "panel_label",
+    "panel_path",
+    "out_dir",
+    "specification_name",
+    "sample_type",
+    "ncloc_specification",
+    "ncloc_column",
+    "readiness_column",
+    "parse_exclusion_mode",
+    "outcomes",
+    "covariates",
+    "first_stage_formula",
+    "rows_after_readiness_filter",
+    "rows_after_parse_filter",
+    "rows_after_ratio_filter",
+    "rows_after_cohort_filter",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "estimator",
+    "time_encoding",
+    "horizon",
+    "pretrends",
+    "static_model_error_count",
+    "dynamic_model_error_count",
+    "npr_agc_threshold",
+    "npr_algorithm_version",
+    "npr_decision_rule",
+    "npr_window_policy",
+    "npr_function_aggregation",
+    "npr_partial_body_policy",
+    "npr_scoring_model",
+    "npr_window_size_literal_space_tokens",
+    "npr_perturbations_per_window",
+    "npr_random_seed",
+    "input_source",
+    "interpretation_note"
+  ),
+  value = c(
+    "proc_r/DiffInDiffBorusyak_agc_commit_function_npr.Rmd",
+    helper_path,
+    panel_label,
+    panel_path,
+    out_dir,
+    specification_name,
+    sample_type,
+    ncloc_spec,
+    ncloc_column,
+    readiness_column,
+    parse_exclusion_mode,
+    paste(outcome_vars, collapse = ", "),
+    paste(covariates, collapse = " + "),
+    paste(deparse(first_stage_formula), collapse = " "),
+    rows_after_readiness_filter,
+    rows_after_parse_filter,
+    rows_after_ratio_filter,
+    rows_after_cohort_filter,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    "Borusyak imputation via didimputation::did_imputation",
+    time_encoding_used,
+    "-6:6",
+    "-6:-2",
+    static_model_error_count,
+    dynamic_model_error_count,
+    paste(unique(panel_raw$npr_agc_threshold), collapse = ";"),
+    paste(unique(panel_raw$npr_algorithm_version), collapse = ";"),
+    paste(unique(panel_raw$npr_decision_rule), collapse = ";"),
+    paste(unique(panel_raw$npr_window_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_function_aggregation), collapse = ";"),
+    paste(unique(panel_raw$npr_partial_body_policy), collapse = ";"),
+    paste(unique(panel_raw$npr_scoring_model), collapse = ";"),
+    paste(unique(panel_raw$npr_window_size_literal_space_tokens), collapse = ";"),
+    paste(unique(panel_raw$npr_perturbations_per_window), collapse = ";"),
+    paste(unique(panel_raw$npr_random_seed), collapse = ";"),
+    paste(
+      "run-py-7b NPR covariate-complete panel derived from run-py-7a",
+      "repository-month aggregation of frozen DetectCodeGPT body scores"
+    ),
+    if (sample_type == "ratio") {
+      paste(
+        "Conditional composition effect among repository-months with at",
+        "least one NPR-scored function-change event. It is not an",
+        "unconditional total effect and may be subject to post-treatment",
+        "selection if treatment affects the occurrence of NPR-scored events."
+      )
+    } else {
+      paste(
+        "Occurrence and count outcomes use the full zero-inclusive",
+        "repository-month panel for the specified NPR token range."
+      )
+    }
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(metadata)
+fwrite(
+  metadata,
+  file.path(out_dir, "borusyak_agc_commit_function_npr_metadata.csv")
+)
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```

@@ -1,0 +1,44 @@
+key,value
+script,proc_r/DiffInDiffBorusyak_regular_module_function_agc_unique_body-v1.Rmd
+helper_file,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/proc_r/diff_in_diff_borusyak_helpers.R
+panel_label,strict_range100_200_regular_module_function_agc_unique_body_python_snapshot_ncloc_calendar_month_parse_clean
+panel_path,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-7e/strict/specifications/range100_200/panel_event_monthly_regular_module_function_agc_unique_body_parse_clean.csv
+out_dir,/home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study/repo_python/run-py-7f/strict/specifications/range100_200/python_snapshot_ncloc/calendar_month/parse_clean
+specification_name,range100_200
+ncloc_specification,python_snapshot
+ncloc_column,ncloc_python_snapshot
+readiness_column,analysis_ready_regular_module_function_agc_unique_body_python_snapshot_ncloc
+time_mode,calendar_month
+parse_exclusion_mode,parse_clean
+outcome,npr_agc_regular_module_function_unique_bodies
+outcome_label,AGC-Like Regular-Function Unique Bodies
+outcome_scale,raw_count
+outcome_unit,distinct bodies per repository-month
+function_scope,module_function
+classification,AGC-like only
+count_unit,distinct_function_body_sha256_per_repository_month
+covariates,log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars + log1p_issues
+first_stage_formula,~log1p_age + ncloc_python_snapshot + log1p_contributors + log1p_stars +      log1p_issues | repo_id + time_id
+rows_after_readiness_filter,1521
+rows_after_parse_filter,1521
+rows_after_cohort_filter,1521
+rows_used_by_models,1521
+repositories_used_by_models,218
+estimator,Borusyak imputation via didimputation::did_imputation
+time_encoding,sequential_calendar_month_id
+horizon,-6:6
+pretrends,-6:-2
+static_model_error_count,0
+dynamic_model_error_count,0
+significant_pre_period_count,0
+npr_agc_threshold,1.571637
+npr_algorithm_version,overlap_final_full_window_valid_frontier_weighting-v1
+npr_decision_rule,function_npr > agc_threshold
+npr_window_policy,full_size_final_window_shifted_backward_with_overlap
+npr_function_aggregation,valid_frontier_weighted_mean
+npr_partial_body_policy,any_valid_window_partial_success_full_windows-v2
+npr_scoring_model,bigcode/starcoder2-7b
+npr_window_size_literal_space_tokens,128
+npr_perturbations_per_window,50
+npr_random_seed,20260723
+interpretation_note,"A dynamic coefficient at month X is the estimated average change in distinct AGC-like synchronous module-function bodies per repository-month. The AGC-like label is a detector classification, not verified AI provenance."

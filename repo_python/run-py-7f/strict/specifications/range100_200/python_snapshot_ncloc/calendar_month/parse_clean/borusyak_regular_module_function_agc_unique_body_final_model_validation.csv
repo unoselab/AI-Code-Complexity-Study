@@ -1,0 +1,8 @@
+check,value
+static_model_error_count,0
+dynamic_model_error_count,0
+static_effect_complete,1
+dynamic_effects_nonempty,1
+dynamic_pre_period_present,1
+dynamic_post_period_present,1
+significant_pre_period_count,0

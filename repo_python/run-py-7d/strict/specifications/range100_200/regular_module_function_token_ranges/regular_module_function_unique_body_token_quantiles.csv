@@ -1,0 +1,15 @@
+classification,quantile,token_count
+AGC-like,0.0,100.0
+AGC-like,0.1,108.0
+AGC-like,0.25,119.0
+AGC-like,0.5,139.0
+AGC-like,0.75,165.0
+AGC-like,0.9,185.0
+AGC-like,1.0,200.0
+HWC-like,0.0,100.0
+HWC-like,0.1,107.0
+HWC-like,0.25,119.0
+HWC-like,0.5,142.0
+HWC-like,0.75,168.0
+HWC-like,0.9,187.0
+HWC-like,1.0,200.0

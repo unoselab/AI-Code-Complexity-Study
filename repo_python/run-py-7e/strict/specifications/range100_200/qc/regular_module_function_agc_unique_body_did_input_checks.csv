@@ -1,0 +1,23 @@
+check_name,passed,observed,expected,note
+base_panel_dataset_source_valid,True,0,0,The matched panel must contain only control and treatment rows.
+treatment_group_matches_dataset_source,True,0,0,Treatment-group metadata must agree with dataset_source.
+base_panel_specification_matches,True,0,0,The base panel must use the requested frozen NPR specification.
+base_panel_detection_complete,True,0,0,All retained repository-months must have complete frozen detection metadata.
+regular_event_rows_match_expected,True,22360,22360,Regular synchronous module-function events must reproduce run-py-7d.
+regular_unique_bodies_match_expected,True,18673,18673,Regular unique bodies must reproduce run-py-7d.
+agc_regular_event_rows_match_expected,True,2994,2994,AGC-like regular-function events must reproduce run-py-7d.
+agc_regular_unique_bodies_match_expected,True,2463,2463,AGC-like regular-function unique bodies must reproduce run-py-7d.
+all_regular_event_repo_months_map_to_panel,True,0,0,Every regular-function event repository-month must exist in the matched panel.
+panel_rows_match_expected,True,1633,1633,The zero-inclusive panel must retain every matched repository-month.
+control_rows_match_expected,True,780,780,Control repository-month count must match the frozen strict panel.
+treatment_rows_match_expected,True,853,853,Treatment repository-month count must match the frozen strict panel.
+parse_exclusion_rows_match_expected,True,97,97,Parse-exclusion count must match the frozen strict panel.
+outcome_is_nonnegative_integer_count,True,0,0,The primary outcome must be a nonnegative integer count.
+occurrence_flag_matches_count,True,0,0,Occurrence must equal one exactly when the count is positive.
+zero_flag_matches_count,True,0,0,Zero-month flag must equal one exactly when the count is zero.
+log1p_diagnostic_matches_raw_count,True,0,0,The diagnostic log1p column must be a deterministic transform of the raw count.
+repo_month_counts_reconstruct_distinct_agc_body_rows,True,2620,2620,Summed repository-month counts must reconstruct distinct AGC body occurrences.
+output_excludes_hwc_and_ratio_columns,True,,none,The focused panel must not carry HWC or ratio variables.
+full_panel_retains_zero_count_months,True,1080,> 0,The unconditional count estimand requires zero-count repository-months.
+full_panel_contains_positive_count_months,True,553,> 0,At least one repository-month must contain an AGC-like regular body.
+parse_clean_panel_has_no_parse_exclusions,True,0,0,Parse-clean output must remove every parse-exclusion repository-month.
