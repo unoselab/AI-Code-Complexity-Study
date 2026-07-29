@@ -786,7 +786,7 @@ fwrite(validation, validation_file)
 fwrite(errors, errors_file)
 fwrite(
   data.table(
-    key = c(
+    metadata_key = c(
       "analysis",
       "sample",
       "method_ablation_unit",
