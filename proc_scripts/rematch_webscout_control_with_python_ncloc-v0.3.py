@@ -8,11 +8,9 @@ third matched control.
 The original paper propensity score is preserved. The six target treatments
 and their three original controls are exact ties under the paper score. The
 three original controls are retained as benchmark-only rows and are excluded
-from replacement eligibility. This revision expands the strict exact-score
-search to all locally available nearest-neighbor candidates with an observed
-paper propensity score or a score inferred from an identical complete paper
-feature vector. Direct pre-adoption Python NCLOC is then used as the second
-matching dimension after propensity-score distance.
+from replacement eligibility. This program restores Python-only source
+snapshots at the end of the last pre-adoption month and uses direct Python
+NCLOC as a tie-breaking dimension for new local control candidates.
 
 Important design constraints:
 - The program never reads post-adoption AGC outcomes.
@@ -60,7 +58,6 @@ CUTOFF_UTC = "2024-09-30T23:59:59+00:00"
 TARGET_PROPENSITY_SCORE = 0.0212830932484271
 OUTPUT_PREFIX = "webscout_local_control_rematching"
 MEASUREMENT_METHOD = "git_archive_python_token_ast_ncloc_v1"
-SELECTION_STRATEGY = "expanded_paper_propensity_nearest_neighbor_then_python_ncloc_v2"
 
 EXPECTED_TARGET_TREATMENTS = (
     "Elevate-Code/better-voice-typing",
@@ -81,16 +78,6 @@ PAPER_SUMMARY_FEATURES = (
     "n_issues",
     "n_comments",
     "total_events",
-)
-
-PAPER_PROFILE_AUDIT_COLUMNS = (
-    "paper_candidate_feature_rows",
-    "paper_within_period_count",
-    "paper_sum_period_count",
-    "paper_candidate_profile_complete",
-    "paper_age_days_202409",
-    "paper_all_activity_features_zero",
-    "paper_zero_profile_exact",
 )
 
 REPO_ALIASES = (
@@ -254,26 +241,6 @@ def normalize_repo_name(value: object) -> str:
 
 def normalize_repo_series(series: pd.Series) -> pd.Series:
     return series.map(normalize_repo_name)
-
-
-def boolean_series(series: pd.Series, default: bool = False) -> pd.Series:
-    """Return a concrete bool Series without pandas silent-downcast warnings."""
-    return series.astype("boolean").fillna(default).astype(bool)
-
-
-def finite_stat(series: pd.Series, statistic: str) -> float:
-    """Compute a statistic only when at least one finite numeric value exists."""
-    numeric = pd.to_numeric(series, errors="coerce")
-    numeric = numeric[np.isfinite(numeric.to_numpy(dtype=float, na_value=np.nan))]
-    if numeric.empty:
-        return float("nan")
-    if statistic == "max":
-        return float(numeric.max())
-    if statistic == "mean":
-        return float(numeric.mean())
-    if statistic == "median":
-        return float(numeric.median())
-    raise ValueError(f"Unsupported statistic: {statistic}")
 
 
 def normalize_month(value: object) -> str:
@@ -1387,14 +1354,6 @@ def build_candidate_eligibility(
     propensity_caliper: float,
     feature_summary: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Build the expanded nearest-neighbor replacement candidate table.
-
-    The frozen strict caliper remains an audit field, but it is not an
-    eligibility gate in the expanded nearest-neighbor sensitivity. A candidate
-    needs either an observed paper propensity score or an inferred score based
-    on a complete paper feature vector that is exactly identical to the frozen
-    all-zero target profile.
-    """
     controls = local_controls.copy()
     match_columns = [
         "repo_name",
@@ -1416,10 +1375,12 @@ def build_candidate_eligibility(
         columns={"propensity_score": "original_propensity_score"}
     )
     controls = controls.merge(matching_unique, on="repo_name", how="left")
-
     control_measurements = measurements[
         measurements["dataset_source"].eq("control")
-    ].drop(columns=["local_clone_exists"], errors="ignore")
+    ].drop(
+        columns=["local_clone_exists"],
+        errors="ignore",
+    )
     controls = controls.merge(
         control_measurements,
         on=["dataset_source", "repo_name", "clone_path"],
@@ -1427,83 +1388,12 @@ def build_candidate_eligibility(
         validate="one_to_one",
     )
     if not feature_summary.empty:
-        # feature_summary is authoritative for paper-profile audit fields.
-        # local_controls may already contain a pre-screen flag. Remove all
-        # overlapping audit fields before merging so pandas cannot create
-        # *_x and *_y columns and silently lose the authoritative value.
-        authoritative_columns = [
-            column
-            for column in PAPER_PROFILE_AUDIT_COLUMNS
-            if column in feature_summary.columns
-        ]
-        controls = controls.drop(
-            columns=[
-                column
-                for column in PAPER_PROFILE_AUDIT_COLUMNS
-                if column in controls.columns
-            ],
-            errors="ignore",
-        )
-        controls = controls.merge(
-            feature_summary[["repo_name", *authoritative_columns]],
-            on="repo_name",
-            how="left",
-            validate="one_to_one",
-        )
-
-    duplicate_profile_columns = [
-        column
-        for column in controls.columns
-        if any(
-            column == f"{base}_x" or column == f"{base}_y"
-            for base in PAPER_PROFILE_AUDIT_COLUMNS
-        )
-    ]
-    if duplicate_profile_columns:
-        raise ValueError(
-            "Duplicate paper-profile columns remained after the authoritative "
-            "feature-summary merge: "
-            + ", ".join(sorted(duplicate_profile_columns))
-        )
-
-    for column, default in (
-        ("paper_candidate_profile_complete", False),
-        ("paper_all_activity_features_zero", False),
-        ("paper_zero_profile_exact", False),
-    ):
-        if column not in controls.columns:
-            controls[column] = default
-        controls[column] = boolean_series(controls[column], default=default)
-
-    if "paper_age_days_202409" not in controls.columns:
-        controls["paper_age_days_202409"] = np.nan
-    paper_age_zero = pd.to_numeric(
-        controls["paper_age_days_202409"], errors="coerce"
-    ).eq(0.0)
-    expected_exact_profile = (
-        controls["paper_candidate_profile_complete"]
-        & controls["paper_all_activity_features_zero"]
-        & paper_age_zero
-    )
-    exact_profile_mismatch = controls["paper_zero_profile_exact"].ne(
-        expected_exact_profile
-    )
-    if exact_profile_mismatch.any():
-        mismatch_rows = controls.loc[
-            exact_profile_mismatch,
-            [
-                "repo_name",
-                "paper_candidate_profile_complete",
-                "paper_all_activity_features_zero",
-                "paper_age_days_202409",
-                "paper_zero_profile_exact",
-            ],
-        ]
-        raise ValueError(
-            "paper_zero_profile_exact is inconsistent with its authoritative "
-            "component fields:\n"
-            + mismatch_rows.head(20).to_string(index=False)
-        )
+        controls = controls.merge(feature_summary, on="repo_name", how="left")
+    if "paper_zero_profile_exact" not in controls.columns:
+        controls["paper_zero_profile_exact"] = False
+    controls["paper_zero_profile_exact"] = controls[
+        "paper_zero_profile_exact"
+    ].fillna(False)
 
     controls["original_propensity_score_source"] = np.where(
         controls["original_propensity_score"].notna(),
@@ -1512,12 +1402,11 @@ def build_candidate_eligibility(
     )
     inferred_exact = (
         controls["original_propensity_score"].isna()
-        & controls["paper_candidate_profile_complete"]
         & controls["paper_zero_profile_exact"]
     )
     controls.loc[inferred_exact, "original_propensity_score"] = target_score
     controls.loc[inferred_exact, "original_propensity_score_source"] = (
-        "inferred_from_identical_complete_zero_paper_feature_vector"
+        "inferred_from_identical_zero_paper_feature_vector"
     )
 
     controls["target_propensity_score"] = target_score
@@ -1528,45 +1417,24 @@ def build_candidate_eligibility(
         controls["propensity_distance"].notna()
         & controls["propensity_distance"].le(propensity_caliper)
     )
-    controls["strict_exact_caliper_diagnostic_only"] = controls[
-        "within_propensity_caliper"
-    ]
     controls["is_original_webscout"] = controls["repo_name"].eq(target_control)
     controls["is_original_control"] = controls["repo_name"].isin(original_controls)
     control_rank_map = {repo: rank for rank, repo in enumerate(original_controls, start=1)}
     controls["original_control_rank"] = controls["repo_name"].map(control_rank_map)
-    controls["is_target_treatment_overlap"] = controls["repo_name"].isin(
-        target_treatments
-    )
+    controls["is_target_treatment_overlap"] = controls["repo_name"].isin(target_treatments)
     controls["paper_matching_row_found"] = controls[
         "original_propensity_score_source"
     ].eq("matching_csv_observed")
     controls["paper_propensity_score_available"] = controls[
         "original_propensity_score"
     ].notna()
-    controls["direct_ncloc_measurement_eligible"] = boolean_series(
-        controls["measurement_eligible"], default=False
-    )
-
-    controls["selection_tier"] = np.select(
-        [
-            controls["original_propensity_score_source"].eq(
-                "inferred_from_identical_complete_zero_paper_feature_vector"
-            ),
-            controls["within_propensity_caliper"],
-            controls["paper_propensity_score_available"],
-        ],
-        [
-            "inferred_exact_paper_profile",
-            "strict_caliper_match",
-            "expanded_nearest_neighbor",
-        ],
-        default="paper_score_unavailable",
-    )
-
+    controls["direct_ncloc_measurement_eligible"] = controls[
+        "measurement_eligible"
+    ].fillna(False)
     controls["eligible_replacement_candidate"] = (
-        boolean_series(controls["local_clone_exists"], default=False)
+        controls["local_clone_exists"].fillna(False)
         & controls["paper_propensity_score_available"]
+        & controls["within_propensity_caliper"]
         & controls["direct_ncloc_measurement_eligible"]
         & ~controls["is_original_control"]
         & ~controls["is_target_treatment_overlap"]
@@ -1574,13 +1442,15 @@ def build_candidate_eligibility(
 
     controls["ineligibility_reason"] = "eligible"
     masks_and_reasons = [
-        (~boolean_series(controls["local_clone_exists"], False), "local_clone_missing"),
-        (
-            ~controls["paper_propensity_score_available"],
-            "paper_propensity_score_unavailable_and_profile_not_exact",
-        ),
+        (~controls["local_clone_exists"].fillna(False), "local_clone_missing"),
+        (~controls["paper_propensity_score_available"], "paper_propensity_score_unavailable"),
         (
             controls["paper_propensity_score_available"]
+            & ~controls["within_propensity_caliper"],
+            "outside_original_propensity_caliper",
+        ),
+        (
+            controls["within_propensity_caliper"]
             & ~controls["direct_ncloc_measurement_eligible"],
             "direct_ncloc_measurement_unavailable",
         ),
@@ -1593,10 +1463,9 @@ def build_candidate_eligibility(
     ]
     for mask, reason in masks_and_reasons:
         controls.loc[mask, "ineligibility_reason"] = reason
-    controls.loc[
-        controls["eligible_replacement_candidate"], "ineligibility_reason"
-    ] = "eligible"
-    controls["selection_strategy"] = SELECTION_STRATEGY
+    controls.loc[controls["eligible_replacement_candidate"], "ineligibility_reason"] = (
+        "eligible"
+    )
     return controls.sort_values("repo_name").reset_index(drop=True)
 
 
@@ -1641,12 +1510,10 @@ def build_rankings(
             "measurement_eligible",
         ]
     ].copy()
-    target_eligible = boolean_series(
-        target_required["measurement_eligible"], default=False
-    )
-    if not target_eligible.all():
+    if not target_required["measurement_eligible"].fillna(False).all():
         unavailable = target_required.loc[
-            ~target_eligible, ["treatment_repo", "snapshot_status"]
+            ~target_required["measurement_eligible"].fillna(False),
+            ["treatment_repo", "snapshot_status"],
         ]
         raise ValueError(
             "Direct pre-adoption Python NCLOC is unavailable for target treatments:\n"
@@ -1656,15 +1523,8 @@ def build_rankings(
     candidate_columns = [
         "repo_name",
         "original_propensity_score",
-        "original_propensity_score_source",
         "propensity_distance",
         "within_propensity_caliper",
-        "strict_exact_caliper_diagnostic_only",
-        "selection_tier",
-        "paper_candidate_profile_complete",
-        "paper_age_days_202409",
-        "paper_all_activity_features_zero",
-        "paper_zero_profile_exact",
         "python_ncloc_direct",
         "repository_age_days_at_cutoff",
         "snapshot_status",
@@ -1674,10 +1534,7 @@ def build_rankings(
         "is_original_control",
         "original_control_rank",
         "failure_reason",
-        "ineligibility_reason",
-        "selection_strategy",
     ]
-    candidate_columns = [column for column in candidate_columns if column in candidates]
     candidate_data = candidates[candidate_columns].copy()
     candidate_data = candidate_data.rename(
         columns={
@@ -1716,11 +1573,10 @@ def build_rankings(
     ).abs()
 
     pairwise["rank_within_treatment"] = np.nan
-    for _, index in pairwise.groupby("treatment_repo").groups.items():
-        eligible_mask = boolean_series(
-            pairwise.loc[index, "eligible_replacement_candidate"], default=False
-        )
-        eligible_index = pairwise.loc[index].index[eligible_mask.to_numpy()]
+    for treatment_repo, index in pairwise.groupby("treatment_repo").groups.items():
+        eligible_index = pairwise.loc[index].index[
+            pairwise.loc[index, "eligible_replacement_candidate"].astype(bool)
+        ]
         ordered = pairwise.loc[eligible_index].sort_values(
             [
                 "propensity_distance_pair",
@@ -1741,45 +1597,58 @@ def build_rankings(
     grouped_rows = []
     for candidate_repo, group in pairwise.groupby("candidate_control_repo", sort=True):
         first = group.iloc[0]
-        row = {
-            "candidate_control_repo": candidate_repo,
-            "original_propensity_score": first.get("original_propensity_score"),
-            "original_propensity_score_source": first.get("original_propensity_score_source"),
-            "selection_tier": first.get("selection_tier"),
-            "max_propensity_distance": finite_stat(group["propensity_distance_pair"], "max"),
-            "mean_propensity_distance": finite_stat(group["propensity_distance_pair"], "mean"),
-            "candidate_python_ncloc_direct": first.get("candidate_python_ncloc_direct"),
-            "candidate_log1p_python_ncloc": first.get("candidate_log1p_python_ncloc"),
-            "max_python_ncloc_log_distance": finite_stat(group["python_ncloc_log_distance"], "max"),
-            "mean_python_ncloc_log_distance": finite_stat(group["python_ncloc_log_distance"], "mean"),
-            "median_python_ncloc_log_distance": finite_stat(group["python_ncloc_log_distance"], "median"),
-            "max_python_ncloc_raw_distance": finite_stat(group["python_ncloc_raw_distance"], "max"),
-            "mean_python_ncloc_raw_distance": finite_stat(group["python_ncloc_raw_distance"], "mean"),
-            "max_repository_age_distance_days": finite_stat(group["repository_age_distance_days"], "max"),
-            "mean_repository_age_distance_days": finite_stat(group["repository_age_distance_days"], "mean"),
-            "candidate_snapshot_status": first.get("candidate_snapshot_status"),
-            "candidate_measurement_eligible": first.get("candidate_measurement_eligible"),
-            "within_propensity_caliper": first.get("within_propensity_caliper"),
-            "eligible_replacement_candidate": first.get("eligible_replacement_candidate"),
-            "is_original_webscout": first.get("is_original_webscout"),
-            "is_original_control": first.get("is_original_control"),
-            "original_control_rank": first.get("original_control_rank"),
-            "paper_candidate_profile_complete": first.get("paper_candidate_profile_complete"),
-            "paper_age_days_202409": first.get("paper_age_days_202409"),
-            "paper_all_activity_features_zero": first.get("paper_all_activity_features_zero"),
-            "paper_zero_profile_exact": first.get("paper_zero_profile_exact"),
-            "candidate_measurement_failure_reason": first.get("candidate_measurement_failure_reason"),
-            "ineligibility_reason": first.get("ineligibility_reason"),
-            "selection_strategy": first.get("selection_strategy", SELECTION_STRATEGY),
-        }
-        grouped_rows.append(row)
-
+        grouped_rows.append(
+            {
+                "candidate_control_repo": candidate_repo,
+                "original_propensity_score": first["original_propensity_score"],
+                "max_propensity_distance": group["propensity_distance_pair"].max(),
+                "mean_propensity_distance": group["propensity_distance_pair"].mean(),
+                "candidate_python_ncloc_direct": first[
+                    "candidate_python_ncloc_direct"
+                ],
+                "candidate_log1p_python_ncloc": first[
+                    "candidate_log1p_python_ncloc"
+                ],
+                "max_python_ncloc_log_distance": group[
+                    "python_ncloc_log_distance"
+                ].max(),
+                "mean_python_ncloc_log_distance": group[
+                    "python_ncloc_log_distance"
+                ].mean(),
+                "median_python_ncloc_log_distance": group[
+                    "python_ncloc_log_distance"
+                ].median(),
+                "max_python_ncloc_raw_distance": group[
+                    "python_ncloc_raw_distance"
+                ].max(),
+                "mean_python_ncloc_raw_distance": group[
+                    "python_ncloc_raw_distance"
+                ].mean(),
+                "max_repository_age_distance_days": group[
+                    "repository_age_distance_days"
+                ].max(),
+                "mean_repository_age_distance_days": group[
+                    "repository_age_distance_days"
+                ].mean(),
+                "candidate_snapshot_status": first["candidate_snapshot_status"],
+                "candidate_measurement_eligible": first[
+                    "candidate_measurement_eligible"
+                ],
+                "within_propensity_caliper": first["within_propensity_caliper"],
+                "eligible_replacement_candidate": first[
+                    "eligible_replacement_candidate"
+                ],
+                "is_original_webscout": first["is_original_webscout"],
+                "is_original_control": first["is_original_control"],
+                "original_control_rank": first["original_control_rank"],
+                "candidate_measurement_failure_reason": first[
+                    "candidate_measurement_failure_reason"
+                ],
+            }
+        )
     common = pd.DataFrame(grouped_rows)
     common["common_donor_rank"] = np.nan
-    eligible_mask = boolean_series(
-        common["eligible_replacement_candidate"], default=False
-    )
-    eligible = common[eligible_mask].sort_values(
+    eligible = common[common["eligible_replacement_candidate"].astype(bool)].sort_values(
         [
             "max_propensity_distance",
             "max_python_ncloc_log_distance",
@@ -1965,7 +1834,7 @@ def run_analysis(
         control_local["paper_zero_profile_exact"] = False
     control_local["paper_zero_profile_exact"] = control_local[
         "paper_zero_profile_exact"
-    ].astype("boolean").fillna(False).astype(bool)
+    ].fillna(False)
 
     candidate_pool = control_local[
         control_local["paper_matching_row_found"]
@@ -2094,75 +1963,12 @@ def run_analysis(
         (
             "all_target_treatments_have_direct_ncloc",
             bool(target_measurement_complete),
-            int(boolean_series(target_measurements["measurement_eligible"], False).sum()),
+            int(target_measurements["measurement_eligible"].fillna(False).sum()),
         ),
         (
             "replacement_candidate_search_completed",
             True,
             len(eligible_candidates),
-        ),
-        (
-            "expanded_nearest_neighbor_mode_enabled",
-            True,
-            SELECTION_STRATEGY,
-        ),
-        (
-            "strict_propensity_caliper_is_diagnostic_only",
-            True,
-            propensity_caliper,
-        ),
-        (
-            "identical_complete_profile_score_inference_supported",
-            True,
-            int(
-                candidate_eligibility["original_propensity_score_source"]
-                .eq("inferred_from_identical_complete_zero_paper_feature_vector")
-                .sum()
-            ),
-        ),
-        (
-            "paper_zero_profile_exact_internal_consistency",
-            bool(
-                candidate_eligibility["paper_zero_profile_exact"].eq(
-                    candidate_eligibility["paper_candidate_profile_complete"]
-                    & candidate_eligibility["paper_all_activity_features_zero"]
-                    & pd.to_numeric(
-                        candidate_eligibility["paper_age_days_202409"],
-                        errors="coerce",
-                    ).eq(0.0)
-                ).all()
-            ),
-            int(candidate_eligibility["paper_zero_profile_exact"].sum()),
-        ),
-        (
-            "exact_profile_missing_scores_were_inferred",
-            bool(
-                candidate_eligibility.loc[
-                    candidate_eligibility["paper_zero_profile_exact"]
-                    & candidate_eligibility["original_propensity_score_source"].ne(
-                        "matching_csv_observed"
-                    ),
-                    "original_propensity_score_source",
-                ].eq(
-                    "inferred_from_identical_complete_zero_paper_feature_vector"
-                ).all()
-            ),
-            int(
-                candidate_eligibility["original_propensity_score_source"]
-                .eq("inferred_from_identical_complete_zero_paper_feature_vector")
-                .sum()
-            ),
-        ),
-        (
-            "duplicate_paper_profile_columns_absent",
-            not any(
-                any(
-                    column == f"{base}_x" or column == f"{base}_y"
-                    for base in PAPER_PROFILE_AUDIT_COLUMNS
-                )
-                for column in candidate_eligibility.columns
-            ),
-            "authoritative feature-summary merge",
         ),
         (
             "webscout_present_as_benchmark",
@@ -2174,7 +1980,7 @@ def run_analysis(
             not candidate_eligibility.loc[
                 candidate_eligibility["repo_name"].eq(target_control),
                 "eligible_replacement_candidate",
-            ].astype("boolean").fillna(False).astype(bool).any(),
+            ].fillna(False).any(),
             "benchmark_only",
         ),
         (
@@ -2185,11 +1991,11 @@ def run_analysis(
         (
             "all_original_controls_excluded_from_replacement",
             not original_control_rows["eligible_replacement_candidate"]
-            .astype("boolean").fillna(False).astype(bool)
+            .fillna(False)
             .any(),
             int(
                 original_control_rows["eligible_replacement_candidate"]
-                .astype("boolean").fillna(False).astype(bool)
+                .fillna(False)
                 .sum()
             ),
         ),
@@ -2285,8 +2091,8 @@ def run_analysis(
     summary = {
         "status": "PASS",
         "analysis": (
-            "expanded original-paper propensity nearest-neighbor matching "
-            "with direct Python-NCLOC as the second matching dimension"
+            "original propensity-score exact matching with direct Python-NCLOC "
+            "tie-breaking"
         ),
         "interpretation": "noncausal design-stage rematching sensitivity",
         "target_control": target_control,
@@ -2295,8 +2101,6 @@ def run_analysis(
         "cutoff_utc": cutoff.isoformat(),
         "target_propensity_score": target_score,
         "propensity_caliper": propensity_caliper,
-        "propensity_caliper_role": "strict diagnostic only; not an expanded eligibility gate",
-        "selection_strategy": SELECTION_STRATEGY,
         "target_treatments": target_treatments,
         "original_controls": original_controls,
         "target_treatment_count": len(target_treatments),
@@ -2322,9 +2126,9 @@ def run_analysis(
         "causal_interpretation_allowed": False,
         "output_hashes": output_hashes,
         "next_step": (
-            "No new eligible replacement donor was found under the expanded "
-            "nearest-neighbor criteria. Report the null search result without "
-            "opening post-adoption outcomes."
+            "No new eligible replacement donor was found under the frozen "
+            "criteria. Report the null search result without opening "
+            "post-adoption outcomes."
             if top_candidate is None
             else "Review and freeze one new donor from the common ranking "
             "before reading 2025-04 or 2025-06 AGC class-method outcomes."
@@ -2355,13 +2159,11 @@ def run_analysis(
     )
 
     print("=" * 80)
-    print("run-py-8d: expanded nearest-neighbor candidate ranking PASS")
+    print("run-py-8d: candidate ranking PASS")
     print("=" * 80)
     print(f"Target treatments measured: {len(target_measurements)}")
     print(f"Candidate controls selected for measurement: {len(candidate_pool)}")
     print(f"Eligible replacement candidates: {len(eligible_candidates)}")
-    print(f"Selection strategy: {SELECTION_STRATEGY}")
-    print("Strict propensity caliper: diagnostic only")
     print("Post-adoption AGC outcomes inspected: NO")
     print("DiD executed: NO")
     print("\nTop common donors:")
@@ -2371,8 +2173,6 @@ def run_analysis(
             [
                 "common_donor_rank",
                 "candidate_control_repo",
-                "original_propensity_score_source",
-                "max_propensity_distance",
                 "candidate_python_ncloc_direct",
                 "max_python_ncloc_log_distance",
                 "mean_python_ncloc_log_distance",
@@ -2486,10 +2286,6 @@ def run_self_test() -> None:
             ),
             "example/LateControl": (None, 0.0212830932484271),
             "example/OutsideCaliper": ("value = 1\n", 0.5),
-            "example/InferredExactControl": (
-                "value = 1\ndef f(x):\n    return x + 1\n",
-                None,
-            ),
         }
         for repo, (before_source, _) in controls.items():
             create_self_test_repository(
@@ -2538,10 +2334,6 @@ def run_self_test() -> None:
             row.update({feature: 0 for feature in PAPER_SUMMARY_FEATURES})
             matching_rows.append(row)
         for repo, (_, score) in controls.items():
-            # Keep one exact-profile control out of matching.csv so the
-            # self-test covers propensity-score inference after the merge.
-            if repo == "example/InferredExactControl":
-                continue
             row = {
                 "repo_name": repo,
                 "matched_period": PAPER_MATCHED_PERIOD,
@@ -2606,55 +2398,20 @@ def run_self_test() -> None:
             skip_frozen_target_checks=False,
         )
         top = summary["top_common_candidate"]["candidate_control_repo"]
-        if top != "example/InferredExactControl":
+        if top != "example/NewControl":
             raise AssertionError(
-                "Self-test expected example/InferredExactControl as top donor, "
-                f"found {top}."
+                f"Self-test expected example/NewControl as top donor, found {top}."
             )
         eligibility = pd.read_csv(
             output_dir / f"{OUTPUT_PREFIX}_candidate_eligibility.csv"
         )
-        outside_row = eligibility.loc[
-            eligibility["repo_name"].eq("example/OutsideCaliper")
-        ]
-        if outside_row.empty or not bool(
-            outside_row["eligible_replacement_candidate"].iloc[0]
-        ):
-            raise AssertionError(
-                "Self-test expected the observed outside-caliper control to be "
-                "eligible in expanded nearest-neighbor mode."
-            )
         original_rows = eligibility[
             eligibility["repo_name"].isin(original_controls)
         ]
-        if original_rows["eligible_replacement_candidate"].astype("boolean").fillna(False).astype(bool).any():
+        if original_rows["eligible_replacement_candidate"].fillna(False).any():
             raise AssertionError(
                 "Self-test found an original control in replacement eligibility."
             )
-
-        inferred = eligibility.loc[
-            eligibility["repo_name"].eq("example/InferredExactControl")
-        ]
-        if len(inferred) != 1:
-            raise AssertionError(
-                "Self-test expected exactly one inferred exact-profile control."
-            )
-        inferred_row = inferred.iloc[0]
-        if not bool(inferred_row["paper_zero_profile_exact"]):
-            raise AssertionError(
-                "Self-test expected the inferred control to retain the exact-profile flag."
-            )
-        if inferred_row["original_propensity_score_source"] != (
-            "inferred_from_identical_complete_zero_paper_feature_vector"
-        ):
-            raise AssertionError(
-                "Self-test expected propensity-score inference from the exact paper profile."
-            )
-        if not bool(inferred_row["eligible_replacement_candidate"]):
-            raise AssertionError(
-                "Self-test expected the inferred exact-profile control to be eligible."
-            )
-
         late = pd.read_csv(
             output_dir / f"{OUTPUT_PREFIX}_python_ncloc_snapshot_restoration.csv"
         )

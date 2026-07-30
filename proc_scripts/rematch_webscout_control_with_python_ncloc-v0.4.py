@@ -60,7 +60,7 @@ CUTOFF_UTC = "2024-09-30T23:59:59+00:00"
 TARGET_PROPENSITY_SCORE = 0.0212830932484271
 OUTPUT_PREFIX = "webscout_local_control_rematching"
 MEASUREMENT_METHOD = "git_archive_python_token_ast_ncloc_v1"
-SELECTION_STRATEGY = "expanded_paper_propensity_nearest_neighbor_then_python_ncloc_v2"
+SELECTION_STRATEGY = "expanded_paper_propensity_nearest_neighbor_then_python_ncloc_v1"
 
 EXPECTED_TARGET_TREATMENTS = (
     "Elevate-Code/better-voice-typing",
@@ -81,16 +81,6 @@ PAPER_SUMMARY_FEATURES = (
     "n_issues",
     "n_comments",
     "total_events",
-)
-
-PAPER_PROFILE_AUDIT_COLUMNS = (
-    "paper_candidate_feature_rows",
-    "paper_within_period_count",
-    "paper_sum_period_count",
-    "paper_candidate_profile_complete",
-    "paper_age_days_202409",
-    "paper_all_activity_features_zero",
-    "paper_zero_profile_exact",
 )
 
 REPO_ALIASES = (
@@ -1427,44 +1417,7 @@ def build_candidate_eligibility(
         validate="one_to_one",
     )
     if not feature_summary.empty:
-        # feature_summary is authoritative for paper-profile audit fields.
-        # local_controls may already contain a pre-screen flag. Remove all
-        # overlapping audit fields before merging so pandas cannot create
-        # *_x and *_y columns and silently lose the authoritative value.
-        authoritative_columns = [
-            column
-            for column in PAPER_PROFILE_AUDIT_COLUMNS
-            if column in feature_summary.columns
-        ]
-        controls = controls.drop(
-            columns=[
-                column
-                for column in PAPER_PROFILE_AUDIT_COLUMNS
-                if column in controls.columns
-            ],
-            errors="ignore",
-        )
-        controls = controls.merge(
-            feature_summary[["repo_name", *authoritative_columns]],
-            on="repo_name",
-            how="left",
-            validate="one_to_one",
-        )
-
-    duplicate_profile_columns = [
-        column
-        for column in controls.columns
-        if any(
-            column == f"{base}_x" or column == f"{base}_y"
-            for base in PAPER_PROFILE_AUDIT_COLUMNS
-        )
-    ]
-    if duplicate_profile_columns:
-        raise ValueError(
-            "Duplicate paper-profile columns remained after the authoritative "
-            "feature-summary merge: "
-            + ", ".join(sorted(duplicate_profile_columns))
-        )
+        controls = controls.merge(feature_summary, on="repo_name", how="left")
 
     for column, default in (
         ("paper_candidate_profile_complete", False),
@@ -1474,36 +1427,6 @@ def build_candidate_eligibility(
         if column not in controls.columns:
             controls[column] = default
         controls[column] = boolean_series(controls[column], default=default)
-
-    if "paper_age_days_202409" not in controls.columns:
-        controls["paper_age_days_202409"] = np.nan
-    paper_age_zero = pd.to_numeric(
-        controls["paper_age_days_202409"], errors="coerce"
-    ).eq(0.0)
-    expected_exact_profile = (
-        controls["paper_candidate_profile_complete"]
-        & controls["paper_all_activity_features_zero"]
-        & paper_age_zero
-    )
-    exact_profile_mismatch = controls["paper_zero_profile_exact"].ne(
-        expected_exact_profile
-    )
-    if exact_profile_mismatch.any():
-        mismatch_rows = controls.loc[
-            exact_profile_mismatch,
-            [
-                "repo_name",
-                "paper_candidate_profile_complete",
-                "paper_all_activity_features_zero",
-                "paper_age_days_202409",
-                "paper_zero_profile_exact",
-            ],
-        ]
-        raise ValueError(
-            "paper_zero_profile_exact is inconsistent with its authoritative "
-            "component fields:\n"
-            + mismatch_rows.head(20).to_string(index=False)
-        )
 
     controls["original_propensity_score_source"] = np.where(
         controls["original_propensity_score"].notna(),
@@ -2121,50 +2044,6 @@ def run_analysis(
             ),
         ),
         (
-            "paper_zero_profile_exact_internal_consistency",
-            bool(
-                candidate_eligibility["paper_zero_profile_exact"].eq(
-                    candidate_eligibility["paper_candidate_profile_complete"]
-                    & candidate_eligibility["paper_all_activity_features_zero"]
-                    & pd.to_numeric(
-                        candidate_eligibility["paper_age_days_202409"],
-                        errors="coerce",
-                    ).eq(0.0)
-                ).all()
-            ),
-            int(candidate_eligibility["paper_zero_profile_exact"].sum()),
-        ),
-        (
-            "exact_profile_missing_scores_were_inferred",
-            bool(
-                candidate_eligibility.loc[
-                    candidate_eligibility["paper_zero_profile_exact"]
-                    & candidate_eligibility["original_propensity_score_source"].ne(
-                        "matching_csv_observed"
-                    ),
-                    "original_propensity_score_source",
-                ].eq(
-                    "inferred_from_identical_complete_zero_paper_feature_vector"
-                ).all()
-            ),
-            int(
-                candidate_eligibility["original_propensity_score_source"]
-                .eq("inferred_from_identical_complete_zero_paper_feature_vector")
-                .sum()
-            ),
-        ),
-        (
-            "duplicate_paper_profile_columns_absent",
-            not any(
-                any(
-                    column == f"{base}_x" or column == f"{base}_y"
-                    for base in PAPER_PROFILE_AUDIT_COLUMNS
-                )
-                for column in candidate_eligibility.columns
-            ),
-            "authoritative feature-summary merge",
-        ),
-        (
             "webscout_present_as_benchmark",
             target_control in set(candidate_eligibility["repo_name"]),
             target_control,
@@ -2486,10 +2365,6 @@ def run_self_test() -> None:
             ),
             "example/LateControl": (None, 0.0212830932484271),
             "example/OutsideCaliper": ("value = 1\n", 0.5),
-            "example/InferredExactControl": (
-                "value = 1\ndef f(x):\n    return x + 1\n",
-                None,
-            ),
         }
         for repo, (before_source, _) in controls.items():
             create_self_test_repository(
@@ -2538,10 +2413,6 @@ def run_self_test() -> None:
             row.update({feature: 0 for feature in PAPER_SUMMARY_FEATURES})
             matching_rows.append(row)
         for repo, (_, score) in controls.items():
-            # Keep one exact-profile control out of matching.csv so the
-            # self-test covers propensity-score inference after the merge.
-            if repo == "example/InferredExactControl":
-                continue
             row = {
                 "repo_name": repo,
                 "matched_period": PAPER_MATCHED_PERIOD,
@@ -2606,10 +2477,9 @@ def run_self_test() -> None:
             skip_frozen_target_checks=False,
         )
         top = summary["top_common_candidate"]["candidate_control_repo"]
-        if top != "example/InferredExactControl":
+        if top != "example/NewControl":
             raise AssertionError(
-                "Self-test expected example/InferredExactControl as top donor, "
-                f"found {top}."
+                f"Self-test expected example/NewControl as top donor, found {top}."
             )
         eligibility = pd.read_csv(
             output_dir / f"{OUTPUT_PREFIX}_candidate_eligibility.csv"
@@ -2631,30 +2501,6 @@ def run_self_test() -> None:
             raise AssertionError(
                 "Self-test found an original control in replacement eligibility."
             )
-
-        inferred = eligibility.loc[
-            eligibility["repo_name"].eq("example/InferredExactControl")
-        ]
-        if len(inferred) != 1:
-            raise AssertionError(
-                "Self-test expected exactly one inferred exact-profile control."
-            )
-        inferred_row = inferred.iloc[0]
-        if not bool(inferred_row["paper_zero_profile_exact"]):
-            raise AssertionError(
-                "Self-test expected the inferred control to retain the exact-profile flag."
-            )
-        if inferred_row["original_propensity_score_source"] != (
-            "inferred_from_identical_complete_zero_paper_feature_vector"
-        ):
-            raise AssertionError(
-                "Self-test expected propensity-score inference from the exact paper profile."
-            )
-        if not bool(inferred_row["eligible_replacement_candidate"]):
-            raise AssertionError(
-                "Self-test expected the inferred exact-profile control to be eligible."
-            )
-
         late = pd.read_csv(
             output_dir / f"{OUTPUT_PREFIX}_python_ncloc_snapshot_restoration.csv"
         )

@@ -722,6 +722,422 @@ repo_python
                                         |-- borusyak_agc_commit_function_ast_band_80_99_panel_checks.csv
                                         |-- borusyak_agc_commit_function_ast_band_80_99_static_effects.csv
                                         |-- borusyak_agc_commit_function_ast_band_80_99_static_errors.csv
+|-- run-py-7a
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- agc_commit_function_npr_body_classifications.csv
+                |-- agc_commit_function_npr_body_reference_audit.csv
+                |-- agc_commit_function_npr_event_classifications.csv
+                |-- agc_commit_function_npr_mapping_audit.csv
+                |-- agc_commit_function_npr_support_by_dataset_source.csv
+                |-- agc_commit_function_npr_support_by_event_time.csv
+                |-- agc_commit_function_npr_support_by_treatment_period.csv
+                |-- qc
+                    |-- agc_commit_function_npr_aggregation_checks.csv
+                    |-- agc_commit_function_npr_aggregation_metadata.json
+                    |-- agc_commit_function_npr_aggregation_summary.json
+                |-- repo_month_agc_commit_function_npr_analysis_complete.csv
+|-- run-py-7b
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- agc_commit_function_npr_covariate_completeness.csv
+                |-- agc_commit_function_npr_event_time_support.csv
+                |-- agc_commit_function_npr_outcome_completeness.csv
+                |-- agc_commit_function_npr_sample_summary.csv
+                |-- agc_commit_function_npr_specification_sample_summary.csv
+                |-- panel_event_monthly_agc_commit_function_npr.csv
+                |-- panel_event_monthly_agc_commit_function_npr_parse_clean.csv
+                |-- panel_event_monthly_agc_commit_function_npr_ratio_positive.csv
+                |-- panel_event_monthly_agc_commit_function_npr_ratio_positive_parse_clean.csv
+                |-- qc
+                    |-- agc_commit_function_npr_did_input_checks.csv
+                    |-- agc_commit_function_npr_did_input_metadata.json
+                    |-- agc_commit_function_npr_did_input_summary.json
+|-- run-py-7c
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- full
+                    |-- paper_ncloc
+                        |-- calendar_month
+                            |-- parse_clean
+                                |-- DiffInDiffBorusyak_agc_commit_function_npr_range100_200_full_paper_ncloc_calendar_month_parse_clean.html
+                                |-- borusyak_agc_commit_function_npr_dynamic_effects.csv
+                                |-- borusyak_agc_commit_function_npr_dynamic_errors.csv
+                                |-- borusyak_agc_commit_function_npr_final_model_validation.csv
+                                |-- borusyak_agc_commit_function_npr_input_summary.csv
+                                |-- borusyak_agc_commit_function_npr_metadata.csv
+                                |-- borusyak_agc_commit_function_npr_panel_checks.csv
+                                |-- borusyak_agc_commit_function_npr_static_effects.csv
+                                |-- borusyak_agc_commit_function_npr_static_errors.csv
+                                |-- dynamic_effects_borusyak_agc_commit_function_npr.pdf
+                    |-- python_snapshot_ncloc
+                        |-- calendar_month
+                            |-- parse_clean
+                                |-- DiffInDiffBorusyak_agc_commit_function_npr_range100_200_full_python_snapshot_ncloc_calendar_month_parse_clean.html
+                                |-- borusyak_agc_commit_function_npr_dynamic_effects.csv
+                                |-- borusyak_agc_commit_function_npr_dynamic_errors.csv
+                                |-- borusyak_agc_commit_function_npr_final_model_validation.csv
+                                |-- borusyak_agc_commit_function_npr_input_summary.csv
+                                |-- borusyak_agc_commit_function_npr_metadata.csv
+                                |-- borusyak_agc_commit_function_npr_panel_checks.csv
+                                |-- borusyak_agc_commit_function_npr_static_effects.csv
+                                |-- borusyak_agc_commit_function_npr_static_errors.csv
+                                |-- dynamic_effects_borusyak_agc_commit_function_npr.pdf
+                |-- ratio
+                    |-- paper_ncloc
+                        |-- calendar_month
+                            |-- parse_clean
+                                |-- DiffInDiffBorusyak_agc_commit_function_npr_range100_200_ratio_paper_ncloc_calendar_month_parse_clean.html
+                                |-- borusyak_agc_commit_function_npr_dynamic_effects.csv
+                                |-- borusyak_agc_commit_function_npr_dynamic_errors.csv
+                                |-- borusyak_agc_commit_function_npr_final_model_validation.csv
+                                |-- borusyak_agc_commit_function_npr_input_summary.csv
+                                |-- borusyak_agc_commit_function_npr_metadata.csv
+                                |-- borusyak_agc_commit_function_npr_panel_checks.csv
+                                |-- borusyak_agc_commit_function_npr_static_effects.csv
+                                |-- borusyak_agc_commit_function_npr_static_errors.csv
+                                |-- dynamic_effects_borusyak_agc_commit_function_npr.pdf
+                    |-- python_snapshot_ncloc
+                        |-- calendar_month
+                            |-- parse_clean
+                                |-- DiffInDiffBorusyak_agc_commit_function_npr_range100_200_ratio_python_snapshot_ncloc_calendar_month_parse_clean.html
+                                |-- borusyak_agc_commit_function_npr_dynamic_effects.csv
+                                |-- borusyak_agc_commit_function_npr_dynamic_errors.csv
+                                |-- borusyak_agc_commit_function_npr_final_model_validation.csv
+                                |-- borusyak_agc_commit_function_npr_input_summary.csv
+                                |-- borusyak_agc_commit_function_npr_metadata.csv
+                                |-- borusyak_agc_commit_function_npr_panel_checks.csv
+                                |-- borusyak_agc_commit_function_npr_static_effects.csv
+                                |-- borusyak_agc_commit_function_npr_static_errors.csv
+                                |-- dynamic_effects_borusyak_agc_commit_function_npr.pdf
+|-- run-py-7d
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- regular_module_function_token_ranges
+                    |-- qc
+                        |-- regular_module_function_token_range_checks.csv
+                        |-- regular_module_function_token_range_summary.json
+                    |-- regular_module_function_adoption_period_totals.csv
+                    |-- regular_module_function_event_exact_token_distribution.csv
+                    |-- regular_module_function_event_token_band_by_dataset_source.csv
+                    |-- regular_module_function_event_token_band_by_event_month_treatment_control.csv
+                    |-- regular_module_function_event_token_band_by_event_time.csv
+                    |-- regular_module_function_event_token_band_by_treatment_period.csv
+                    |-- regular_module_function_event_token_band_distribution.csv
+                    |-- regular_module_function_event_token_band_post_month_1_to_6_treatment_control.csv
+                    |-- regular_module_function_matched_pair_alignment_audit.csv
+                    |-- regular_module_function_matched_pair_calendar_alignment.csv
+                    |-- regular_module_function_treatment_event_time_totals.csv
+                    |-- regular_module_function_unique_body_exact_token_distribution.csv
+                    |-- regular_module_function_unique_body_pre_vs_adoption_after_overlap.csv
+                    |-- regular_module_function_unique_body_token_band_by_event_month_treatment_control.csv
+                    |-- regular_module_function_unique_body_token_band_by_treatment_period.csv
+                    |-- regular_module_function_unique_body_token_band_distribution.csv
+                    |-- regular_module_function_unique_body_token_band_post_month_1_to_6_treatment_control.csv
+                    |-- regular_module_function_unique_body_token_quantiles.csv
+                    |-- regular_module_function_unique_body_window_distribution.csv
+|-- run-py-7e
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- panel_event_monthly_regular_module_function_agc_unique_body.csv
+                |-- panel_event_monthly_regular_module_function_agc_unique_body_parse_clean.csv
+                |-- qc
+                    |-- regular_module_function_agc_unique_body_did_input_checks.csv
+                    |-- regular_module_function_agc_unique_body_did_input_summary.json
+                |-- regular_module_function_agc_unique_body_repo_month_counts.csv
+|-- run-py-7f
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- DiffInDiffBorusyak_regular_module_function_agc_unique_body_range100_200_python_snapshot_ncloc_calendar_month_parse_clean.html
+                            |-- borusyak_regular_module_function_agc_unique_body_dynamic_effects.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_dynamic_errors.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_final_model_validation.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_input_summary.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_metadata.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_panel_checks.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_static_effects.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_static_errors.csv
+                            |-- dynamic_effects_borusyak_regular_module_function_agc_unique_body.pdf
+|-- run-py-7g
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_all_repositories.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_full_model.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_metadata.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_significance_flips.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_top_absolute_estimate_change.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_top_lower_bound_decrease.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_top_lower_bound_increase.csv
+                            |-- borusyak_regular_module_function_agc_unique_body_month1_leave_one_repository_out_validation.csv
+|-- run-py-7h
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- positive_outcome_months_only
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_dynamic_effects.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_dynamic_effects.pdf
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_dynamic_effects.png
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_event_time_counts.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_filter_summary.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_metadata.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_model_errors.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_rankify_audit.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_sample_summary.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_static_effects.csv
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_status.txt
+                                |-- borusyak_regular_module_function_agc_unique_body_positive_months_validation.csv
+|-- run-py-7j
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- panel_event_monthly_regular_module_function_and_class_method_agc_unique_body.csv
+                |-- panel_event_monthly_regular_module_function_and_class_method_agc_unique_body_parse_clean.csv
+                |-- panel_event_monthly_regular_module_function_and_class_method_agc_unique_body_positive_outcome.csv
+                |-- panel_event_monthly_regular_module_function_and_class_method_agc_unique_body_positive_outcome_parse_clean.csv
+                |-- qc
+                    |-- regular_module_function_and_class_method_agc_unique_body_did_input_checks.csv
+                    |-- regular_module_function_and_class_method_agc_unique_body_did_input_summary.json
+                |-- regular_module_function_and_class_method_agc_unique_body_kind_summary.csv
+                |-- regular_module_function_and_class_method_agc_unique_body_overlap_audit.csv
+                |-- regular_module_function_and_class_method_agc_unique_body_rankify_audit.csv
+                |-- regular_module_function_and_class_method_agc_unique_body_repo_month_counts.csv
+|-- run-py-7k
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- positive_outcome_months_only
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_dynamic_effects.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_event_time_counts.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_filter_summary.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_metadata.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_model_errors.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_rankify_audit.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_sample_summary.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_effects.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_status.txt
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_validation.csv
+|-- run-py-7m
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- positive_outcome_months_only
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_all_repositories.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_full_model.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_metadata.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_model_errors.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_significance_flips.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_status.txt
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_top_absolute_estimate_change.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_top_lower_bound_decrease.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_top_lower_bound_increase.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_top_std_error_reduction.csv
+                                |-- borusyak_regfun_classmethod_agc_uniquebody_positive_months_static_leave_one_repository_out_validation.csv
+|-- run-py-7n
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- panel_event_monthly_regfun_selected_classmethod_agc_uniquebody_original_positive_sample_parse_clean.csv
+                |-- panel_event_monthly_regfun_selected_classmethod_agc_uniquebody_parse_clean.csv
+                |-- qc
+                    |-- regfun_selected_classmethod_agc_uniquebody_did_input_checks.csv
+                    |-- regfun_selected_classmethod_agc_uniquebody_did_input_summary.json
+                |-- regfun_selected_classmethod_agc_uniquebody_sample_summary.csv
+                |-- regfun_selected_classmethod_agc_uniquebody_selected_repo_month_audit.csv
+                |-- regfun_selected_classmethod_agc_uniquebody_selected_repo_summary.csv
+                |-- regfun_selected_classmethod_agc_uniquebody_selected_repositories.csv
+                |-- regfun_selected_classmethod_agc_uniquebody_status.txt
+|-- run-py-7o
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- original_positive_sample_fixed
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_baseline_static_effects.csv
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_filter_summary.csv
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_hybrid_static_effects.csv
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_metadata.csv
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_model_errors.csv
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_selected_repo_summary.csv
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_static_comparison.csv
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_status.txt
+                                |-- borusyak_regfun_selected_classmethod_agc_uniquebody_fixed_sample_validation.csv
+|-- run-py-7p
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- original_positive_sample_fixed
+                                |-- one_repository_at_a_time
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_comparison_to_baseline.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_filter_summary.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_metadata.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_model_errors.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_root_cause_ranking.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_static_results.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_status.txt
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_target_repo_month_audit.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_target_repo_summary.csv
+                                    |-- borusyak_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample_validation.csv
+|-- run-py-8a
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- original_positive_sample_fixed
+                                |-- cliagent_webscout_month_diagnosis
+                                    |-- cliagent_webscout_classmethod_months_calendar_month_comparison.csv
+                                    |-- cliagent_webscout_classmethod_months_diagnostic_findings.csv
+                                    |-- cliagent_webscout_classmethod_months_metadata.json
+                                    |-- cliagent_webscout_classmethod_months_month_spike_ranking.csv
+                                    |-- cliagent_webscout_classmethod_months_repo_month_audit.csv
+                                    |-- cliagent_webscout_classmethod_months_repo_summary.csv
+                                    |-- cliagent_webscout_classmethod_months_status.txt
+                                    |-- cliagent_webscout_classmethod_months_validation.csv
+|-- run-py-8b
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- original_positive_sample_fixed
+                                |-- month_ablation_pair_alignment
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_comparison.csv
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_metadata.csv
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_model_errors.csv
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_root_cause_ranking.csv
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_scenario_definitions.csv
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_scenario_month_audit.csv
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_static_results.csv
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_status.txt
+                                    |-- cliagent_webscout_classmethod_month_ablation_fixed_sample_validation.csv
+                                    |-- cliagent_webscout_pair_alignment_control_pair_summary.csv
+                                    |-- cliagent_webscout_pair_alignment_diagnostic_findings.csv
+                                    |-- cliagent_webscout_pair_alignment_metadata.json
+                                    |-- cliagent_webscout_pair_alignment_spike_month_alignment.csv
+                                    |-- cliagent_webscout_pair_alignment_spike_month_alignment_summary.csv
+                                    |-- cliagent_webscout_pair_alignment_status.txt
+                                    |-- cliagent_webscout_pair_alignment_target_pair_manifest.csv
+                                    |-- cliagent_webscout_pair_alignment_treatment_calendar_coverage.csv
+                                    |-- cliagent_webscout_pair_alignment_validation.csv
+|-- run-py-8c
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- original_positive_sample_fixed
+                                |-- webscout_joint_ablation_pair_balanced_sensitivity
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_key_comparisons.csv
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_metadata.csv
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_model_errors.csv
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_sample_comparison.csv
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_sample_summary.csv
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_scenario_definitions.csv
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_static_results.csv
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_status.txt
+                                    |-- borusyak_webscout_joint_ablation_pair_balanced_sensitivity_validation.csv
+                                    |-- pair_balanced_monthly_support_calendar_summary.csv
+                                    |-- pair_balanced_monthly_support_excluded_fixed_rows.csv
+                                    |-- pair_balanced_monthly_support_normalized_pairs.csv
+                                    |-- pair_balanced_monthly_support_pair_month_manifest.csv
+                                    |-- pair_balanced_monthly_support_panel.csv
+                                    |-- pair_balanced_monthly_support_row_support.csv
+                                    |-- pair_balanced_monthly_support_status.txt
+                                    |-- pair_balanced_monthly_support_summary.json
+                                    |-- pair_balanced_monthly_support_validation.csv
+                                    |-- pair_balanced_monthly_support_webscout_diagnostic_months.csv
+|-- run-py-8d
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- 202410_local_control_rematching
+                        |-- webscout_local_control_rematching_202410_python_treatment_cohort.csv
+                        |-- webscout_local_control_rematching_candidate_eligibility.csv
+                        |-- webscout_local_control_rematching_common_donor_ranking.csv
+                        |-- webscout_local_control_rematching_common_donor_top25.csv
+                        |-- webscout_local_control_rematching_local_clone_inventory.csv
+                        |-- webscout_local_control_rematching_paper_candidate_feature_profile_audit.csv
+                        |-- webscout_local_control_rematching_paper_candidate_features_long_audit.csv
+                        |-- webscout_local_control_rematching_per_treatment_ranking.csv
+                        |-- webscout_local_control_rematching_per_treatment_top25.csv
+                        |-- webscout_local_control_rematching_python_ncloc_file_measurements.csv
+                        |-- webscout_local_control_rematching_python_ncloc_snapshot_restoration.csv
+                        |-- webscout_local_control_rematching_status.txt
+                        |-- webscout_local_control_rematching_summary.json
+                        |-- webscout_local_control_rematching_target_matching_profile.csv
+                        |-- webscout_local_control_rematching_target_python_ncloc_measurements.csv
+                        |-- webscout_local_control_rematching_target_treatments.csv
+                        |-- webscout_local_control_rematching_validation.csv
+|-- run-py-8e
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- 202410_webscout_rematched_donor_freeze
+                        |-- webscout_rematched_donor_freeze_manifest.csv
+                        |-- webscout_rematched_donor_snapshot_availability.csv
+                        |-- webscout_rematched_donor_status.txt
+                        |-- webscout_rematched_donor_summary.json
+                        |-- webscout_rematched_donor_validation.csv
+|-- run-py-8f
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- 202410_webscout_rematched_donor_commit_activity_audit
+                        |-- webscout_rematched_donor_commit_activity_monthly_commits.csv
+                        |-- webscout_rematched_donor_commit_activity_provenance.csv
+                        |-- webscout_rematched_donor_commit_activity_status.txt
+                        |-- webscout_rematched_donor_commit_activity_summary.json
+                        |-- webscout_rematched_donor_commit_activity_validation.csv
+|-- run-py-8g
+    |-- strict
+        |-- specifications
+            |-- range100_200
+                |-- python_snapshot_ncloc
+                    |-- calendar_month
+                        |-- parse_clean
+                            |-- original_positive_sample_fixed
+                                |-- webscout_frozen_donor_substitution
+                                    |-- panel_event_monthly_regfun_selected_classmethod_agc_uniquebody_webscout_frozen_donor_substitution_original_positive_sample_parse_clean.csv
+                                    |-- webscout_rematched_donor_agc_substitution_ablation_equivalence.csv
+                                    |-- webscout_rematched_donor_agc_substitution_month_audit.csv
+                                    |-- webscout_rematched_donor_agc_substitution_provenance.csv
+                                    |-- webscout_rematched_donor_agc_substitution_status.txt
+                                    |-- webscout_rematched_donor_agc_substitution_summary.json
+                                    |-- webscout_rematched_donor_agc_substitution_target_month_outcomes.csv
+                                    |-- webscout_rematched_donor_agc_substitution_validation.csv
 |-- tmp
     |-- run-py-1b
         |-- treatment_python_clone_status_20260710-181947.csv
@@ -977,11 +1393,17 @@ repo_python
 
 ============== [ proc_r ] ==============
 proc_r
+├── did_cliagent_webscout_month_ablation_fixed_sample.R
+├── did_regfun_classmethod_agc_uniquebody_positive_months.R
+├── did_regfun_each_selected_classmethod_agc_uniquebody_fixed_sample.R
+├── did_regfun_selected_classmethod_agc_uniquebody_fixed_sample.R
+├── did_regular_module_function_agc_unique_body_positive_months.R
+├── did_webscout_joint_ablation_pair_balanced_sensitivity.R
 ├── DiffInDiffBorusyak_AGC_ChangedBlock_ActivityCheck.Rmd
 ├── DiffInDiffBorusyak_AGC_ChangedBlock.Rmd
 ├── DiffInDiffBorusyak_AGC_ChangedBlock-v0.1.Rmd
 ├── DiffInDiffBorusyak_agc_commit_function_ast_sequence_band.Rmd
-├── DiffInDiffBorusyak_agc_commit_function_ast_sequence_band-v0.1.Rmd
+├── DiffInDiffBorusyak_agc_commit_function_npr.Rmd
 ├── DiffInDiffBorusyak_agc_commit_function.Rmd
 ├── DiffInDiffBorusyak_agc_commit_function-v0.1.Rmd
 ├── DiffInDiffBorusyak_AGC.Rmd
@@ -990,24 +1412,27 @@ proc_r
 ├── DiffInDiffBorusyak_python_only.html
 ├── DiffInDiffBorusyak_quality_python_v2.html
 ├── DiffInDiffBorusyak_quality_python_v2.Rmd
+├── DiffInDiffBorusyak_regular_module_function_agc_unique_body.Rmd
 ├── DiffInDiffBorusyak.Rmd
 ├── dynamic_effects_borusyak.pdf
 ├── dynamic_effects_borusyak_python_only.pdf
 ├── dynamic_effects_borusyak_quality_python_v2.pdf
 ├── dynamic_effects_python_group_python_only.pdf
-└── dynamic_effects_python_only.pdf
+├── dynamic_effects_python_only.pdf
+├── leave_one_repo_out_regfun_classmethod_agc_uniquebody_positive_months_static.R
+└── leave_one_repository_out_regular_module_function_agc_unique_body.R
 
 ============== [ proc_scripts ] ==============
 proc_scripts
+├── aggregate_agc_commit_function_npr.py
 ├── analyze_agc_commit_function_ast_sequence_size.py
-├── analyze_agc_commit_function_ast_sequence_size-v0.1.py
 ├── analyze_agc_commit_function_parse_exclusions.py
-├── analyze_agc_commit_function_parse_exclusions-v0.1.py
-├── analyze_agc_commit_function_parse_exclusions-v0.2.py
-├── analyze_agc_commit_function_parse_exclusions-v0.3.py
 ├── analyze_agc_zero_event_months.py
-├── analyze_agc_zero_event_months-v0.1.py
+├── analyze_cliagent_webscout_classmethod_months.py
+├── analyze_cliagent_webscout_pair_alignment.py
+├── analyze_regular_module_function_npr_token_ranges.py
 ├── analyze_repos_v2.py
+├── audit_webscout_rematched_donor_monthly_commit_activity.py
 ├── check_agc_changed_block_inputs.py
 ├── check_cache_control_repos.py
 ├── check_sonarqube_panel.py
@@ -1019,25 +1444,34 @@ proc_scripts
 ├── create_tmp_repo_timeseries_history.py
 ├── export_python_snapshots.py
 ├── extract_agc_commit_function_events.py
-├── extract_agc_commit_function_events-v0.1.py
 ├── extract_matched_control_repos.py
+├── extract_webscout_rematched_donor_agc_prepare_substitution_panel.py
 ├── filter_controls_by_local_cursor_evidence.py
+├── freeze_webscout_rematched_donor_check_snapshot_availability.py
 ├── merge_sonarqube_panel_v2.py
+├── plot_regular_module_function_agc_unique_body_positive_months.py
 ├── prepare_agc_changed_block_panel.py
 ├── prepare_agc_commit_function_ast_sequence_band_did_input.py
-├── prepare_agc_commit_function_ast_sequence_band_did_input-v0.1.py
 ├── prepare_agc_commit_function_did_input.py
 ├── prepare_agc_commit_function_did_input-v0.1.py
 ├── prepare_agc_commit_function_did_input-v0.2.py
+├── prepare_agc_commit_function_npr_did_input.py
 ├── prepare_agc_commit_function_scan_manifest.py
-├── prepare_agc_commit_function_scan_manifest-v0.2.py
-├── prepare_agc_commit_function_scan_manifest-v0.3.py
 ├── prepare_agc_did_input.py
+├── prepare_pair_balanced_monthly_support_sensitivity.py
 ├── prepare_panel_event_v2.py
 ├── prepare_quality_did_input_v2.py
+├── prepare_regfun_classmethod_agc_uniquebody_did_input.py
+├── prepare_regfun_selected_classmethod_agc_uniquebody_did_input.py
+├── prepare_regular_module_function_agc_unique_body_did_input.py
 ├── prepare_sonarqube_input.py
 ├── probe_agc_commit_month_timezone.py
 ├── recheck_agc_commit_function_parse_exclusions_py312.py
+├── rematch_webscout_control_with_python_ncloc.py
+├── rematch_webscout_control_with_python_ncloc-v0.1.py
+├── rematch_webscout_control_with_python_ncloc-v0.2.py
+├── rematch_webscout_control_with_python_ncloc-v0.3.py
+├── rematch_webscout_control_with_python_ncloc-v0.4.py
 ├── run_sonarqube_v2.py
 ├── save_treatment_options.py
 ├── summarize_borusyak_quality_outputs_python.py
@@ -1061,11 +1495,30 @@ proc_sh
 ├── run-py-5e-prepare-agc-commit-function-did-input.sh
 ├── run-py-5f-did-agc-commit-function.sh
 ├── run-py-5g-analyzeAGC-commitFunc-ASTseq-size.sh
-├── run-py-5g-analyzeAGC-commitFunc-ASTseq-size-v0.1.sh
 ├── run-py-6a-prepare-AGC-commitFunc-ASTseq-band-DiD-input.sh
-├── run-py-6a-prepare-AGC-commitFunc-ASTseq-band-DiD-input-v0.1.sh
 ├── run-py-6b-did-agc-commitFunc-ASTseq-band-borusyak.sh
-└── run-py-6b-did-agc-commitFunc-ASTseq-band-borusyak-v0.1.sh
+├── run-py-7a-aggregate-agc-commit-function-npr.sh
+├── run-py-7b-prepare-agc-commit-function-npr-did-input.sh
+├── run-py-7c-did-agc-commit-function-npr-borusyak.sh
+├── run-py-7d-regular_func_npr_token_ranges.sh
+├── run-py-7e-prepare-regular-module-function-agc-unique-body-did-input.sh
+├── run-py-7f-did-regular-module-function-agc-unique-body-borusyak.sh
+├── run-py-7g-leave-one-repository-out-regular-module-function-agc-unique-body.sh
+├── run-py-7h-did-regular-module-function-agc-unique-body-positive-months-borusyak.sh
+├── run-py-7i-plot-regular-module-function-agc-unique-body-positive-months.sh
+├── run-py-7j-prepare-regfun-classmethod-agc-uniquebody-did-input.sh
+├── run-py-7k-did-regfun-classmethod-agc-uniquebody-positive-months-borusyak.sh
+├── run-py-7m-loo-regfun-classmethod-agc-uniquebody-positive-months-static.sh
+├── run-py-7n-prepare-regfun-selected-classmethod-agc-uniquebody-did-input.sh
+├── run-py-7o-did-regfun-selected-classmethod-agc-uniquebody-fixed-sample-borusyak.sh
+├── run-py-7p-did-regfun-each-selected-classmethod-agc-uniquebody-fixed-sample-borusyak.sh
+├── run-py-8a-analyze-cliagent-webscout-classmethod-months.sh
+├── run-py-8b-ablate-cliagent-webscout-months-check-pairs.sh
+├── run-py-8c-webscout-joint-ablation-pair-balanced-sensitivity.sh
+├── run-py-8d-rematch-webscout-control-with-python-ncloc.sh
+├── run-py-8e-freeze-webscout-rematched-donor-check-snapshot-availability.sh
+├── run-py-8f-audit-webscout-rematched-donor-monthly-commit-activity.sh
+└── run-py-8g-extract-webscout-rematched-donor-agc-prepare-substitution-panel.sh
 
 ============== [ run-py-* FILES ] ==============
 run-py-1a-count-repo.sh
