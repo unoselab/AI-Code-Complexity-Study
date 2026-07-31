@@ -225,6 +225,36 @@ def normalize_binary(series: pd.Series, label: str) -> pd.Series:
     return result.astype("int8")
 
 
+def to_nullable_integer(series: pd.Series, label: str) -> pd.Series:
+    """Coerce to nullable Int64, preserving legitimately missing values.
+
+    ``pd.to_numeric(errors="raise")`` only rejects unparseable text; blank
+    cells survive as NaN and then break a plain ``int64`` cast. Int64 keeps
+    the missing marker so the caller can decide where absence is admissible.
+    """
+    numeric = pd.to_numeric(series, errors="raise")
+    present = numeric.notna()
+    fractional = present & numeric.ne(numeric.round())
+    if fractional.any():
+        examples = series.loc[fractional].head(20).tolist()
+        raise ValidationError(
+            f"{label} contains non-integer values: {examples}"
+        )
+    return numeric.astype("Int64")
+
+
+def to_required_integer(series: pd.Series, label: str) -> pd.Series:
+    """Coerce to int64 and fail with a readable message on missing values."""
+    values = to_nullable_integer(series, label)
+    if values.isna().any():
+        missing = int(values.isna().sum())
+        raise ValidationError(
+            f"{label} contains {missing} missing values but is required to "
+            "be fully populated."
+        )
+    return values.astype("int64")
+
+
 def prepare_output_directory(path: Path, overwrite: bool) -> None:
     if path.exists() and any(path.iterdir()):
         if not overwrite:
@@ -394,6 +424,11 @@ def source_features(source_text: str, source_label: str) -> dict[str, Any]:
 def treatment_period(dataset_source: str, time_to_event: Any) -> str:
     if str(dataset_source).strip().lower() == "control":
         return "control"
+    if pd.isna(time_to_event):
+        raise ValidationError(
+            "time_to_event is missing for a non-control row; only control "
+            "repository-months may omit the relative-time anchor."
+        )
     value = int(time_to_event)
     if value < 0:
         return "pre"
@@ -438,20 +473,15 @@ def join_model_scope(
         & events["npr_agc_like"].eq(1)
     ].copy()
     panel[READY_COLUMN] = normalize_binary(panel[READY_COLUMN], READY_COLUMN)
-    panel[OUTCOME_COLUMN] = pd.to_numeric(
-        panel[OUTCOME_COLUMN], errors="raise"
-    ).astype("int64")
-    # panel["time_to_event"] = pd.to_numeric(
-    #     panel["time_to_event"], errors="raise"
-    # ).astype("int64")
-    model_panel = panel.loc[panel[READY_COLUMN].eq(1)].copy()
-    model_panel["treatment_period"] = [
-        treatment_period(source, relative_time)
-        for source, relative_time in zip(
-            model_panel["dataset_source"],
-            model_panel["time_to_event"],
-        )
-    ]
+    panel[OUTCOME_COLUMN] = to_required_integer(
+        panel[OUTCOME_COLUMN], OUTCOME_COLUMN
+    )
+    # Control repository-months carry no anchoring event, so relative time is
+    # undefined for them by construction. A nullable Int64 column preserves
+    # that absence instead of failing a plain int64 cast on NaN.
+    panel["time_to_event"] = to_nullable_integer(
+        panel["time_to_event"], "time_to_event"
+    )
 
     checks: list[dict[str, Any]] = []
 
@@ -465,6 +495,37 @@ def join_model_scope(
                 "note": note,
             }
         )
+
+    model_panel = panel.loc[panel[READY_COLUMN].eq(1)].copy()
+    control_rows = (
+        model_panel["dataset_source"]
+        .astype("string")
+        .str.strip()
+        .str.lower()
+        .eq("control")
+    )
+    unanchored_treated = model_panel["time_to_event"].isna() & ~control_rows
+    check(
+        "model_ready_relative_time_present_outside_control",
+        int(unanchored_treated.sum()),
+        0,
+        "Only control repository-months may omit time_to_event.",
+    )
+    if unanchored_treated.any():
+        sample = model_panel.loc[
+            unanchored_treated, [*KEY_COLUMNS, "time_to_event"]
+        ].head(20)
+        raise ValidationError(
+            "Model-ready non-control rows have a missing time_to_event "
+            "anchor:\n" + sample.to_string(index=False)
+        )
+    model_panel["treatment_period"] = [
+        treatment_period(source, relative_time)
+        for source, relative_time in zip(
+            model_panel["dataset_source"],
+            model_panel["time_to_event"],
+        )
+    ]
 
     check(
         "full_agc_regular_event_rows",
@@ -719,6 +780,7 @@ def build_body_month_units(contexts: pd.DataFrame) -> pd.DataFrame:
         UNIT_COLUMNS, sort=False, dropna=False
     ):
         representative = group.iloc[0]
+        relative_time = representative["time_to_event"]
         function_names = sorted(
             set(group["manifest_function_name"].astype(str))
         )
@@ -731,7 +793,9 @@ def build_body_month_units(contexts: pd.DataFrame) -> pd.DataFrame:
         rows.append(
             {
                 **dict(zip(UNIT_COLUMNS, unit_key)),
-                "time_to_event": int(representative["time_to_event"]),
+                "time_to_event": (
+                    None if pd.isna(relative_time) else int(relative_time)
+                ),
                 "treatment_period": representative["treatment_period"],
                 "event_context_count": int(len(group)),
                 "distinct_function_names": len(function_names),
@@ -754,7 +818,10 @@ def build_body_month_units(contexts: pd.DataFrame) -> pd.DataFrame:
                 "representative_source_path": representative["source_path"],
             }
         )
-    return pd.DataFrame(rows)
+    units = pd.DataFrame(rows)
+    if not units.empty:
+        units["time_to_event"] = units["time_to_event"].astype("Int64")
+    return units
 
 
 def feature_summary(contexts: pd.DataFrame) -> pd.DataFrame:
