@@ -12,10 +12,7 @@ set -euo pipefail
 # New approach:
 #   - Read repository-month history inputs from run-py-2a only.
 #   - Resolve every latest_commit directly in the local Git clones.
-#   - Parse each distinct tracked Python Git blob with Python 3.13 or newer.
-#   - First parse with type_comments=True; retry with type_comments=False only
-#     when the primary parse fails, and record the selected parse mode.
-#   - Parse each distinct blob once through a parser-v2 reusable cache.
+#   - Parse each distinct tracked Python Git blob once through a reusable cache.
 #   - Record raw AST parents, lexical scopes, nesting depth, names, parameters,
 #     and decorators without assigning a function-role taxonomy.
 #   - Do not read run-py-7 or run-py-8 output CSV files.
@@ -43,10 +40,10 @@ set -euo pipefail
 #
 # Reusable cache:
 #   repo_python/tmp/run-py-7f02/strict/
-#     run-py-7f02-blob-parse-cache-v2.sqlite3
+#     run-py-7f02-blob-parse-cache.sqlite3
 #
 # Full run:
-#   OVERWRITE_OUTPUT=1 RUN_SELF_TEST=1 bash proc_sh_v2/run-py-7f02-scan-function-structure-history.sh
+#   RUN_SELF_TEST=1 bash proc_sh_v2/run-py-7f02-scan-function-structure-history.sh
 #
 # Targeted smoke run:
 # REPOSITORIES="owner/repo" \
@@ -66,7 +63,7 @@ if [[ "${PANEL_VARIANT}" != "strict" ]]; then
     exit 2
 fi
 
-PYTHON_BIN="${PYTHON_BIN:-/home/user1-system12/miniconda3/envs/agcparse313/bin/python}"
+PYTHON_BIN="${PYTHON_BIN:-/home/user1-system12/miniconda3/envs/agcparse312/bin/python}"
 PYTHON_SCRIPT="${PYTHON_SCRIPT:-proc_scripts/scan_function_structure_history.py}"
 
 TREATMENT_INPUT="${TREATMENT_INPUT:-repo_python/run-py-2a/${PANEL_VARIANT}/treatment/data/ts_repos_monthly.csv}"
@@ -75,7 +72,7 @@ TREATMENT_CLONE_DIR="${TREATMENT_CLONE_DIR:-../treatment-repos}"
 CONTROL_CLONE_DIR="${CONTROL_CLONE_DIR:-../control-repos}"
 
 OUTPUT_DIR="${OUTPUT_DIR:-repo_python/run-py-7f02/${PANEL_VARIANT}}"
-CACHE_DB="${CACHE_DB:-repo_python/tmp/run-py-7f02/${PANEL_VARIANT}/run-py-7f02-blob-parse-cache-v2.sqlite3}"
+CACHE_DB="${CACHE_DB:-repo_python/tmp/run-py-7f02/${PANEL_VARIANT}/run-py-7f02-blob-parse-cache.sqlite3}"
 LOG_DIR="${LOG_DIR:-logs/run-py-7f02}"
 RUN_TIMESTAMP="${RUN_TIMESTAMP:-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/run-py-7f02-scan-function-structure-history-${PANEL_VARIANT}-${RUN_TIMESTAMP}.log}"
@@ -151,8 +148,8 @@ read -r PYTHON_MAJOR PYTHON_MINOR PYTHON_MICRO < <(
         'import sys; print(sys.version_info.major, sys.version_info.minor, sys.version_info.micro)'
 )
 PYTHON_VERSION="${PYTHON_MAJOR}.${PYTHON_MINOR}.${PYTHON_MICRO}"
-if (( PYTHON_MAJOR < 3 || (PYTHON_MAJOR == 3 && PYTHON_MINOR < 13) )); then
-    echo "ERROR: Python 3.13 or newer is required; found ${PYTHON_VERSION}." >&2
+if (( PYTHON_MAJOR < 3 || (PYTHON_MAJOR == 3 && PYTHON_MINOR < 12) )); then
+    echo "ERROR: Python 3.12 or newer is required; found ${PYTHON_VERSION}." >&2
     exit 2
 fi
 
@@ -194,9 +191,6 @@ echo "Python:                   $(command -v "${PYTHON_BIN}")"
 echo "Python version:           ${PYTHON_VERSION}"
 echo "Python script:            ${PYTHON_SCRIPT}"
 echo "Python script SHA:        $(sha256sum "${PYTHON_SCRIPT}" | awk '{print $1}')"
-echo "Parser/cache revision:    v2"
-echo "Primary parse mode:       type_comments=True"
-echo "Fallback parse mode:      type_comments=False after primary failure"
 echo "Treatment history input:  ${TREATMENT_INPUT}"
 echo "Control history input:    ${CONTROL_INPUT}"
 echo "Treatment clones:         ${TREATMENT_CLONE_DIR}"
@@ -287,27 +281,6 @@ failed_critical = [
 ]
 if not str(metadata.get("status", "")).startswith("PASS"):
     raise SystemExit(f"run-py-7f02 metadata status is not PASS: {metadata.get('status')}")
-if metadata.get("script_version") != "run-py-7f02-v2":
-    raise SystemExit(
-        "run-py-7f02 script version is not v2: "
-        f"{metadata.get('script_version')}"
-    )
-if not str(metadata.get("parser_version", "")).startswith(
-    "python-ast-raw-structure-v2-"
-):
-    raise SystemExit(
-        "run-py-7f02 parser version is not v2: "
-        f"{metadata.get('parser_version')}"
-    )
-python_version_info = metadata.get("python_version_info", {})
-if int(python_version_info.get("major", 0)) < 3 or (
-    int(python_version_info.get("major", 0)) == 3
-    and int(python_version_info.get("minor", 0)) < 13
-):
-    raise SystemExit(
-        "run-py-7f02 metadata does not report Python 3.13 or newer: "
-        f"{python_version_info}"
-    )
 if failed_critical:
     raise SystemExit(
         "run-py-7f02 has failed critical checks:\n"
@@ -323,9 +296,6 @@ print(f"Unique repository commits: {metadata['counts']['unique_repository_commit
 print(f"Function inventory rows:   {metadata['counts']['function_inventory_rows']}")
 print(f"Decorator inventory rows:  {metadata['counts']['decorator_inventory_rows']}")
 print(f"Parse-failure rows:         {metadata['counts']['parse_failure_rows']}")
-print(f"Primary parse files:        {metadata['counts']['parse_mode_type_comments_true_files']}")
-print(f"Fallback parse files:       {metadata['counts']['parse_mode_type_comments_false_fallback_files']}")
-print(f"Dual parse failures:        {metadata['counts']['parse_mode_type_comments_true_and_false_failed_files']}")
 print(f"Critical failed checks:     {metadata['counts']['critical_failed_checks']}")
 print("================================================================================")
 PY

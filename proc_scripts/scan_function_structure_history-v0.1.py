@@ -24,9 +24,6 @@ The detailed inventories are normalized:
    repository-commit-path occurrence.
 
 Git blobs are parsed once per parser version through a reusable SQLite cache.
-Parser v2 requires Python 3.13 or newer, attempts ``type_comments=True`` first,
-and retries with ``type_comments=False`` only when the primary parse fails.
-Every eligible file records the parse mode and both attempts' error evidence.
 """
 
 from __future__ import annotations
@@ -52,16 +49,11 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Iterator, Sequence
 
 
-SCRIPT_VERSION = "run-py-7f02-v2"
+SCRIPT_VERSION = "run-py-7f02-v1"
 PARSER_VERSION = (
-    "python-ast-raw-structure-v2-dual-type-comments-"
+    "python-ast-raw-structure-v1-"
     f"py{sys.version_info.major}.{sys.version_info.minor}"
 )
-MINIMUM_PYTHON = (3, 13)
-PARSE_MODE_PRIMARY = "type_comments_true"
-PARSE_MODE_FALLBACK = "type_comments_false_fallback"
-PARSE_MODE_DUAL_FAILURE = "type_comments_true_and_false_failed"
-PARSE_MODE_NOT_ATTEMPTED = "parse_not_attempted"
 FULL_SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 ALLOWED_SOURCES = {"treatment", "control"}
 
@@ -120,14 +112,9 @@ FILE_COLUMNS = [
     "source_encoding",
     "source_bytes",
     "physical_lines",
-    "parse_mode",
     "parse_status",
     "parse_error_type",
     "parse_error_message",
-    "primary_parse_error_type",
-    "primary_parse_error_message",
-    "fallback_parse_error_type",
-    "fallback_parse_error_message",
     "function_count",
 ]
 
@@ -197,13 +184,8 @@ PARSE_FAILURE_COLUMNS = [
     "relative_path",
     "git_blob_sha",
     "stage",
-    "parse_mode",
     "error_type",
     "error_message",
-    "primary_parse_error_type",
-    "primary_parse_error_message",
-    "fallback_parse_error_type",
-    "fallback_parse_error_message",
 ]
 
 
@@ -436,7 +418,7 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path(
             "repo_python/tmp/run-py-7f02/strict/"
-            "run-py-7f02-blob-parse-cache-v2.sqlite3"
+            "run-py-7f02-blob-parse-cache-v1.sqlite3"
         ),
     )
     parser.add_argument(
@@ -490,17 +472,6 @@ def require_git(result: subprocess.CompletedProcess[Any], label: str) -> Any:
 
 def valid_sha(value: str) -> bool:
     return bool(FULL_SHA_RE.fullmatch(value.strip()))
-
-
-def require_supported_python() -> None:
-    """Require the parser version needed by the historical source corpus."""
-    current = (sys.version_info.major, sys.version_info.minor)
-    if current < MINIMUM_PYTHON:
-        required = ".".join(str(value) for value in MINIMUM_PYTHON)
-        found = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        raise ValidationError(
-            f"Python {required} or newer is required; found {found}."
-        )
 
 
 def repo_slug(repo_name: str) -> str:
@@ -733,34 +704,6 @@ def scope_name(node: ast.AST) -> str:
     return str(getattr(node, "name", type(node).__name__))
 
 
-def safe_error_message(error: BaseException) -> str:
-    return str(error).replace("\x00", "\\0")
-
-
-def parse_source_with_fallback(
-    source: str,
-    result: dict[str, Any],
-) -> ast.Module:
-    """Parse source while preserving the primary and fallback evidence."""
-    try:
-        tree = ast.parse(source, filename="<git-blob>", type_comments=True)
-        result["parse_mode"] = PARSE_MODE_PRIMARY
-        return tree
-    except Exception as primary_error:
-        result["primary_parse_error_type"] = type(primary_error).__name__
-        result["primary_parse_error_message"] = safe_error_message(primary_error)
-
-    try:
-        tree = ast.parse(source, filename="<git-blob>", type_comments=False)
-        result["parse_mode"] = PARSE_MODE_FALLBACK
-        return tree
-    except Exception as fallback_error:
-        result["parse_mode"] = PARSE_MODE_DUAL_FAILURE
-        result["fallback_parse_error_type"] = type(fallback_error).__name__
-        result["fallback_parse_error_message"] = safe_error_message(fallback_error)
-        raise
-
-
 def parse_blob(payload: bytes) -> dict[str, Any]:
     result: dict[str, Any] = {
         "content_sha256": hashlib.sha256(payload).hexdigest(),
@@ -768,20 +711,15 @@ def parse_blob(payload: bytes) -> dict[str, Any]:
         "physical_lines": payload.count(b"\n")
         + (1 if payload and not payload.endswith(b"\n") else 0),
         "source_encoding": "",
-        "parse_mode": PARSE_MODE_NOT_ATTEMPTED,
         "parse_status": "not_started",
         "parse_error_type": "",
         "parse_error_message": "",
-        "primary_parse_error_type": "",
-        "primary_parse_error_message": "",
-        "fallback_parse_error_type": "",
-        "fallback_parse_error_message": "",
         "functions": [],
     }
     try:
         source, encoding = decode_python_source(payload)
         result["source_encoding"] = encoding
-        tree = parse_source_with_fallback(source, result)
+        tree = ast.parse(source, filename="<git-blob>", type_comments=True)
         parents = build_parent_map(tree)
         lines = source.splitlines(keepends=True)
         function_nodes = [
@@ -961,7 +899,7 @@ def parse_blob(payload: bytes) -> dict[str, Any]:
     except Exception as error:
         result["parse_status"] = "failure"
         result["parse_error_type"] = type(error).__name__
-        result["parse_error_message"] = safe_error_message(error)
+        result["parse_error_message"] = str(error).replace("\x00", "\\0")
         result["functions"] = []
     return result
 
@@ -1020,7 +958,6 @@ def prepare_output_dir(path: Path, overwrite: bool) -> None:
 
 
 def self_test() -> None:
-    require_supported_python()
     source = b'''
 def module_function(value):
     return value
@@ -1043,7 +980,6 @@ async def module_async():
     parsed = parse_blob(source)
     if parsed["parse_status"] != "success":
         raise AssertionError(parsed)
-    assert parsed["parse_mode"] == PARSE_MODE_PRIMARY
     functions = parsed["functions"]
     by_name = {row["qualified_function_name"]: row for row in functions}
     assert by_name["module_function"]["is_module_level"] == 1
@@ -1056,37 +992,13 @@ async def module_async():
         "classmethod"
     ]
 
-    type_comment_false_positive = parse_blob(
-        b'''#     type: Literal["feature"]
-def valid_after_ordinary_comment():
-    return 1
-'''
-    )
-    assert type_comment_false_positive["parse_status"] == "success"
-    assert type_comment_false_positive["parse_mode"] == PARSE_MODE_FALLBACK
-    assert type_comment_false_positive["primary_parse_error_type"] == "SyntaxError"
-    assert type_comment_false_positive["fallback_parse_error_type"] == ""
-
-    python_313_source = parse_blob(
-        b'''class Box[T = int]:
-    def get(self, value: T) -> T:
-        return value
-'''
-    )
-    assert python_313_source["parse_status"] == "success"
-    assert python_313_source["parse_mode"] == PARSE_MODE_PRIMARY
-
     failed = parse_blob(b"def broken(:\n    pass\n")
     assert failed["parse_status"] == "failure"
-    assert failed["parse_mode"] == PARSE_MODE_DUAL_FAILURE
     assert failed["parse_error_type"] == "SyntaxError"
-    assert failed["primary_parse_error_type"] == "SyntaxError"
-    assert failed["fallback_parse_error_type"] == "SyntaxError"
     print("run-py-7f02 self-test PASS")
 
 
 def scan(args: argparse.Namespace) -> dict[str, Any]:
-    require_supported_python()
     treatment_input = args.treatment_input.expanduser().resolve()
     control_input = args.control_input.expanduser().resolve()
     treatment_clones = args.treatment_clone_dir.expanduser().resolve()
@@ -1172,8 +1084,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
     parent_repos: defaultdict[tuple[Any, ...], set[str]] = defaultdict(set)
     decorator_counts: Counter[tuple[str, str, str, int]] = Counter()
     decorator_repos: defaultdict[tuple[str, str, str, int], set[str]] = defaultdict(set)
-    parse_mode_counts: Counter[str] = Counter()
-    parse_mode_blobs: defaultdict[str, set[str]] = defaultdict(set)
     started_at = datetime.now(timezone.utc)
     try:
         total = len(unique_commit_rows)
@@ -1275,7 +1185,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
                                 "git_blob_sha": entry.object_id,
                                 "scan_eligible": 0,
                                 "selection_reason": reason,
-                                "parse_mode": "not_scanned",
                                 "parse_status": "not_scanned",
                                 "function_count": 0,
                             }
@@ -1295,24 +1204,14 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
                                 "source_bytes": 0,
                                 "physical_lines": 0,
                                 "source_encoding": "",
-                                "parse_mode": PARSE_MODE_NOT_ATTEMPTED,
                                 "parse_status": "failure",
                                 "parse_error_type": type(error).__name__,
-                                "parse_error_message": safe_error_message(error),
-                                "primary_parse_error_type": "",
-                                "primary_parse_error_message": "",
-                                "fallback_parse_error_type": "",
-                                "fallback_parse_error_message": "",
+                                "parse_error_message": str(error),
                                 "functions": [],
                             }
                         cache.put(entry.object_id, parsed)
 
                     functions = parsed.get("functions", [])
-                    parse_mode = str(
-                        parsed.get("parse_mode", PARSE_MODE_NOT_ATTEMPTED)
-                    )
-                    parse_mode_counts[parse_mode] += 1
-                    parse_mode_blobs[parse_mode].add(entry.object_id)
                     parse_status = str(parsed.get("parse_status", "failure"))
                     if parse_status == "success":
                         stats["parsed_python_files"] += 1
@@ -1326,29 +1225,12 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
                                 "relative_path": entry.relative_path,
                                 "git_blob_sha": entry.object_id,
                                 "stage": "python_ast_parse",
-                                "parse_mode": parse_mode,
                                 "error_type": parsed.get(
                                     "parse_error_type",
                                     "UnknownError",
                                 ),
                                 "error_message": parsed.get(
                                     "parse_error_message",
-                                    "",
-                                ),
-                                "primary_parse_error_type": parsed.get(
-                                    "primary_parse_error_type",
-                                    "",
-                                ),
-                                "primary_parse_error_message": parsed.get(
-                                    "primary_parse_error_message",
-                                    "",
-                                ),
-                                "fallback_parse_error_type": parsed.get(
-                                    "fallback_parse_error_type",
-                                    "",
-                                ),
-                                "fallback_parse_error_message": parsed.get(
-                                    "fallback_parse_error_message",
                                     "",
                                 ),
                             }
@@ -1369,7 +1251,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
                             "source_encoding": parsed.get("source_encoding", ""),
                             "source_bytes": parsed.get("source_bytes", 0),
                             "physical_lines": parsed.get("physical_lines", 0),
-                            "parse_mode": parse_mode,
                             "parse_status": parse_status,
                             "parse_error_type": parsed.get(
                                 "parse_error_type",
@@ -1377,22 +1258,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
                             ),
                             "parse_error_message": parsed.get(
                                 "parse_error_message",
-                                "",
-                            ),
-                            "primary_parse_error_type": parsed.get(
-                                "primary_parse_error_type",
-                                "",
-                            ),
-                            "primary_parse_error_message": parsed.get(
-                                "primary_parse_error_message",
-                                "",
-                            ),
-                            "fallback_parse_error_type": parsed.get(
-                                "fallback_parse_error_type",
-                                "",
-                            ),
-                            "fallback_parse_error_message": parsed.get(
-                                "fallback_parse_error_message",
                                 "",
                             ),
                             "function_count": len(functions),
@@ -1645,34 +1510,8 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
         int(stats["parse_failure_files"])
         for stats in commit_stats.values()
     )
-    supported_parse_modes = {
-        PARSE_MODE_PRIMARY,
-        PARSE_MODE_FALLBACK,
-        PARSE_MODE_DUAL_FAILURE,
-        PARSE_MODE_NOT_ATTEMPTED,
-    }
-    unexpected_parse_mode_files = sum(
-        count
-        for mode, count in parse_mode_counts.items()
-        if mode not in supported_parse_modes
-    )
 
     checks = [
-        {
-            "check_name": "python_runtime_supports_3_13_syntax",
-            "severity": "critical",
-            "passed": (
-                sys.version_info.major,
-                sys.version_info.minor,
-            )
-            >= MINIMUM_PYTHON,
-            "observed": (
-                f"{sys.version_info.major}.{sys.version_info.minor}."
-                f"{sys.version_info.micro}"
-            ),
-            "expected": "Python 3.13 or newer",
-            "note": "Python 3.13 is required for type-parameter defaults.",
-        },
         {
             "check_name": "repository_month_keys_unique",
             "severity": "critical",
@@ -1718,22 +1557,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
             ),
         },
         {
-            "check_name": "all_eligible_python_files_have_v2_parse_mode",
-            "severity": "critical",
-            "passed": unexpected_parse_mode_files == 0
-            and sum(parse_mode_counts.values()) == file_table.rows_written
-            - sum(
-                int(stats["excluded_python_paths"])
-                for stats in commit_stats.values()
-            ),
-            "observed": unexpected_parse_mode_files,
-            "expected": 0,
-            "note": (
-                "Every eligible file records primary, fallback, dual-failure, "
-                "or not-attempted mode."
-            ),
-        },
-        {
             "check_name": "no_prior_outcome_inputs_used",
             "severity": "critical",
             "passed": True,
@@ -1765,11 +1588,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
         "script_version": SCRIPT_VERSION,
         "parser_version": PARSER_VERSION,
         "python_version": sys.version,
-        "python_version_info": {
-            "major": sys.version_info.major,
-            "minor": sys.version_info.minor,
-            "micro": sys.version_info.micro,
-        },
         "started_at_utc": started_at.isoformat(),
         "completed_at_utc": completed_at.isoformat(),
         "elapsed_seconds": (completed_at - started_at).total_seconds(),
@@ -1783,10 +1601,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
             "file_selection": (
                 "tracked .py blobs excluding established generated/cache/vendor paths"
             ),
-            "parse_strategy": (
-                "Python 3.13+ ast.parse(type_comments=True), followed only on "
-                "failure by ast.parse(type_comments=False)"
-            ),
         },
         "inputs": {
             "treatment_input": str(treatment_input),
@@ -1795,7 +1609,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
             "control_input_sha256": hash_file(control_input),
             "treatment_clone_dir": str(treatment_clones),
             "control_clone_dir": str(control_clones),
-            "blob_parse_cache": str(cache_path),
         },
         "selection": {
             "requested_repositories": sorted(requested_repos),
@@ -1812,27 +1625,6 @@ def scan(args: argparse.Namespace) -> dict[str, Any]:
             "function_inventory_rows": function_table.rows_written,
             "decorator_inventory_rows": decorator_table.rows_written,
             "parse_failure_rows": failure_table.rows_written,
-            "parse_mode_type_comments_true_files": parse_mode_counts[
-                PARSE_MODE_PRIMARY
-            ],
-            "parse_mode_type_comments_false_fallback_files": parse_mode_counts[
-                PARSE_MODE_FALLBACK
-            ],
-            "parse_mode_type_comments_true_and_false_failed_files": parse_mode_counts[
-                PARSE_MODE_DUAL_FAILURE
-            ],
-            "parse_mode_not_attempted_files": parse_mode_counts[
-                PARSE_MODE_NOT_ATTEMPTED
-            ],
-            "parse_mode_type_comments_true_unique_blobs": len(
-                parse_mode_blobs[PARSE_MODE_PRIMARY]
-            ),
-            "parse_mode_type_comments_false_fallback_unique_blobs": len(
-                parse_mode_blobs[PARSE_MODE_FALLBACK]
-            ),
-            "parse_mode_type_comments_true_and_false_failed_unique_blobs": len(
-                parse_mode_blobs[PARSE_MODE_DUAL_FAILURE]
-            ),
             "critical_errors": len(critical_errors),
             "critical_failed_checks": critical_failed,
             "blob_cache_hits": cache.hits,

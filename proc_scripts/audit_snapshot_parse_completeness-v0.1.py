@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Audit Python snapshot parse failures before defining a function-role taxonomy.
+"""Audit Python snapshot parse failures before defining a method taxonomy.
 
-This script is outcome-blind. It reads only run-py-7f02 raw scan outputs and
-does not read AGC/HWC outcome panels, labels, ATT values, or DiD estimates.
+This script is outcome-blind. It reads only run-py-9a raw scan outputs and
+does not read run-py-7/run-py-8 panels, AGC/HWC labels, or DiD estimates.
 
 The path classifier is deliberately conservative. Only paths with explicit
 template, vendor, test/example, or archive/documentation evidence are marked
@@ -27,14 +27,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 
-SCRIPT_VERSION = "run-py-7f03-parse-completeness-audit-v1"
-
-ANALYSIS_RELEVANT_CATEGORIES = frozenset(
-    {
-        "source_candidate",
-        "test_or_example",
-    }
-)
+SCRIPT_VERSION = "run-py-9b-parse-completeness-audit-v1"
 
 CATEGORIES = (
     "template_or_generated",
@@ -279,23 +272,15 @@ SNAPSHOT_FIELDS = (
     "source_candidate_parsed_files",
     "source_candidate_failure_files",
     "source_candidate_parse_success_rate",
-    "analysis_relevant_eligible_files",
-    "analysis_relevant_parsed_files",
-    "analysis_relevant_failure_files",
-    "analysis_relevant_parse_success_rate",
     "clear_ancillary_failure_files",
     "parse_complete_all_eligible",
     "parse_complete_source_candidate",
-    "parse_complete_analysis_relevant",
     "has_only_clear_ancillary_failures",
-    "has_only_non_analysis_relevant_failures",
     "sensitivity_keep_successfully_parsed_portion",
     "strict_repository_keep_all_complete",
     "strict_repository_keep_source_complete",
-    "strict_repository_keep_analysis_relevant_complete",
     "failure_paths_json",
     "source_candidate_failure_paths_json",
-    "analysis_relevant_failure_paths_json",
 )
 
 REPOSITORY_FIELDS = (
@@ -305,37 +290,15 @@ REPOSITORY_FIELDS = (
     "unique_repository_commits",
     "months_with_any_parse_failure",
     "months_with_source_candidate_failure",
-    "months_with_analysis_relevant_failure",
     "unique_failed_paths",
     "unique_failed_blobs",
     "parse_failure_file_month_occurrences",
     "source_candidate_failure_file_month_occurrences",
-    "analysis_relevant_failure_file_month_occurrences",
     "eligible_python_file_month_occurrences",
     "source_candidate_eligible_file_month_occurrences",
     "source_candidate_parsed_file_month_occurrences",
-    "analysis_relevant_eligible_file_month_occurrences",
-    "analysis_relevant_parsed_file_month_occurrences",
     "strict_repository_keep_all_complete",
     "strict_repository_keep_source_complete",
-    "strict_repository_keep_analysis_relevant_complete",
-)
-
-POLICY_SUMMARY_FIELDS = (
-    "dataset_scope",
-    "repository_months",
-    "repositories",
-    "months_keep_all_eligible_complete",
-    "months_excluded_all_eligible_failure",
-    "months_keep_source_candidate_complete",
-    "months_excluded_source_candidate_failure",
-    "months_keep_analysis_relevant_complete",
-    "months_excluded_analysis_relevant_failure",
-    "months_keep_successfully_parsed_portion",
-    "months_excluded_snapshot_unavailable",
-    "repositories_keep_all_complete",
-    "repositories_keep_source_complete",
-    "repositories_keep_analysis_relevant_complete",
 )
 
 PATH_SUMMARY_FIELDS = (
@@ -526,17 +489,13 @@ class RepoStats:
     commits: set[str] = field(default_factory=set)
     failure_months: int = 0
     source_failure_months: int = 0
-    analysis_relevant_failure_months: int = 0
     failed_paths: set[str] = field(default_factory=set)
     failed_blobs: set[str] = field(default_factory=set)
     failure_file_month_occurrences: int = 0
     source_failure_file_month_occurrences: int = 0
-    analysis_relevant_failure_file_month_occurrences: int = 0
     eligible_file_month_occurrences: int = 0
     source_eligible_file_month_occurrences: int = 0
     source_parsed_file_month_occurrences: int = 0
-    analysis_relevant_eligible_file_month_occurrences: int = 0
-    analysis_relevant_parsed_file_month_occurrences: int = 0
 
 
 def load_file_inventory(
@@ -692,17 +651,16 @@ def run_audit(
     overwrite_output: bool,
 ) -> dict[str, Any]:
     output_names = {
-        "classification": "run-py-7f03-parse-failure-classification.csv",
-        "unique_blobs": "run-py-7f03-unique-failed-blobs.csv",
-        "snapshot": "run-py-7f03-snapshot-completeness.csv",
-        "repository": "run-py-7f03-repository-completeness.csv",
-        "policy_summary": "run-py-7f03-parse-policy-summary.csv",
-        "path_summary": "run-py-7f03-path-category-summary.csv",
-        "failure_summary": "run-py-7f03-failure-category-summary.csv",
-        "manual_review": "run-py-7f03-source-candidate-manual-review.csv",
-        "rules": "run-py-7f03-path-classification-rules.csv",
-        "qc": "run-py-7f03-audit-qc.csv",
-        "metadata": "run-py-7f03-audit-metadata.json",
+        "classification": "run-py-9b-parse-failure-classification.csv",
+        "unique_blobs": "run-py-9b-unique-failed-blobs.csv",
+        "snapshot": "run-py-9b-snapshot-completeness.csv",
+        "repository": "run-py-9b-repository-completeness.csv",
+        "path_summary": "run-py-9b-path-category-summary.csv",
+        "failure_summary": "run-py-9b-failure-category-summary.csv",
+        "manual_review": "run-py-9b-source-candidate-manual-review.csv",
+        "rules": "run-py-9b-path-classification-rules.csv",
+        "qc": "run-py-9b-audit-qc.csv",
+        "metadata": "run-py-9b-audit-metadata.json",
     }
     output_dir.mkdir(parents=True, exist_ok=True)
     existing = [
@@ -759,26 +717,6 @@ def run_audit(
     qc_rows: list[dict[str, Any]] = []
     manifest_commit_keys = set(commit_months)
     failure_commit_keys = set(failures_by_commit)
-    manifest_commits_with_python_paths = {
-        (
-            row["dataset_source"],
-            row["repo_name"],
-            row["latest_commit"],
-        )
-        for row in manifest_rows
-        if parse_int(
-            row["tracked_python_paths"],
-            f"{manifest_path}:tracked_python_paths",
-        )
-        > 0
-    }
-    manifest_zero_python_commits = (
-        manifest_commit_keys - manifest_commits_with_python_paths
-    )
-    file_inventory_commit_keys = set(file_by_commit)
-    manifest_commits_without_file_inventory = (
-        manifest_commit_keys - file_inventory_commit_keys
-    )
     add_qc(
         qc_rows,
         "manifest_repository_month_keys_unique",
@@ -800,49 +738,12 @@ def run_audit(
     if full_inventory_mode:
         add_qc(
             qc_rows,
-            "manifest_commits_with_python_paths_in_file_inventory",
+            "all_manifest_commits_in_file_inventory",
             "critical",
-            manifest_commits_with_python_paths <= file_inventory_commit_keys,
-            len(
-                manifest_commits_with_python_paths
-                - file_inventory_commit_keys
-            ),
+            manifest_commit_keys <= set(file_by_commit),
+            len(manifest_commit_keys - set(file_by_commit)),
             0,
-            "Every manifest commit with tracked Python paths must have "
-            "file-inventory rows.",
-        )
-        add_qc(
-            qc_rows,
-            "file_inventory_commits_in_manifest",
-            "critical",
-            file_inventory_commit_keys <= manifest_commit_keys,
-            len(file_inventory_commit_keys - manifest_commit_keys),
-            0,
-            "Every file-inventory commit must occur in the snapshot manifest.",
-        )
-        add_qc(
-            qc_rows,
-            "manifest_commits_without_file_inventory_are_zero_python",
-            "critical",
-            manifest_commits_without_file_inventory
-            <= manifest_zero_python_commits,
-            len(
-                manifest_commits_without_file_inventory
-                - manifest_zero_python_commits
-            ),
-            0,
-            "Manifest commits without file rows are valid only when the "
-            "snapshot tracks zero Python paths.",
-        )
-        add_qc(
-            qc_rows,
-            "zero_python_manifest_commits_without_file_inventory",
-            "diagnostic",
-            True,
-            len(manifest_commits_without_file_inventory),
-            ">=0",
-            "Row-based file inventory correctly has no row for snapshots "
-            "with zero tracked Python paths.",
+            "Every manifest repository commit must have file-inventory rows.",
         )
         add_qc(
             qc_rows,
@@ -851,7 +752,7 @@ def run_audit(
             failure_keys == inventory_failure_keys,
             len(failure_keys.symmetric_difference(inventory_failure_keys)),
             0,
-            "Failure keys must agree across the two run-py-7f02 inventories.",
+            "Failure keys must agree across the two run-py-9a inventories.",
         )
     else:
         add_qc(
@@ -913,10 +814,6 @@ def run_audit(
             file_stats.category_failed.update(failure_category_counts)
 
         source_failures = failure_category_counts["source_candidate"]
-        analysis_relevant_failures = sum(
-            failure_category_counts[category]
-            for category in ANALYSIS_RELEVANT_CATEGORIES
-        )
         clear_failures = reconstructed_failures - source_failures
         failure_paths = [item["relative_path"] for item in failures]
         source_failure_paths = [
@@ -924,19 +821,6 @@ def run_audit(
             for item in failures
             if item["path_category"] == "source_candidate"
         ]
-        analysis_relevant_failure_paths = [
-            item["relative_path"]
-            for item in failures
-            if item["path_category"] in ANALYSIS_RELEVANT_CATEGORIES
-        ]
-        analysis_relevant_eligible = sum(
-            file_stats.category_eligible[category]
-            for category in ANALYSIS_RELEVANT_CATEGORIES
-        )
-        analysis_relevant_parsed = sum(
-            file_stats.category_parsed[category]
-            for category in ANALYSIS_RELEVANT_CATEGORIES
-        )
 
         output: dict[str, Any] = {
             "dataset_source": source,
@@ -954,15 +838,8 @@ def run_audit(
             "clear_ancillary_failure_files": clear_failures,
             "parse_complete_all_eligible": int(reconstructed_failures == 0),
             "parse_complete_source_candidate": int(source_failures == 0),
-            "parse_complete_analysis_relevant": int(
-                analysis_relevant_failures == 0
-            ),
             "has_only_clear_ancillary_failures": int(
                 reconstructed_failures > 0 and source_failures == 0
-            ),
-            "has_only_non_analysis_relevant_failures": int(
-                reconstructed_failures > 0
-                and analysis_relevant_failures == 0
             ),
             "sensitivity_keep_successfully_parsed_portion": int(
                 row["commit_available"].strip() == "1"
@@ -971,9 +848,6 @@ def run_audit(
             "failure_paths_json": json_list(failure_paths),
             "source_candidate_failure_paths_json": json_list(
                 source_failure_paths
-            ),
-            "analysis_relevant_failure_paths_json": json_list(
-                analysis_relevant_failure_paths
             ),
         }
         for category in CATEGORIES:
@@ -998,20 +872,6 @@ def run_audit(
             if full_inventory_mode
             else ""
         )
-        output["analysis_relevant_eligible_files"] = (
-            analysis_relevant_eligible if full_inventory_mode else ""
-        )
-        output["analysis_relevant_parsed_files"] = (
-            analysis_relevant_parsed if full_inventory_mode else ""
-        )
-        output["analysis_relevant_failure_files"] = (
-            analysis_relevant_failures
-        )
-        output["analysis_relevant_parse_success_rate"] = (
-            safe_rate(analysis_relevant_parsed, analysis_relevant_eligible)
-            if full_inventory_mode
-            else ""
-        )
         snapshot_rows.append(output)
 
         stats = repo_stats[(source, repo)]
@@ -1019,16 +879,10 @@ def run_audit(
         stats.commits.add(commit)
         stats.failure_months += int(reconstructed_failures > 0)
         stats.source_failure_months += int(source_failures > 0)
-        stats.analysis_relevant_failure_months += int(
-            analysis_relevant_failures > 0
-        )
         stats.failed_paths.update(failure_paths)
         stats.failed_blobs.update(item["git_blob_sha"] for item in failures)
         stats.failure_file_month_occurrences += reconstructed_failures
         stats.source_failure_file_month_occurrences += source_failures
-        stats.analysis_relevant_failure_file_month_occurrences += (
-            analysis_relevant_failures
-        )
         stats.eligible_file_month_occurrences += eligible
         if full_inventory_mode:
             stats.source_eligible_file_month_occurrences += (
@@ -1036,12 +890,6 @@ def run_audit(
             )
             stats.source_parsed_file_month_occurrences += (
                 file_stats.category_parsed["source_candidate"]
-            )
-            stats.analysis_relevant_eligible_file_month_occurrences += (
-                analysis_relevant_eligible
-            )
-            stats.analysis_relevant_parsed_file_month_occurrences += (
-                analysis_relevant_parsed
             )
 
         if full_inventory_mode:
@@ -1064,9 +912,6 @@ def run_audit(
         )
         snapshot["strict_repository_keep_source_complete"] = int(
             stats.source_failure_months == 0
-        )
-        snapshot["strict_repository_keep_analysis_relevant_complete"] = int(
-            stats.analysis_relevant_failure_months == 0
         )
 
     add_qc(
@@ -1101,9 +946,6 @@ def run_audit(
                 "months_with_source_candidate_failure": (
                     stats.source_failure_months
                 ),
-                "months_with_analysis_relevant_failure": (
-                    stats.analysis_relevant_failure_months
-                ),
                 "unique_failed_paths": len(stats.failed_paths),
                 "unique_failed_blobs": len(stats.failed_blobs),
                 "parse_failure_file_month_occurrences": (
@@ -1111,9 +953,6 @@ def run_audit(
                 ),
                 "source_candidate_failure_file_month_occurrences": (
                     stats.source_failure_file_month_occurrences
-                ),
-                "analysis_relevant_failure_file_month_occurrences": (
-                    stats.analysis_relevant_failure_file_month_occurrences
                 ),
                 "eligible_python_file_month_occurrences": (
                     stats.eligible_file_month_occurrences
@@ -1128,94 +967,11 @@ def run_audit(
                     if full_inventory_mode
                     else ""
                 ),
-                "analysis_relevant_eligible_file_month_occurrences": (
-                    stats.analysis_relevant_eligible_file_month_occurrences
-                    if full_inventory_mode
-                    else ""
-                ),
-                "analysis_relevant_parsed_file_month_occurrences": (
-                    stats.analysis_relevant_parsed_file_month_occurrences
-                    if full_inventory_mode
-                    else ""
-                ),
                 "strict_repository_keep_all_complete": int(
                     stats.failure_months == 0
                 ),
                 "strict_repository_keep_source_complete": int(
                     stats.source_failure_months == 0
-                ),
-                "strict_repository_keep_analysis_relevant_complete": int(
-                    stats.analysis_relevant_failure_months == 0
-                ),
-            }
-        )
-
-    policy_summary_rows: list[dict[str, Any]] = []
-    dataset_sources = sorted(
-        {row["dataset_source"] for row in snapshot_rows}
-    )
-    for dataset_scope in ["ALL", *dataset_sources]:
-        scoped_snapshots = [
-            row
-            for row in snapshot_rows
-            if dataset_scope == "ALL"
-            or row["dataset_source"] == dataset_scope
-        ]
-        scoped_repositories = [
-            row
-            for row in repository_rows
-            if dataset_scope == "ALL"
-            or row["dataset_source"] == dataset_scope
-        ]
-        repository_months = len(scoped_snapshots)
-        policy_summary_rows.append(
-            {
-                "dataset_scope": dataset_scope,
-                "repository_months": repository_months,
-                "repositories": len(scoped_repositories),
-                "months_keep_all_eligible_complete": sum(
-                    row["parse_complete_all_eligible"]
-                    for row in scoped_snapshots
-                ),
-                "months_excluded_all_eligible_failure": sum(
-                    not row["parse_complete_all_eligible"]
-                    for row in scoped_snapshots
-                ),
-                "months_keep_source_candidate_complete": sum(
-                    row["parse_complete_source_candidate"]
-                    for row in scoped_snapshots
-                ),
-                "months_excluded_source_candidate_failure": sum(
-                    not row["parse_complete_source_candidate"]
-                    for row in scoped_snapshots
-                ),
-                "months_keep_analysis_relevant_complete": sum(
-                    row["parse_complete_analysis_relevant"]
-                    for row in scoped_snapshots
-                ),
-                "months_excluded_analysis_relevant_failure": sum(
-                    not row["parse_complete_analysis_relevant"]
-                    for row in scoped_snapshots
-                ),
-                "months_keep_successfully_parsed_portion": sum(
-                    row["sensitivity_keep_successfully_parsed_portion"]
-                    for row in scoped_snapshots
-                ),
-                "months_excluded_snapshot_unavailable": sum(
-                    not row["sensitivity_keep_successfully_parsed_portion"]
-                    for row in scoped_snapshots
-                ),
-                "repositories_keep_all_complete": sum(
-                    row["strict_repository_keep_all_complete"]
-                    for row in scoped_repositories
-                ),
-                "repositories_keep_source_complete": sum(
-                    row["strict_repository_keep_source_complete"]
-                    for row in scoped_repositories
-                ),
-                "repositories_keep_analysis_relevant_complete": sum(
-                    row["strict_repository_keep_analysis_relevant_complete"]
-                    for row in scoped_repositories
                 ),
             }
         )
@@ -1440,11 +1196,6 @@ def run_audit(
         repository_rows,
     )
     write_csv(
-        output_dir / output_names["policy_summary"],
-        POLICY_SUMMARY_FIELDS,
-        policy_summary_rows,
-    )
-    write_csv(
         output_dir / output_names["path_summary"],
         PATH_SUMMARY_FIELDS,
         path_summary_rows,
@@ -1492,25 +1243,13 @@ def run_audit(
                 if file_inventory_path
                 else None
             ),
-            "prior_outcome_outputs": None,
+            "prior_run_py_7_or_8_outputs": None,
         },
         "counts": {
             "repository_months": len(snapshot_rows),
             "repositories": len(repository_rows),
             "unique_repository_commits": len(manifest_commit_keys),
             "python_file_inventory_rows": inventory_rows,
-            "zero_python_repository_commits_without_file_inventory": len(
-                manifest_commits_without_file_inventory
-            ),
-            "zero_python_repository_months_without_file_inventory": sum(
-                (
-                    row["dataset_source"],
-                    row["repo_name"],
-                    row["latest_commit"],
-                )
-                in manifest_commits_without_file_inventory
-                for row in manifest_rows
-            ),
             "parse_failure_repository_commit_file_occurrences": len(
                 failure_rows
             ),
@@ -1524,10 +1263,6 @@ def run_audit(
             "source_candidate_failure_repository_commit_occurrences": (
                 source_failure_occurrences
             ),
-            "analysis_relevant_failure_repository_commit_occurrences": sum(
-                row["path_category"] in ANALYSIS_RELEVANT_CATEGORIES
-                for row in failure_rows
-            ),
             "source_candidate_manual_review_rows": len(manual_review_rows),
             "months_with_any_parse_failure": sum(
                 row["reconstructed_parse_failure_files"] > 0
@@ -1536,26 +1271,6 @@ def run_audit(
             "months_with_source_candidate_failure": sum(
                 row["source_candidate_failure_files"] > 0
                 for row in snapshot_rows
-            ),
-            "months_with_analysis_relevant_failure": sum(
-                row["analysis_relevant_failure_files"] > 0
-                for row in snapshot_rows
-            ),
-            "analysis_relevant_failure_repository_month_file_occurrences": sum(
-                row["analysis_relevant_failure_files"]
-                for row in snapshot_rows
-            ),
-            "repositories_with_any_parse_failure": sum(
-                row["months_with_any_parse_failure"] > 0
-                for row in repository_rows
-            ),
-            "repositories_with_source_candidate_failure": sum(
-                row["months_with_source_candidate_failure"] > 0
-                for row in repository_rows
-            ),
-            "repositories_with_analysis_relevant_failure": sum(
-                row["months_with_analysis_relevant_failure"] > 0
-                for row in repository_rows
             ),
             "critical_qc_failures": len(critical_failures),
         },
@@ -1567,27 +1282,6 @@ def run_audit(
             "source_candidate_policy": (
                 "Unmatched paths are not assumed to be production source. "
                 "They require manual review before final sample filtering."
-            ),
-            "analysis_relevant_categories": sorted(
-                ANALYSIS_RELEVANT_CATEGORIES
-            ),
-        },
-        "parse_completeness_policies": {
-            "all_eligible_files_complete": (
-                "Keep a repository-month only when no eligible Python file "
-                "has a retained parse failure."
-            ),
-            "source_candidate_files_complete": (
-                "Keep a repository-month when no source-candidate file has "
-                "a retained parse failure."
-            ),
-            "analysis_relevant_files_complete": (
-                "Keep a repository-month when neither source-candidate nor "
-                "test/example files have retained parse failures."
-            ),
-            "successfully_parsed_portion_retained": (
-                "Sensitivity policy: retain available, successfully scanned "
-                "snapshots and use the successfully parsed portion."
             ),
         },
         "outputs": {
@@ -1625,7 +1319,7 @@ def run_self_test() -> None:
             expected_category,
         )
 
-    with tempfile.TemporaryDirectory(prefix="run-py-7f03-self-test-") as temp:
+    with tempfile.TemporaryDirectory(prefix="run-py-9b-self-test-") as temp:
         root = Path(temp)
         manifest = root / "manifest.csv"
         failures = root / "failures.csv"
@@ -1683,30 +1377,6 @@ def run_self_test() -> None:
                     "parsed_python_files": 1,
                     "parse_failure_files": 1,
                 },
-                {
-                    "dataset_source": "treatment",
-                    "repo_name": "example/test",
-                    "month": "2024-01",
-                    "latest_commit": "c3",
-                    "commit_available": 1,
-                    "tree_scan_status": "success",
-                    "tracked_python_paths": 2,
-                    "eligible_python_files": 2,
-                    "parsed_python_files": 1,
-                    "parse_failure_files": 1,
-                },
-                {
-                    "dataset_source": "control",
-                    "repo_name": "example/zero-python",
-                    "month": "2024-01",
-                    "latest_commit": "c0",
-                    "commit_available": 1,
-                    "tree_scan_status": "success",
-                    "tracked_python_paths": 0,
-                    "eligible_python_files": 0,
-                    "parsed_python_files": 0,
-                    "parse_failure_files": 0,
-                },
             ),
         )
         write_csv(
@@ -1741,16 +1411,6 @@ def run_self_test() -> None:
                     "stage": "python_ast_parse",
                     "error_type": "SyntaxError",
                     "error_message": "actual source candidate",
-                },
-                {
-                    "dataset_source": "treatment",
-                    "repo_name": "example/test",
-                    "latest_commit": "c3",
-                    "relative_path": "tests/test_broken.py",
-                    "git_blob_sha": "b5",
-                    "stage": "python_ast_parse",
-                    "error_type": "SyntaxError",
-                    "error_message": "actual test candidate",
                 },
             ),
         )
@@ -1807,26 +1467,6 @@ def run_self_test() -> None:
                     "selection_reason": "eligible",
                     "parse_status": "success",
                 },
-                {
-                    "dataset_source": "treatment",
-                    "repo_name": "example/test",
-                    "latest_commit": "c3",
-                    "relative_path": "tests/test_broken.py",
-                    "git_blob_sha": "b5",
-                    "scan_eligible": 1,
-                    "selection_reason": "eligible",
-                    "parse_status": "failure",
-                },
-                {
-                    "dataset_source": "treatment",
-                    "repo_name": "example/test",
-                    "latest_commit": "c3",
-                    "relative_path": "src/main.py",
-                    "git_blob_sha": "b6",
-                    "scan_eligible": 1,
-                    "selection_reason": "eligible",
-                    "parse_status": "success",
-                },
             ),
         )
 
@@ -1838,16 +1478,9 @@ def run_self_test() -> None:
             overwrite_output=False,
         )
         assert metadata["status"] == "PASS"
-        assert metadata["counts"]["repository_months"] == 5
-        assert metadata["counts"]["months_with_any_parse_failure"] == 4
+        assert metadata["counts"]["repository_months"] == 3
+        assert metadata["counts"]["months_with_any_parse_failure"] == 3
         assert metadata["counts"]["months_with_source_candidate_failure"] == 1
-        assert metadata["counts"]["months_with_analysis_relevant_failure"] == 2
-        assert (
-            metadata["counts"][
-                "zero_python_repository_commits_without_file_inventory"
-            ]
-            == 1
-        )
         assert (
             metadata["counts"][
                 "source_candidate_failure_repository_commit_occurrences"
@@ -1855,7 +1488,7 @@ def run_self_test() -> None:
             == 1
         )
 
-        with (output / "run-py-7f03-snapshot-completeness.csv").open(
+        with (output / "run-py-9b-snapshot-completeness.csv").open(
             "r", encoding="utf-8", newline=""
         ) as handle:
             rows = list(csv.DictReader(handle))
@@ -1863,18 +1496,11 @@ def run_self_test() -> None:
             row for row in rows if row["repo_name"] == "example/ancillary"
         ]
         source = [row for row in rows if row["repo_name"] == "example/source"]
-        test = [row for row in rows if row["repo_name"] == "example/test"]
-        zero_python = [
-            row for row in rows if row["repo_name"] == "example/zero-python"
-        ]
         assert all(row["has_only_clear_ancillary_failures"] == "1" for row in ancillary)
         assert source[0]["parse_complete_source_candidate"] == "0"
-        assert test[0]["parse_complete_source_candidate"] == "1"
-        assert test[0]["parse_complete_analysis_relevant"] == "0"
-        assert zero_python[0]["parse_complete_all_eligible"] == "1"
 
         with (
-            output / "run-py-7f03-source-candidate-manual-review.csv"
+            output / "run-py-9b-source-candidate-manual-review.csv"
         ).open("r", encoding="utf-8", newline="") as handle:
             review_rows = list(csv.DictReader(handle))
         assert len(review_rows) == 1
@@ -1884,7 +1510,7 @@ def run_self_test() -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Classify run-py-7f02 parse-failure paths and audit repository-month "
+            "Classify run-py-9a parse-failure paths and audit repository-month "
             "snapshot completeness without reading outcomes."
         )
     )
