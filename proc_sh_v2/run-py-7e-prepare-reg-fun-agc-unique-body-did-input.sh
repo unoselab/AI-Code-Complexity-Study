@@ -30,10 +30,10 @@ set -euo pipefail
 #     qc/regular_module_function_agc_unique_body_did_input_summary.json
 #
 # Usage:
-#   OVERWRITE_OUTPUT=1 bash proc_sh_v2/run-py-7e-prepare-regular-module-function-agc-unique-body-did-input.sh
+#   OVERWRITE_OUTPUT=1 bash proc_sh_v2/run-py-7e-prepare-reg-fun-agc-unique-body-did-input.sh
 #
 # Optional validation-only run:
-#   RUN_SELF_TEST=1 bash proc_sh_v2/run-py-7e-prepare-regular-module-function-agc-unique-body-did-input.sh
+#   RUN_SELF_TEST=1 bash proc_sh_v2/run-py-7e-prepare-reg-fun-agc-unique-body-did-input.sh
 # =============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

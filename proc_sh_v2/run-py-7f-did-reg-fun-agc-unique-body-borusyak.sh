@@ -31,11 +31,11 @@ set -euo pipefail
 #     python_snapshot_ncloc/calendar_month/parse_clean/
 #
 # Default execution:
-#   OVERWRITE_OUTPUT=1 bash proc_sh_v2/run-py-7f-did-regular-module-function-agc-unique-body-borusyak.sh
+#   OVERWRITE_OUTPUT=1 bash proc_sh_v2/run-py-7f-did-reg-fun-agc-unique-body-borusyak.sh
 #
 # Optional paper-compatible NCLOC robustness run:
 #   NCLOC_SPECS="paper python_snapshot" OVERWRITE_OUTPUT=1 \
-#   bash proc_sh/run-py-7f-did-regular-module-function-agc-unique-body-borusyak.sh
+#   bash proc_sh_v2/run-py-7f-did-reg-fun-agc-unique-body-borusyak.sh
 # =============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
