@@ -28,11 +28,11 @@ printf '# Consolidated shell and Python sources generated on %s\n\n' "$(date)"
 
 shopt -s nullglob
 
-for shell_file in run-py-*.sh; do
+for shell_file in run-py-*.sh proc_sh/run-py-*.sh; do
     [[ -f "${shell_file}" ]] || continue
-    [[ "${shell_file}" != "${GENERATED_SHELL}" ]] || continue
+    [[ "$(basename "${shell_file}")" != "${GENERATED_SHELL}" ]] || continue
 
-    shell_name="$(basename "${shell_file}")"
+    shell_name="${shell_file}"
     echo "Processing shell script: ${shell_name}" >&2
 
     printf '%s\n' '###############################################################################'
