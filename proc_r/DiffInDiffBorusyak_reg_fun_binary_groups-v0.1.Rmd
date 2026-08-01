@@ -1,0 +1,1014 @@
+---
+title: "Diff-in-Diff Borusyak: Binary Regular-Function Groups"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- Sys.getenv(
+  "PROJECT_ROOT",
+  unset = normalizePath(".", mustWork = TRUE)
+)
+project_root <- normalizePath(project_root, mustWork = TRUE)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || path_value == "") {
+    return("")
+  }
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(Sys.getenv("PANEL_PATH", unset = ""))
+out_dir <- resolve_project_path(Sys.getenv("OUT_DIR", unset = ""))
+panel_label <- Sys.getenv("PANEL_LABEL", unset = "panel")
+outcome_group <- tolower(Sys.getenv("OUTCOME_GROUP", unset = ""))
+specification_name <- Sys.getenv(
+  "SPECIFICATION_NAME",
+  unset = "range100_200"
+)
+ncloc_spec <- tolower(Sys.getenv("NCLOC_SPEC", unset = "python_snapshot"))
+time_mode <- tolower(Sys.getenv("TIME_MODE", unset = "calendar_month"))
+parse_exclusion_mode <- tolower(
+  Sys.getenv("PARSE_EXCLUSION_MODE", unset = "parse_clean")
+)
+helper_path <- resolve_project_path(
+  Sys.getenv(
+    "HELPER_FILE",
+    unset = "proc_r/diff_in_diff_borusyak_helpers.R"
+  )
+)
+
+valid_groups <- c("testing", "other_functions", "all_regular_functions")
+if (!(outcome_group %in% valid_groups)) {
+  stop(
+    "OUTCOME_GROUP must be one of: ",
+    paste(valid_groups, collapse = ", "),
+    ". Got: ", outcome_group
+  )
+}
+if (ncloc_spec != "python_snapshot") {
+  stop("run-py-7f09 locks NCLOC_SPEC to python_snapshot.")
+}
+if (time_mode != "calendar_month") {
+  stop("run-py-7f09 locks TIME_MODE to calendar_month.")
+}
+if (parse_exclusion_mode != "parse_clean") {
+  stop("run-py-7f09 locks PARSE_EXCLUSION_MODE to parse_clean.")
+}
+if (panel_path == "") {
+  stop("PANEL_PATH environment variable is required.")
+}
+if (out_dir == "") {
+  stop("OUT_DIR environment variable is required.")
+}
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+# Purpose
+
+This notebook applies one locked Borusyak imputation DiD specification to one
+of the three zero-inclusive `run-py-7f08` outcomes:
+
+1. AGC-like testing and test-support regular functions.
+2. AGC-like non-testing regular functions.
+3. All AGC-like regular functions, which is the aggregate of the first two.
+
+The three analyses use identical repository-month rows, treatment timing,
+covariates, fixed effects, event-time horizon, and inference settings. Only the
+raw-count outcome changes.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+
+if (!file.exists(helper_path)) {
+  stop("Helper file not found: ", helper_path)
+}
+source(helper_path)
+```
+
+# Utility Functions
+
+```{r utility-functions}
+normalize_yyyymm <- function(x) {
+  x <- as.character(x)
+  x[x %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+  x <- gsub("-", "", x)
+  suppressWarnings(as.integer(x))
+}
+
+yyyymm_to_month_id <- function(x) {
+  x <- as.integer(x)
+  year <- x %/% 100L
+  month <- x %% 100L
+  out <- year * 12L + month
+  out[is.na(x) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+write_error_table <- function(errors, stage, output_path) {
+  if (length(errors) == 0) {
+    fwrite(
+      data.frame(
+        stage = character(),
+        outcome_group = character(),
+        outcome = character(),
+        error = character()
+      ),
+      output_path
+    )
+    return(invisible(NULL))
+  }
+
+  fwrite(
+    data.frame(
+      stage = stage,
+      outcome_group = outcome_group,
+      outcome = names(errors),
+      error = unlist(errors),
+      row.names = NULL,
+      stringsAsFactors = FALSE
+    ),
+    output_path
+  )
+}
+
+add_normal_p_value <- function(data) {
+  data$p_value <- ifelse(
+    !is.na(data$estimate) & !is.na(data$std_error) & data$std_error > 0,
+    2 * pnorm(abs(data$estimate / data$std_error), lower.tail = FALSE),
+    NA_real_
+  )
+  data
+}
+```
+
+# Outcome Configuration
+
+```{r outcome-configuration}
+group_config <- data.frame(
+  outcome_group = c("testing", "other_functions", "all_regular_functions"),
+  outcome_label = c(
+    "AGC-Like Testing and Test-Support Regular-Function Unique Bodies",
+    "AGC-Like Non-Testing Regular-Function Unique Bodies",
+    "All AGC-Like Regular-Function Unique Bodies"
+  ),
+  expected_total = c(627L, 1622L, 2249L),
+  expected_positive_rows = c(198L, 417L, 486L),
+  expected_zero_rows = c(1323L, 1104L, 1035L),
+  stringsAsFactors = FALSE
+)
+
+selected_config <- group_config[group_config$outcome_group == outcome_group, ]
+outcome_label <- selected_config$outcome_label[[1]]
+expected_total <- selected_config$expected_total[[1]]
+expected_positive_rows <- selected_config$expected_positive_rows[[1]]
+expected_zero_rows <- selected_config$expected_zero_rows[[1]]
+
+outcome_var <- "npr_agc_regular_module_function_unique_bodies"
+occurrence_var <- "has_npr_agc_regular_module_function_unique_body"
+zero_var <- "zero_npr_agc_regular_module_function_unique_body_month"
+output_prefix <- paste0("borusyak_reg_fun_binary_group_", outcome_group)
+```
+
+# Load and Validate Input Panel
+
+```{r load-panel}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Panel label:", panel_label, "\n")
+cat("Outcome group:", outcome_group, "\n")
+cat("Outcome label:", outcome_label, "\n")
+cat("Specification:", specification_name, "\n")
+cat("Output directory:", out_dir, "\n")
+
+if (!file.exists(panel_path)) {
+  stop("Panel file not found: ", panel_path)
+}
+
+panel_raw <- fread(panel_path)
+
+covariates <- c(
+  "log1p_age",
+  "ncloc_python_snapshot",
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues"
+)
+readiness_column <-
+  "analysis_ready_regular_module_function_agc_unique_body_python_snapshot_ncloc"
+
+base_required <- c(
+  "dataset_source",
+  "repo_name",
+  "time",
+  "event",
+  "time_to_event",
+  outcome_var,
+  occurrence_var,
+  zero_var,
+  covariates,
+  readiness_column,
+  "has_parse_exclusion",
+  "npr_detection_complete",
+  "npr_specification",
+  "treatment_group",
+  "regular_function_scope",
+  "agc_count_unit",
+  "agc_outcome_scale",
+  "regular_function_outcome_group",
+  "regular_function_outcome_schema_version",
+  "regular_function_taxonomy_status",
+  "regular_function_taxonomy_version"
+)
+require_columns(panel_raw, base_required, "Input panel")
+
+if (nrow(panel_raw) != 1521L) {
+  stop("Expected 1,521 input rows; got ", nrow(panel_raw), ".")
+}
+if (uniqueN(panel_raw$repo_name) != 218L) {
+  stop("Expected 218 repositories; got ", uniqueN(panel_raw$repo_name), ".")
+}
+if (anyDuplicated(panel_raw[, .(dataset_source, repo_name, time)]) > 0) {
+  stop("Input panel has duplicate dataset_source/repo_name/time keys.")
+}
+if (!all(panel_raw$dataset_source %in% c("control", "treatment"))) {
+  stop("dataset_source contains unexpected values.")
+}
+if (!all(as.character(panel_raw$regular_function_outcome_group) == outcome_group)) {
+  stop("regular_function_outcome_group does not match OUTCOME_GROUP.")
+}
+if (!all(
+  as.character(panel_raw$regular_function_outcome_schema_version) ==
+    "run-py-7f08-v1"
+)) {
+  stop("Unexpected run-py-7f08 outcome schema version.")
+}
+if (!all(
+  as.character(panel_raw$regular_function_taxonomy_status) == "FROZEN_BINARY"
+)) {
+  stop("Binary taxonomy is not uniformly frozen.")
+}
+if (!all(
+  as.character(panel_raw$regular_function_taxonomy_version) ==
+    "testing-vs-other-functions-v1"
+)) {
+  stop("Unexpected binary taxonomy version.")
+}
+if (!all(as.character(panel_raw$npr_specification) == specification_name)) {
+  stop("npr_specification does not match the requested specification.")
+}
+if (!all(as.character(panel_raw$regular_function_scope) == "module_function")) {
+  stop("Regular-function scope is not uniformly module_function.")
+}
+if (!all(as.character(panel_raw$agc_outcome_scale) == "raw_count")) {
+  stop("Outcome scale is not uniformly raw_count.")
+}
+if (!all(
+  as.character(panel_raw$agc_count_unit) ==
+    "distinct_function_body_sha256_per_repository_month"
+)) {
+  stop("Unexpected AGC count unit.")
+}
+if (!all(
+  as.character(panel_raw$treatment_group) ==
+    as.character(panel_raw$dataset_source)
+)) {
+  stop("treatment_group does not match dataset_source.")
+}
+
+detection_complete_true <- panel_raw$npr_detection_complete %in%
+  c(TRUE, 1L, 1.0, "True", "TRUE", "true", "1", "1.0")
+if (!all(detection_complete_true)) {
+  stop("npr_detection_complete is not uniformly true.")
+}
+
+outcome_values <- suppressWarnings(as.numeric(panel_raw[[outcome_var]]))
+outcome_missing_rows <- sum(is.na(outcome_values))
+outcome_negative_rows <- sum(outcome_values < 0, na.rm = TRUE)
+outcome_noninteger_rows <- sum(
+  !is.na(outcome_values) & abs(outcome_values - round(outcome_values)) > 1e-12
+)
+occurrence_mismatch_rows <- sum(
+  as.integer(panel_raw[[occurrence_var]]) != as.integer(outcome_values > 0),
+  na.rm = TRUE
+)
+zero_flag_mismatch_rows <- sum(
+  as.integer(panel_raw[[zero_var]]) != as.integer(outcome_values == 0),
+  na.rm = TRUE
+)
+
+if (
+  outcome_missing_rows > 0 ||
+    outcome_negative_rows > 0 ||
+    outcome_noninteger_rows > 0 ||
+    occurrence_mismatch_rows > 0 ||
+    zero_flag_mismatch_rows > 0
+) {
+  stop("Canonical raw-count outcome contract failed.")
+}
+
+observed_total <- sum(outcome_values)
+observed_positive_rows <- sum(outcome_values > 0)
+observed_zero_rows <- sum(outcome_values == 0)
+
+if (observed_total != expected_total) {
+  stop("Outcome total mismatch: ", observed_total, " != ", expected_total)
+}
+if (observed_positive_rows != expected_positive_rows) {
+  stop(
+    "Positive-row mismatch: ",
+    observed_positive_rows, " != ", expected_positive_rows
+  )
+}
+if (observed_zero_rows != expected_zero_rows) {
+  stop("Zero-row mismatch: ", observed_zero_rows, " != ", expected_zero_rows)
+}
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repositories:", uniqueN(panel_raw$repo_name), "\n")
+cat("Positive-outcome rows:", observed_positive_rows, "\n")
+cat("Zero-outcome rows:", observed_zero_rows, "\n")
+cat("Total unique bodies:", observed_total, "\n")
+```
+
+# Configure Locked Borusyak Model
+
+```{r configure-model}
+panel_data <- copy(panel_raw)
+panel_data <- panel_data[get(readiness_column) == 1]
+rows_after_readiness_filter <- nrow(panel_data)
+
+panel_data <- panel_data[has_parse_exclusion == 0]
+rows_after_parse_filter <- nrow(panel_data)
+
+model_required <- c(outcome_var, covariates)
+implicit_missing_rows <- sum(!complete.cases(panel_data[, ..model_required]))
+if (implicit_missing_rows > 0) {
+  stop(
+    "Analysis-ready flag allowed rows with missing model variables: ",
+    implicit_missing_rows
+  )
+}
+
+panel_data[, time_yyyymm := normalize_yyyymm(time)]
+event_yyyymm_raw <- normalize_yyyymm(panel_data$event)
+event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
+panel_data[, event_yyyymm := event_yyyymm_raw]
+
+event_membership_mismatch_rows <- panel_data[
+  ,
+  sum((dataset_source == "treatment") != (event_yyyymm > 0L))
+]
+if (event_membership_mismatch_rows > 0) {
+  stop("Event encoding disagrees with dataset_source.")
+}
+
+# Preserve the cohort restriction from the original and run-py-7f models.
+panel_data <- panel_data[
+  event_yyyymm == 0L |
+    (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+]
+rows_after_cohort_filter <- nrow(panel_data)
+
+panel_data[, repo_name_str := as.character(repo_name)]
+panel_data[, repo_id := as.integer(factor(repo_name_str))]
+panel_data[, time_id := yyyymm_to_month_id(time_yyyymm)]
+panel_data[, event_id := fifelse(
+  event_yyyymm == 0L,
+  0L,
+  yyyymm_to_month_id(event_yyyymm)
+)]
+panel_data <- panel_data[!is.na(time_id)]
+panel_data <- panel_data[event_id == 0L | !is.na(event_id)]
+panel_data[, treated := as.integer(event_id > 0L)]
+
+first_stage_rhs <- paste(covariates, collapse = " + ")
+first_stage_formula <- as.formula(
+  paste0("~ ", first_stage_rhs, " | repo_id + time_id")
+)
+
+cat("Outcome:", outcome_var, "\n")
+cat("Outcome group:", outcome_group, "\n")
+cat("Outcome scale: raw count\n")
+cat("Rows used by models:", nrow(panel_data), "\n")
+cat("Repositories used:", uniqueN(panel_data$repo_id), "\n")
+cat("Time encoding: sequential calendar-month id\n")
+cat("First-stage formula:\n")
+print(first_stage_formula)
+cat("Inference clustering: repository id (didimputation idname default)\n")
+```
+
+# Panel Checks and Input Summary
+
+```{r panel-checks}
+panel_checks <- data.frame(
+  check = c(
+    "schema_version",
+    "panel_label",
+    "outcome_group",
+    "specification_name",
+    "ncloc_specification",
+    "time_mode",
+    "parse_exclusion_mode",
+    "input_rows",
+    "input_repositories",
+    "rows_after_readiness_filter",
+    "rows_after_parse_filter",
+    "rows_after_cohort_filter",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "treated_repositories",
+    "control_repositories",
+    "zero_outcome_rows_in_model_sample",
+    "positive_outcome_rows_in_model_sample",
+    "total_outcome_count_in_model_sample",
+    "parse_exclusion_rows_in_model_sample",
+    "outcome_missing_rows",
+    "outcome_negative_rows",
+    "outcome_noninteger_rows",
+    "occurrence_arithmetic_mismatch_rows",
+    "zero_flag_arithmetic_mismatch_rows",
+    "event_membership_mismatch_rows",
+    "covariate_missing_sum",
+    "first_stage_covariates",
+    "fixed_effects",
+    "cluster_variable"
+  ),
+  value = c(
+    "run-py-7f09-v1",
+    panel_label,
+    outcome_group,
+    specification_name,
+    ncloc_spec,
+    time_mode,
+    parse_exclusion_mode,
+    nrow(panel_raw),
+    uniqueN(panel_raw$repo_name),
+    rows_after_readiness_filter,
+    rows_after_parse_filter,
+    rows_after_cohort_filter,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    uniqueN(panel_data[treated == 1, repo_id]),
+    uniqueN(panel_data[treated == 0, repo_id]),
+    sum(panel_data[[outcome_var]] == 0),
+    sum(panel_data[[outcome_var]] > 0),
+    sum(panel_data[[outcome_var]]),
+    sum(panel_data$has_parse_exclusion == 1),
+    outcome_missing_rows,
+    outcome_negative_rows,
+    outcome_noninteger_rows,
+    occurrence_mismatch_rows,
+    zero_flag_mismatch_rows,
+    event_membership_mismatch_rows,
+    sum(is.na(panel_data[, ..covariates])),
+    first_stage_rhs,
+    "repo_id + time_id",
+    "repo_id (idname default)"
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(panel_checks)
+fwrite(
+  panel_checks,
+  file.path(out_dir, paste0(output_prefix, "_panel_checks.csv"))
+)
+
+input_summary <- panel_data[, .(
+  rows = .N,
+  repositories = uniqueN(repo_id),
+  total_unique_body_count = sum(get(outcome_var)),
+  mean_unique_body_count = mean(get(outcome_var)),
+  median_unique_body_count = as.numeric(median(get(outcome_var))),
+  maximum_unique_body_count = max(get(outcome_var)),
+  positive_month_share = mean(get(outcome_var) > 0),
+  zero_month_share = mean(get(outcome_var) == 0),
+  mean_python_snapshot_ncloc = mean(ncloc_python_snapshot)
+), by = dataset_source]
+input_summary$outcome_group <- outcome_group
+input_summary$outcome_label <- outcome_label
+
+print(input_summary)
+fwrite(
+  input_summary,
+  file.path(out_dir, paste0(output_prefix, "_input_summary.csv"))
+)
+```
+
+# Static ATT
+
+```{r static-effect}
+static_errors <- list()
+static_result <- tryCatch(
+  run_borusyak_static(
+    data = panel_data,
+    outcome_var = outcome_var,
+    first_stage_formula = first_stage_formula,
+    idname = "repo_id",
+    tname = "time_id",
+    gname = "event_id"
+  ),
+  error = function(e) {
+    static_errors[[outcome_var]] <<- conditionMessage(e)
+    NULL
+  }
+)
+
+static_df <- extract_static_result(static_result, outcome_var)
+static_df <- add_normal_p_value(static_df)
+static_df$outcome_group <- outcome_group
+static_df$outcome_label <- outcome_label
+static_df$outcome_scale <- "raw_count"
+static_df$outcome_unit <- "distinct bodies per repository-month"
+static_df$panel <- panel_label
+static_df$specification <- specification_name
+static_df$ncloc_spec <- ncloc_spec
+static_df$time_mode <- time_mode
+static_df$parse_exclusion_mode <- parse_exclusion_mode
+static_df$cluster_variable <- "repo_id"
+static_df$confidence_level <- 0.95
+
+print(static_df)
+fwrite(
+  static_df,
+  file.path(out_dir, paste0(output_prefix, "_static_effects.csv"))
+)
+write_error_table(
+  static_errors,
+  "static",
+  file.path(out_dir, paste0(output_prefix, "_static_errors.csv"))
+)
+```
+
+# Dynamic Effects
+
+```{r dynamic-effects}
+dynamic_errors <- list()
+dynamic_result <- tryCatch(
+  run_borusyak_dynamic(
+    data = panel_data,
+    outcome_var = outcome_var,
+    first_stage_formula = first_stage_formula,
+    horizon = -6:6,
+    pretrends = -6:-2,
+    idname = "repo_id",
+    tname = "time_id",
+    gname = "event_id"
+  ),
+  error = function(e) {
+    dynamic_errors[[outcome_var]] <<- conditionMessage(e)
+    NULL
+  }
+)
+
+dynamic_df <- extract_dynamic_result(
+  dynamic_result,
+  outcome = outcome_var,
+  outcome_label = outcome_label,
+  min_horizon = -6,
+  max_horizon = 6
+)
+dynamic_df <- add_normal_p_value(dynamic_df)
+
+if (nrow(dynamic_df) > 0) {
+  dynamic_df$outcome_group <- outcome_group
+  dynamic_df$outcome_scale <- "raw_count"
+  dynamic_df$outcome_unit <- "distinct bodies per repository-month"
+  dynamic_df$panel <- panel_label
+  dynamic_df$specification <- specification_name
+  dynamic_df$ncloc_spec <- ncloc_spec
+  dynamic_df$time_mode <- time_mode
+  dynamic_df$parse_exclusion_mode <- parse_exclusion_mode
+  dynamic_df$cluster_variable <- "repo_id"
+  dynamic_df$confidence_level <- 0.95
+}
+
+print(dynamic_df)
+fwrite(
+  dynamic_df,
+  file.path(out_dir, paste0(output_prefix, "_dynamic_effects.csv"))
+)
+write_error_table(
+  dynamic_errors,
+  "dynamic",
+  file.path(out_dir, paste0(output_prefix, "_dynamic_errors.csv"))
+)
+```
+
+# Uncertainty Results
+
+```{r uncertainty-results}
+static_uncertainty <- data.frame(
+  outcome_group = outcome_group,
+  outcome_label = outcome_label,
+  effect_type = "static_att",
+  event_time = NA_real_,
+  estimate = static_df$estimate,
+  std_error = static_df$std_error,
+  conf_low = static_df$conf_low,
+  conf_high = static_df$conf_high,
+  p_value = static_df$p_value,
+  significant_05 = !is.na(static_df$conf_low) &
+    !is.na(static_df$conf_high) &
+    (static_df$conf_low > 0 | static_df$conf_high < 0),
+  confidence_level = 0.95,
+  cluster_variable = "repo_id",
+  inference_method = paste(
+    "didimputation analytic standard errors;",
+    "repository clustering through idname default"
+  ),
+  stringsAsFactors = FALSE
+)
+
+dynamic_uncertainty <- data.frame(
+  outcome_group = outcome_group,
+  outcome_label = outcome_label,
+  effect_type = "dynamic_event_time",
+  event_time = dynamic_df$time,
+  estimate = dynamic_df$estimate,
+  std_error = dynamic_df$std_error,
+  conf_low = dynamic_df$conf_low,
+  conf_high = dynamic_df$conf_high,
+  p_value = dynamic_df$p_value,
+  significant_05 = dynamic_df$significant,
+  confidence_level = 0.95,
+  cluster_variable = "repo_id",
+  inference_method = paste(
+    "didimputation analytic standard errors;",
+    "repository clustering through idname default"
+  ),
+  stringsAsFactors = FALSE
+)
+
+uncertainty_df <- bind_rows(static_uncertainty, dynamic_uncertainty)
+print(uncertainty_df)
+fwrite(
+  uncertainty_df,
+  file.path(out_dir, paste0(output_prefix, "_uncertainty.csv"))
+)
+```
+
+# Pre-Trend Results
+
+```{r pretrend-results}
+pretrend_df <- dynamic_df[dynamic_df$time %in% -6:-2, , drop = FALSE]
+pretrend_period_count <- nrow(pretrend_df)
+
+if (pretrend_period_count > 0) {
+  pretrend_df$p_value_unadjusted <- pretrend_df$p_value
+  pretrend_df$p_value_bonferroni <- pmin(
+    1,
+    pretrend_period_count * pretrend_df$p_value_unadjusted
+  )
+  pretrend_df$significant_unadjusted_05 <-
+    !is.na(pretrend_df$p_value_unadjusted) &
+    pretrend_df$p_value_unadjusted < 0.05
+  pretrend_df$significant_bonferroni_05 <-
+    !is.na(pretrend_df$p_value_bonferroni) &
+    pretrend_df$p_value_bonferroni < 0.05
+}
+
+minimum_pretrend_p <- if (pretrend_period_count > 0) {
+  min(pretrend_df$p_value_unadjusted, na.rm = TRUE)
+} else {
+  NA_real_
+}
+global_bonferroni_p <- if (!is.na(minimum_pretrend_p)) {
+  min(1, pretrend_period_count * minimum_pretrend_p)
+} else {
+  NA_real_
+}
+
+pretrend_conclusion <- if (is.na(global_bonferroni_p)) {
+  "UNAVAILABLE"
+} else if (global_bonferroni_p < 0.05) {
+  "EVIDENCE_OF_NONZERO_PRETREND"
+} else {
+  "NO_EVIDENCE_OF_NONZERO_PRETREND"
+}
+
+pretrend_summary <- data.frame(
+  outcome_group = outcome_group,
+  outcome_label = outcome_label,
+  expected_pretrend_periods = 5L,
+  available_pretrend_periods = pretrend_period_count,
+  significant_unadjusted_periods = if (pretrend_period_count > 0) {
+    sum(pretrend_df$significant_unadjusted_05)
+  } else {
+    NA_integer_
+  },
+  significant_bonferroni_periods = if (pretrend_period_count > 0) {
+    sum(pretrend_df$significant_bonferroni_05)
+  } else {
+    NA_integer_
+  },
+  minimum_unadjusted_p_value = minimum_pretrend_p,
+  global_bonferroni_p_value = global_bonferroni_p,
+  family_wise_alpha = 0.05,
+  pretrend_conclusion = pretrend_conclusion,
+  diagnostic_method = paste(
+    "Five marginal lead tests (-6:-2) with a conservative",
+    "Bonferroni family-wise diagnostic"
+  ),
+  interpretation_note = paste(
+    "Failure to reject does not prove parallel trends;",
+    "it means these five lead estimates do not provide evidence against them."
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(pretrend_df)
+print(pretrend_summary)
+fwrite(
+  pretrend_df,
+  file.path(out_dir, paste0(output_prefix, "_pretrend_effects.csv"))
+)
+fwrite(
+  pretrend_summary,
+  file.path(out_dir, paste0(output_prefix, "_pretrend_summary.csv"))
+)
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=10, fig.height=4.5}
+if (nrow(dynamic_df) > 0) {
+  plot_object <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_errorbar(
+      data = subset(dynamic_df, significant %in% TRUE),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "solid"
+    ) +
+    geom_errorbar(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      aes(ymin = conf_low, ymax = conf_high),
+      width = 0.4,
+      linetype = "dotted"
+    ) +
+    geom_point(
+      data = subset(dynamic_df, significant %in% TRUE),
+      shape = 19,
+      size = 1.8
+    ) +
+    geom_point(
+      data = subset(dynamic_df, !(significant %in% TRUE)),
+      shape = 21,
+      fill = "transparent",
+      size = 1.8
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    labs(
+      title = paste("Borusyak DiD:", outcome_label),
+      subtitle = paste(
+        "Raw count | Python-snapshot NCLOC | Calendar month |",
+        "Repository-clustered 95% CI"
+      ),
+      x = "Months Relative to Cursor Adoption",
+      y = "Estimated Change in Distinct AGC-Like Bodies per Repository-Month",
+      caption = paste(
+        "Filled dots: 95% CI excludes 0.",
+        "Zero-count repository-months are retained."
+      )
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.caption = element_text(hjust = 0.5, size = 8)
+    )
+
+  print(plot_object)
+  ggsave(
+    filename = file.path(
+      out_dir,
+      paste0("dynamic_effects_borusyak_reg_fun_binary_group_", outcome_group, ".pdf")
+    ),
+    plot = plot_object,
+    width = 10,
+    height = 4.5
+  )
+}
+```
+
+# Final Model Validation
+
+```{r final-model-validation}
+static_model_error_count <- length(static_errors)
+dynamic_model_error_count <- length(dynamic_errors)
+expected_dynamic_times <- -6:6
+
+static_effect_complete <- nrow(static_df) == 1 &&
+  !is.na(static_df$estimate[1]) &&
+  !is.na(static_df$std_error[1]) &&
+  !is.na(static_df$conf_low[1]) &&
+  !is.na(static_df$conf_high[1]) &&
+  !is.na(static_df$p_value[1])
+dynamic_effects_complete <- nrow(dynamic_df) == 13L &&
+  identical(sort(as.integer(dynamic_df$time)), expected_dynamic_times) &&
+  all(complete.cases(
+    dynamic_df[, c("estimate", "std_error", "conf_low", "conf_high", "p_value")]
+  ))
+pretrend_effects_complete <- nrow(pretrend_df) == 5L &&
+  identical(sort(as.integer(pretrend_df$time)), -6:-2)
+uncertainty_rows_complete <- nrow(uncertainty_df) == 14L
+
+final_model_validation <- data.frame(
+  check = c(
+    "schema_version",
+    "outcome_group",
+    "static_model_error_count",
+    "dynamic_model_error_count",
+    "static_effect_complete",
+    "dynamic_effects_complete_13_periods",
+    "pretrend_effects_complete_5_periods",
+    "uncertainty_rows_complete_14_rows",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "covariate_missing_sum",
+    "status"
+  ),
+  value = c(
+    "run-py-7f09-v1",
+    outcome_group,
+    static_model_error_count,
+    dynamic_model_error_count,
+    static_effect_complete,
+    dynamic_effects_complete,
+    pretrend_effects_complete,
+    uncertainty_rows_complete,
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    sum(is.na(panel_data[, ..covariates])),
+    if (
+      static_model_error_count == 0 &&
+        dynamic_model_error_count == 0 &&
+        static_effect_complete &&
+        dynamic_effects_complete &&
+        pretrend_effects_complete &&
+        uncertainty_rows_complete
+    ) "PASS" else "FAIL"
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(final_model_validation)
+fwrite(
+  final_model_validation,
+  file.path(out_dir, paste0(output_prefix, "_final_model_validation.csv"))
+)
+
+if (static_model_error_count > 0 || dynamic_model_error_count > 0) {
+  stop("One or more Borusyak models failed.")
+}
+if (!static_effect_complete) {
+  stop("Static ATT or its uncertainty fields are incomplete.")
+}
+if (!dynamic_effects_complete) {
+  stop("Dynamic effects do not contain complete -6:6 estimates and uncertainty.")
+}
+if (!pretrend_effects_complete) {
+  stop("Pre-trend results do not contain all five leads from -6 through -2.")
+}
+if (!uncertainty_rows_complete) {
+  stop("Uncertainty table does not contain one static plus 13 dynamic rows.")
+}
+```
+
+# Metadata
+
+```{r metadata}
+metadata <- data.frame(
+  key = c(
+    "schema_version",
+    "script",
+    "helper_file",
+    "panel_label",
+    "panel_path",
+    "out_dir",
+    "outcome_group",
+    "outcome_label",
+    "outcome",
+    "outcome_scale",
+    "outcome_unit",
+    "zero_inclusive",
+    "specification_name",
+    "taxonomy_status",
+    "taxonomy_version",
+    "ncloc_specification",
+    "time_mode",
+    "parse_exclusion_mode",
+    "covariates",
+    "covariate_scaling",
+    "fixed_effects",
+    "first_stage_formula",
+    "cohort_restriction",
+    "rows_used_by_models",
+    "repositories_used_by_models",
+    "estimator",
+    "time_encoding",
+    "horizon",
+    "pretrends",
+    "cluster_variable",
+    "uncertainty_method",
+    "confidence_level",
+    "pretrend_diagnostic",
+    "global_bonferroni_p_value",
+    "pretrend_conclusion",
+    "interpretation_note"
+  ),
+  value = c(
+    "run-py-7f09-v1",
+    "proc_r/DiffInDiffBorusyak_reg_fun_binary_groups-v1.Rmd",
+    helper_path,
+    panel_label,
+    panel_path,
+    out_dir,
+    outcome_group,
+    outcome_label,
+    outcome_var,
+    "raw_count",
+    "distinct bodies per repository-month",
+    "true",
+    specification_name,
+    "FROZEN_BINARY",
+    "testing-vs-other-functions-v1",
+    "python_snapshot",
+    "calendar_month",
+    "parse_clean",
+    first_stage_rhs,
+    paste(
+      "log1p(age, contributors, stars, issues);",
+      "raw ncloc_python_snapshot"
+    ),
+    "repo_id + time_id",
+    paste(deparse(first_stage_formula), collapse = " "),
+    "controls plus treatment cohorts 2024-08 through 2025-03",
+    nrow(panel_data),
+    uniqueN(panel_data$repo_id),
+    "Borusyak imputation via didimputation::did_imputation",
+    "sequential_calendar_month_id",
+    "-6:6",
+    "-6:-2",
+    "repo_id",
+    paste(
+      "didimputation analytic standard errors and 95% confidence intervals;",
+      "repository clustering through idname default"
+    ),
+    "0.95",
+    "five marginal leads with conservative Bonferroni family-wise diagnostic",
+    global_bonferroni_p,
+    pretrend_conclusion,
+    if (outcome_group == "all_regular_functions") {
+      paste(
+        "All regular functions is the aggregate benchmark equal to testing",
+        "plus other_functions; it is not a third disjoint category."
+      )
+    } else {
+      paste(
+        "Testing and other_functions are mutually exclusive frozen binary",
+        "groups. Separate significance levels do not establish a significant",
+        "difference between their ATTs."
+      )
+    }
+  ),
+  stringsAsFactors = FALSE
+)
+
+print(metadata)
+fwrite(
+  metadata,
+  file.path(out_dir, paste0(output_prefix, "_metadata.csv"))
+)
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```
