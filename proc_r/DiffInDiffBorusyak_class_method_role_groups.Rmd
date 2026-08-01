@@ -1,0 +1,1223 @@
+---
+title: "Diff-in-Diff Borusyak: Class-Method Role Groups"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE)
+options(bitmapType = "cairo")
+
+project_root <- normalizePath(
+  Sys.getenv("PROJECT_ROOT", unset = "."),
+  mustWork = TRUE
+)
+
+resolve_project_path <- function(path_value) {
+  if (is.null(path_value) || path_value == "") return("")
+  if (grepl("^/", path_value)) {
+    return(normalizePath(path_value, mustWork = FALSE))
+  }
+  normalizePath(file.path(project_root, path_value), mustWork = FALSE)
+}
+
+panel_path <- resolve_project_path(Sys.getenv("PANEL_PATH", unset = ""))
+out_dir <- resolve_project_path(Sys.getenv("OUT_DIR", unset = ""))
+panel_label <- Sys.getenv("PANEL_LABEL", unset = "panel")
+outcome_group <- tolower(Sys.getenv("OUTCOME_GROUP", unset = ""))
+specification_name <- Sys.getenv("SPECIFICATION_NAME", unset = "range100_200")
+ncloc_spec <- tolower(Sys.getenv("NCLOC_SPEC", unset = "python_snapshot"))
+time_mode <- tolower(Sys.getenv("TIME_MODE", unset = "calendar_month"))
+parse_exclusion_mode <- tolower(
+  Sys.getenv("PARSE_EXCLUSION_MODE", unset = "parse_clean")
+)
+allow_model_failure <- Sys.getenv("ALLOW_MODEL_FAILURE", unset = "0") == "1"
+rmd_script_label <- Sys.getenv(
+  "RMD_SCRIPT_LABEL",
+  unset = "proc_r/DiffInDiffBorusyak_class_method_role_groups.Rmd"
+)
+helper_path <- resolve_project_path(
+  Sys.getenv(
+    "HELPER_FILE",
+    unset = "proc_r/diff_in_diff_borusyak_helpers.R"
+  )
+)
+
+valid_groups <- c(
+  "all_class_methods",
+  "testing_class_methods",
+  "boilerplate_class_methods",
+  "other_class_methods"
+)
+if (!(outcome_group %in% valid_groups)) {
+  stop("OUTCOME_GROUP must be one of: ", paste(valid_groups, collapse = ", "))
+}
+if (ncloc_spec != "python_snapshot") {
+  stop("run-py-7f15 locks NCLOC_SPEC to python_snapshot.")
+}
+if (time_mode != "calendar_month") {
+  stop("run-py-7f15 locks TIME_MODE to calendar_month.")
+}
+if (parse_exclusion_mode != "parse_clean") {
+  stop("run-py-7f15 locks PARSE_EXCLUSION_MODE to parse_clean.")
+}
+if (panel_path == "" || out_dir == "") {
+  stop("PANEL_PATH and OUT_DIR environment variables are required.")
+}
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+# Purpose
+
+This notebook applies the locked Borusyak imputation DiD model to one of the
+four zero-inclusive `run-py-7f14` class-method outcomes. Categories 5, 6, and 7
+form a mutually exclusive partition of Category 4 at the raw-count level.
+
+The model outcome is `log1p` of the distinct AGC-like class-method body count.
+The raw count is retained for input validation and partition checks. Category 6
+is explicitly exploratory because it has only 28 bodies in 11 positive
+repository-months. Estimator failures are recorded in machine-readable outputs
+instead of preventing the other categories from running.
+
+Version 2 explicitly removes treated repositories that have no pre-treatment
+observation before model fitting. It records the effective sample and
+event-time support, uses the covariance-aware repository-clustered joint Wald
+test as the primary pre-trend diagnostic, and retains the marginal Bonferroni
+diagnostic as a secondary check.
+
+# Load Packages and Helper Functions
+
+```{r load-packages}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(didimputation)
+library(fixest)
+
+if (!file.exists(helper_path)) stop("Helper file not found: ", helper_path)
+source(helper_path)
+```
+
+# Utility Functions
+
+```{r utility-functions}
+normalize_yyyymm <- function(x) {
+  x <- as.character(x)
+  x[x %in% c("", "NA", "NaN", "NULL", "None")] <- NA_character_
+  x <- gsub("-", "", x)
+  suppressWarnings(as.integer(x))
+}
+
+yyyymm_to_month_id <- function(x) {
+  x <- as.integer(x)
+  year <- x %/% 100L
+  month <- x %% 100L
+  out <- year * 12L + month
+  out[is.na(x) | month < 1L | month > 12L] <- NA_integer_
+  out
+}
+
+as_logical_flag <- function(x) {
+  tolower(as.character(x)) %in% c("true", "1", "1.0")
+}
+
+require_columns <- function(data, required, label) {
+  missing <- setdiff(required, names(data))
+  if (length(missing) > 0) {
+    stop(label, " missing required columns: ", paste(missing, collapse = ", "))
+  }
+}
+
+write_error_table <- function(errors, stage, output_path) {
+  if (length(errors) == 0) {
+    fwrite(
+      data.frame(
+        stage = character(),
+        outcome_group = character(),
+        outcome = character(),
+        error = character()
+      ),
+      output_path
+    )
+    return(invisible(NULL))
+  }
+  fwrite(
+    data.frame(
+      stage = stage,
+      outcome_group = outcome_group,
+      outcome = names(errors),
+      error = unlist(errors),
+      row.names = NULL,
+      stringsAsFactors = FALSE
+    ),
+    output_path
+  )
+}
+
+add_normal_p_value <- function(data) {
+  data$p_value <- ifelse(
+    !is.na(data$estimate) & !is.na(data$std_error) & data$std_error > 0,
+    2 * pnorm(abs(data$estimate / data$std_error), lower.tail = FALSE),
+    NA_real_
+  )
+  data
+}
+
+empty_dynamic_table <- function() {
+  data.frame(
+    outcome = character(), outcome_label = character(), time = numeric(),
+    estimate = numeric(), conf_low = numeric(), conf_high = numeric(),
+    std_error = numeric(), p_value = numeric(), significant = logical(),
+    stringsAsFactors = FALSE
+  )
+}
+
+safe_percent <- function(x) {
+  ifelse(is.na(x), NA_real_, 100 * expm1(x))
+}
+
+extract_named_numeric <- function(x, name) {
+  if (length(x) == 1L && is.na(x)) return(NA_real_)
+  if (!(name %in% names(x))) return(NA_real_)
+  suppressWarnings(as.numeric(x[[name]]))
+}
+
+wrap_plot_text <- function(x, width = 64L) {
+  paste(strwrap(x, width = width), collapse = "\n")
+}
+```
+
+# Outcome Configuration
+
+```{r outcome-configuration}
+group_config <- data.frame(
+  outcome_group = valid_groups,
+  outcome_category = c(4L, 5L, 6L, 7L),
+  outcome_label = c(
+    "All AGC-like synchronous class-method unique bodies",
+    "AGC-like testing-related synchronous class-method unique bodies",
+    "AGC-like boilerplate synchronous class-method unique bodies",
+    "AGC-like other synchronous class-method unique bodies"
+  ),
+  plot_label = c(
+    "All Class Methods",
+    "Testing Class Methods",
+    "Boilerplate Class Methods",
+    "Other Class Methods"
+  ),
+  expected_total = c(3925L, 1201L, 28L, 2696L),
+  expected_positive_rows = c(497L, 162L, 11L, 455L),
+  expected_zero_rows = c(1024L, 1359L, 1510L, 1066L),
+  exploratory = c(FALSE, FALSE, TRUE, FALSE),
+  stringsAsFactors = FALSE
+)
+
+selected_config <- group_config[group_config$outcome_group == outcome_group, ]
+outcome_category <- selected_config$outcome_category[[1]]
+outcome_label <- selected_config$outcome_label[[1]]
+plot_label <- selected_config$plot_label[[1]]
+expected_total <- selected_config$expected_total[[1]]
+expected_positive_rows <- selected_config$expected_positive_rows[[1]]
+expected_zero_rows <- selected_config$expected_zero_rows[[1]]
+exploratory_outcome <- selected_config$exploratory[[1]]
+
+if (allow_model_failure != exploratory_outcome) {
+  stop(
+    "ALLOW_MODEL_FAILURE must be 1 only for boilerplate_class_methods and 0 ",
+    "for the three required outcomes."
+  )
+}
+
+raw_count_var <- "npr_agc_class_method_unique_bodies"
+outcome_var <- "log1p_npr_agc_class_method_unique_bodies"
+occurrence_var <- "has_npr_agc_class_method_unique_body"
+zero_var <- "zero_npr_agc_class_method_unique_body_month"
+output_prefix <- paste0("borusyak_class_method_role_group_", outcome_group)
+```
+
+# Load and Validate Input Panel
+
+```{r load-panel}
+cat("Project root:", project_root, "\n")
+cat("Panel path:", panel_path, "\n")
+cat("Outcome group:", outcome_group, "\n")
+cat("Outcome category:", outcome_category, "\n")
+cat("Exploratory outcome:", exploratory_outcome, "\n")
+cat("Model outcome:", outcome_var, "\n")
+
+if (!file.exists(panel_path)) stop("Panel file not found: ", panel_path)
+panel_raw <- fread(panel_path)
+
+covariates <- c(
+  "log1p_age",
+  "ncloc_python_snapshot",
+  "log1p_contributors",
+  "log1p_stars",
+  "log1p_issues"
+)
+readiness_column <-
+  "analysis_ready_regular_module_function_agc_unique_body_python_snapshot_ncloc"
+
+base_required <- c(
+  "dataset_source", "repo_name", "time", "event", "time_to_event",
+  raw_count_var, outcome_var, occurrence_var, zero_var, covariates,
+  readiness_column, "has_parse_exclusion", "npr_detection_complete",
+  "npr_specification", "treatment_group", "class_method_outcome_category",
+  "class_method_outcome_group", "class_method_outcome_schema_version",
+  "class_method_taxonomy_status", "class_method_taxonomy_version",
+  "class_method_scope", "class_method_count_unit", "class_method_outcome_scale"
+)
+require_columns(panel_raw, base_required, "Input panel")
+
+if (nrow(panel_raw) != 1521L) stop("Expected 1,521 input rows.")
+if (uniqueN(panel_raw$repo_name) != 218L) stop("Expected 218 repositories.")
+if (anyDuplicated(panel_raw[, .(dataset_source, repo_name, time)]) > 0) {
+  stop("Input panel has duplicate repository-month keys.")
+}
+if (!all(panel_raw$dataset_source %in% c("control", "treatment"))) {
+  stop("dataset_source contains unexpected values.")
+}
+if (!all(as.character(panel_raw$class_method_outcome_group) == outcome_group)) {
+  stop("class_method_outcome_group does not match OUTCOME_GROUP.")
+}
+if (!all(as.integer(panel_raw$class_method_outcome_category) == outcome_category)) {
+  stop("class_method_outcome_category does not match the locked mapping.")
+}
+if (!all(panel_raw$class_method_outcome_schema_version == "run-py-7f14-v2")) {
+  stop("Unexpected run-py-7f14 outcome schema version.")
+}
+if (!all(panel_raw$class_method_taxonomy_status == "FROZEN_PARTITION")) {
+  stop("Class-method taxonomy is not uniformly frozen.")
+}
+if (!all(
+  panel_raw$class_method_taxonomy_version ==
+    "class-method-testing-boilerplate-other-v1"
+)) {
+  stop("Unexpected class-method taxonomy version.")
+}
+if (!all(panel_raw$class_method_scope ==
+  "synchronous_direct_class_scope_method_excluding_lexically_nested")) {
+  stop("Unexpected class-method scope.")
+}
+if (!all(panel_raw$class_method_outcome_scale == "raw_count")) {
+  stop("The source panel raw-count contract is not uniform.")
+}
+if (!all(panel_raw$npr_specification == specification_name)) {
+  stop("npr_specification does not match the requested specification.")
+}
+if (!all(panel_raw$treatment_group == panel_raw$dataset_source)) {
+  stop("treatment_group does not match dataset_source.")
+}
+if (!all(as_logical_flag(panel_raw$npr_detection_complete))) {
+  stop("npr_detection_complete is not uniformly true.")
+}
+
+raw_values <- suppressWarnings(as.numeric(panel_raw[[raw_count_var]]))
+log_values <- suppressWarnings(as.numeric(panel_raw[[outcome_var]]))
+outcome_missing_rows <- sum(is.na(raw_values) | is.na(log_values))
+outcome_negative_rows <- sum(raw_values < 0, na.rm = TRUE)
+outcome_noninteger_rows <- sum(
+  !is.na(raw_values) & abs(raw_values - round(raw_values)) > 1e-12
+)
+log1p_mismatch_rows <- sum(
+  is.na(raw_values) | is.na(log_values) |
+    abs(log_values - log1p(raw_values)) > 1e-12
+)
+occurrence_mismatch_rows <- sum(
+  as.integer(panel_raw[[occurrence_var]]) != as.integer(raw_values > 0),
+  na.rm = TRUE
+)
+zero_flag_mismatch_rows <- sum(
+  as.integer(panel_raw[[zero_var]]) != as.integer(raw_values == 0),
+  na.rm = TRUE
+)
+
+if (
+  outcome_missing_rows > 0 || outcome_negative_rows > 0 ||
+    outcome_noninteger_rows > 0 || log1p_mismatch_rows > 0 ||
+    occurrence_mismatch_rows > 0 || zero_flag_mismatch_rows > 0
+) {
+  stop("Raw-count/log1p outcome contract failed.")
+}
+
+observed_total <- sum(raw_values)
+observed_positive_rows <- sum(raw_values > 0)
+observed_zero_rows <- sum(raw_values == 0)
+if (observed_total != expected_total) stop("Outcome total mismatch.")
+if (observed_positive_rows != expected_positive_rows) {
+  stop("Positive-row mismatch.")
+}
+if (observed_zero_rows != expected_zero_rows) stop("Zero-row mismatch.")
+
+cat("Loaded rows:", nrow(panel_raw), "\n")
+cat("Loaded repositories:", uniqueN(panel_raw$repo_name), "\n")
+cat("Positive rows:", observed_positive_rows, "\n")
+cat("Zero rows:", observed_zero_rows, "\n")
+cat("Total raw-count bodies:", observed_total, "\n")
+```
+
+# Configure Locked Borusyak Model
+
+```{r configure-model}
+panel_after_readiness <- copy(panel_raw)[get(readiness_column) == 1]
+rows_after_readiness_filter <- nrow(panel_after_readiness)
+panel_after_parse <- panel_after_readiness[has_parse_exclusion == 0]
+rows_after_parse_filter <- nrow(panel_after_parse)
+
+model_required <- c(outcome_var, covariates)
+implicit_missing_rows <- sum(!complete.cases(panel_after_parse[, ..model_required]))
+if (implicit_missing_rows > 0) {
+  stop("Analysis-ready rows contain missing model variables.")
+}
+
+panel_after_parse[, time_yyyymm := normalize_yyyymm(time)]
+event_yyyymm_raw <- normalize_yyyymm(panel_after_parse$event)
+event_yyyymm_raw[is.na(event_yyyymm_raw)] <- 0L
+panel_after_parse[, event_yyyymm := event_yyyymm_raw]
+
+event_membership_mismatch_rows <- panel_after_parse[
+  , sum((dataset_source == "treatment") != (event_yyyymm > 0L))
+]
+if (event_membership_mismatch_rows > 0) {
+  stop("Event encoding disagrees with dataset_source.")
+}
+
+panel_after_cohort <- panel_after_parse[
+  event_yyyymm == 0L |
+    (event_yyyymm > 202407L & event_yyyymm <= 202503L)
+]
+rows_after_cohort_filter <- nrow(panel_after_cohort)
+
+panel_after_cohort[, time_id := yyyymm_to_month_id(time_yyyymm)]
+panel_after_cohort[, event_id := fifelse(
+  event_yyyymm == 0L,
+  0L,
+  yyyymm_to_month_id(event_yyyymm)
+)]
+panel_after_cohort <- panel_after_cohort[!is.na(time_id)]
+panel_after_cohort <- panel_after_cohort[event_id == 0L | !is.na(event_id)]
+
+treated_repository_support <- panel_after_cohort[event_id > 0L, .(
+  event_yyyymm = unique(event_yyyymm)[1],
+  input_rows = .N,
+  pre_treatment_rows = sum(time_id < event_id),
+  post_treatment_rows = sum(time_id >= event_id),
+  minimum_event_time = min(time_id - event_id),
+  maximum_event_time = max(time_id - event_id)
+), by = repo_name]
+
+excluded_treated_repositories <- treated_repository_support[
+  pre_treatment_rows == 0L
+]
+excluded_treated_repositories[, `:=`(
+  outcome_category = outcome_category,
+  outcome_group = outcome_group,
+  exclusion_reason = "no_pre_treatment_observation_for_repository_fixed_effect"
+)]
+setcolorder(
+  excluded_treated_repositories,
+  c(
+    "outcome_category", "outcome_group", "repo_name", "event_yyyymm",
+    "input_rows", "pre_treatment_rows", "post_treatment_rows",
+    "minimum_event_time", "maximum_event_time", "exclusion_reason"
+  )
+)
+
+excluded_repo_names <- excluded_treated_repositories$repo_name
+rows_excluded_no_pre_treatment <- panel_after_cohort[
+  repo_name %chin% excluded_repo_names, .N
+]
+panel_data <- panel_after_cohort[!(repo_name %chin% excluded_repo_names)]
+
+if (nrow(excluded_treated_repositories) != 38L) {
+  stop("Expected 38 treated repositories without pre-treatment observations.")
+}
+if (rows_excluded_no_pre_treatment != 96L) {
+  stop("Expected 96 rows from treated repositories without pre-treatment support.")
+}
+if (nrow(panel_data) != 1425L || uniqueN(panel_data$repo_name) != 180L) {
+  stop("Effective-sample support filter must retain 1,425 rows and 180 repositories.")
+}
+
+panel_data[, repo_id := as.integer(factor(as.character(repo_name)))]
+panel_data[, treated := as.integer(event_id > 0L)]
+panel_data[, event_time := fifelse(
+  treated == 1L,
+  time_id - event_id,
+  NA_integer_
+)]
+
+first_stage_data <- panel_data[event_id == 0L | time_id < event_id]
+treated_pre_data <- panel_data[event_id > 0L & time_id < event_id]
+treated_post_data <- panel_data[event_id > 0L & time_id >= event_id]
+
+if (uniqueN(panel_data[treated == 1L, repo_id]) != 62L) {
+  stop("Expected 62 supported treated repositories.")
+}
+if (nrow(treated_post_data) != 297L ||
+    uniqueN(treated_post_data$repo_id) != 61L) {
+  stop("Expected static ATT support of 297 rows and 61 treated repositories.")
+}
+
+first_stage_rhs <- paste(covariates, collapse = " + ")
+first_stage_formula <- as.formula(
+  paste0("~ ", first_stage_rhs, " | repo_id + time_id")
+)
+
+fwrite(
+  excluded_treated_repositories,
+  file.path(out_dir, paste0(output_prefix, "_excluded_treated_repositories.csv"))
+)
+
+summarize_sample_stage <- function(data, stage_name) {
+  data.frame(
+    outcome_category = outcome_category,
+    outcome_group = outcome_group,
+    stage = stage_name,
+    rows = nrow(data),
+    repositories = uniqueN(data$repo_name),
+    treated_repositories = uniqueN(data[dataset_source == "treatment", repo_name]),
+    control_repositories = uniqueN(data[dataset_source == "control", repo_name]),
+    raw_count_total = sum(data[[raw_count_var]]),
+    positive_outcome_rows = sum(data[[raw_count_var]] > 0),
+    zero_outcome_rows = sum(data[[raw_count_var]] == 0),
+    stringsAsFactors = FALSE
+  )
+}
+
+effective_sample_summary <- bind_rows(
+  summarize_sample_stage(panel_raw, "input_panel"),
+  summarize_sample_stage(panel_after_readiness, "after_readiness_filter"),
+  summarize_sample_stage(panel_after_parse, "after_parse_filter"),
+  summarize_sample_stage(panel_after_cohort, "after_cohort_filter"),
+  summarize_sample_stage(panel_data, "effective_model_panel"),
+  summarize_sample_stage(first_stage_data, "first_stage_untreated_observations"),
+  summarize_sample_stage(treated_pre_data, "supported_treated_pre_observations"),
+  summarize_sample_stage(treated_post_data, "static_att_treated_post_observations")
+)
+fwrite(
+  effective_sample_summary,
+  file.path(out_dir, paste0(output_prefix, "_effective_sample_summary.csv"))
+)
+
+event_time_support_observed <- panel_data[
+  treated == 1L & event_time >= -6L & event_time <= 6L,
+  .(
+    contributing_rows = .N,
+    contributing_repositories = uniqueN(repo_id),
+    raw_count_total = sum(get(raw_count_var)),
+    positive_outcome_rows = sum(get(raw_count_var) > 0),
+    zero_outcome_rows = sum(get(raw_count_var) == 0)
+  ),
+  by = event_time
+]
+event_time_support <- merge(
+  data.table(event_time = -6:6),
+  event_time_support_observed,
+  by = "event_time",
+  all.x = TRUE,
+  sort = TRUE
+)
+support_count_columns <- c(
+  "contributing_rows", "contributing_repositories", "raw_count_total",
+  "positive_outcome_rows", "zero_outcome_rows"
+)
+for (column_name in support_count_columns) {
+  set(event_time_support, which(is.na(event_time_support[[column_name]])), column_name, 0L)
+}
+event_time_support[, `:=`(
+  outcome_category = outcome_category,
+  outcome_group = outcome_group,
+  estimated_coefficient = event_time != -1L,
+  effect_role = fifelse(
+    event_time == -1L,
+    "omitted_reference",
+    fifelse(event_time < -1L, "pretrend_lead", "post_treatment_effect")
+  )
+)]
+setcolorder(
+  event_time_support,
+  c(
+    "outcome_category", "outcome_group", "event_time", "effect_role",
+    "estimated_coefficient", "contributing_rows",
+    "contributing_repositories", "raw_count_total",
+    "positive_outcome_rows", "zero_outcome_rows"
+  )
+)
+fwrite(
+  event_time_support,
+  file.path(out_dir, paste0(output_prefix, "_event_time_support.csv"))
+)
+
+cat("Effective rows used by models:", nrow(panel_data), "\n")
+cat("Effective repositories used:", uniqueN(panel_data$repo_id), "\n")
+cat("Excluded no-pre treated repositories:", nrow(excluded_treated_repositories), "\n")
+cat("Excluded no-pre rows:", rows_excluded_no_pre_treatment, "\n")
+cat("Static ATT treated post rows:", nrow(treated_post_data), "\n")
+cat("Static ATT treated repositories:", uniqueN(treated_post_data$repo_id), "\n")
+cat("First-stage formula:\n")
+print(first_stage_formula)
+```
+
+# Panel Checks and Input Summary
+
+```{r panel-checks}
+panel_checks <- data.frame(
+  check = c(
+    "schema_version", "panel_label", "outcome_category", "outcome_group",
+    "model_outcome", "model_outcome_scale", "input_rows",
+    "input_repositories", "rows_after_readiness_filter",
+    "rows_after_parse_filter", "rows_after_cohort_filter",
+    "treated_repositories_excluded_no_pre", "rows_excluded_no_pre",
+    "rows_used_by_models", "repositories_used_by_models",
+    "supported_treated_repositories", "control_repositories",
+    "first_stage_untreated_rows", "static_att_treated_post_rows",
+    "static_att_treated_repositories",
+    "raw_count_total", "positive_outcome_rows", "zero_outcome_rows",
+    "outcome_missing_rows", "outcome_negative_rows",
+    "outcome_noninteger_rows", "log1p_arithmetic_mismatch_rows",
+    "occurrence_arithmetic_mismatch_rows", "zero_flag_arithmetic_mismatch_rows",
+    "event_membership_mismatch_rows", "covariate_missing_sum",
+    "first_stage_covariates", "fixed_effects", "cluster_variable",
+    "exploratory_outcome", "allow_model_failure"
+  ),
+  value = c(
+    "run-py-7f15-v2", panel_label, outcome_category, outcome_group,
+    outcome_var, "log1p(raw_count)", nrow(panel_raw),
+    uniqueN(panel_raw$repo_name), rows_after_readiness_filter,
+    rows_after_parse_filter, rows_after_cohort_filter,
+    nrow(excluded_treated_repositories), rows_excluded_no_pre_treatment,
+    nrow(panel_data), uniqueN(panel_data$repo_id),
+    uniqueN(panel_data[treated == 1, repo_id]),
+    uniqueN(panel_data[treated == 0, repo_id]),
+    nrow(first_stage_data), nrow(treated_post_data),
+    uniqueN(treated_post_data$repo_id),
+    sum(panel_data[[raw_count_var]]), sum(panel_data[[raw_count_var]] > 0),
+    sum(panel_data[[raw_count_var]] == 0), outcome_missing_rows,
+    outcome_negative_rows, outcome_noninteger_rows, log1p_mismatch_rows,
+    occurrence_mismatch_rows, zero_flag_mismatch_rows,
+    event_membership_mismatch_rows, sum(is.na(panel_data[, ..covariates])),
+    first_stage_rhs, "repo_id + time_id", "repo_id (idname default)",
+    exploratory_outcome, allow_model_failure
+  ),
+  stringsAsFactors = FALSE
+)
+fwrite(panel_checks, file.path(out_dir, paste0(output_prefix, "_panel_checks.csv")))
+
+input_summary <- panel_data[, .(
+  rows = .N,
+  repositories = uniqueN(repo_id),
+  total_raw_count = sum(get(raw_count_var)),
+  mean_raw_count = mean(get(raw_count_var)),
+  median_raw_count = as.numeric(median(get(raw_count_var))),
+  maximum_raw_count = max(get(raw_count_var)),
+  mean_log1p_count = mean(get(outcome_var)),
+  positive_month_share = mean(get(raw_count_var) > 0),
+  zero_month_share = mean(get(raw_count_var) == 0)
+), by = dataset_source]
+input_summary$outcome_category <- outcome_category
+input_summary$outcome_group <- outcome_group
+input_summary$outcome_label <- outcome_label
+fwrite(input_summary, file.path(out_dir, paste0(output_prefix, "_input_summary.csv")))
+```
+
+# Static ATT
+
+```{r static-effect}
+static_errors <- list()
+static_result <- tryCatch(
+  run_borusyak_static(
+    data = panel_data,
+    outcome_var = outcome_var,
+    first_stage_formula = first_stage_formula,
+    idname = "repo_id", tname = "time_id", gname = "event_id"
+  ),
+  error = function(e) {
+    static_errors[[outcome_var]] <<- conditionMessage(e)
+    NULL
+  }
+)
+
+static_df <- add_normal_p_value(extract_static_result(static_result, outcome_var))
+static_df$estimate_percent_yplus1 <- safe_percent(static_df$estimate)
+static_df$conf_low_percent_yplus1 <- safe_percent(static_df$conf_low)
+static_df$conf_high_percent_yplus1 <- safe_percent(static_df$conf_high)
+static_df$outcome_category <- outcome_category
+static_df$outcome_group <- outcome_group
+static_df$outcome_label <- outcome_label
+static_df$outcome_scale <- "log1p_raw_count"
+static_df$outcome_unit <- "log(1 + distinct bodies per repository-month)"
+static_df$exploratory <- exploratory_outcome
+static_df$panel <- panel_label
+static_df$specification <- specification_name
+static_df$cluster_variable <- "repo_id"
+static_df$confidence_level <- 0.95
+
+fwrite(static_df, file.path(out_dir, paste0(output_prefix, "_static_effects.csv")))
+write_error_table(
+  static_errors, "static",
+  file.path(out_dir, paste0(output_prefix, "_static_errors.csv"))
+)
+```
+
+# Dynamic Effects
+
+```{r dynamic-effects}
+dynamic_errors <- list()
+dynamic_result <- tryCatch(
+  run_borusyak_dynamic(
+    data = panel_data,
+    outcome_var = outcome_var,
+    first_stage_formula = first_stage_formula,
+    horizon = -6:6,
+    pretrends = -6:-2,
+    idname = "repo_id", tname = "time_id", gname = "event_id"
+  ),
+  error = function(e) {
+    dynamic_errors[[outcome_var]] <<- conditionMessage(e)
+    NULL
+  }
+)
+
+dynamic_df <- extract_dynamic_result(
+  dynamic_result,
+  outcome = outcome_var,
+  outcome_label = outcome_label,
+  min_horizon = -6,
+  max_horizon = 6
+)
+if (nrow(dynamic_df) == 0) dynamic_df <- empty_dynamic_table()
+dynamic_df <- add_normal_p_value(dynamic_df)
+dynamic_df$estimate_percent_yplus1 <- safe_percent(dynamic_df$estimate)
+dynamic_df$conf_low_percent_yplus1 <- safe_percent(dynamic_df$conf_low)
+dynamic_df$conf_high_percent_yplus1 <- safe_percent(dynamic_df$conf_high)
+dynamic_df$outcome_category <- rep(outcome_category, nrow(dynamic_df))
+dynamic_df$outcome_group <- rep(outcome_group, nrow(dynamic_df))
+dynamic_df$outcome_scale <- rep("log1p_raw_count", nrow(dynamic_df))
+dynamic_df$outcome_unit <- rep(
+  "log(1 + distinct bodies per repository-month)", nrow(dynamic_df)
+)
+dynamic_df$exploratory <- rep(exploratory_outcome, nrow(dynamic_df))
+dynamic_df$panel <- rep(panel_label, nrow(dynamic_df))
+dynamic_df$specification <- rep(specification_name, nrow(dynamic_df))
+dynamic_df$cluster_variable <- rep("repo_id", nrow(dynamic_df))
+dynamic_df$confidence_level <- rep(0.95, nrow(dynamic_df))
+
+fwrite(dynamic_df, file.path(out_dir, paste0(output_prefix, "_dynamic_effects.csv")))
+write_error_table(
+  dynamic_errors, "dynamic",
+  file.path(out_dir, paste0(output_prefix, "_dynamic_errors.csv"))
+)
+```
+
+# Uncertainty and Pre-Trend Results
+
+```{r uncertainty-and-pretrend}
+static_uncertainty <- data.frame(
+  outcome_category = outcome_category,
+  outcome_group = outcome_group,
+  outcome_label = outcome_label,
+  effect_type = "static_att",
+  event_time = NA_real_,
+  estimate = static_df$estimate,
+  std_error = static_df$std_error,
+  conf_low = static_df$conf_low,
+  conf_high = static_df$conf_high,
+  p_value = static_df$p_value,
+  estimate_percent_yplus1 = static_df$estimate_percent_yplus1,
+  significant_05 = !is.na(static_df$conf_low) &
+    !is.na(static_df$conf_high) &
+    (static_df$conf_low > 0 | static_df$conf_high < 0),
+  exploratory = exploratory_outcome,
+  confidence_level = 0.95,
+  cluster_variable = "repo_id",
+  stringsAsFactors = FALSE
+)
+
+if (nrow(dynamic_df) > 0) {
+  dynamic_uncertainty <- data.frame(
+    outcome_category = dynamic_df$outcome_category,
+    outcome_group = dynamic_df$outcome_group,
+    outcome_label = dynamic_df$outcome_label,
+    effect_type = "dynamic_event_time",
+    event_time = dynamic_df$time,
+    estimate = dynamic_df$estimate,
+    std_error = dynamic_df$std_error,
+    conf_low = dynamic_df$conf_low,
+    conf_high = dynamic_df$conf_high,
+    p_value = dynamic_df$p_value,
+    estimate_percent_yplus1 = dynamic_df$estimate_percent_yplus1,
+    significant_05 = dynamic_df$significant,
+    exploratory = exploratory_outcome,
+    confidence_level = 0.95,
+    cluster_variable = "repo_id",
+    stringsAsFactors = FALSE
+  )
+} else {
+  dynamic_uncertainty <- static_uncertainty[0, ]
+}
+
+uncertainty_df <- bind_rows(static_uncertainty, dynamic_uncertainty)
+fwrite(uncertainty_df, file.path(out_dir, paste0(output_prefix, "_uncertainty.csv")))
+
+pretrend_df <- dynamic_df[dynamic_df$time %in% -6:-2, , drop = FALSE]
+pretrend_period_count <- nrow(pretrend_df)
+if (pretrend_period_count > 0) {
+  pretrend_df$p_value_unadjusted <- pretrend_df$p_value
+  pretrend_df$p_value_bonferroni <- pmin(
+    1, pretrend_period_count * pretrend_df$p_value_unadjusted
+  )
+  pretrend_df$significant_unadjusted_05 <-
+    !is.na(pretrend_df$p_value_unadjusted) &
+    pretrend_df$p_value_unadjusted < 0.05
+  pretrend_df$significant_bonferroni_05 <-
+    !is.na(pretrend_df$p_value_bonferroni) &
+    pretrend_df$p_value_bonferroni < 0.05
+} else {
+  pretrend_df$p_value_unadjusted <- numeric()
+  pretrend_df$p_value_bonferroni <- numeric()
+  pretrend_df$significant_unadjusted_05 <- logical()
+  pretrend_df$significant_bonferroni_05 <- logical()
+}
+
+valid_pretrend_p <- pretrend_df$p_value_unadjusted[
+  !is.na(pretrend_df$p_value_unadjusted)
+]
+minimum_pretrend_p <- if (length(valid_pretrend_p) > 0) {
+  min(valid_pretrend_p)
+} else {
+  NA_real_
+}
+global_bonferroni_p <- if (!is.na(minimum_pretrend_p)) {
+  min(1, pretrend_period_count * minimum_pretrend_p)
+} else {
+  NA_real_
+}
+
+bonferroni_pretrend_conclusion <- if (is.na(global_bonferroni_p)) {
+  "UNAVAILABLE"
+} else if (global_bonferroni_p < 0.05) {
+  "EVIDENCE_OF_NONZERO_PRETREND"
+} else {
+  "NO_EVIDENCE_OF_NONZERO_PRETREND"
+}
+
+pretrend_joint_errors <- list()
+pretrend_joint_model <- NULL
+pretrend_joint_wald_result <- NULL
+pretrend_joint_coefficients <- data.frame()
+
+tryCatch({
+  pretrend_model_data <- copy(panel_data)
+  pretrend_model_data[, zz000treat := as.integer(
+    event_id > 0L & time_id >= event_id
+  )]
+  pretrend_model_data[, zz000event_time := fifelse(
+    event_id == 0L,
+    -Inf,
+    as.numeric(time_id - event_id)
+  )]
+  pretrend_model_data[, zz000weight := 1]
+
+  pretrend_formula <- as.formula(paste0(
+    outcome_var,
+    " ~ i(zz000event_time, keep = c(-6, -5, -4, -3, -2)) + ",
+    first_stage_rhs,
+    " | repo_id + time_id"
+  ))
+
+  pretrend_joint_model <- fixest::feols(
+    pretrend_formula,
+    data = pretrend_model_data[zz000treat == 0L],
+    cluster = "repo_id",
+    weights = ~zz000weight,
+    warn = FALSE,
+    notes = FALSE,
+    fixef.rm = "none"
+  )
+  pretrend_joint_wald_result <- fixest::wald(
+    pretrend_joint_model,
+    keep = "^zz000event_time::",
+    print = FALSE
+  )
+
+  joint_coeftable <- as.data.frame(pretrend_joint_model$coeftable)
+  joint_coeftable$term <- rownames(joint_coeftable)
+  joint_event_time <- extract_event_time_from_term(joint_coeftable$term)
+  joint_keep <- !is.na(joint_event_time) & joint_event_time %in% -6:-2
+  pretrend_joint_coefficients <- data.frame(
+    time = joint_event_time[joint_keep],
+    estimate_joint_model = joint_coeftable[joint_keep, 1],
+    std_error_joint_model = joint_coeftable[joint_keep, 2],
+    stringsAsFactors = FALSE
+  )
+}, error = function(e) {
+  pretrend_joint_errors[[outcome_var]] <<- conditionMessage(e)
+})
+
+joint_wald_statistic <- extract_named_numeric(pretrend_joint_wald_result, "stat")
+joint_wald_p_value <- extract_named_numeric(pretrend_joint_wald_result, "p")
+joint_wald_df1 <- extract_named_numeric(pretrend_joint_wald_result, "df1")
+joint_wald_df2 <- extract_named_numeric(pretrend_joint_wald_result, "df2")
+
+pretrend_estimate_reconciliation_max_abs <- NA_real_
+pretrend_se_reconciliation_max_abs <- NA_real_
+if (nrow(pretrend_joint_coefficients) == 5L && nrow(pretrend_df) == 5L) {
+  pretrend_reconciliation <- merge(
+    pretrend_df[, c("time", "estimate", "std_error")],
+    pretrend_joint_coefficients,
+    by = "time",
+    all = TRUE,
+    sort = TRUE
+  )
+  pretrend_estimate_reconciliation_max_abs <- max(
+    abs(
+      pretrend_reconciliation$estimate -
+        pretrend_reconciliation$estimate_joint_model
+    ),
+    na.rm = TRUE
+  )
+  pretrend_se_reconciliation_max_abs <- max(
+    abs(
+      pretrend_reconciliation$std_error -
+        pretrend_reconciliation$std_error_joint_model
+    ),
+    na.rm = TRUE
+  )
+}
+
+joint_pretrend_test_complete <-
+  length(pretrend_joint_errors) == 0L &&
+  !anyNA(c(
+    joint_wald_statistic, joint_wald_p_value,
+    joint_wald_df1, joint_wald_df2
+  )) &&
+  joint_wald_df1 == 5 &&
+  nrow(pretrend_joint_coefficients) == 5L &&
+  !is.na(pretrend_estimate_reconciliation_max_abs) &&
+  !is.na(pretrend_se_reconciliation_max_abs) &&
+  pretrend_estimate_reconciliation_max_abs <= 1e-8 &&
+  pretrend_se_reconciliation_max_abs <= 1e-8
+
+pretrend_conclusion <- if (!joint_pretrend_test_complete) {
+  "UNAVAILABLE"
+} else if (joint_wald_p_value < 0.05) {
+  "EVIDENCE_OF_NONZERO_PRETREND"
+} else {
+  "NO_EVIDENCE_OF_NONZERO_PRETREND"
+}
+
+pretrend_joint_wald <- data.frame(
+  outcome_category = outcome_category,
+  outcome_group = outcome_group,
+  outcome_label = outcome_label,
+  exploratory = exploratory_outcome,
+  tested_event_times = "-6,-5,-4,-3,-2",
+  tested_coefficient_count = nrow(pretrend_joint_coefficients),
+  wald_statistic = joint_wald_statistic,
+  p_value = joint_wald_p_value,
+  df1 = joint_wald_df1,
+  df2 = joint_wald_df2,
+  cluster_variable = "repo_id",
+  covariance = "repository-clustered",
+  estimate_reconciliation_max_abs =
+    pretrend_estimate_reconciliation_max_abs,
+  std_error_reconciliation_max_abs = pretrend_se_reconciliation_max_abs,
+  joint_test_complete = joint_pretrend_test_complete,
+  conclusion = pretrend_conclusion,
+  stringsAsFactors = FALSE
+)
+
+pretrend_summary <- data.frame(
+  outcome_category = outcome_category,
+  outcome_group = outcome_group,
+  outcome_label = outcome_label,
+  exploratory = exploratory_outcome,
+  expected_pretrend_periods = 5L,
+  available_pretrend_periods = pretrend_period_count,
+  significant_unadjusted_periods = if (pretrend_period_count > 0) {
+    sum(pretrend_df$significant_unadjusted_05)
+  } else NA_integer_,
+  significant_bonferroni_periods = if (pretrend_period_count > 0) {
+    sum(pretrend_df$significant_bonferroni_05)
+  } else NA_integer_,
+  minimum_unadjusted_p_value = minimum_pretrend_p,
+  global_bonferroni_p_value = global_bonferroni_p,
+  bonferroni_conclusion = bonferroni_pretrend_conclusion,
+  joint_wald_statistic = joint_wald_statistic,
+  joint_wald_p_value = joint_wald_p_value,
+  joint_wald_df1 = joint_wald_df1,
+  joint_wald_df2 = joint_wald_df2,
+  joint_test_complete = joint_pretrend_test_complete,
+  family_wise_alpha = 0.05,
+  pretrend_conclusion = pretrend_conclusion,
+  diagnostic_method = paste(
+    "Primary: covariance-aware repository-clustered joint Wald test of",
+    "five leads (-6:-2). Secondary: marginal lead tests with Bonferroni."
+  ),
+  stringsAsFactors = FALSE
+)
+
+fwrite(pretrend_df, file.path(out_dir, paste0(output_prefix, "_pretrend_effects.csv")))
+fwrite(
+  pretrend_summary,
+  file.path(out_dir, paste0(output_prefix, "_pretrend_summary.csv"))
+)
+fwrite(
+  pretrend_joint_wald,
+  file.path(out_dir, paste0(output_prefix, "_pretrend_joint_wald.csv"))
+)
+write_error_table(
+  pretrend_joint_errors, "pretrend_joint_wald",
+  file.path(out_dir, paste0(output_prefix, "_pretrend_joint_errors.csv"))
+)
+```
+
+# Dynamic Plot
+
+```{r dynamic-plot, fig.width=9, fig.height=5.2}
+if (nrow(dynamic_df) > 0) {
+  plot_object <- ggplot(dynamic_df, aes(x = time, y = estimate)) +
+    geom_errorbar(
+      aes(ymin = conf_low, ymax = conf_high, linetype = !significant),
+      width = 0.4
+    ) +
+    geom_point(aes(shape = significant), size = 2) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = -0.5, linetype = "dashed") +
+    scale_x_continuous(breaks = -6:6) +
+    scale_linetype_manual(values = c("solid", "dotted"), guide = "none") +
+    scale_shape_manual(values = c(`TRUE` = 19, `FALSE` = 1), guide = "none") +
+    coord_cartesian(xlim = c(-6.5, 6.5)) +
+    labs(
+      title = paste("Borusyak DiD —", plot_label),
+      subtitle = wrap_plot_text(paste(
+        outcome_label, "| log1p count | Python-snapshot NCLOC |",
+        if (exploratory_outcome) "Exploratory sparse outcome" else "Primary outcome"
+      ), width = 78L),
+      x = "Months Relative to Cursor Adoption",
+      y = "Estimated Change in log(1 + Distinct AGC-Like Bodies)",
+      caption = wrap_plot_text(paste(
+        "Month -1 is omitted and normalized to zero.",
+        "Zero-count repository-months are retained; repositories without",
+        "pre-treatment support are excluded."
+      ), width = 92L)
+    ) +
+    theme_minimal(base_family = "sans", base_size = 10.5) +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
+      plot.margin = margin(10, 14, 10, 10)
+    )
+} else {
+  plot_object <- ggplot() +
+    annotate(
+      "text", x = 0, y = 0,
+      label = paste(
+        "Dynamic model unavailable for", outcome_group,
+        "\nSee dynamic_errors.csv and final_model_validation.csv"
+      )
+    ) +
+    xlim(-1, 1) + ylim(-1, 1) +
+    labs(title = paste("Borusyak DiD —", plot_label)) +
+    theme_void(base_family = "sans")
+}
+
+print(plot_object)
+if (!capabilities("cairo")) {
+  stop("Cairo PDF support is required for embedded-font output.")
+}
+ggsave(
+  filename = file.path(
+    out_dir,
+    paste0("dynamic_effects_borusyak_class_method_role_group_", outcome_group, ".pdf")
+  ),
+  plot = plot_object,
+  width = 9,
+  height = 5.2,
+  device = grDevices::cairo_pdf,
+  family = "sans"
+)
+```
+
+# Final Model Validation and Metadata
+
+```{r final-model-validation}
+static_model_error_count <- length(static_errors)
+dynamic_model_error_count <- length(dynamic_errors)
+pretrend_joint_error_count <- length(pretrend_joint_errors)
+expected_dynamic_times <- c(-6:-2, 0:6)
+
+static_effect_complete <- nrow(static_df) == 1 &&
+  all(complete.cases(static_df[, c(
+    "estimate", "std_error", "conf_low", "conf_high", "p_value"
+  )]))
+dynamic_effects_complete <- nrow(dynamic_df) == 12L &&
+  identical(sort(as.integer(dynamic_df$time)), expected_dynamic_times) &&
+  all(complete.cases(dynamic_df[, c(
+    "estimate", "std_error", "conf_low", "conf_high", "p_value"
+  )]))
+pretrend_effects_complete <- nrow(pretrend_df) == 5L &&
+  identical(sort(as.integer(pretrend_df$time)), -6:-2)
+uncertainty_rows_complete <- nrow(uncertainty_df) == 13L
+effective_sample_complete <-
+  nrow(panel_data) == 1425L &&
+  uniqueN(panel_data$repo_id) == 180L &&
+  nrow(excluded_treated_repositories) == 38L &&
+  rows_excluded_no_pre_treatment == 96L &&
+  nrow(treated_post_data) == 297L &&
+  uniqueN(treated_post_data$repo_id) == 61L
+event_time_support_complete <-
+  nrow(event_time_support) == 13L &&
+  identical(as.integer(event_time_support$event_time), -6:6) &&
+  all(event_time_support$contributing_rows > 0L)
+model_complete <-
+  static_model_error_count == 0 && dynamic_model_error_count == 0 &&
+  pretrend_joint_error_count == 0 &&
+  static_effect_complete && dynamic_effects_complete &&
+  pretrend_effects_complete && uncertainty_rows_complete &&
+  effective_sample_complete && event_time_support_complete &&
+  joint_pretrend_test_complete
+
+model_status <- if (model_complete && exploratory_outcome) {
+  "EXPLORATORY_PASS"
+} else if (model_complete) {
+  "PASS"
+} else if (allow_model_failure) {
+  "EXPLORATORY_INCOMPLETE"
+} else {
+  "FAIL"
+}
+
+final_model_validation <- data.frame(
+  check = c(
+    "schema_version", "outcome_category", "outcome_group",
+    "exploratory_outcome", "allow_model_failure",
+    "static_model_error_count", "dynamic_model_error_count",
+    "pretrend_joint_error_count",
+    "static_effect_complete", "dynamic_effects_complete_12_estimated_periods",
+    "pretrend_effects_complete_5_periods",
+    "joint_pretrend_test_complete", "effective_sample_complete",
+    "event_time_support_complete_13_periods",
+    "uncertainty_rows_complete_13_rows", "rows_used_by_models",
+    "repositories_used_by_models", "excluded_no_pre_treated_repositories",
+    "excluded_no_pre_rows", "static_att_treated_post_rows",
+    "static_att_treated_repositories", "joint_wald_p_value",
+    "covariate_missing_sum", "status"
+  ),
+  value = c(
+    "run-py-7f15-v2", outcome_category, outcome_group,
+    exploratory_outcome, allow_model_failure,
+    static_model_error_count, dynamic_model_error_count,
+    pretrend_joint_error_count,
+    static_effect_complete, dynamic_effects_complete,
+    pretrend_effects_complete, joint_pretrend_test_complete,
+    effective_sample_complete, event_time_support_complete,
+    uncertainty_rows_complete,
+    nrow(panel_data), uniqueN(panel_data$repo_id),
+    nrow(excluded_treated_repositories), rows_excluded_no_pre_treatment,
+    nrow(treated_post_data), uniqueN(treated_post_data$repo_id),
+    joint_wald_p_value,
+    sum(is.na(panel_data[, ..covariates])), model_status
+  ),
+  stringsAsFactors = FALSE
+)
+fwrite(
+  final_model_validation,
+  file.path(out_dir, paste0(output_prefix, "_final_model_validation.csv"))
+)
+
+interpretation_note <- if (exploratory_outcome) {
+  paste(
+    "Category 6 is exploratory: the full panel has 28 bodies in 11 positive",
+    "months, while the supported treated post sample has only",
+    sum(treated_post_data[[raw_count_var]]), "bodies in",
+    sum(treated_post_data[[raw_count_var]] > 0),
+    "positive months; absence of significance is not evidence of no effect."
+  )
+} else if (outcome_group == "all_class_methods") {
+  paste(
+    "Category 4 is the aggregate raw-count benchmark. Categories 5, 6, and 7",
+    "partition it before log1p transformation."
+  )
+} else {
+  paste(
+    "Separate category significance levels do not establish a significant",
+    "difference between category-specific ATTs."
+  )
+}
+
+metadata <- data.frame(
+  key = c(
+    "schema_version", "script", "helper_file", "panel_label", "panel_path",
+    "out_dir", "outcome_category", "outcome_group", "outcome_label",
+    "raw_count_outcome", "model_outcome", "model_outcome_scale",
+    "percent_transform", "zero_inclusive", "specification_name",
+    "taxonomy_status", "taxonomy_version", "ncloc_specification",
+    "time_mode", "parse_exclusion_mode", "covariates", "covariate_scaling",
+    "fixed_effects", "first_stage_formula", "cohort_restriction",
+    "effective_sample_rule", "excluded_no_pre_treated_repositories",
+    "excluded_no_pre_rows", "static_att_treated_post_rows",
+    "static_att_treated_repositories",
+    "rows_used_by_models", "repositories_used_by_models", "estimator",
+    "time_encoding", "horizon", "reference_period",
+    "estimated_dynamic_periods", "pretrends", "cluster_variable",
+    "uncertainty_method", "confidence_level",
+    "pretrend_primary_diagnostic", "joint_wald_statistic",
+    "joint_wald_p_value", "joint_wald_df1", "joint_wald_df2",
+    "pretrend_secondary_diagnostic", "global_bonferroni_p_value",
+    "pretrend_conclusion",
+    "exploratory_outcome", "allow_model_failure", "model_status",
+    "interpretation_note"
+  ),
+  value = c(
+    "run-py-7f15-v2", rmd_script_label, helper_path, panel_label, panel_path,
+    out_dir, outcome_category, outcome_group, outcome_label,
+    raw_count_var, outcome_var, "log1p(raw_count)",
+    "100 * (exp(ATT) - 1), interpreted on count+1 scale", "true",
+    specification_name, "FROZEN_PARTITION",
+    "class-method-testing-boilerplate-other-v1", "python_snapshot",
+    "calendar_month", "parse_clean", first_stage_rhs,
+    "log1p(age, contributors, stars, issues); raw ncloc_python_snapshot",
+    "repo_id + time_id", paste(deparse(first_stage_formula), collapse = " "),
+    "controls plus treatment cohorts 2024-08 through 2025-03",
+    paste(
+      "explicitly exclude treated repositories with zero pre-treatment",
+      "observations before assigning fixed-effect ids"
+    ),
+    nrow(excluded_treated_repositories), rows_excluded_no_pre_treatment,
+    nrow(treated_post_data), uniqueN(treated_post_data$repo_id),
+    nrow(panel_data), uniqueN(panel_data$repo_id),
+    "Borusyak imputation via didimputation::did_imputation",
+    "sequential_calendar_month_id", "-6:6",
+    "-1 (omitted and normalized to zero; not estimated)",
+    "-6:-2 and 0:6 (12 estimated periods)", "-6:-2", "repo_id",
+    paste(
+      "didimputation analytic standard errors and 95% confidence intervals;",
+      "repository clustering through idname default"
+    ),
+    "0.95",
+    "repository-clustered joint Wald test of leads -6 through -2",
+    joint_wald_statistic, joint_wald_p_value, joint_wald_df1, joint_wald_df2,
+    "five marginal lead tests with conservative Bonferroni adjustment",
+    global_bonferroni_p, pretrend_conclusion, exploratory_outcome,
+    allow_model_failure, model_status, interpretation_note
+  ),
+  stringsAsFactors = FALSE
+)
+fwrite(metadata, file.path(out_dir, paste0(output_prefix, "_metadata.csv")))
+
+print(final_model_validation)
+print(metadata)
+```
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```
