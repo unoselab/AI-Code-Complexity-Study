@@ -10,7 +10,7 @@ sonar_host = os.getenv("SONAR_HOST")
 sonar_token = os.getenv("SONAR_TOKEN")
 scanner_path = os.getenv("SONAR_SCANNER_PATH")
 
-project_dir = Path("tmp_sonar_smoke/tiny_project").resolve()
+project_dir = Path("../tmp_sonar_smoke/tiny_project").resolve()
 
 print("SONAR_HOST:", sonar_host)
 print("SONAR_TOKEN is set:", bool(sonar_token))
