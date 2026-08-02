@@ -1,0 +1,24 @@
+section,metric,value,note
+input,matching_rows,78189,
+input,matching_treatment_rows,840,
+input,matching_control_candidate_rows,77349,
+input,case_insensitive_repo_name_collision_keys,1,Case-only repository-name variants are treated as the same GitHub repository identity and do not stop the alignment audit.
+input,case_insensitive_repo_name_collision_examples,"rednick16/trollstorejitenabler: ['Rednick16/TrollStoreJITEnabler', 'Rednick16/TrollStoreJitEnabler']",Up to 10 collision keys are shown.
+treatment,clone_directories,123,
+treatment,valid_git_repositories,123,
+treatment,resolved_repository_names,123,
+treatment,cloned_treatments_found_in_matching,115,
+treatment,cloned_treatments_missing_from_matching,8,
+control,clone_directories,160,
+control,valid_git_repositories,160,
+control,resolved_repository_names,160,
+pair,matching_slots_checked,345,
+pair,nonempty_matching_slots,345,
+pair,unique_expected_controls,162,
+pair,aligned_matching_slots,338,
+pair_status,aligned,338,
+pair_status,control_clone_missing,7,
+alignment_status,aligned,275,
+alignment_status,clone_not_in_matching_treatment,8,
+alignment_status,expected_control_clone_missing,2,
+scope,definition,cloned_treatments_and_their_matching_controls,The audit does not treat all 840 paper treatments as expected local clones. It checks the currently cloned treatment subset and the controls assigned to that subset.

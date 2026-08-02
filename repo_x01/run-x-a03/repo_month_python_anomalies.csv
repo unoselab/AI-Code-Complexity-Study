@@ -1,0 +1,38 @@
+anomaly_type,dataset_source,repo_name,month,latest_commit_original,latest_commit_effective,commit_resolution,detail
+repo_month_scan_failure,control,justin4ai/Quark,2024-11,3ec77af1531c7e8803bb70f92b213fb077aa6ace,3ec77af1531c7e8803bb70f92b213fb077aa6ace,observed,missing_clone: Clone directory does not exist.
+repo_month_scan_failure,treatment,W1ndys/W1ndysBot,2025-07,98ca48eb0817e96094ff662cf5e98a2231fe7703,98ca48eb0817e96094ff662cf5e98a2231fe7703,observed,commit_not_found: fatal: Not a valid object name 98ca48eb0817e96094ff662cf5e98a2231fe7703^{commit}
+repo_month_scan_failure,treatment,W1ndys/W1ndysBot,2025-08,64984204c81f8193080999b3c87238de94c4d187,64984204c81f8193080999b3c87238de94c4d187,observed,commit_not_found: fatal: Not a valid object name 64984204c81f8193080999b3c87238de94c4d187^{commit}
+scope_repo_missing_monthly_rows,control,QiuChenly/InjectLib,,,,,In matching scope but absent from the corresponding monthly CSV.
+scope_repo_missing_panel_rows,control,4mritGiri/NumberTracker,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,666wcy/ARPT-Bot,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,AlexIoannides/pyspark-example-project,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,Cherecho/Triangular-arbitrage,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,Cjy-CN/PUBGRecognizeAndGunpress,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,Khrylx/PyTorch-RL,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,LinJing517/micropython-deauth,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,LonamiWebs/Telebackup,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,QiuChenly/InjectLib,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,Scholar01/sd-webui-bg-mask,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,The-Compiler/pytest-vw,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,YangDi666/UNIK,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,ahmetozlu/color_recognition,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,anujshah1003/Tensorboard-own-image-data-image-features-embedding-visualization,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,autti/abraham,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,bannsec/stegoVeritas,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,chenjie/PyTorch-CIFAR-10-autoencoder,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,chrisyy2003/nonebot-plugin-gpt3,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,ergrelet/unlicense,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,harvard-edge/QuaRL,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,jgwak/GSDN,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,joereynolds/reap-get,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,jyjblrd/SelfDrivingCar,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,krishpranav/socialosint,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,liangchundong/HGNN-AC,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,linuxacademy/content-gitops,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,monero-project/meta,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,oval-group/smooth-topk,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,snowzjx/ns3-load-balance,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,surajt97/Train_Delay_Prediction,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,tranceitionalMynd/spy-reaper,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,william-sy/TesyLocal,,,,,In matching scope but absent from panel_event_monthly.csv.
+scope_repo_missing_panel_rows,control,yousseb/meld,,,,,In matching scope but absent from panel_event_monthly.csv.

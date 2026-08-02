@@ -1,0 +1,9 @@
+repo_name,found_in_matching_any_role,matching_groups,matched_periods,is_missing_commit_repository,interpretation
+Altinity/clickhouse-grafana,0,,,0,Absent from matching.csv under the same repository name.
+ChatFAQ/ChatFAQ,1,control,202408,0,"Present in matching.csv only as a control candidate, not as a treatment."
+ethereum/pm,0,,,0,Absent from matching.csv under the same repository name.
+huggingface/nanotron,1,control,202502,0,"Present in matching.csv only as a control candidate, not as a treatment."
+ifokeev/telegram-ai-agent,1,control,202409,0,"Present in matching.csv only as a control candidate, not as a treatment."
+kenshiro-o/nagato-ai,1,control,202501,0,"Present in matching.csv only as a control candidate, not as a treatment."
+kevon217/custom-agency-swarms,0,,,0,Absent from matching.csv under the same repository name.
+PrefectHQ/marvin,1,control,202501,0,"Present in matching.csv only as a control candidate, not as a treatment."

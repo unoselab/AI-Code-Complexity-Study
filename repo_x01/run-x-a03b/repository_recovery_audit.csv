@@ -1,0 +1,39 @@
+repo_name,clone_path,clone_exists,is_git_repository,configured_origin_url,origin_repo_name,origin_name_matches_input,local_head_sha,is_shallow_before,partial_clone_filter,remote_accessible,remote_head_ref,remote_head_sha,remote_check_stderr,missing_unique_commits,already_available_before,recovered_unique_commits,unresolved_unique_commits,unshallow_returncode,unshallow_stderr,fetch_all_returncode,fetch_all_stderr,explicit_refs_returncode,explicit_refs_stderr,direct_sha_fetch_attempts,direct_sha_fetch_failures,direct_sha_fetch_error_samples,pr_fetch_returncode,pr_fetch_stderr
+DataScienceUIBK/Rankify,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/DataScienceUIBK_Rankify,1,1,https://github.com/DataScienceUIBK/Rankify.git,DataScienceUIBK/Rankify,1,56044993562bdcee8ccf324db3bc04474e2373bb,false,,1,refs/heads/main,56044993562bdcee8ccf324db3bc04474e2373bb,,3,3,0,0,,,,,,,0,0,,,
+ericyuegu/hal,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/ericyuegu_hal,1,1,https://github.com/ericyuegu/hal.git,ericyuegu/hal,1,18759c9e7c635ed1ea5159b77fb45a2a27022ddb,false,,1,refs/heads/main,fa3ff14e5eaed65462d1bb8984d3c39570303530,,10,10,0,0,,,,,,,0,0,,,
+Hankanman/Area-Occupancy-Detection,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/Hankanman_Area-Occupancy-Detection,1,1,https://github.com/Hankanman/Area-Occupancy-Detection.git,Hankanman/Area-Occupancy-Detection,1,bf4db1995ab4a10ee6b2928d654bf149c7e1b430,false,,1,refs/heads/main,84387fd67994fd53647cee5aec4bc72b3e2849b1,,9,9,0,0,,,,,,,0,0,,,
+ToolUse/infinite-ai-seo,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/ToolUse_infinite-ai-seo,1,1,https://github.com/ToolUse/infinite-ai-seo.git,ToolUse/infinite-ai-seo,1,d4019a3edb442ae7ffddbfdad289ec92400d32ee,false,,1,refs/heads/main,d4019a3edb442ae7ffddbfdad289ec92400d32ee,,1,1,0,0,,,,,,,0,0,,,
+W1ndys/W1ndysBot,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/W1ndys_W1ndysBot,1,1,https://github.com/W1ndys/W1ndysBot.git,W1ndys/W1ndysBot,1,12932c19302ed79ee155483a724529a9cfe438d8,false,,1,refs/heads/main,12932c19302ed79ee155483a724529a9cfe438d8,,2,0,0,2,,,0,,0,,2,2,64984204c81f8193080999b3c87238de94c4d187: fatal: remote error: upload-pack: not our ref 64984204c81f8193080999b3c87238de94c4d187 | 98ca48eb0817e96094ff662cf5e98a2231fe7703: fatal: remote error: upload-pack: not our ref 98ca48eb0817e96094ff662cf5e98a2231fe7703,0,"From https://github.com/W1ndys/W1ndysBot
+ * [new ref]         refs/pull/25/head  -> origin/pull/25/head
+ * [new ref]         refs/pull/259/head -> origin/pull/259/head
+ * [new ref]         refs/pull/260/head -> origin/pull/260/head
+ * [new ref]         refs/pull/262/head -> origin/pull/262/head
+ * [new ref]         refs/pull/264/head -> origin/pull/264/head
+ * [new ref]         refs/pull/266/head -> origin/pull/266/head
+ * [new ref]         refs/pull/267/head -> origin/pull/267/head
+ * [new ref]         refs/pull/269/head -> origin/pull/269/head
+ * [new ref]         refs/pull/27/head  -> origin/pull/27/head
+ * [new ref]         refs/pull/271/head -> origin/pull/271/head
+ * [new ref]         refs/pull/272/head -> origin/pull/272/head
+ * [new ref]         refs/pull/273/head -> origin/pull/273/head
+ * [new ref]         refs/pull/274/head -> origin/pull/274/head
+ * [new ref]         refs/pull/275/head -> origin/pull/275/head
+ * [new ref]         refs/pull/277/head -> origin/pull/277/head
+ * [new ref]         refs/pull/278/head -> origin/pull/278/head
+ * [new ref]         refs/pull/279/head -> origin/pull/279/head
+ * [new ref]         refs/pull/28/head  -> origin/pull/28/head
+ * [new ref]         refs/pull/280/head -> origin/pull/280/head
+ * [new ref]         refs/pull/281/head -> origin/pull/281/head
+ * [new ref]         refs/pull/282/head -> origin/pull/282/head
+ * [new ref]         refs/pull/284/head -> origin/pull/284/head
+ * [new ref]         refs/pull/285/head -> origin/pull/285/head
+ * [new ref]         refs/pull/286/head -> origin/pull/286/head
+ * [new ref]         refs/pull/287/head -> origin/pull/287/head
+ * [new ref]         refs/pull/288/head -> origin/pull/288/head
+ * [new ref]         refs/pull/289/head -> origin/pull/289/head
+ * [new ref]         refs/pull/29/head  -> origin/pull/29/head
+ * [new ref]         refs/pull/290/head -> origin/pull/290/head
+ * [new ref]         refs/pull/291/head -> origin/pull/291/head
+ * [new ref]         refs/pull/292/head ..."
+whiteducksoftware/flock,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/whiteducksoftware_flock,1,1,https://github.com/whiteducksoftware/flock.git,whiteducksoftware/flock,1,c13f1f0a35426c8a954b73c1a0c3944f5597c5dc,false,,1,refs/heads/main,c13f1f0a35426c8a954b73c1a0c3944f5597c5dc,,1,1,0,0,,,,,,,0,0,,,
+yagami1997/TradeMind,/home/user1-system12/project-workspace/ai_code_complexity_study_python/treatment-repos/yagami1997_TradeMind,1,1,https://github.com/yagami1997/TradeMind.git,yagami1997/TradeMind,1,110b4b41c0f405fea056f00a61c22cd3eb6ebcc4,false,,1,refs/heads/main,110b4b41c0f405fea056f00a61c22cd3eb6ebcc4,,6,6,0,0,,,,,,,0,0,,,

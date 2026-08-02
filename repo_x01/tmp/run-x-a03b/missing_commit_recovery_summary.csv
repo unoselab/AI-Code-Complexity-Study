@@ -1,0 +1,23 @@
+section,metric,value,note
+implementation,version,v1,run-x-a03b recovery implementation.
+mode,dry_run,0,1 means no fetch commands were executed.
+mode,fetch_pr_refs,1,Optional GitHub pull-request refs fetch.
+input,commit_not_found_repo_month_rows,34,Rows selected from run-x-a03-v2.
+input,unique_missing_commits,32,Unique repo_name + commit SHA pairs.
+input,affected_repositories,7,
+result,unique_commits_available_before,30,
+result,unique_commits_recovered,0,Missing before and available after recovery.
+result,unique_commits_resolved_final,30,Includes commits already available before the run.
+result,unique_commits_unresolved_final,2,
+result,repo_month_rows_unresolved_final,2,
+repository,remote_accessible,7,
+repository,remote_unavailable,0,
+repository,origin_name_mismatch,0,Only rows with a parsed GitHub origin name are counted.
+recovery_stage,already_available,30,
+recovery_stage,unshallow,0,
+recovery_stage,fetch_all,0,
+recovery_stage,explicit_refs,0,
+recovery_stage,direct_sha_fetch,0,
+recovery_stage,pull_request_refs,0,
+recovery_stage,dry_run_unresolved,0,
+recovery_stage,unresolved_after_fetch,2,
