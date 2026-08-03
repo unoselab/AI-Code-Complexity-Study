@@ -1,3 +1,0 @@
-outcome,outcome_label,placebo_periods,placebo_terms,all_ci_include_zero,periods_excluding_zero,minimum_p_value,check_definition
-log_commits,Commits,"-6,-5,-4,-3,-2",5,TRUE,"",0.28771171316107,Original Rmd check: each package-native placebo 95% CI should include zero.
-log_lines_added,Lines Added,"-6,-5,-4,-3,-2",5,TRUE,"",0.121235942502697,Original Rmd check: each package-native placebo 95% CI should include zero.

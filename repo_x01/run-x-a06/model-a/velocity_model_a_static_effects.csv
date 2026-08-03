@@ -1,3 +1,0 @@
-outcome,outcome_label,term,term_type,estimate,std.error,conf.low,conf.high,p_value,significant,exp_coefficient_change_pct,exp_ci_low_pct,exp_ci_high_pct,treated_observations,first_stage_observations,treatment_repositories,control_repositories,percent_interpretation
-log_commits,Commits,treat,static_att,0.054717300592691,0.111958210979872,-0.164716760701396,0.274151361886778,0.625033088486131,FALSE,5.62419734847603,-15.1866105079912,31.5413890699532,363,1591,63,104,100*(exp(beta)-1) on the log1p outcome scale
-log_lines_added,Lines Added,treat,static_att,0.647106412402476,0.258976176307487,0.139522433985905,1.15469039081905,0.0124646197422724,TRUE,91.0006055366519,14.972459833418,217.30408628488,363,1591,63,104,100*(exp(beta)-1) on the log1p outcome scale
