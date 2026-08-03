@@ -1,0 +1,8 @@
+event,event_index,treatment_repositories,total_rows,pre_treatment_rows,treated_rows,dynamic_0_to_max_rows,min_event_time,max_event_time
+2024-09,9,2,31,14,17,12,-8,11
+2024-10,10,1,20,9,11,7,-9,10
+2024-11,11,2,31,20,11,11,-10,5
+2024-12,12,6,62,24,38,33,-9,8
+2025-01,13,11,158,89,69,63,-12,7
+2025-02,14,11,180,113,67,67,-13,6
+2025-03,15,30,432,282,150,150,-14,5

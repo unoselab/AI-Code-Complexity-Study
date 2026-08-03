@@ -1,0 +1,9 @@
+outcome,model_type,status,runtime_seconds,warning_count,warning_messages,error_message,input_rows,untreated_rows,treated_rows,result_terms,extra
+log_commits,first_stage,success,0.032,0,"","",1954,1591,363,5,nobs=1591; prediction_na_all=0; prediction_na_treated=0
+log_commits,static,success,0.471,0,"","",1954,1591,363,1,""
+log_commits,dynamic,success,0.0860000000000001,0,"","",1954,1591,363,12,"horizon_argument=-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6; pretrends=-6,-5,-4,-3,-2; reference=-1 omitted"
+log_commits,pretrend_original_rmd_check,success,0,0,"","",1954,1591,363,5,all_ci_include_zero=TRUE; periods_excluding_zero=none
+log_lines_added,first_stage,success,0.0170000000000001,0,"","",1954,1591,363,5,nobs=1591; prediction_na_all=0; prediction_na_treated=0
+log_lines_added,static,success,0.0410000000000001,0,"","",1954,1591,363,1,""
+log_lines_added,dynamic,success,0.079,0,"","",1954,1591,363,12,"horizon_argument=-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6; pretrends=-6,-5,-4,-3,-2; reference=-1 omitted"
+log_lines_added,pretrend_original_rmd_check,success,0,0,"","",1954,1591,363,5,all_ci_include_zero=TRUE; periods_excluding_zero=none

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # ============================================================
-# run-x-a05 v2: Prepare pooled Python velocity DiD input
+# run-x-a05 v3: Prepare pooled Python velocity DiD input
 # ============================================================
 #
 # Purpose:
@@ -29,6 +29,12 @@ set -euo pipefail
 #   Fixed effects will be applied later in run-x-a06 using repo_id and
 #   time_index.
 #
+# NCLOC recovery:
+#   Merge the successful run-x-a05b whole-repository NCLOC patch using
+#   dataset source, repository, month, and effective commit. Recovered
+#   values fill only originally missing NCLOC cells. Existing values are
+#   never overwritten, and provenance columns are retained.
+#
 # Control-adoption protection:
 #   If an original candidate control later adopts Cursor, only rows strictly
 #   before its adoption month are retained. Rows at or after adoption are
@@ -44,6 +50,7 @@ set -euo pipefail
 #   repo_x01/run-x-a03/panel_event_monthly_python_eligibility.csv
 #   repo_x01/run-x-a04/control_reuse_summary.csv
 #   repo_x01/run-x-a04/treatment_month_control_python_coverage.csv
+#   repo_x01/run-x-a05b/missing_ncloc_repo_month_patch.csv
 #
 # Main outputs:
 #   repo_x01/run-x-a05/velocity_did_panel_python_pooled.csv
@@ -73,7 +80,7 @@ cd "${PROJECT_ROOT}"
 export PROJECT_ROOT
 
 RUN_PREFIX="run-x-a05"
-IMPLEMENTATION_VERSION="v2"
+IMPLEMENTATION_VERSION="v3"
 RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_DIR="${LOG_DIR:-logs}"
@@ -86,6 +93,7 @@ MATCHING_PAIRS_FILE="${MATCHING_PAIRS_FILE:-repo_x01/run-x-a01/clonedrepo_matchi
 PANEL_FILE="${PANEL_FILE:-repo_x01/run-x-a03/panel_event_monthly_python_eligibility.csv}"
 CONTROL_REUSE_FILE="${CONTROL_REUSE_FILE:-repo_x01/run-x-a04/control_reuse_summary.csv}"
 COVERAGE_FILE="${COVERAGE_FILE:-repo_x01/run-x-a04/treatment_month_control_python_coverage.csv}"
+NCLOC_RECOVERY_PATCH_FILE="${NCLOC_RECOVERY_PATCH_FILE:-repo_x01/run-x-a05b/missing_ncloc_repo_month_patch.csv}"
 
 OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_x01}"
 MAIN_OUTPUT_DIR="${MAIN_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/${RUN_PREFIX}}"
@@ -119,7 +127,8 @@ for required_file in \
   "${MATCHING_PAIRS_FILE}" \
   "${PANEL_FILE}" \
   "${CONTROL_REUSE_FILE}" \
-  "${COVERAGE_FILE}"; do
+  "${COVERAGE_FILE}" \
+  "${NCLOC_RECOVERY_PATCH_FILE}"; do
   if [[ ! -f "${required_file}" ]]; then
     echo "ERROR: required file not found: ${required_file}" >&2
     exit 1
@@ -140,6 +149,7 @@ mkdir -p "${LOG_DIR}" "${MAIN_OUTPUT_DIR}" "${TMP_OUTPUT_DIR}"
   echo "Enriched panel input:        ${PANEL_FILE}"
   echo "Control reuse input:         ${CONTROL_REUSE_FILE}"
   echo "Coverage input:              ${COVERAGE_FILE}"
+  echo "NCLOC recovery patch:        ${NCLOC_RECOVERY_PATCH_FILE}"
   echo "Pooled panel output:         ${POOLED_PANEL_OUTPUT}"
   echo "Model A complete-case:       ${MODEL_A_COMPLETE_CASE_OUTPUT}"
   echo "Model A estimable panel:     ${MODEL_A_PANEL_OUTPUT}"
@@ -160,6 +170,7 @@ COMMAND=(
   --panel-file "${PANEL_FILE}"
   --control-reuse-file "${CONTROL_REUSE_FILE}"
   --coverage-file "${COVERAGE_FILE}"
+  --ncloc-recovery-patch-file "${NCLOC_RECOVERY_PATCH_FILE}"
   --pooled-panel-output "${POOLED_PANEL_OUTPUT}"
   --model-a-complete-case-output "${MODEL_A_COMPLETE_CASE_OUTPUT}"
   --model-a-panel-output "${MODEL_A_PANEL_OUTPUT}"
@@ -175,7 +186,7 @@ COMMAND=(
 
 {
   echo
-  echo "** Step 1: Build unique repository-month Python velocity panel"
+  echo "** Step 1: Merge recovered NCLOC and rebuild the Python velocity panel"
   echo "------------------------------------------------------------"
   printf 'Command:'
   printf ' %q' "${COMMAND[@]}"
@@ -230,6 +241,6 @@ done
   echo "Model A estimable panel:     ${MODEL_A_PANEL_OUTPUT}"
   echo "Summary output:              ${SUMMARY_OUTPUT}"
   echo "Log file:                    ${LOG_FILE}"
-  echo "Next step:                   review Model A sample before run-x-a06 Borusyak DiD"
+  echo "Next step:                   verify the v3 Model A sample, then run run-x-a06 Borusyak DiD"
   echo "============================================================"
 } | tee -a "${LOG_FILE}"

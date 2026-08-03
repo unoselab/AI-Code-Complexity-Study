@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Prepare the original-style pooled Python velocity DiD input (v2).
+Prepare the original-style pooled Python velocity DiD input (v3).
 
 This stage builds a unique repository-month panel from the original matched
 sample. It does not duplicate a control repository because the same control was
@@ -33,11 +33,17 @@ Raw metrics are preserved. Log1p-transformed columns are added explicitly for
 future R analysis. The script also creates a unique snapshot manifest for the
 later Python-only SonarQube run that will produce ncloc_py for Model C.
 
-Version 2 also protects the pooled control group from treated-control
+Version 2 protects the pooled control group from treated-control
 contamination. If a repository listed in the original control dataset later has
 a Cursor adoption event, only its strictly pre-adoption rows may remain in the
 control pool. Rows at or after adoption are censored and recorded explicitly in
 the exclusion and QC outputs.
+
+Version 3 merges the targeted whole-repository NCLOC recovery produced by
+run-x-a05b. Recovered values may fill only originally missing NCLOC cells. The
+merge requires repository, calendar month, dataset source, and effective commit
+to match exactly. Existing replication-package NCLOC values are never
+overwritten, and all recovery provenance is retained in the output panels.
 """
 
 from __future__ import annotations
@@ -109,6 +115,23 @@ COVERAGE_REQUIRED_COLUMNS = {
     "coverage_class",
 }
 
+NCLOC_PATCH_REQUIRED_COLUMNS = {
+    "snapshot_key",
+    "dataset_source",
+    "scope_role",
+    "repo_name",
+    "time",
+    "latest_commit_effective",
+    "project_key",
+    "project_version",
+    "status",
+    "ncloc_recovered",
+    "git_precheck_status",
+    "scanner_log_path",
+    "ncloc_patch_available",
+    "ncloc_patch_source",
+}
+
 MODEL_A_RAW_COLUMNS = [
     "commits",
     "lines_added",
@@ -153,6 +176,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--panel-file", required=True, type=Path)
     parser.add_argument("--control-reuse-file", required=True, type=Path)
     parser.add_argument("--coverage-file", required=True, type=Path)
+    parser.add_argument("--ncloc-recovery-patch-file", required=True, type=Path)
     parser.add_argument("--pooled-panel-output", required=True, type=Path)
     parser.add_argument("--model-a-complete-case-output", required=True, type=Path)
     parser.add_argument("--model-a-panel-output", required=True, type=Path)
@@ -245,6 +269,7 @@ def validate_args(args: argparse.Namespace) -> tuple[pd.Period, pd.Period]:
         args.panel_file,
         args.control_reuse_file,
         args.coverage_file,
+        args.ncloc_recovery_patch_file,
     ]:
         if not path.is_file():
             raise FileNotFoundError(f"Required input file not found: {path}")
@@ -327,6 +352,272 @@ def normalize_panel(panel: pd.DataFrame) -> pd.DataFrame:
             + repr(sample.to_dict(orient="records"))
         )
     return data
+
+
+def normalize_ncloc_patch(patch: pd.DataFrame) -> pd.DataFrame:
+    """Validate and normalize the run-x-a05b repo-month NCLOC patch."""
+    require_columns(patch, NCLOC_PATCH_REQUIRED_COLUMNS, "NCLOC recovery patch CSV")
+    data = patch.copy()
+
+    for column in [
+        "snapshot_key",
+        "dataset_source",
+        "scope_role",
+        "repo_name",
+        "time",
+        "latest_commit_effective",
+        "project_key",
+        "project_version",
+        "status",
+        "git_precheck_status",
+        "scanner_log_path",
+        "ncloc_patch_source",
+    ]:
+        data[column] = data[column].map(clean_text)
+
+    data["dataset_source"] = data["dataset_source"].str.casefold()
+    data["scope_role"] = data["scope_role"].str.casefold()
+    data["status"] = data["status"].str.casefold()
+    data["repo_key"] = data["repo_name"].map(repo_key)
+    data["time_period"] = parse_month_series(data["time"], "NCLOC patch.time")
+    data["commit_key"] = data["latest_commit_effective"].str.casefold()
+    data["ncloc_recovered"] = pd.to_numeric(
+        data["ncloc_recovered"], errors="coerce"
+    )
+    data["ncloc_patch_available_flag"] = normalize_bool_series(
+        data["ncloc_patch_available"], "NCLOC patch.ncloc_patch_available"
+    )
+
+    blank_key = (
+        data["repo_key"].eq("")
+        | data["time"].eq("")
+        | data["commit_key"].eq("")
+        | data["dataset_source"].eq("")
+    )
+    if blank_key.any():
+        sample = data.loc[
+            blank_key,
+            ["dataset_source", "repo_name", "time", "latest_commit_effective"],
+        ].head(20)
+        raise ValueError(
+            "NCLOC recovery patch contains blank merge keys: "
+            + repr(sample.to_dict(orient="records"))
+        )
+
+    invalid_source = ~data["dataset_source"].isin(["treatment", "control"])
+    if invalid_source.any():
+        examples = sorted(data.loc[invalid_source, "dataset_source"].unique().tolist())
+        raise ValueError(f"NCLOC recovery patch has invalid dataset_source values: {examples}")
+
+    invalid_role = data["scope_role"].ne(data["dataset_source"])
+    if invalid_role.any():
+        sample = data.loc[
+            invalid_role, ["repo_name", "dataset_source", "scope_role"]
+        ].head(20)
+        raise ValueError(
+            "NCLOC recovery patch scope_role does not match dataset_source: "
+            + repr(sample.to_dict(orient="records"))
+        )
+
+    invalid_value = data["ncloc_recovered"].isna() | data["ncloc_recovered"].lt(0)
+    invalid_status = data["status"].ne("success")
+    invalid_available = data["ncloc_patch_available_flag"].ne(1)
+    invalid = invalid_value | invalid_status | invalid_available
+    if invalid.any():
+        sample = data.loc[
+            invalid,
+            [
+                "repo_name",
+                "time",
+                "status",
+                "ncloc_recovered",
+                "ncloc_patch_available",
+            ],
+        ].head(20)
+        raise ValueError(
+            "NCLOC recovery patch contains unresolved or invalid rows: "
+            + repr(sample.to_dict(orient="records"))
+        )
+
+    duplicated = data.duplicated(
+        ["dataset_source", "repo_key", "time", "commit_key"], keep=False
+    )
+    if duplicated.any():
+        sample = data.loc[
+            duplicated,
+            ["dataset_source", "repo_name", "time", "latest_commit_effective"],
+        ].head(20)
+        raise ValueError(
+            "NCLOC recovery patch contains duplicate merge keys: "
+            + repr(sample.to_dict(orient="records"))
+        )
+
+    return data
+
+
+def apply_ncloc_recovery(
+    panel: pd.DataFrame, patch: pd.DataFrame
+) -> tuple[pd.DataFrame, dict[str, int]]:
+    """Fill only originally missing NCLOC values and preserve provenance."""
+    data = panel.copy()
+    data["ncloc_original"] = pd.to_numeric(data["ncloc"], errors="coerce")
+    data["ncloc_recovered"] = np.nan
+    data["ncloc_source"] = np.where(
+        data["ncloc_original"].notna(), "replication_panel", "missing"
+    )
+    data["ncloc_recovery_applied"] = 0
+    data["ncloc_recovery_snapshot_key"] = ""
+    data["ncloc_recovery_scanner_log"] = ""
+    data["ncloc_recovery_project_key"] = ""
+    data["ncloc_recovery_project_version"] = ""
+    data["ncloc_recovery_status"] = ""
+    data["ncloc_recovery_git_precheck_status"] = ""
+    data["commit_key"] = data["latest_commit_effective"].map(clean_text).str.casefold()
+
+    patch_fields = patch[
+        [
+            "dataset_source",
+            "repo_key",
+            "time",
+            "commit_key",
+            "snapshot_key",
+            "ncloc_recovered",
+            "ncloc_patch_source",
+            "scanner_log_path",
+            "project_key",
+            "project_version",
+            "status",
+            "git_precheck_status",
+        ]
+    ].rename(
+        columns={
+            "snapshot_key": "patch_snapshot_key",
+            "ncloc_recovered": "patch_ncloc_recovered",
+            "ncloc_patch_source": "patch_ncloc_source",
+            "scanner_log_path": "patch_scanner_log_path",
+            "project_key": "patch_project_key",
+            "project_version": "patch_project_version",
+            "status": "patch_status",
+            "git_precheck_status": "patch_git_precheck_status",
+        }
+    )
+
+    merged = data.merge(
+        patch_fields,
+        on=["dataset_source", "repo_key", "time", "commit_key"],
+        how="left",
+        validate="one_to_one",
+        indicator="ncloc_patch_merge",
+    )
+
+    matched = merged["ncloc_patch_merge"].eq("both")
+    matched_rows = int(matched.sum())
+    unmatched_patch_rows = int(len(patch) - matched_rows)
+    if unmatched_patch_rows != 0:
+        panel_keys = set(
+            zip(
+                data["dataset_source"],
+                data["repo_key"],
+                data["time"],
+                data["commit_key"],
+            )
+        )
+        unmatched = patch[
+            ~patch.apply(
+                lambda row: (
+                    row["dataset_source"],
+                    row["repo_key"],
+                    row["time"],
+                    row["commit_key"],
+                ) in panel_keys,
+                axis=1,
+            )
+        ]
+        sample = unmatched[
+            ["dataset_source", "repo_name", "time", "latest_commit_effective"]
+        ].head(20)
+        raise ValueError(
+            f"{unmatched_patch_rows} NCLOC patch rows did not match the enriched panel: "
+            + repr(sample.to_dict(orient="records"))
+        )
+
+    overwrite = matched & merged["ncloc_original"].notna()
+    overwritten_rows = int(overwrite.sum())
+    if overwritten_rows != 0:
+        sample = merged.loc[
+            overwrite,
+            [
+                "dataset_source",
+                "repo_name",
+                "time",
+                "latest_commit_effective",
+                "ncloc_original",
+                "patch_ncloc_recovered",
+            ],
+        ].head(20)
+        raise ValueError(
+            "NCLOC recovery would overwrite existing replication values: "
+            + repr(sample.to_dict(orient="records"))
+        )
+
+    apply_mask = matched & merged["ncloc_original"].isna()
+    merged.loc[apply_mask, "ncloc_recovered"] = merged.loc[
+        apply_mask, "patch_ncloc_recovered"
+    ]
+    merged.loc[apply_mask, "ncloc"] = merged.loc[
+        apply_mask, "patch_ncloc_recovered"
+    ]
+    merged.loc[apply_mask, "ncloc_source"] = merged.loc[
+        apply_mask, "patch_ncloc_source"
+    ]
+    merged.loc[apply_mask, "ncloc_recovery_applied"] = 1
+    merged.loc[apply_mask, "ncloc_recovery_snapshot_key"] = merged.loc[
+        apply_mask, "patch_snapshot_key"
+    ]
+    merged.loc[apply_mask, "ncloc_recovery_scanner_log"] = merged.loc[
+        apply_mask, "patch_scanner_log_path"
+    ]
+    merged.loc[apply_mask, "ncloc_recovery_project_key"] = merged.loc[
+        apply_mask, "patch_project_key"
+    ]
+    merged.loc[apply_mask, "ncloc_recovery_project_version"] = merged.loc[
+        apply_mask, "patch_project_version"
+    ]
+    merged.loc[apply_mask, "ncloc_recovery_status"] = merged.loc[
+        apply_mask, "patch_status"
+    ]
+    merged.loc[apply_mask, "ncloc_recovery_git_precheck_status"] = merged.loc[
+        apply_mask, "patch_git_precheck_status"
+    ]
+
+    drop_columns = [
+        "commit_key",
+        "patch_snapshot_key",
+        "patch_ncloc_recovered",
+        "patch_ncloc_source",
+        "patch_scanner_log_path",
+        "patch_project_key",
+        "patch_project_version",
+        "patch_status",
+        "patch_git_precheck_status",
+        "ncloc_patch_merge",
+    ]
+    merged = merged.drop(columns=drop_columns)
+
+    audit = {
+        "patch_rows": int(len(patch)),
+        "matched_rows": matched_rows,
+        "applied_rows": int(apply_mask.sum()),
+        "overwritten_existing_rows": overwritten_rows,
+        "unmatched_rows": unmatched_patch_rows,
+        "treatment_applied_rows": int(
+            (merged["ncloc_recovery_applied"].eq(1) & merged["dataset_source"].eq("treatment")).sum()
+        ),
+        "control_applied_rows": int(
+            (merged["ncloc_recovery_applied"].eq(1) & merged["dataset_source"].eq("control")).sum()
+        ),
+    }
+    return merged, audit
 
 
 def normalize_reuse(reuse: pd.DataFrame) -> pd.DataFrame:
@@ -901,6 +1192,39 @@ def build_model_c_manifest(pooled: pd.DataFrame) -> pd.DataFrame:
             else:
                 aggregation[optional] = (optional, "max")
 
+    if "ncloc" in data.columns:
+        inconsistent_ncloc = (
+            data.groupby(
+                ["dataset_source", "repo_name", "latest_commit_effective"]
+            )["ncloc"]
+            .nunique(dropna=False)
+            .gt(1)
+        )
+        if inconsistent_ncloc.any():
+            raise ValueError(
+                "The same Model C snapshot has inconsistent final NCLOC values"
+            )
+        aggregation["ncloc_model_a"] = ("ncloc", "first")
+
+    if "ncloc_source" in data.columns:
+        aggregation["ncloc_source_values"] = (
+            "ncloc_source",
+            lambda values: " | ".join(
+                sorted({clean_text(value) for value in values if clean_text(value)})
+            ),
+        )
+    if "ncloc_recovery_applied" in data.columns:
+        aggregation["ncloc_recovery_applied_repo_month_rows"] = (
+            "ncloc_recovery_applied", "sum"
+        )
+    if "ncloc_recovery_snapshot_key" in data.columns:
+        aggregation["ncloc_recovery_snapshot_key"] = (
+            "ncloc_recovery_snapshot_key",
+            lambda values: next(
+                (clean_text(value) for value in values if clean_text(value)), ""
+            ),
+        )
+
     manifest = (
         data.groupby(
             ["dataset_source", "repo_name", "repo_key", "latest_commit_effective"],
@@ -971,6 +1295,11 @@ def make_exclusions(
         "lines_added",
         "age",
         "ncloc",
+        "ncloc_original",
+        "ncloc_recovered",
+        "ncloc_source",
+        "ncloc_recovery_applied",
+        "ncloc_recovery_snapshot_key",
         "contributors",
         "stars",
         "issues",
@@ -1003,11 +1332,12 @@ def build_summary(
     control_audit: pd.DataFrame,
     manifest: pd.DataFrame,
     exclusions: pd.DataFrame,
+    recovery_audit: dict[str, int],
     start_period: pd.Period,
     end_period: pd.Period,
 ) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
-    append_summary(rows, "implementation", "version", "v2")
+    append_summary(rows, "implementation", "version", "v3")
     append_summary(rows, "definition", "panel_design", "original_style_unique_repository_month_pool")
     append_summary(rows, "definition", "treatment_rule", "valid_event_and_python_eligible_repo_month")
     append_summary(rows, "definition", "control_rule", "candidate_unique_control_and_python_eligible_repo_month")
@@ -1015,6 +1345,7 @@ def build_summary(
     append_summary(rows, "definition", "control_adoption_handling", "censor_at_adoption_month", "A candidate control that later adopts Cursor contributes only strictly pre-adoption rows.")
     append_summary(rows, "definition", "analysis_window", f"{start_period}:{end_period}")
     append_summary(rows, "definition", "model_a_complete_case", "commits_lines_added_age_ncloc_contributors_stars_issues_nonmissing")
+    append_summary(rows, "definition", "ncloc_recovery", "fill_originally_missing_values_only", "Strict match on dataset source, repository, month, and effective commit; existing values are never overwritten.")
     append_summary(rows, "definition", "borusyak_estimability", "treated_repository_requires_pre_and_post_complete_case_rows")
     append_summary(rows, "definition", "estimable_control_pool", "controls_linked_to_estimable_treatments_only")
     append_summary(rows, "definition", "model_c_status", "snapshot_manifest_for_model_a_estimable_panel", "ncloc_py is pending Python-only SonarQube.")
@@ -1024,6 +1355,17 @@ def build_summary(
     append_summary(rows, "input", "matching_pair_rows", len(pairs))
     append_summary(rows, "input", "candidate_unique_controls", len(candidate_controls))
     append_summary(rows, "input", "candidate_control_assignments", int(candidate_controls["matched_treatment_count_candidates"].sum()))
+
+    append_summary(rows, "ncloc_recovery", "patch_rows", recovery_audit["patch_rows"])
+    append_summary(rows, "ncloc_recovery", "matched_rows", recovery_audit["matched_rows"])
+    append_summary(rows, "ncloc_recovery", "applied_rows", recovery_audit["applied_rows"])
+    append_summary(rows, "ncloc_recovery", "treatment_applied_rows", recovery_audit["treatment_applied_rows"])
+    append_summary(rows, "ncloc_recovery", "control_applied_rows", recovery_audit["control_applied_rows"])
+    append_summary(rows, "ncloc_recovery", "overwritten_existing_rows", recovery_audit["overwritten_existing_rows"])
+    append_summary(rows, "ncloc_recovery", "unmatched_rows", recovery_audit["unmatched_rows"])
+    append_summary(rows, "ncloc_recovery", "pooled_rows_using_recovered_ncloc", int(pooled["ncloc_recovery_applied"].sum()))
+    append_summary(rows, "ncloc_recovery", "estimable_rows_using_recovered_ncloc", int(model_a_estimable["ncloc_recovery_applied"].sum()))
+    append_summary(rows, "ncloc_recovery", "pooled_rows_still_missing_ncloc", int(pooled["ncloc"].isna().sum()))
 
     treatment_scope = classified[classified["scope_role"].eq("treatment")]
     control_scope = classified[classified["scope_role"].eq("control")]
@@ -1125,6 +1467,16 @@ def order_panel_columns(data: pd.DataFrame) -> pd.DataFrame:
         "age",
         "log_age",
         "ncloc",
+        "ncloc_original",
+        "ncloc_recovered",
+        "ncloc_source",
+        "ncloc_recovery_applied",
+        "ncloc_recovery_snapshot_key",
+        "ncloc_recovery_scanner_log",
+        "ncloc_recovery_project_key",
+        "ncloc_recovery_project_version",
+        "ncloc_recovery_status",
+        "ncloc_recovery_git_precheck_status",
         "model_a_complete",
         "model_a_exclusion_reason",
         "python_eligible",
@@ -1177,11 +1529,30 @@ def main() -> int:
             args.coverage_file,
             ["treatment_repo", "treatment_month", "coverage_class"],
         )
+        ncloc_patch = read_csv_stable(
+            args.ncloc_recovery_patch_file,
+            [
+                "snapshot_key",
+                "dataset_source",
+                "scope_role",
+                "repo_name",
+                "time",
+                "latest_commit_effective",
+                "project_key",
+                "project_version",
+                "status",
+                "git_precheck_status",
+                "scanner_log_path",
+                "ncloc_patch_source",
+            ],
+        )
 
         pairs = normalize_pairs(pairs)
         panel = normalize_panel(panel)
         reuse = normalize_reuse(reuse)
         coverage = normalize_coverage(coverage)
+        ncloc_patch = normalize_ncloc_patch(ncloc_patch)
+        panel, recovery_audit = apply_ncloc_recovery(panel, ncloc_patch)
 
         candidate_controls = reuse[reuse["matched_treatment_count_candidates"].gt(0)].copy()
         candidate_control_keys = set(candidate_controls["control_key"])
@@ -1266,6 +1637,7 @@ def main() -> int:
             control_audit,
             manifest,
             exclusions,
+            recovery_audit,
             start_period,
             end_period,
         )
@@ -1288,7 +1660,7 @@ def main() -> int:
         write_csv(summary, args.summary_output)
 
         logging.info(
-            "Completed run-x-a05-v2: %d pooled rows, %d complete-case rows, %d estimable Model A rows, %d Model C snapshots",
+            "Completed run-x-a05-v3: %d pooled rows, %d complete-case rows, %d estimable Model A rows, %d Model C snapshots",
             len(pooled_output),
             len(complete_output),
             len(estimable_output),
