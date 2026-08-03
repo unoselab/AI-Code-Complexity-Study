@@ -1,128 +1,154 @@
-added_agc_top_level_blocks
-added_hwc_top_level_blocks
-added_top_level_blocks
-agc_added_top_level_block_ratio
-agc_analysis_status
-agc_changed_class_block_ratio
-agc_changed_function_block_ratio
-agc_changed_top_level_block_ratio
-agc_class_block_ratio
-agc_class_blocks
-agc_function_block_ratio
-agc_function_blocks
-agc_modified_top_level_block_ratio
-agc_repo_month_matched
-agc_top_level_block_ratio
-agc_top_level_blocks
-age
-analysis_ready_agc_changed_block_paper_ncloc
-analysis_ready_agc_changed_block_python_snapshot_ncloc
-analysis_ready_agc_paper_ncloc
-analysis_ready_agc_python_snapshot_ncloc
-changed_agc_class_blocks
-changed_agc_function_blocks
-changed_agc_top_level_blocks
-changed_class_blocks
-changed_function_blocks
-changed_hwc_class_blocks
-changed_hwc_function_blocks
-changed_hwc_top_level_blocks
-changed_top_level_blocks
-class_blocks_scored
-commits
-comparison_status
-contributors
-cursor
-dataset_source
-event
-failure_count
-files_analyzed
-function_blocks_scored
-human_class_blocks
-human_function_blocks
-human_top_level_blocks
-issues
-is_treatment
-lag_0
-lag_1
-lag_2
-lag_3
-lag_4
-lag_5
-lag_6
-latest_commit
-lead_1
-lead_2
-lead_3
-lead_4
-lead_5
-lead_6
-lines_added
-lines_removed
-modified_agc_top_level_blocks
-modified_hwc_top_level_blocks
-modified_top_level_blocks
-ncloc_paper
-ncloc_python_snapshot
-paper_covariate_matched
-post_event
-python_file_count
-python_snapshot_ncloc_matched
-repo_name
-stars
-time
-time_to_event
-top_level_blocks_scored
----
-agc_analysis_status
-agc_class_block_ratio
-agc_class_blocks
-agc_function_block_ratio
-agc_function_blocks
-agc_repo_month_matched
-agc_top_level_block_ratio
-agc_top_level_blocks
-age
-analysis_ready_agc_paper_ncloc
-analysis_ready_agc_python_snapshot_ncloc
-class_blocks_scored
-commits
-contributors
-cursor
-dataset_source
-event
-failure_count
-files_analyzed
-function_blocks_scored
-human_class_blocks
-human_function_blocks
-human_top_level_blocks
-issues
-is_treatment
-lag_0
-lag_1
-lag_2
-lag_3
-lag_4
-lag_5
-lag_6
-latest_commit
-lead_1
-lead_2
-lead_3
-lead_4
-lead_5
-lead_6
-lines_added
-lines_removed
-ncloc_paper
-ncloc_python_snapshot
-paper_covariate_matched
-post_event
-python_file_count
-python_snapshot_ncloc_matched
-repo_name
-stars
-time
-time_to_event
-top_level_blocks_scored
+===== ./clone_candidates.csv =====
+rank,repo_name,adoption_month,n_pre,n_post,has_adoption_obs,n_obs_months,total_activity,balance,window
+1,Altinity/clickhouse-grafana,2024-04,51,17,True,69,2635,17,68
+2,dgokcin/dotfiles,2024-05,31,14,True,46,1373,14,45
+3,samuelclay/NewsBlur,2024-08,129,13,True,143,19486,13,142
+4,udecode/plate,2024-08,37,13,True,51,48025,13,50
+
+===== data_baseline_backup/control_repo_candidates_202408.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-0000/MiniExtend,202407,within,613,1,1,0,0,0,0,0,1
+0-0000/MiniExtend,202406,within,582,0,0,0,0,0,0,0,0
+0-0000/MiniExtend,202405,within,552,0,0,0,0,0,0,0,0
+0-0000/MiniExtend,202404,within,521,2,0,2,0,0,0,0,2
+
+===== data_baseline_backup/control_repo_candidates_202409.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-0000/MiniExtend,202408,within,644,1,1,0,0,0,0,0,1
+0-0000/MiniExtend,202407,within,613,1,1,0,0,0,0,0,1
+0-0000/MiniExtend,202406,within,582,0,0,0,0,0,0,0,0
+0-0000/MiniExtend,202405,within,552,0,0,0,0,0,0,0,0
+
+===== data_baseline_backup/control_repo_candidates_202410.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-5788719150923125/praxis,202409,within,28,2,2,1,0,0,3,3,180
+0-5788719150923125/praxis,202408,within,0,0,0,0,0,0,0,0,0
+0-5788719150923125/praxis,202407,within,0,0,0,0,0,0,0,0,0
+0-5788719150923125/praxis,202406,within,0,0,0,0,0,0,0,0,0
+
+===== data_baseline_backup/control_repo_candidates_202411.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-5788719150923125/praxis,202410,within,59,2,0,0,0,12,10,17,299
+0-5788719150923125/praxis,202409,within,28,2,2,1,0,0,3,3,180
+0-5788719150923125/praxis,202408,within,0,0,0,0,0,0,0,0,0
+0-5788719150923125/praxis,202407,within,0,0,0,0,0,0,0,0,0
+
+===== data_baseline_backup/control_repo_candidates_202412.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-5788719150923125/praxis,202411,within,89,2,1,0,0,4,11,8,331
+0-5788719150923125/praxis,202410,within,59,2,0,0,0,12,10,17,299
+0-5788719150923125/praxis,202409,within,28,2,2,1,0,0,3,3,180
+0-5788719150923125/praxis,202408,within,0,0,0,0,0,0,0,0,0
+
+===== data_baseline_backup/control_repo_candidates_202501.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-5788719150923125/praxis,202412,within,120,2,1,0,0,4,6,6,220
+0-5788719150923125/praxis,202411,within,89,2,1,0,0,4,11,8,331
+0-5788719150923125/praxis,202410,within,59,2,0,0,0,12,10,17,299
+0-5788719150923125/praxis,202409,within,28,2,2,1,0,0,3,3,180
+
+===== data_baseline_backup/control_repo_candidates_202502.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-14N/NDroid,202501,within,3653,0,0,0,0,0,0,0,0
+0-14N/NDroid,202412,within,3622,0,0,0,0,0,0,0,0
+0-14N/NDroid,202411,within,3591,0,0,0,0,0,0,0,0
+0-14N/NDroid,202410,within,3561,0,0,0,0,0,0,0,0
+
+===== data_baseline_backup/control_repo_candidates_202503.csv =====
+repo_name,period,period_type,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events
+0-5788719150923125/praxis,202502,within,179,3,2,0,0,2,5,6,92
+0-5788719150923125/praxis,202501,within,151,6,5,0,0,0,7,5,185
+0-5788719150923125/praxis,202412,within,120,2,1,0,0,4,6,6,220
+0-5788719150923125/praxis,202411,within,89,2,1,0,0,4,11,8,331
+
+===== data_baseline_backup/cursor_commits.csv =====
+repo_name,commit_hash,author,authored_at,committer,committed_at,message,paths
+pig-mesh/pig-ui,c8b8264f0ac662e8b2c9162ae09a56b6d961e32f,冷冷 <2270033969@qq.com>,2024-11-08T10:04:10,冷冷 <2270033969@qq.com>,2024-11-08T10:04:10,feat(AI): 增加 cursorrule 方便上下文提示,.cursorrules
+pig-mesh/pig-ui,68b3d00fd2b131b9fcb692b5112cde2b42af2e12,PIG AI <wangiegie@gmail.com>,2025-07-17T00:31:24,PIG AI <wangiegie@gmail.com>,2025-07-17T00:31:24,feat(theme): 优化全局主题样式和布局,.cursorrules
+pig-mesh/pig-ui,1edd72fe7988417bb271d00fb3f6ada23a0089bd,PIG AI <wangiegie@gmail.com>,2025-07-17T00:33:16,PIG AI <wangiegie@gmail.com>,2025-07-17T00:33:16,docs(cursor): 新增多种技术栈的最佳实践文档,.cursor/rules/axios-best-practices.mdc;.cursor/rules/daisyui-best-practices.mdc;.cursor/rules/element-plus-best-practices.mdc;.cursor/rules/mcp-interactive-feedback.mdc;.cursor/rules/pinia-best-practices.mdc;.cursor/rules/tailwind-best-practices.mdc;.cursor/rules/typescript-best-practices.mdc;.cursor/rules/vue-best-practices.mdc;.cursor/rules/vue-i18n-best-practices.mdc;.cursor/rules/vue-router-best-practices.mdc;.cursor/rules/vueuse-best-practices.mdc
+DannyMac180/mirror,356d8c144c19c16e5a116f91f4b1b0bfa3f5dd2f,Danny McAteer <mcateerd2@gmail.com>,2024-12-20T16:02:02,Danny McAteer <mcateerd2@gmail.com>,2024-12-20T16:02:02,add full codebase snapshot,.cursorrules
+
+===== data_baseline_backup/cursor_files.csv =====
+repo_name,file_path,file_url
+zzzz465/zzzz465.github.io,.cursorrules,https://github.com/zzzz465/zzzz465.github.io/blob/da49347126c57e7362ee269996a6325fc89b42af/.cursorrules
+zzzz465/hw4,.cursorrules,https://github.com/zzzz465/hw4/blob/da49347126c57e7362ee269996a6325fc89b42af/.cursorrules
+zzzz465/hw3,.cursorignore,https://github.com/zzzz465/hw3/blob/79f1cf38244d388d729f2edccdfb99b722f963c4/.cursorignore
+zzstoatzz/structured,.cursorrules,https://github.com/zzstoatzz/structured/blob/323a64e85566690b2da389dc1ede7de1f70e4409/.cursorrules
+
+===== data_baseline_backup/matching.csv =====
+repo_name,matched_period,group,propensity_score,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events,matched_control_1,matched_control_2,matched_control_3
+007sair/hammerspoon,202407,control,0.0006294244111168457,1976,88,54,42,0,0,0,0,97,,,
+0art0/lean-slides,202407,control,0.004311375999912117,367,17,13,3,0,6,11,12,64,,,
+0dayCTF/security,202407,control,0.0015159980152614127,1225,14,10,5,0,0,0,0,15,,,
+0soft/mui-form-fields,202407,control,0.000706376424498119,1874,21,17,3,0,64,14,1,275,,,
+
+===== data_baseline_backup/matching_no_pl.csv =====
+repo_name,matched_period,group,propensity_score,age_days,users_involved,n_stars,n_forks,n_releases,n_pulls,n_issues,n_comments,total_events,matched_control_1,matched_control_2,matched_control_3
+0Jiahao/uv_detector,202407,control,0.000652850037774342,1964,30,24,7,0,0,0,0,35,,,
+0f-0b/luogu-api-docs,202407,control,0.002235626006023499,778,51,37,12,0,19,12,17,142,,,
+0glabs/0g-chain,202407,control,0.005572934543824401,106,73,23,29,2,75,13,33,839,,,
+0glabs/0g-storage-kv,202407,control,0.003426388380452267,144,20,3,7,1,19,2,2,85,,,
+
+===== data_baseline_backup/panel_event_monthly.csv =====
+repo_name,time,is_treatment,event,post_event,time_to_event,lead_6,lead_5,lead_4,lead_3,lead_2,lead_1,lag_0,lag_1,lag_2,lag_3,lag_4,lag_5,lag_6,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag,dataset_source,other_agents,high_confidence
+0xAquaWolf/portfolio,2024-08,0,2024-09,0,-1.0,0,0,0,0,0,1,0,0,0,0,0,0,0,False,43.0,3206.0,822.0,1.0,8,0,0,0,1357.0,1.0,0.0,17.0,4.0,1.2,23.0,85.0,22.0,0.0,25.967678089751686,treatment,,
+0xAquaWolf/portfolio,2024-09,1,2024-09,1,0.0,0,0,0,0,0,0,1,0,0,0,0,0,0,True,66.0,4973.0,1381.0,2.0,27,0,5,5,3177.0,1.0,0.0,52.0,1.7,3.1,74.0,243.0,41.0,0.0,24.87153605634598,treatment,False,True
+0xAquaWolf/portfolio,2024-10,1,2024-09,1,1.0,0,0,0,0,0,0,0,1,0,0,0,0,0,True,23.0,4734.0,1157.0,3.0,11,1,4,35,4352.0,3.0,0.0,104.0,4.1,6.3,106.0,432.0,54.0,0.0,15.405403814514749,treatment,False,False
+0xAquaWolf/portfolio,2024-11,1,2024-09,1,2.0,0,0,0,0,0,0,0,0,1,0,0,0,0,True,29.0,3800.0,2185.0,2.0,2,0,9,66,4551.0,3.0,0.0,120.0,3.7,11.3,110.0,529.0,60.0,0.0,26.59624812037037,treatment,False,False
+
+===== data_baseline_backup/repo_events_control.csv =====
+type,created_at,repo,actor
+CreateEvent,2024-11-05 15:06:36+00:00,00sapo/taskcheck,00sapo
+CreateEvent,2024-11-05 15:07:25+00:00,00sapo/taskcheck,00sapo
+PushEvent,2024-11-05 15:15:29+00:00,00sapo/taskcheck,00sapo
+PushEvent,2024-11-05 15:19:31+00:00,00sapo/taskcheck,00sapo
+
+===== data_baseline_backup/repo_events.csv =====
+type,created_at,repo,actor
+CreateEvent,2024-08-26 16:34:43+00:00,0xAquaWolf/portfolio,0xAquaWolf
+CreateEvent,2024-08-26 16:35:49+00:00,0xAquaWolf/portfolio,0xAquaWolf
+WatchEvent,2024-08-26 16:37:13+00:00,0xAquaWolf/portfolio,0xAquaWolf
+PushEvent,2024-08-26 18:12:16+00:00,0xAquaWolf/portfolio,0xAquaWolf
+
+===== data_baseline_backup/repo_metrics.csv =====
+repo_name,cursor_commits,cursor_adoptor_percentage,cursor_adoption_time
+hanyk/BayeSED3,2,100.0,2024-10-05T04:51:09
+hoishing/natal,2,100.0,2024-12-21T23:08:54
+Elevate-Code/better-voice-typing,5,100.0,2024-10-30T12:15:20
+ericyuegu/hal,2,100.0,2025-02-28T20:11:04
+
+===== data_baseline_backup/repos.csv =====
+repo_name,repo_stars,repo_forks,repo_created,repo_updated,repo_description,repo_issues,repo_pulls,repo_commits,repo_contributors,repo_size,repo_languages,repo_primary_language
+f/awesome-chatgpt-prompts,122280,16401,2022-12-05T13:54:13+00:00,2025-03-31T14:41:25+00:00,This repo includes ChatGPT prompt curation to use ChatGPT and other LLM tools better.,673.0,673.0,682.0,124.0,1338.0,JavaScript: 56993; CSS: 38027; HTML: 19372; Shell: 294; Ruby: 87,JavaScript
+ant-design/ant-design,94114,51745,2015-04-24T15:37:24+00:00,2025-03-30T21:31:51+00:00,An enterprise-class UI design language and React UI library,50429.0,19344.0,29298.0,376.0,219388.0,TypeScript: 6221786; JavaScript: 26708; CSS: 4063; Shell: 3337; HTML: 3223,TypeScript
+storybookjs/storybook,86254,9485,2016-03-18T04:23:44+00:00,2025-03-30T18:41:32+00:00,"Storybook is the industry standard workshop for building, documenting, and testing UI components in isolation",26872.0,13608.0,67620.0,372.0,963301.0,TypeScript: 7798051; JavaScript: 2513079; Svelte: 125957; MDX: 87137; Vue: 35552; HTML: 23979; CSS: 19808; EJS: 6074; Pug: 3991; Handlebars: 1711; Shell: 1051; SCSS: 125,TypeScript
+oven-sh/bun,77162,2995,2021-04-14T00:48:17+00:00,2025-03-31T14:40:59+00:00,"Incredibly fast JavaScript runtime, bundler, test runner, and package manager – all in one",17860.0,6546.0,12174.0,461.0,246224.0,Zig: 22420471; C++: 7947007; TypeScript: 2935289; C: 1058283; JavaScript: 471269; CMake: 130659; Shell: 106823; Python: 92459; Makefile: 89505; Objective-C: 41890; CSS: 39767; Rust: 31216; Perl: 30364; PowerShell: 27793; Dockerfile: 18861; HTML: 17254; Ruby: 14292; Svelte: 7184; Linker Script: 6073; MDX: 864; AMPL: 112,Zig
+
+===== data_baseline_backup/sonarqube_warning_definitions.csv =====
+rule,type,severity,effort,example_message,category
+Web:AvoidCommentedOutCodeCheck,CODE_SMELL,MAJOR,5min,Remove this commented out code.,Code Hygiene
+Web:DoctypePresenceCheck,BUG,MAJOR,5min,Insert a <!DOCTYPE> declaration to before this <html> tag.,HTML Structure
+Web:FrameWithoutTitleCheck,BUG,MINOR,5min,"Add a ""title"" attribute to this <iframe> tag.",Accessibility
+Web:ImgWithoutAltCheck,CODE_SMELL,MINOR,5min,"Add an ""alt"" attribute to this image.",Accessibility
+
+===== data_baseline_backup/sonarqube_warnings.csv =====
+repo_name,month,event_time,relative_period,issue_key,component,line,rule,creation_date
+0xAquaWolf/portfolio,202408,202409,-1,0a76a8f7-40b2-4393-9ed5-94f86ce5f9ad,0xAquaWolf_portfolio:app/projects/[slug]/page.tsx,11.0,typescript:S6759,2025-04-14T16:20:37-0400
+0xAquaWolf/portfolio,202408,202409,-1,cf83e5d7-33cf-4927-ab51-8b2a6b3bc613,0xAquaWolf_portfolio:components/Projects/ProjectCard.tsx,5.0,typescript:S1128,2025-04-14T16:20:37-0400
+0xAquaWolf/portfolio,202408,202409,-1,c571a5f2-9ef6-4181-99fd-56eb957f7653,0xAquaWolf_portfolio:components/Projects/ProjectCard.tsx,17.0,typescript:S6759,2025-04-14T16:20:37-0400
+0xAquaWolf/portfolio,202408,202409,-1,a8d3a7e0-926f-48da-942e-b2c9a651f8fd,0xAquaWolf_portfolio:components/Projects/Projects.tsx,206.0,typescript:S6479,2025-04-14T16:20:37-0400
+
+===== data_baseline_backup/ts_repos_control_monthly.csv =====
+month,repo_name,latest_commit,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag
+2024-11,00sapo/taskcheck,1c51a1d6596b27cf0803be6fe76a3cf55d136027,False,87.0,3031.0,1711.0,1.0,6,0,0,0,1113.0,1.0,0.0,45.0,0.0,7.2,318.0,464.0,,,
+2024-12,00sapo/taskcheck,5d3fcfe965b3f342b19ea3a96b37c9840583eab4,False,1.0,21.0,19.0,1.0,2,0,0,25,1113.0,1.0,0.0,45.0,0.0,7.2,318.0,464.0,,,
+2025-01,00sapo/taskcheck,,,0.0,0.0,0.0,0.0,1,0,0,56,1113.0,1.0,0.0,45.0,0.0,7.2,318.0,464.0,,,
+2025-02,00sapo/taskcheck,,,0.0,0.0,0.0,0.0,0,0,0,0,1113.0,1.0,0.0,45.0,0.0,7.2,318.0,464.0,,,
+
+===== data_baseline_backup/ts_repos_monthly.csv =====
+month,repo_name,latest_commit,cursor,commits,lines_added,lines_removed,contributors,stars,issues,issue_comments,age,ncloc,bugs,vulnerabilities,code_smells,duplicated_lines_density,comment_lines_density,cognitive_complexity,technical_debt,num_dependencies_total,num_vulnerable_dependencies,average_technical_lag
+2024-08,0xAquaWolf/portfolio,9b36a6c6d2916944c886fec2b1bff9ee3d0d5e0d,False,43.0,3206.0,822.0,1.0,8,0,0,0,1357.0,1.0,0.0,17.0,4.0,1.2,23.0,85.0,22.0,0.0,25.967678089751686
+2024-09,0xAquaWolf/portfolio,adea4f847183d37ca3bb360b29b244eb66398e93,True,66.0,4973.0,1381.0,2.0,27,0,5,5,3177.0,1.0,0.0,52.0,1.7,3.1,74.0,243.0,41.0,0.0,24.87153605634598
+2024-10,0xAquaWolf/portfolio,125161b759c1e3406791fb7cde9e624f7a0b3923,True,23.0,4734.0,1157.0,3.0,11,1,4,35,4352.0,3.0,0.0,104.0,4.1,6.3,106.0,432.0,54.0,0.0,15.405403814514747
+2024-11,0xAquaWolf/portfolio,1d1752d835df70eb4de21a9daa6d3009ac13a774,True,29.0,3800.0,2185.0,2.0,2,0,9,66,4551.0,3.0,0.0,120.0,3.7,11.3,110.0,529.0,60.0,0.0,26.59624812037037
+
