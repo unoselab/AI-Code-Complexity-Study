@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compute Python-only SonarQube NCLOC for the Model C snapshot manifest.
 
-This program is the self-contained analysis implementation for run-x-b01.
+This program is the self-contained SonarQube analysis implementation for run-x-b01-sonarqube.
 It does not call any prior experiment script. The workflow is:
 
 1. Read the run-x-a05 Model C snapshot manifest.
@@ -9,9 +9,9 @@ It does not call any prior experiment script. The workflow is:
 3. Create a detached temporary Git worktree for each historical commit.
 4. run SonarScanner with ``sonar.inclusions=**/*.py``.
 5. Poll the SonarQube Compute Engine task until completion.
-6. Fetch the project-level ``ncloc`` measure as ``ncloc_py``.
+6. Fetch the project-level ``ncloc`` measure as ``ncloc_py_sonarqube``.
 7. Save each result atomically so interrupted runs can resume.
-8. Write a completed manifest, unresolved targets, and QC summaries.
+8. Join SonarQube results with the local cloc results and write QC summaries.
 
 The main treatment/control clones are never checked out, reset, or cleaned.
 All historical scans use detached temporary Git worktrees.
@@ -46,7 +46,7 @@ if load_dotenv is not None:
     load_dotenv(override=True)
 
 
-IMPLEMENTATION_VERSION = "v1"
+IMPLEMENTATION_VERSION = "v2"
 HEX_SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 EXPECTED_DATASET_SOURCES = {"treatment", "control"}
 
@@ -95,7 +95,7 @@ RESULT_COLUMNS = [
     "scanner_return_code",
     "ce_task_id",
     "analysis_id",
-    "ncloc_py",
+    "ncloc_py_sonarqube",
     "status",
     "error_stage",
     "error_message",
@@ -133,6 +133,7 @@ class SonarConfig:
     scanner_timeout_seconds: int
     compute_timeout_seconds: int
     poll_interval_seconds: int
+    python_version: str
 
 
 @dataclass
@@ -648,7 +649,7 @@ def base_result_row(
         "scanner_return_code": pd.NA,
         "ce_task_id": "",
         "analysis_id": "",
-        "ncloc_py": pd.NA,
+        "ncloc_py_sonarqube": pd.NA,
         "status": "pending",
         "error_stage": "",
         "error_message": "",
@@ -713,7 +714,7 @@ def run_sonar_snapshot(
             f"-Dsonar.projectVersion={result['project_version']}",
             "-Dsonar.sources=.",
             "-Dsonar.inclusions=**/*.py",
-            "-Dsonar.python.version=3.11",
+            f"-Dsonar.python.version={config.python_version}",
             "-Dsonar.sourceEncoding=UTF-8",
             f"-Dsonar.exclusions={SONAR_EXCLUSIONS}",
             f"-Dsonar.host.url={config.host}",
@@ -795,7 +796,9 @@ def run_sonar_snapshot(
         result["ce_task_id"] = task.get("id", "")
         result["analysis_id"] = task.get("analysisId", "")
         try:
-            result["ncloc_py"] = fetch_ncloc_py(str(result["project_key"]), config)
+            result["ncloc_py_sonarqube"] = fetch_ncloc_py(
+                str(result["project_key"]), config
+            )
         except Exception as exc:
             result["status"] = "measure_fetch_failed"
             result["error_stage"] = "measure_fetch"
@@ -818,6 +821,88 @@ def run_sonar_snapshot(
         result["runtime_seconds"] = round(time.monotonic() - started, 3)
 
 
+
+def build_cloc_comparison(
+    sonar_results: pd.DataFrame, cloc_results_file: Path
+) -> pd.DataFrame:
+    """Join SonarQube snapshot results with the local cloc results."""
+    cloc_path = cloc_results_file.expanduser().resolve()
+    if not cloc_path.exists():
+        raise FileNotFoundError(f"Local cloc results file not found: {cloc_path}")
+
+    cloc = pd.read_csv(cloc_path)
+    required_cloc_columns = {
+        "snapshot_key",
+        "ncloc_py_cloc",
+        "cloc_status",
+        "python_file_count_cloc",
+    }
+    missing = required_cloc_columns - set(cloc.columns)
+    if missing:
+        raise ValueError(
+            "Local cloc results file is missing required columns: "
+            f"{sorted(missing)}"
+        )
+    if cloc["snapshot_key"].duplicated().any():
+        raise ValueError("Local cloc results contain duplicate snapshot_key rows.")
+
+    sonar_columns = [
+        "snapshot_key",
+        "dataset_source",
+        "repo_name",
+        "commit_sha",
+        "python_file_count_git",
+        "ncloc_py_sonarqube",
+        "status",
+    ]
+    sonar = sonar_results.copy()
+    for column in sonar_columns:
+        if column not in sonar.columns:
+            sonar[column] = pd.NA
+    sonar = sonar[sonar_columns].rename(
+        columns={
+            "python_file_count_git": "python_file_count_sonarqube_scan",
+            "status": "sonarqube_status",
+        }
+    )
+
+    cloc_keep = cloc[
+        [
+            "snapshot_key",
+            "python_file_count_cloc",
+            "ncloc_py_cloc",
+            "cloc_status",
+        ]
+    ].copy()
+    comparison = sonar.merge(
+        cloc_keep,
+        on="snapshot_key",
+        how="left",
+        validate="one_to_one",
+    )
+    comparison["ncloc_py_sonarqube"] = pd.to_numeric(
+        comparison["ncloc_py_sonarqube"], errors="coerce"
+    )
+    comparison["ncloc_py_cloc"] = pd.to_numeric(
+        comparison["ncloc_py_cloc"], errors="coerce"
+    )
+    both_available = (
+        comparison["sonarqube_status"].eq("success")
+        & comparison["cloc_status"].eq("success")
+        & comparison["ncloc_py_sonarqube"].notna()
+        & comparison["ncloc_py_cloc"].notna()
+    )
+    comparison["sonarqube_cloc_both_available"] = both_available
+    comparison["sonarqube_minus_cloc"] = (
+        comparison["ncloc_py_sonarqube"] - comparison["ncloc_py_cloc"]
+    ).where(both_available)
+    comparison["exact_match_sonarqube_cloc"] = (
+        comparison["ncloc_py_sonarqube"] == comparison["ncloc_py_cloc"]
+    ).where(both_available)
+    return comparison.sort_values(
+        ["dataset_source", "repo_name", "commit_sha"], kind="stable"
+    ).reset_index(drop=True)
+
 def build_completed_manifest(
     manifest: pd.DataFrame, results: pd.DataFrame
 ) -> pd.DataFrame:
@@ -826,7 +911,7 @@ def build_completed_manifest(
         "snapshot_key",
         "scan_attempt",
         "status",
-        "ncloc_py",
+        "ncloc_py_sonarqube",
         "git_precheck_status",
         "python_file_count_git",
         "python_file_count_matches_manifest",
@@ -843,24 +928,28 @@ def build_completed_manifest(
     available = [column for column in result_columns if column in results.columns]
     merged = manifest.merge(results[available], on="snapshot_key", how="left")
     merged["ncloc_py_status_original"] = merged["ncloc_py_status"]
-    merged["ncloc_py_original"] = merged["ncloc_py_x"] if "ncloc_py_x" in merged else merged["ncloc_py"]
-
-    if "ncloc_py_y" in merged.columns:
-        merged["ncloc_py"] = pd.to_numeric(merged["ncloc_py_y"], errors="coerce")
-        merged = merged.drop(columns=["ncloc_py_x", "ncloc_py_y"])
-    else:
-        merged["ncloc_py"] = pd.to_numeric(merged["ncloc_py"], errors="coerce")
+    merged["ncloc_py_original"] = pd.to_numeric(
+        merged["ncloc_py"], errors="coerce"
+    )
+    merged["ncloc_py_sonarqube"] = pd.to_numeric(
+        merged.get(
+            "ncloc_py_sonarqube",
+            pd.Series(index=merged.index, dtype="float64"),
+        ),
+        errors="coerce",
+    )
 
     status_series = merged.get(
         "status", pd.Series(index=merged.index, dtype="object")
     )
-    merged["ncloc_py_status"] = status_series.fillna("pending")
-    merged["ncloc_py_available"] = merged["ncloc_py_status"].eq("success") & merged[
-        "ncloc_py"
-    ].notna()
-    merged["ncloc_py_source"] = merged["ncloc_py_available"].map(
-        {True: "run-x-b01-sonarqube-python-only", False: ""}
+    merged["ncloc_py_sonarqube_status"] = status_series.fillna("pending")
+    merged["ncloc_py_sonarqube_available"] = (
+        merged["ncloc_py_sonarqube_status"].eq("success")
+        & merged["ncloc_py_sonarqube"].notna()
     )
+    merged["ncloc_py_sonarqube_source"] = merged[
+        "ncloc_py_sonarqube_available"
+    ].map({True: "run-x-b01-sonarqube-v2-python-only", False: ""})
     return merged.sort_values("manifest_order", kind="stable").reset_index(drop=True)
 
 
@@ -868,10 +957,13 @@ def build_qc_records(
     manifest: pd.DataFrame,
     results: pd.DataFrame,
     completed: pd.DataFrame,
+    comparison: pd.DataFrame,
     structural_checks: list[dict[str, Any]],
     counters: RunCounters,
     *,
     dry_run: bool,
+    sonar_python_version: str,
+    cloc_results_file: Path,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Build check-oriented and long-form summary outputs."""
     qc_records = list(structural_checks)
@@ -901,17 +993,41 @@ def build_qc_records(
     manifest_keys = set(manifest["snapshot_key"].astype(str))
     result_keys = set(results["snapshot_key"].dropna().astype(str)) if not results.empty else set()
     orphan_result_rows = len(result_keys - manifest_keys)
-    successful = completed[completed["ncloc_py_available"]].copy()
-    unresolved = completed[~completed["ncloc_py_available"]].copy()
+    successful = completed[completed["ncloc_py_sonarqube_available"]].copy()
+    unresolved = completed[~completed["ncloc_py_sonarqube_available"]].copy()
     mismatch_count = int(
         completed["python_file_count_matches_manifest"].eq(False).fillna(False).sum()
     )
     duplicate_snapshot_keys = int(completed["snapshot_key"].duplicated().sum())
     duplicate_project_keys = int(completed["project_key"].duplicated().sum())
     negative_ncloc = int(
-        (pd.to_numeric(successful["ncloc_py"], errors="coerce") < 0).sum()
+        (
+            pd.to_numeric(
+                successful["ncloc_py_sonarqube"], errors="coerce"
+            )
+            < 0
+        ).sum()
     )
     successful_coverage = int(successful["repo_month_rows"].sum())
+    comparison_available = comparison.get(
+        "sonarqube_cloc_both_available",
+        pd.Series(False, index=comparison.index, dtype="boolean"),
+    ).astype("boolean").fillna(False)
+    comparison_both = int(comparison_available.sum())
+    successful_sonar_keys = set(successful["snapshot_key"].astype(str))
+    comparison_both_keys = set(
+        comparison.loc[comparison_available, "snapshot_key"].astype(str)
+    )
+    sonar_success_missing_cloc = len(successful_sonar_keys - comparison_both_keys)
+    exact_comparison_matches = int(
+        comparison.get(
+            "exact_match_sonarqube_cloc",
+            pd.Series(False, index=comparison.index, dtype="boolean"),
+        )
+        .astype("boolean")
+        .fillna(False)
+        .sum()
+    )
 
     add_check(
         "completed_manifest_rows",
@@ -939,7 +1055,7 @@ def build_qc_records(
         0,
     )
     add_check(
-        "negative_ncloc_py_values",
+        "negative_ncloc_py_sonarqube_values",
         "pass" if negative_ncloc == 0 else "fail",
         negative_ncloc,
         0,
@@ -969,6 +1085,27 @@ def build_qc_records(
         successful_coverage,
         int(manifest["repo_month_rows"].sum()) if not dry_run else "dry_run",
     )
+    add_check(
+        "sonarqube_cloc_comparison_rows",
+        "pass" if comparison_both > 0 or dry_run else "warn",
+        comparison_both,
+        "at least 1" if not dry_run else "dry_run",
+        "Only rows with successful SonarQube and cloc values are comparable.",
+    )
+    add_check(
+        "sonarqube_success_missing_cloc",
+        "pass" if sonar_success_missing_cloc == 0 else "fail",
+        sonar_success_missing_cloc,
+        0,
+        "Every successful SonarQube snapshot must match one successful cloc row.",
+    )
+    add_check(
+        "sonarqube_cloc_exact_matches",
+        "pass" if comparison_both == exact_comparison_matches and comparison_both > 0 else "warn",
+        exact_comparison_matches,
+        comparison_both,
+        "Differences are diagnostic and do not invalidate either backend.",
+    )
 
     summary_records: list[dict[str, Any]] = []
 
@@ -978,7 +1115,9 @@ def build_qc_records(
         )
 
     add_summary("implementation", "version", IMPLEMENTATION_VERSION)
-    add_summary("definition", "target", "model_c_python_only_ncloc")
+    add_summary("implementation", "sonar_python_version", sonar_python_version)
+    add_summary("input", "cloc_results_file", str(cloc_results_file))
+    add_summary("definition", "target", "model_c_python_only_ncloc_sonarqube")
     add_summary("definition", "scan_scope", "sonar.inclusions=**/*.py")
     add_summary("definition", "checkout_method", "detached_temporary_git_worktree")
     add_summary("definition", "resume_key", "snapshot_key")
@@ -1006,12 +1145,39 @@ def build_qc_records(
     add_summary("result", "successful_repo_month_coverage", successful_coverage)
     add_summary("qc", "python_file_count_mismatches", mismatch_count)
     add_summary("qc", "orphan_result_snapshot_keys", orphan_result_rows)
+    add_summary("comparison", "sonarqube_cloc_rows", comparison_both)
+    add_summary("comparison", "sonarqube_cloc_exact_matches", exact_comparison_matches)
+    add_summary("comparison", "sonarqube_success_missing_cloc", sonar_success_missing_cloc)
+    if comparison_both > 0:
+        deltas = pd.to_numeric(
+            comparison.loc[
+                comparison["sonarqube_cloc_both_available"],
+                "sonarqube_minus_cloc",
+            ],
+            errors="coerce",
+        ).dropna()
+        add_summary("comparison", "sonarqube_minus_cloc_min", deltas.min())
+        add_summary("comparison", "sonarqube_minus_cloc_median", deltas.median())
+        add_summary("comparison", "sonarqube_minus_cloc_mean", deltas.mean())
+        add_summary("comparison", "sonarqube_minus_cloc_max", deltas.max())
     if not successful.empty:
-        values = pd.to_numeric(successful["ncloc_py"], errors="coerce").dropna()
-        add_summary("ncloc_py", "min", values.min() if not values.empty else "")
-        add_summary("ncloc_py", "median", values.median() if not values.empty else "")
-        add_summary("ncloc_py", "mean", values.mean() if not values.empty else "")
-        add_summary("ncloc_py", "max", values.max() if not values.empty else "")
+        values = pd.to_numeric(
+            successful["ncloc_py_sonarqube"], errors="coerce"
+        ).dropna()
+        add_summary(
+            "ncloc_py_sonarqube", "min", values.min() if not values.empty else ""
+        )
+        add_summary(
+            "ncloc_py_sonarqube",
+            "median",
+            values.median() if not values.empty else "",
+        )
+        add_summary(
+            "ncloc_py_sonarqube", "mean", values.mean() if not values.empty else ""
+        )
+        add_summary(
+            "ncloc_py_sonarqube", "max", values.max() if not values.empty else ""
+        )
 
     return pd.DataFrame(qc_records), pd.DataFrame(summary_records)
 
@@ -1069,6 +1235,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--unresolved-output", type=Path, required=True)
     parser.add_argument("--scan-qc-output", type=Path, required=True)
     parser.add_argument("--summary-output", type=Path, required=True)
+    parser.add_argument("--cloc-results-file", type=Path, required=True)
+    parser.add_argument("--comparison-output", type=Path, required=True)
     parser.add_argument("--worktree-root", type=Path, required=True)
     parser.add_argument("--scanner-log-dir", type=Path, required=True)
     parser.add_argument(
@@ -1084,7 +1252,10 @@ def parse_args() -> argparse.Namespace:
             or "sonar-scanner"
         ),
     )
-    parser.add_argument("--project-key-prefix", default="b01_ncloc_py_")
+    parser.add_argument(
+        "--project-key-prefix", default="b01_ncloc_py_sonarqube_v2_"
+    )
+    parser.add_argument("--sonar-python-version", default="3.12")
     parser.add_argument("--server-timeout-seconds", type=int, default=300)
     parser.add_argument("--scanner-timeout-seconds", type=int, default=1800)
     parser.add_argument("--compute-timeout-seconds", type=int, default=900)
@@ -1131,6 +1302,8 @@ def validate_cli_args(args: argparse.Namespace) -> None:
         raise ValueError("--start-order must be at least 1.")
     if args.sleep_between_scans_seconds < 0:
         raise ValueError("--sleep-between-scans-seconds must be non-negative.")
+    if not str(args.sonar_python_version).strip():
+        raise ValueError("--sonar-python-version must not be empty.")
     if args.poll_interval_seconds == 0 and not args.dry_run:
         raise ValueError("--poll-interval-seconds must be positive for a real scan.")
 
@@ -1148,6 +1321,11 @@ def main() -> int:
     input_path = args.input_manifest_file.expanduser().resolve()
     if not input_path.exists():
         raise FileNotFoundError(f"Model C snapshot manifest not found: {input_path}")
+    cloc_results_path = args.cloc_results_file.expanduser().resolve()
+    if not cloc_results_path.exists():
+        raise FileNotFoundError(
+            f"Local cloc results file not found: {cloc_results_path}"
+        )
 
     raw_manifest = pd.read_csv(input_path)
     manifest = normalize_input_manifest(raw_manifest, args.project_key_prefix)
@@ -1210,12 +1388,13 @@ def main() -> int:
             scanner_timeout_seconds=args.scanner_timeout_seconds,
             compute_timeout_seconds=args.compute_timeout_seconds,
             poll_interval_seconds=args.poll_interval_seconds,
+            python_version=args.sonar_python_version,
         )
 
         successful_keys: set[str] = set()
         if not results.empty and not args.analysis_again:
             valid_success = results["status"].eq("success") & pd.to_numeric(
-                results["ncloc_py"], errors="coerce"
+                results["ncloc_py_sonarqube"], errors="coerce"
             ).notna()
             successful_keys = set(results.loc[valid_success, "snapshot_key"].astype(str))
 
@@ -1256,10 +1435,10 @@ def main() -> int:
                     counters.successful_this_run += 1
                     successful_keys.add(snapshot_key)
                     logging.info(
-                        "Success: %s at %s -> ncloc_py=%s",
+                        "Success: %s at %s -> ncloc_py_sonarqube=%s",
                         target["repo_name"],
                         str(target["commit_sha"])[:12],
-                        result["ncloc_py"],
+                        result["ncloc_py_sonarqube"],
                     )
                 else:
                     counters.failed_this_run += 1
@@ -1298,26 +1477,36 @@ def main() -> int:
     completed = build_completed_manifest(manifest, results)
     save_dataframe(completed, args.completed_manifest_output)
 
-    unresolved = completed[~completed["ncloc_py_available"]].copy()
+    unresolved = completed[
+        ~completed["ncloc_py_sonarqube_available"]
+    ].copy()
     save_dataframe(unresolved, args.unresolved_output)
+
+    comparison = build_cloc_comparison(results, args.cloc_results_file)
+    save_dataframe(comparison, args.comparison_output)
 
     qc, summary = build_qc_records(
         manifest,
         results,
         completed,
+        comparison,
         structural_checks,
         counters,
         dry_run=args.dry_run,
+        sonar_python_version=args.sonar_python_version,
+        cloc_results_file=args.cloc_results_file,
     )
     save_dataframe(qc, args.scan_qc_output)
     save_dataframe(summary, args.summary_output)
 
-    successful_count = int(completed["ncloc_py_available"].sum())
+    successful_count = int(completed["ncloc_py_sonarqube_available"].sum())
     successful_coverage = int(
-        completed.loc[completed["ncloc_py_available"], "repo_month_rows"].sum()
+        completed.loc[
+            completed["ncloc_py_sonarqube_available"], "repo_month_rows"
+        ].sum()
     )
     logging.info(
-        "Completed run-x-b01-%s: %d/%d snapshots resolved; %d/%d repo-month rows covered; %d unresolved",
+        "Completed run-x-b01-sonarqube-%s: %d/%d snapshots resolved; %d/%d repo-month rows covered; %d unresolved",
         IMPLEMENTATION_VERSION,
         successful_count,
         len(manifest),

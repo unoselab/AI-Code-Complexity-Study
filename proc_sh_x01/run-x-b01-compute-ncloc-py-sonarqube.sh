@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # ============================================================
-# run-x-b01 v1: Compute Python-only NCLOC for Model C
+# run-x-b01-sonarqube v2: Compute Python-only NCLOC for Model C
 # ============================================================
 #
 # Purpose:
@@ -15,7 +15,8 @@ set -euo pipefail
 #     through run-x-a05.
 #   - Deduplicate that panel into 1,496 historical snapshots.
 #   - Scan only Python files with sonar.inclusions=**/*.py.
-#   - Save one ncloc_py value per snapshot for the later Model C merge.
+#   - Save one ncloc_py_sonarqube value per snapshot.
+#   - Join each SonarQube result with the completed local cloc result.
 #
 # Safety:
 #   The Python implementation creates detached temporary Git worktrees.
@@ -32,23 +33,24 @@ set -euo pipefail
 #   repo_x01/run-x-a05/velocity_did_model_c_snapshot_manifest.csv
 #
 # Main outputs:
-#   repo_x01/run-x-b01/model_c_ncloc_py_snapshot_manifest.csv
-#   repo_x01/run-x-b01/model_c_ncloc_py_snapshot_results.csv
-#   repo_x01/run-x-b01/model_c_ncloc_py_completed_manifest.csv
-#   repo_x01/run-x-b01/model_c_ncloc_py_unresolved.csv
-#   repo_x01/run-x-b01/model_c_ncloc_py_scan_qc.csv
+#   repo_x01/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_snapshot_manifest.csv
+#   repo_x01/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_snapshot_results.csv
+#   repo_x01/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_completed_manifest.csv
+#   repo_x01/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_unresolved.csv
+#   repo_x01/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_vs_cloc.csv
+#   repo_x01/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_scan_qc.csv
 #
 # Summary output:
-#   repo_x01/tmp/run-x-b01/model_c_ncloc_py_summary.csv
+#   repo_x01/tmp/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_summary.csv
 #
 # Full run:
-#   bash proc_sh_x01/run-x-b01-compute-ncloc-py.sh
+#   bash proc_sh_x01/run-x-b01-compute-ncloc-py-sonarqube.sh
 #
 # Manifest and output-format dry run:
-#   DRY_RUN=1 bash proc_sh_x01/run-x-b01-compute-ncloc-py.sh
+#   DRY_RUN=1 bash proc_sh_x01/run-x-b01-compute-ncloc-py-sonarqube.sh
 #
 # One-snapshot smoke test:
-#   LIMIT=1 bash proc_sh_x01/run-x-b01-compute-ncloc-py.sh
+#   LIMIT=1 bash proc_sh_x01/run-x-b01-compute-ncloc-py-sonarqube.sh
 #
 # Resume:
 #   Re-run the same command. Successful snapshot_key rows are skipped.
@@ -56,6 +58,8 @@ set -euo pipefail
 #
 # Optional overrides:
 #   PYTHON_BIN=/path/to/python
+#   SONAR_PYTHON_VERSION=3.12
+#   CLOC_RESULTS_FILE=repo_x01/run-x-b01/model_c_ncloc_py_snapshot_results.csv
 #   START_ORDER=1
 #   LIMIT=0
 #   DATASET_SOURCE=treatment|control
@@ -88,15 +92,15 @@ if [[ -f ".env" ]]; then
   set +a
 fi
 
-RUN_PREFIX="run-x-b01"
-IMPLEMENTATION_VERSION="v1"
+RUN_PREFIX="run-x-b01-sonarqube"
+IMPLEMENTATION_VERSION="v2"
 RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_DIR="${LOG_DIR:-logs}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_LABEL}-compute-ncloc-py-${RUN_TS}.log}"
 
 PYTHON_BIN="${PYTHON_BIN:-python}"
-PY_SCRIPT="${PY_SCRIPT:-proc_script_x01/compute_ncloc_python.py}"
+PY_SCRIPT="${PY_SCRIPT:-proc_script_x01/compute_ncloc_python_sonarqube.py}"
 INPUT_MANIFEST_FILE="${INPUT_MANIFEST_FILE:-repo_x01/run-x-a05/velocity_did_model_c_snapshot_manifest.csv}"
 
 OUTPUT_BASE_DIR="${OUTPUT_BASE_DIR:-repo_x01}"
@@ -105,16 +109,19 @@ TMP_OUTPUT_DIR="${TMP_OUTPUT_DIR:-${OUTPUT_BASE_DIR}/tmp/${RUN_PREFIX}}"
 WORKTREE_ROOT="${WORKTREE_ROOT:-${TMP_OUTPUT_DIR}/worktrees}"
 SCANNER_LOG_DIR="${SCANNER_LOG_DIR:-${MAIN_OUTPUT_DIR}/scanner_logs}"
 
-SNAPSHOT_MANIFEST_OUTPUT="${SNAPSHOT_MANIFEST_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_snapshot_manifest.csv}"
-SNAPSHOT_RESULTS_OUTPUT="${SNAPSHOT_RESULTS_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_snapshot_results.csv}"
-COMPLETED_MANIFEST_OUTPUT="${COMPLETED_MANIFEST_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_completed_manifest.csv}"
-UNRESOLVED_OUTPUT="${UNRESOLVED_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_unresolved.csv}"
-SCAN_QC_OUTPUT="${SCAN_QC_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_scan_qc.csv}"
-SUMMARY_OUTPUT="${SUMMARY_OUTPUT:-${TMP_OUTPUT_DIR}/model_c_ncloc_py_summary.csv}"
+SNAPSHOT_MANIFEST_OUTPUT="${SNAPSHOT_MANIFEST_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_sonarqube_snapshot_manifest.csv}"
+SNAPSHOT_RESULTS_OUTPUT="${SNAPSHOT_RESULTS_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_sonarqube_snapshot_results.csv}"
+COMPLETED_MANIFEST_OUTPUT="${COMPLETED_MANIFEST_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_sonarqube_completed_manifest.csv}"
+UNRESOLVED_OUTPUT="${UNRESOLVED_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_sonarqube_unresolved.csv}"
+SCAN_QC_OUTPUT="${SCAN_QC_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_sonarqube_scan_qc.csv}"
+SUMMARY_OUTPUT="${SUMMARY_OUTPUT:-${TMP_OUTPUT_DIR}/model_c_ncloc_py_sonarqube_summary.csv}"
+CLOC_RESULTS_FILE="${CLOC_RESULTS_FILE:-repo_x01/run-x-b01/model_c_ncloc_py_snapshot_results.csv}"
+COMPARISON_OUTPUT="${COMPARISON_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_ncloc_py_sonarqube_vs_cloc.csv}"
 
 SONAR_HOST="${SONAR_HOST:-http://localhost:9000}"
 SONAR_SCANNER_BIN="${SONAR_PATH:-${SONAR_SCANNER_PATH:-sonar-scanner}}"
-PROJECT_KEY_PREFIX="${PROJECT_KEY_PREFIX:-b01_ncloc_py_}"
+SONAR_PYTHON_VERSION="${SONAR_PYTHON_VERSION:-3.12}"
+PROJECT_KEY_PREFIX="${PROJECT_KEY_PREFIX:-b01_ncloc_py_sonarqube_v2_}"
 SERVER_TIMEOUT_SECONDS="${SERVER_TIMEOUT_SECONDS:-300}"
 SCANNER_TIMEOUT_SECONDS="${SCANNER_TIMEOUT_SECONDS:-1800}"
 COMPUTE_TIMEOUT_SECONDS="${COMPUTE_TIMEOUT_SECONDS:-900}"
@@ -193,12 +200,22 @@ if [[ -n "${DATASET_SOURCE}" && "${DATASET_SOURCE}" != "treatment" && "${DATASET
   exit 1
 fi
 
-for required_file in "${PY_SCRIPT}" "${INPUT_MANIFEST_FILE}"; do
+for required_file in "${PY_SCRIPT}" "${INPUT_MANIFEST_FILE}" "${CLOC_RESULTS_FILE}"; do
   if [[ ! -f "${required_file}" ]]; then
     echo "ERROR: required file not found: ${required_file}" >&2
     exit 1
   fi
 done
+
+if ! command -v "${PYTHON_BIN}" >/dev/null 2>&1 && [[ ! -x "${PYTHON_BIN}" ]]; then
+  echo "ERROR: Python executable not found: ${PYTHON_BIN}" >&2
+  exit 1
+fi
+
+if [[ -z "${SONAR_PYTHON_VERSION}" ]]; then
+  echo "ERROR: SONAR_PYTHON_VERSION must not be empty." >&2
+  exit 1
+fi
 
 if ! command -v git >/dev/null 2>&1; then
   echo "ERROR: git is required but was not found in PATH." >&2
@@ -215,6 +232,7 @@ mkdir -p \
 PYTHON_VERSION="$("${PYTHON_BIN}" --version 2>&1 || true)"
 PY_SCRIPT_SHA256="$(sha256sum "${PY_SCRIPT}" | awk '{print $1}')"
 INPUT_SHA256="$(sha256sum "${INPUT_MANIFEST_FILE}" | awk '{print $1}')"
+CLOC_RESULTS_SHA256="$(sha256sum "${CLOC_RESULTS_FILE}" | awk '{print $1}')"
 
 {
   echo "============================================================"
@@ -227,16 +245,20 @@ INPUT_SHA256="$(sha256sum "${INPUT_MANIFEST_FILE}" | awk '{print $1}')"
   echo "Python script SHA256:             ${PY_SCRIPT_SHA256}"
   echo "Input manifest:                  ${INPUT_MANIFEST_FILE}"
   echo "Input SHA256:                    ${INPUT_SHA256}"
+  echo "Local cloc results:              ${CLOC_RESULTS_FILE}"
+  echo "Local cloc SHA256:               ${CLOC_RESULTS_SHA256}"
   echo "Snapshot manifest output:        ${SNAPSHOT_MANIFEST_OUTPUT}"
   echo "Snapshot results output:         ${SNAPSHOT_RESULTS_OUTPUT}"
   echo "Completed manifest output:       ${COMPLETED_MANIFEST_OUTPUT}"
   echo "Unresolved output:               ${UNRESOLVED_OUTPUT}"
   echo "Scan QC output:                  ${SCAN_QC_OUTPUT}"
   echo "Summary output:                  ${SUMMARY_OUTPUT}"
+  echo "SonarQube vs cloc comparison:    ${COMPARISON_OUTPUT}"
   echo "Worktree root:                   ${WORKTREE_ROOT}"
   echo "Scanner log directory:           ${SCANNER_LOG_DIR}"
   echo "SonarQube host:                  ${SONAR_HOST}"
   echo "SonarScanner:                    ${SONAR_SCANNER_BIN}"
+  echo "Sonar Python version:            ${SONAR_PYTHON_VERSION}"
   echo "Sonar scope:                     sonar.inclusions=**/*.py"
   echo "Project key prefix:              ${PROJECT_KEY_PREFIX}"
   echo "Server timeout seconds:          ${SERVER_TIMEOUT_SECONDS}"
@@ -272,10 +294,13 @@ COMMAND=(
   --unresolved-output "${UNRESOLVED_OUTPUT}"
   --scan-qc-output "${SCAN_QC_OUTPUT}"
   --summary-output "${SUMMARY_OUTPUT}"
+  --cloc-results-file "${CLOC_RESULTS_FILE}"
+  --comparison-output "${COMPARISON_OUTPUT}"
   --worktree-root "${WORKTREE_ROOT}"
   --scanner-log-dir "${SCANNER_LOG_DIR}"
   --sonar-host "${SONAR_HOST}"
   --sonar-scanner "${SONAR_SCANNER_BIN}"
+  --sonar-python-version "${SONAR_PYTHON_VERSION}"
   --project-key-prefix "${PROJECT_KEY_PREFIX}"
   --server-timeout-seconds "${SERVER_TIMEOUT_SECONDS}"
   --scanner-timeout-seconds "${SCANNER_TIMEOUT_SECONDS}"
@@ -336,7 +361,8 @@ for output_file in \
   "${COMPLETED_MANIFEST_OUTPUT}" \
   "${UNRESOLVED_OUTPUT}" \
   "${SCAN_QC_OUTPUT}" \
-  "${SUMMARY_OUTPUT}"; do
+  "${SUMMARY_OUTPUT}" \
+  "${COMPARISON_OUTPUT}"; do
   if [[ ! -f "${output_file}" ]]; then
     echo "ERROR: expected output was not created: ${output_file}" \
       | tee -a "${LOG_FILE}" >&2
@@ -359,13 +385,17 @@ done
     "${COMPLETED_MANIFEST_OUTPUT}" \
     "${UNRESOLVED_OUTPUT}" \
     "${SCAN_QC_OUTPUT}" \
-    "${SUMMARY_OUTPUT}"
+    "${SUMMARY_OUTPUT}" \
+    "${COMPARISON_OUTPUT}"
   echo
   echo "QC checks:"
   cat "${SCAN_QC_OUTPUT}"
   echo
   echo "Summary:"
   cat "${SUMMARY_OUTPUT}"
+  echo
+  echo "SonarQube vs cloc comparison preview:"
+  head -n 11 "${COMPARISON_OUTPUT}"
   echo
   echo "Unresolved preview:"
   head -n 11 "${UNRESOLVED_OUTPUT}"
@@ -378,7 +408,8 @@ done
   echo "Unresolved output:               ${UNRESOLVED_OUTPUT}"
   echo "QC output:                       ${SCAN_QC_OUTPUT}"
   echo "Summary output:                  ${SUMMARY_OUTPUT}"
+  echo "SonarQube vs cloc comparison:    ${COMPARISON_OUTPUT}"
   echo "Log file:                        ${LOG_FILE}"
-  echo "Next step:                       review unresolved snapshots, then build Model C panel in run-x-b02"
+  echo "Next step:                       review SonarQube-vs-cloc differences, then increase LIMIT"
   echo "============================================================"
 } | tee -a "${LOG_FILE}"
