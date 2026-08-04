@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ============================================================
-# run-x-c06 v3: Run Borusyak DiD for four repository-NCLOC specs
+# run-x-c06 v1: Run Borusyak DiD for four repository-NCLOC specs
 # ============================================================
 #
 # Purpose:
@@ -20,8 +20,6 @@ set -euo pipefail
 #   First stage: log_age + ncloc + log_contributors + log_stars + log_issues,
 #                with repository and calendar-month fixed effects.
 #   Dynamic horizon: event months -6 through +6.
-#   Event time -1 is the omitted normalization reference, so each dynamic
-#   model returns 12 estimated coefficients rather than 13 rows.
 #   Pretrend terms: event months -6 through -2.
 #
 # Inputs:
@@ -39,7 +37,7 @@ cd "${PROJECT_ROOT}"
 export PROJECT_ROOT
 
 RUN_PREFIX="run-x-c06"
-IMPLEMENTATION_VERSION="v3"
+IMPLEMENTATION_VERSION="v1"
 RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_DIR="${LOG_DIR:-logs}"
@@ -86,27 +84,41 @@ HORIZON_MIN="${HORIZON_MIN:--6}"
 HORIZON_MAX="${HORIZON_MAX:-6}"
 PRETREND_MIN="${PRETREND_MIN:--6}"
 PRETREND_MAX="${PRETREND_MAX:--2}"
-# didimputation uses event time -1 as the omitted reference period.
-REFERENCE_EVENT_TIME="${REFERENCE_EVENT_TIME:--1}"
-
-SPECIFICATION_COUNT=4
-OUTCOME_COUNT=2
-COMPARISON_COUNT=3
-POST_HORIZON_MIN=$(( HORIZON_MIN > 0 ? HORIZON_MIN : 0 ))
-POST_HORIZON_TERMS=$(( HORIZON_MAX - POST_HORIZON_MIN + 1 ))
-ESTIMABLE_PRETREND_TERMS=$(( PRETREND_MAX - PRETREND_MIN + 1 ))
-if (( REFERENCE_EVENT_TIME >= PRETREND_MIN && REFERENCE_EVENT_TIME <= PRETREND_MAX )); then
-  ESTIMABLE_PRETREND_TERMS=$(( ESTIMABLE_PRETREND_TERMS - 1 ))
-fi
-DYNAMIC_TERMS_PER_MODEL=$(( POST_HORIZON_TERMS + ESTIMABLE_PRETREND_TERMS ))
-
-EXPECTED_STATIC_ROWS="${EXPECTED_STATIC_ROWS:-$(( SPECIFICATION_COUNT * OUTCOME_COUNT ))}"
-EXPECTED_DYNAMIC_ROWS="${EXPECTED_DYNAMIC_ROWS:-$(( SPECIFICATION_COUNT * OUTCOME_COUNT * DYNAMIC_TERMS_PER_MODEL ))}"
-EXPECTED_PRETREND_ROWS="${EXPECTED_PRETREND_ROWS:-$(( SPECIFICATION_COUNT * OUTCOME_COUNT * ESTIMABLE_PRETREND_TERMS ))}"
-EXPECTED_MODEL_AUDIT_ROWS="${EXPECTED_MODEL_AUDIT_ROWS:-$(( SPECIFICATION_COUNT * OUTCOME_COUNT * 2 ))}"
-EXPECTED_STATIC_COMPARISON_ROWS="${EXPECTED_STATIC_COMPARISON_ROWS:-$(( COMPARISON_COUNT * OUTCOME_COUNT ))}"
-EXPECTED_DYNAMIC_COMPARISON_ROWS="${EXPECTED_DYNAMIC_COMPARISON_ROWS:-$(( COMPARISON_COUNT * OUTCOME_COUNT * DYNAMIC_TERMS_PER_MODEL ))}"
 RANDOM_SEED="${RANDOM_SEED:-20260804}"
+
+# didimputation estimates post-treatment horizons (event time >= 0) and
+# pre-treatment placebo terms separately, and never estimates event time -1,
+# which is the normalized reference period. The estimable grid is therefore
+# smaller than the nominal HORIZON_MIN:HORIZON_MAX span, and the expected row
+# counts below are derived from it rather than hard-coded.
+NUMBER_OF_MODELS=8      # four specifications x two outcomes
+NUMBER_OF_COMPARISONS=3 # sample attrition, measurement backend, taxonomy breadth
+
+PRETREND_TERMS=0
+for relative_time in $(seq "${PRETREND_MIN}" "${PRETREND_MAX}"); do
+  if [[ "${relative_time}" -lt 0 && "${relative_time}" -ne -1 ]]; then
+    PRETREND_TERMS=$((PRETREND_TERMS + 1))
+  fi
+done
+
+POST_HORIZON_TERMS=0
+if [[ "${HORIZON_MAX}" -ge 0 ]]; then
+  POST_HORIZON_START=$(( HORIZON_MIN > 0 ? HORIZON_MIN : 0 ))
+  POST_HORIZON_TERMS=$(( HORIZON_MAX - POST_HORIZON_START + 1 ))
+fi
+
+DYNAMIC_TERMS_PER_MODEL=$(( PRETREND_TERMS + POST_HORIZON_TERMS ))
+if [[ "${DYNAMIC_TERMS_PER_MODEL}" -le 0 ]]; then
+  echo "ERROR: horizon and pretrend windows contain no estimable event times." >&2
+  exit 1
+fi
+
+EXPECTED_STATIC_ROWS="${EXPECTED_STATIC_ROWS:-8}"
+EXPECTED_DYNAMIC_ROWS="${EXPECTED_DYNAMIC_ROWS:-$(( NUMBER_OF_MODELS * DYNAMIC_TERMS_PER_MODEL ))}"
+EXPECTED_PRETREND_ROWS="${EXPECTED_PRETREND_ROWS:-$(( NUMBER_OF_MODELS * PRETREND_TERMS ))}"
+EXPECTED_MODEL_AUDIT_ROWS="${EXPECTED_MODEL_AUDIT_ROWS:-16}"
+EXPECTED_STATIC_COMPARISON_ROWS="${EXPECTED_STATIC_COMPARISON_ROWS:-6}"
+EXPECTED_DYNAMIC_COMPARISON_ROWS="${EXPECTED_DYNAMIC_COMPARISON_ROWS:-$(( NUMBER_OF_COMPARISONS * 2 * DYNAMIC_TERMS_PER_MODEL ))}"
 
 if ! command -v "${R_BIN}" >/dev/null 2>&1; then
   echo "ERROR: R executable not found: ${R_BIN}" >&2
@@ -114,26 +126,6 @@ if ! command -v "${R_BIN}" >/dev/null 2>&1; then
 fi
 if [[ "${STRICT_EXPECTED_COUNTS}" != "0" && "${STRICT_EXPECTED_COUNTS}" != "1" ]]; then
   echo "ERROR: STRICT_EXPECTED_COUNTS must be 0 or 1." >&2
-  exit 1
-fi
-if (( HORIZON_MIN > HORIZON_MAX )); then
-  echo "ERROR: HORIZON_MIN must not exceed HORIZON_MAX." >&2
-  exit 1
-fi
-if (( HORIZON_MAX < 0 )); then
-  echo "ERROR: HORIZON_MAX must include at least event time 0." >&2
-  exit 1
-fi
-if (( PRETREND_MIN > PRETREND_MAX )); then
-  echo "ERROR: PRETREND_MIN must not exceed PRETREND_MAX." >&2
-  exit 1
-fi
-if (( PRETREND_MAX >= 0 )); then
-  echo "ERROR: PRETREND_MAX must be negative." >&2
-  exit 1
-fi
-if (( DYNAMIC_TERMS_PER_MODEL <= 0 || ESTIMABLE_PRETREND_TERMS <= 0 )); then
-  echo "ERROR: The estimable dynamic event-time grid is empty or invalid." >&2
   exit 1
 fi
 
@@ -183,10 +175,7 @@ LOCAL_ALL_SHA256="$(sha256sum "${LOCAL_ALL_COMMON_INPUT}" | awk '{print $1}')"
   printf "%-46s %s\n" "Outcomes:" "log_commits, log_lines_added"
   printf "%-46s %s\n" "Dynamic horizon:" "${HORIZON_MIN}:${HORIZON_MAX}"
   printf "%-46s %s\n" "Pretrend window:" "${PRETREND_MIN}:${PRETREND_MAX}"
-  printf "%-46s %s\n" "Omitted reference event time:" "${REFERENCE_EVENT_TIME}"
-  printf "%-46s %s\n" "Post-treatment horizons:" "${POST_HORIZON_MIN}:${HORIZON_MAX}"
-  printf "%-46s %s\n" "Estimable pretrend terms:" "${ESTIMABLE_PRETREND_TERMS}"
-  printf "%-46s %s\n" "Estimable dynamic terms/model:" "${DYNAMIC_TERMS_PER_MODEL}"
+  printf "%-46s %s\n" "Estimable event-time terms per model:" "${DYNAMIC_TERMS_PER_MODEL} (event time -1 is the reference period)"
   printf "%-46s %s\n" "Expected dynamic rows:" "${EXPECTED_DYNAMIC_ROWS}"
   printf "%-46s %s\n" "Expected dynamic comparison rows:" "${EXPECTED_DYNAMIC_COMPARISON_ROWS}"
   printf "%-46s %s\n" "Strict expected counts:" "${STRICT_EXPECTED_COUNTS}"
@@ -239,7 +228,6 @@ set +e
   --horizon-max "${HORIZON_MAX}" \
   --pretrend-min "${PRETREND_MIN}" \
   --pretrend-max "${PRETREND_MAX}" \
-  --reference-event-time "${REFERENCE_EVENT_TIME}" \
   --random-seed "${RANDOM_SEED}" \
   2>&1 | tee -a "${LOG_FILE}"
 run_status=${PIPESTATUS[0]}

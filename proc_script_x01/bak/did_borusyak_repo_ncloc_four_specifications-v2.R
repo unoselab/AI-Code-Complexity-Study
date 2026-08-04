@@ -1,14 +1,12 @@
 #!/usr/bin/env Rscript
 
 # ============================================================
-# run-x-c06 v3: Borusyak DiD for four repository-NCLOC specs
+# run-x-c06 v1: Borusyak DiD for four repository-NCLOC specs
 # ============================================================
 #
 # This script runs the same static and dynamic DiD model on four panels.
 # The exact-common specifications share identical repository-month keys, so
 # their differences isolate the NCLOC measurement backend or taxonomy scope.
-# Event time -1 is the omitted normalization reference in didimputation;
-# therefore the requested -6:6 horizon yields 12 estimated coefficients.
 
 parse_cli <- function(args) {
   result <- list()
@@ -73,6 +71,9 @@ expected_common_repositories <- as_int("expected_common_repositories", 194L)
 expected_common_treatment_repositories <- as_int("expected_common_treatment_repositories", 69L)
 expected_common_control_repositories <- as_int("expected_common_control_repositories", 125L)
 expected_static_rows <- as_int("expected_static_rows", 8L)
+# Dynamic-row expectations default to NA and are derived from the estimable
+# event-time grid below, because event time -1 is the normalized reference
+# period and is never estimated by didimputation.
 expected_dynamic_rows <- as_int("expected_dynamic_rows", NA_integer_)
 expected_pretrend_rows <- as_int("expected_pretrend_rows", NA_integer_)
 expected_model_audit_rows <- as_int("expected_model_audit_rows", 16L)
@@ -82,7 +83,6 @@ horizon_min <- as_int("horizon_min", -6L)
 horizon_max <- as_int("horizon_max", 6L)
 pretrend_min <- as_int("pretrend_min", -6L)
 pretrend_max <- as_int("pretrend_max", -2L)
-reference_event_time <- as_int("reference_event_time", -1L)
 random_seed <- as_int("random_seed", 20260804L)
 
 if (!strict_expected_counts %in% c(0L, 1L)) {
@@ -90,12 +90,6 @@ if (!strict_expected_counts %in% c(0L, 1L)) {
 }
 if (horizon_min > horizon_max) stop("horizon_min must not exceed horizon_max.")
 if (pretrend_min > pretrend_max) stop("pretrend_min must not exceed pretrend_max.")
-if (reference_event_time < horizon_min || reference_event_time > horizon_max) {
-  stop("reference_event_time must be within the dynamic horizon.")
-}
-if (reference_event_time >= pretrend_min && reference_event_time <= pretrend_max) {
-  stop("reference_event_time must not overlap the pretrend window.")
-}
 
 required_packages <- c("didimputation", "data.table", "ggplot2")
 missing_packages <- required_packages[!vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)]
@@ -389,40 +383,44 @@ add_qc(
 first_stage_formula <- stats::as.formula(
   "~ log_age + ncloc + log_contributors + log_stars + log_issues | repo_id + time_index"
 )
+horizon_values <- seq.int(horizon_min, horizon_max)
+pretrend_values <- seq.int(pretrend_min, pretrend_max)
 
-# didimputation estimates non-negative treatment horizons and negative placebo
-# terms separately. Event time -1 is the normalized reference period and is
-# never supplied as an estimable coefficient.
-requested_event_time_values <- seq.int(horizon_min, horizon_max)
-requested_pretrend_values <- seq.int(pretrend_min, pretrend_max)
-post_horizon_values <- requested_event_time_values[requested_event_time_values >= 0L]
-estimable_pretrend_values <- requested_pretrend_values[
-  requested_pretrend_values < 0L & requested_pretrend_values != reference_event_time
-]
+# didimputation::did_imputation estimates post-treatment effects from the
+# `horizon` argument (relative time >= 0 only) and pre-treatment placebo terms
+# from `pretrends`. Relative time -1 is the normalized reference period and is
+# never estimated, and negative values passed through `horizon` match no
+# treated observation. The estimable grid is therefore the union of the
+# requested pretrends (excluding -1) and the non-negative horizons; it has one
+# fewer term than seq(horizon_min, horizon_max) whenever -1 falls inside the
+# requested window.
+post_horizon_values <- if (horizon_max < 0L) integer(0) else seq.int(max(0L, horizon_min), horizon_max)
+estimable_pretrend_values <- pretrend_values[pretrend_values < 0L & pretrend_values != -1L]
 estimable_event_times <- sort(unique(c(estimable_pretrend_values, post_horizon_values)))
 expected_dynamic_terms_per_model <- length(estimable_event_times)
-
-if (length(post_horizon_values) == 0L) {
-  stop("The dynamic event-time window must include at least one non-negative horizon.")
-}
-if (length(estimable_pretrend_values) == 0L) {
-  stop("The pretrend window must include at least one estimable negative event time.")
-}
-if (any(estimable_pretrend_values >= 0L)) {
-  stop("All estimable pretrend values must be negative.")
-}
-if (reference_event_time %in% estimable_event_times) {
-  stop("The omitted reference event time must not be included in the estimable event-time grid.")
+if (expected_dynamic_terms_per_model == 0L) {
+  stop("The requested horizon and pretrend windows contain no estimable event times.")
 }
 
-# Explicit CLI expectations take precedence. Otherwise derive counts from the
-# actual estimable event-time grid so future horizon changes remain valid.
-if (is.na(expected_dynamic_rows)) {
-  expected_dynamic_rows <- nrow(specifications) * nrow(outcomes) * expected_dynamic_terms_per_model
+resolve_expected <- function(value, computed) {
+  if (is.na(value)) as.integer(computed) else as.integer(value)
 }
-if (is.na(expected_pretrend_rows)) {
-  expected_pretrend_rows <- nrow(specifications) * nrow(outcomes) * length(estimable_pretrend_values)
-}
+
+n_models <- nrow(specifications) * nrow(outcomes)
+expected_dynamic_rows <- resolve_expected(
+  expected_dynamic_rows,
+  n_models * expected_dynamic_terms_per_model
+)
+expected_pretrend_rows <- resolve_expected(
+  expected_pretrend_rows,
+  n_models * length(estimable_pretrend_values)
+)
+
+log_message(
+  "Estimable event times: %s (%d terms per dynamic model; -1 is the reference period)",
+  paste(estimable_event_times, collapse = ","),
+  expected_dynamic_terms_per_model
+)
 
 pick_column <- function(df, candidates, required = TRUE) {
   found <- candidates[candidates %in% names(df)]
@@ -709,10 +707,6 @@ comparison_definitions <- data.table(
   )
 )
 
-if (is.na(expected_dynamic_comparison_rows)) {
-  expected_dynamic_comparison_rows <- nrow(comparison_definitions) * nrow(outcomes) * expected_dynamic_terms_per_model
-}
-
 build_static_comparisons <- function() {
   rows <- list()
   for (i in seq_len(nrow(comparison_definitions))) {
@@ -808,6 +802,10 @@ build_dynamic_comparisons <- function() {
 
 static_comparisons <- build_static_comparisons()
 dynamic_comparisons <- build_dynamic_comparisons()
+expected_dynamic_comparison_rows <- resolve_expected(
+  expected_dynamic_comparison_rows,
+  nrow(comparison_definitions) * nrow(outcomes) * expected_dynamic_terms_per_model
+)
 strict_count_check("static_comparison_rows", nrow(static_comparisons), expected_static_comparison_rows)
 strict_count_check("dynamic_comparison_rows", nrow(dynamic_comparisons), expected_dynamic_comparison_rows)
 
@@ -832,44 +830,26 @@ expected_horizon_terms <- expected_dynamic_terms_per_model
 dynamic_term_counts <- dynamic_effects[, .N, by = .(specification_id, outcome)]
 dynamic_incomplete_models <- dynamic_term_counts[N != expected_horizon_terms, .N]
 add_qc(
-  "dynamic_models_without_complete_estimated_horizon",
+  "dynamic_models_without_complete_horizon",
   dynamic_incomplete_models,
   0,
   dynamic_incomplete_models == 0,
   "hard",
   sprintf(
-    "Every model must contain %d estimated event-time coefficients; event time %d is the omitted reference period.",
+    "Every model must contain %d event-time coefficients (%s); -1 is the omitted reference period.",
     expected_horizon_terms,
-    reference_event_time
+    paste(estimable_event_times, collapse = ",")
   )
 )
 
-reference_rows <- dynamic_effects[event_time == reference_event_time, .N]
+observed_event_times <- sort(unique(dynamic_effects$event_time))
+event_grid_matches <- identical(as.integer(observed_event_times), as.integer(estimable_event_times))
 add_qc(
-  "dynamic_reference_period_rows",
-  reference_rows,
-  0,
-  reference_rows == 0,
-  "hard",
-  sprintf("Event time %d must be omitted because it is the normalization reference period.", reference_event_time)
-)
-
-horizon_set_audit <- dynamic_effects[, .(
-  observed_terms = paste(sort(unique(event_time)), collapse = ";"),
-  horizon_matches = identical(sort(unique(event_time)), sort(estimable_event_times))
-), by = .(specification_id, outcome)]
-dynamic_wrong_horizon_models <- horizon_set_audit[horizon_matches == FALSE, .N]
-add_qc(
-  "dynamic_models_with_wrong_event_time_set",
-  dynamic_wrong_horizon_models,
-  0,
-  dynamic_wrong_horizon_models == 0,
-  "hard",
-  sprintf(
-    "Expected event times: %s; omitted reference: %d.",
-    paste(estimable_event_times, collapse = ";"),
-    reference_event_time
-  )
+  "dynamic_event_time_grid_matches_estimable_grid",
+  paste(observed_event_times, collapse = ","),
+  paste(estimable_event_times, collapse = ","),
+  event_grid_matches,
+  "hard"
 )
 
 qc <- rbindlist(qc_rows, fill = TRUE)
@@ -907,7 +887,7 @@ if (nrow(dynamic_effects) > 0L) {
     ) +
     geom_line(position = position, linewidth = 0.45) +
     geom_point(position = position, size = 1.5) +
-    scale_x_continuous(breaks = requested_event_time_values) +
+    scale_x_continuous(breaks = horizon_values) +
     facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
     labs(
       x = "Months Relative to Cursor Adoption",
@@ -940,7 +920,7 @@ if (nrow(dynamic_effects) > 0L) {
     ) +
     geom_line(position = position_dodge(width = 0.35), linewidth = 0.55) +
     geom_point(position = position_dodge(width = 0.35), size = 1.7) +
-    scale_x_continuous(breaks = requested_event_time_values) +
+    scale_x_continuous(breaks = horizon_values) +
     facet_wrap(~ outcome_label, scales = "free_y", nrow = 1) +
     labs(
       x = "Months Relative to Cursor Adoption",
@@ -988,7 +968,7 @@ session_lines <- capture.output(sessionInfo())
 writeLines(session_lines, args$session_info_output)
 
 summary_output <- data.table(
-  implementation_version = "v3",
+  implementation_version = "v1",
   specifications = nrow(specifications),
   outcomes = nrow(outcomes),
   static_models = model_audit[model_type == "static", .N],
@@ -1006,11 +986,6 @@ summary_output <- data.table(
   horizon_max = horizon_max,
   pretrend_min = pretrend_min,
   pretrend_max = pretrend_max,
-  reference_event_time = reference_event_time,
-  estimated_horizon_terms_per_model = expected_dynamic_terms_per_model,
-  post_horizon_values = paste(post_horizon_values, collapse = ";"),
-  estimable_pretrend_values = paste(estimable_pretrend_values, collapse = ";"),
-  estimable_event_times = paste(estimable_event_times, collapse = ";"),
   first_stage_formula = paste(deparse(first_stage_formula), collapse = " "),
   generated_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")
 )
@@ -1032,7 +1007,7 @@ if (nrow(static_effects) > 0L) {
 }
 log_message(
   paste0(
-    "Completed run-x-c06-v3: specifications=%d; outcomes=%d; ",
+    "Completed run-x-c06-v1: specifications=%d; outcomes=%d; ",
     "static_rows=%d; dynamic_rows=%d; model_failures=%d; ",
     "hard_qc_failures=%d; warnings=%d"
   ),
