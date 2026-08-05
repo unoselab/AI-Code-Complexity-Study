@@ -1,200 +1,69 @@
-python - <<'PY'
-from pathlib import Path
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+REVIEW_CSV="repo_x02/run-x-d01a/model_c_token_py_blob_resolution_review.csv"
+
+BLOB_OIDS=(
+    # atopile/atopile: 9 unique blobs
+    "14568e4e6d7958ae0d7bb1c84bce10f469aa597a"
+    "1b3636ab38e901b74604da842eb54a6a66adfb53"
+    "349d655d924d4b5194c15aa6244751f1ff98ace1"
+    "73613c6951ca4bb5855cbae01bb6e3551b248bf4"
+    "765f77c6d84bee9d31df4a5bcd86ec3fbb611339"
+    "85af8f7f0e69888d747e260e869b05d9c67d629c"
+    "9e6b9c6359392c560b0ed5139c7dc4b5fa86c071"
+    "9f6e89558dcd738b4b05860f9a2696c8957ccd05"
+    "c8cc049329150f0743a920006a87ca13da020c1c"
+
+    # ericyuegu/hal: 1 unique blob
+    "9512baaad8dfb8bf7e2bd89be5378d2ce4c09df4"
+
+    # getsentry/sentry: 5 unique blobs
+    "2348337c2b41c2152a78dbac927601a648eabe62"
+    "380bf15b62c7348223e5eeb03cf435302be79344"
+    "64f3fe81c81fb9b4bf587cdab13d12ba3f2d263e"
+    "9b2605e2e75a9d6fed6a645a195d4c401cda8669"
+    "e4e06bb6d4177c75f0a173d04a7371f044c4f2e1"
+
+    # yagami1997/TradeMind: 1 unique blob
+    "d9b802fdd9ff8575ac2e32ec8bf619dbc5a91582"
+)
+
+for index in "${!BLOB_OIDS[@]}"; do
+    case_number=$((index + 1))
+    blob_oid="${BLOB_OIDS[$index]}"
+
+    printf '\n'
+    printf '======================================================================\n'
+    printf 'Case %02d / %02d\n' "${case_number}" "${#BLOB_OIDS[@]}"
+    printf 'Blob: %s\n' "${blob_oid}"
+    printf '======================================================================\n'
+
+    REVIEW_CSV="${REVIEW_CSV}" \
+    BLOB_OID="${blob_oid}" \
+    python - <<'PY'
+import os
 
 import pandas as pd
 
+review_csv = os.environ["REVIEW_CSV"]
+blob_oid = os.environ["BLOB_OID"]
 
-INPUT_FILE = Path(
-    "repo_python/run-py-7a/strict/specifications/range100_200/"
-    "agc_commit_function_npr_event_classifications.csv"
+df = pd.read_csv(
+    review_csv,
+    dtype=str,
+    keep_default_na=False,
 )
 
-BODY_COLUMN = "function_body_sha256"
-KIND_COLUMN = "function_kind"
-AGC_COLUMN = "npr_agc_like"
-HWC_COLUMN = "npr_hwc_like"
+matched = df[df["blob_oid"].eq(blob_oid)]
 
-required_columns = {
-    "function_event_id",
-    BODY_COLUMN,
-    KIND_COLUMN,
-    AGC_COLUMN,
-    HWC_COLUMN,
-}
+if matched.empty:
+    raise SystemExit(f"Blob not found in review CSV: {blob_oid}")
 
-events = pd.read_csv(INPUT_FILE, low_memory=False)
-
-missing_columns = sorted(required_columns - set(events.columns))
-if missing_columns:
-    raise RuntimeError(
-        f"Missing required columns: {missing_columns}. "
-        f"Available columns: {list(events.columns)}"
-    )
-
-events[BODY_COLUMN] = (
-    events[BODY_COLUMN]
-    .astype("string")
-    .str.strip()
-    .str.lower()
-)
-
-events[KIND_COLUMN] = (
-    events[KIND_COLUMN]
-    .astype("string")
-    .str.strip()
-    .str.lower()
-)
-
-for column in [AGC_COLUMN, HWC_COLUMN]:
-    events[column] = pd.to_numeric(
-        events[column],
-        errors="raise",
-    ).astype("int8")
-
-partition_failures = int(
-    (events[AGC_COLUMN] + events[HWC_COLUMN]).ne(1).sum()
-)
-if partition_failures:
-    raise RuntimeError(
-        f"AGC/HWC event partition failures: {partition_failures}"
-    )
-
-# A regular function is a synchronous function defined at module scope.
-regular_events = events.loc[
-    events[KIND_COLUMN].eq("module_function")
-].copy()
-
-print("=" * 72)
-print("A. Regular module-level synchronous function events")
-print("=" * 72)
-print(f"Total event rows: {len(regular_events)}")
-print(f"AGC-like event rows: {int(regular_events[AGC_COLUMN].sum())}")
-print(f"HWC-like event rows: {int(regular_events[HWC_COLUMN].sum())}")
-print(
-    "Partition check:",
-    int(regular_events[AGC_COLUMN].sum() + regular_events[HWC_COLUMN].sum()),
-)
-
-# Verify that every body hash has one stable AGC/HWC classification.
-body_classification = (
-    events.groupby(BODY_COLUMN, as_index=False)
-    .agg(
-        agc_min=(AGC_COLUMN, "min"),
-        agc_max=(AGC_COLUMN, "max"),
-        hwc_min=(HWC_COLUMN, "min"),
-        hwc_max=(HWC_COLUMN, "max"),
-    )
-)
-
-classification_conflicts = int(
-    (
-        body_classification["agc_min"].ne(
-            body_classification["agc_max"]
-        )
-        | body_classification["hwc_min"].ne(
-            body_classification["hwc_max"]
-        )
-    ).sum()
-)
-
-if classification_conflicts:
-    raise RuntimeError(
-        f"Body-level classification conflicts: {classification_conflicts}"
-    )
-
-body_classification = (
-    body_classification
-    .rename(
-        columns={
-            "agc_min": AGC_COLUMN,
-            "hwc_min": HWC_COLUMN,
-        }
-    )
-    [[BODY_COLUMN, AGC_COLUMN, HWC_COLUMN]]
-    .set_index(BODY_COLUMN)
-)
-
-# Count bodies referenced by at least one regular module function event.
-regular_hashes = set(
-    regular_events[BODY_COLUMN].dropna().astype(str)
-)
-
-regular_bodies = body_classification.loc[
-    body_classification.index.isin(regular_hashes)
-]
-
-print()
-print("=" * 72)
-print("B. Unique bodies referenced by regular module functions")
-print("=" * 72)
-print(f"Unique bodies: {len(regular_bodies)}")
-print(f"AGC-like unique bodies: {int(regular_bodies[AGC_COLUMN].sum())}")
-print(f"HWC-like unique bodies: {int(regular_bodies[HWC_COLUMN].sum())}")
-print(
-    "Partition check:",
-    int(
-        regular_bodies[AGC_COLUMN].sum()
-        + regular_bodies[HWC_COLUMN].sum()
-    ),
-)
-
-# Identify the set of function kinds associated with every body hash.
-body_kind_sets = (
-    events.groupby(BODY_COLUMN)[KIND_COLUMN]
-    .agg(lambda values: tuple(sorted(set(values.dropna()))))
-)
-
-exclusive_regular_hashes = set(
-    body_kind_sets.loc[
-        body_kind_sets.map(
-            lambda kinds: kinds == ("module_function",)
-        )
-    ].index
-)
-
-exclusive_regular_bodies = body_classification.loc[
-    body_classification.index.isin(exclusive_regular_hashes)
-]
-
-cross_kind_regular_hashes = regular_hashes - exclusive_regular_hashes
-
-print()
-print("=" * 72)
-print("C. Bodies used exclusively as regular module functions")
-print("=" * 72)
-print(f"Exclusive unique bodies: {len(exclusive_regular_bodies)}")
-print(
-    "AGC-like exclusive unique bodies:",
-    int(exclusive_regular_bodies[AGC_COLUMN].sum()),
-)
-print(
-    "HWC-like exclusive unique bodies:",
-    int(exclusive_regular_bodies[HWC_COLUMN].sum()),
-)
-print(
-    "Cross-kind bodies also observed as another function kind:",
-    len(cross_kind_regular_hashes),
-)
-
-print()
-print("=" * 72)
-print("D. All function kinds in range100_200")
-print("=" * 72)
-
-kind_summary = (
-    events.groupby(KIND_COLUMN, dropna=False)
-    .agg(
-        event_rows=("function_event_id", "size"),
-        unique_bodies=(BODY_COLUMN, "nunique"),
-        agc_event_rows=(AGC_COLUMN, "sum"),
-        hwc_event_rows=(HWC_COLUMN, "sum"),
-    )
-    .reset_index()
-    .sort_values(KIND_COLUMN)
-)
-
-print(kind_summary.to_string(index=False))
-
-print()
-print("Note: unique_bodies in section D may overlap across function kinds.")
+print(matched.T.to_string(header=False))
 PY
+done
+
+
+
