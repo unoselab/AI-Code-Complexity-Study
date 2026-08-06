@@ -2,20 +2,21 @@
 """Resolve the final run-x-d01a parser-version and malformed-source cases.
 
 This self-contained run-x-d01b implementation consumes only the unresolved
-file occurrences left by run-x-d01a.  Recovery follows a strict evidence
-order:
+file occurrences left by run-x-d01a. Recovery follows a strict evidence order:
 
 1. Parse the original historical source with Python 3.12 AST.
 2. If Python 3.12 fails, parse the same unmodified source with Python 3.13 AST.
-3. If both exact parsers fail, apply one of the two explicitly reviewed,
-   blob-specific diagnostic repairs.  Function identity and boundaries come
-   from the repaired source, but every body hash and literal-space token count
-   is computed from the original historical blob.
+3. If both exact parsers fail, apply the reviewed HAL diagnostic mask. Function
+   identity and boundaries come from the diagnostic source, but every body hash
+   and literal-space token count is computed from the original historical blob.
+4. Classify the manually reviewed TradeMind blob as an explicit malformed-source
+   exclusion. It is not treated as unresolved and never contributes a guessed
+   metric value.
 
 Python 3.13 exact recovery is automatically production-applied because it does
-not alter the source.  Reviewed malformed-source repairs remain diagnostic by
-default and are production-applied only when
-``--apply-reviewed-malformed`` is explicitly supplied.
+not alter the source. The reviewed HAL correction is production-applied when
+``--apply-reviewed-malformed`` is supplied. The project shell wrapper enables
+this approved correction by default in v2.
 
 Nested functions are not separate metric occurrences.  Their original source
 remains inside the enclosing function body.  Existing run-x-d01 and
@@ -48,9 +49,9 @@ WORKER_MODE = any(arg in {"--resolver-worker", "--resolver-worker-version"} for 
 if not WORKER_MODE:
     import pandas as pd
 
-IMPLEMENTATION_VERSION = "v1"
+IMPLEMENTATION_VERSION = "v2"
 EXPERIMENT_NAME = "run-x-d01b-resolve-python313-and-malformed"
-WORKER_PROTOCOL_VERSION = "v1"
+WORKER_PROTOCOL_VERSION = "v2"
 TOKEN_MIN = 100
 TOKEN_MAX = 200
 TOKEN_DEFINITION = "len(raw_implementation_body.split(' '))"
@@ -69,12 +70,24 @@ METRIC_NAMES = [
     "token_py_100_200",
 ]
 
-# These two blobs were reviewed at source level after run-x-d01a.  The repair
-# functions below verify both the blob id and the exact malformed source shape
-# before producing a diagnostic parse source.
+# These two blobs were reviewed at source level after run-x-d01a. HAL has an
+# approved local diagnostic mask. TradeMind is not repaired; it is finalized as
+# an explicit exclusion based on documented manual source review.
 HAL_MALFORMED_BLOB = "9512baaad8dfb8bf7e2bd89be5378d2ce4c09df4"
 TRADEMIND_MALFORMED_BLOB = "d9b802fdd9ff8575ac2e32ec8bf619dbc5a91582"
 KNOWN_MALFORMED_BLOBS = {HAL_MALFORMED_BLOB, TRADEMIND_MALFORMED_BLOB}
+APPROVED_MALFORMED_DIAGNOSTIC_BLOBS = {HAL_MALFORMED_BLOB}
+EXCLUDED_MALFORMED_BLOBS = {TRADEMIND_MALFORMED_BLOB}
+MANUAL_REVIEW_REFERENCE = "README-0805b-ParsingErrorCheck.md"
+TRADEMIND_EXCLUSION_ROOT_CAUSE = (
+    "malformed_historical_source_multiple_indentation_errors"
+)
+TRADEMIND_EXCLUSION_NOTE = (
+    "Excluded after manual review because the historical backup source contains "
+    "multiple independent indentation defects across function bodies and the "
+    "module-level main block. Reliable AST boundary reconstruction would require "
+    "extensive counterfactual rewriting."
+)
 
 BLOB_REVIEW_COLUMNS = [
     "blob_oid",
@@ -103,6 +116,8 @@ BLOB_REVIEW_COLUMNS = [
     "exact_original_source",
     "counterfactual_repair",
     "production_applied",
+    "explicitly_excluded",
+    "manual_review_reference",
     "eligible_function_count",
     "extractable_function_count",
     "docstring_only_function_count",
@@ -174,6 +189,8 @@ FILE_RESOLUTION_COLUMNS = [
     "counterfactual_repair",
     "diagnostic_repair_id",
     "production_applied",
+    "explicitly_excluded",
+    "manual_review_reference",
     "diagnostic_function_count_all_delta",
     "diagnostic_function_count_extracted_delta",
     "diagnostic_function_count_100_200_delta",
@@ -207,6 +224,8 @@ SNAPSHOT_CORRECTION_COLUMNS = [
     "metric_available_before_d01b",
     "affected_file_occurrences",
     "resolved_file_occurrences",
+    "excluded_file_occurrences",
+    "unclassified_unresolved_file_occurrences",
     "unresolved_file_occurrences",
     "python313_exact_file_occurrences",
     "malformed_diagnostic_file_occurrences",
@@ -230,6 +249,20 @@ SNAPSHOT_CORRECTION_COLUMNS.extend(
         "resolution_note",
     ]
 )
+
+EXCLUSION_COLUMNS = [
+    "snapshot_key",
+    "dataset_source",
+    "repo_name",
+    "commit_sha",
+    "path",
+    "blob_oid",
+    "recovery_method",
+    "root_cause",
+    "resolution_status",
+    "resolution_note",
+    "manual_review_reference",
+]
 
 UNRESOLVED_COLUMNS = [
     "snapshot_key",
@@ -1353,32 +1386,6 @@ def build_known_malformed_repair(
         repaired = apply_source_edits(source, [edit])
         return "hal_mask_invalid_def_update", edit.description, [edit]
 
-    if blob_oid == TRADEMIND_MALFORMED_BLOB:
-        candidate_indexes: list[int] = []
-        for index, line in enumerate(lines):
-            content, _ = split_line_ending(line)
-            if content.strip() != "patterns.append(TechnicalPattern(":
-                continue
-            previous = index - 1
-            while previous >= 0 and not split_line_ending(lines[previous])[0].strip():
-                previous -= 1
-            if previous >= 0 and split_line_ending(lines[previous])[0].strip() == "else:":
-                candidate_indexes.append(index)
-        if len(candidate_indexes) != 1:
-            raise ValueError(
-                "Expected one under-indented patterns.append statement after else; "
-                f"found {len(candidate_indexes)} in {path}"
-            )
-        index = candidate_indexes[0]
-        edit = SourceEdit(
-            original_start=line_starts[index],
-            original_end=line_starts[index],
-            replacement="    ",
-            description="indent_patterns_append_four_spaces_after_else",
-        )
-        repaired = apply_source_edits(source, [edit])
-        return "trademind_indent_else_body", edit.description, [edit]
-
     return "", "", []
 
 
@@ -1420,6 +1427,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resolved-snapshot-results-output", type=Path, required=True)
     parser.add_argument("--resolution-decisions-output", type=Path, required=True)
     parser.add_argument("--unresolved-output", type=Path, required=True)
+    parser.add_argument("--exclusion-output", type=Path, required=True)
     parser.add_argument("--qc-output", type=Path, required=True)
     parser.add_argument("--summary-output", type=Path, required=True)
     parser.add_argument("--python312-bin", required=True)
@@ -1488,27 +1496,12 @@ class Model:
         patterns.append(TechnicalPattern(
             name='x'
         ))
-
-    def later(self):
-        return 2
 """
     repair_id, _, edits = build_known_malformed_repair(
         TRADEMIND_MALFORMED_BLOB, "stock_analyzer_original_backup.py", trade_source
     )
-    if repair_id != "trademind_indent_else_body" or not edits:
-        raise AssertionError("TradeMind repair self-test did not produce a plan")
-    repaired = apply_source_edits(trade_source, edits)
-    trade_result = run_worker_batch(
-        [{"request_index": 3, "path": "stock.py", "source": repaired}],
-        python313_bin,
-        script_path,
-        timeout_seconds,
-    )[3]
-    if trade_result.get("ast_status") != "success":
-        raise AssertionError("TradeMind diagnostic repair self-test failed")
-    mapped = map_worker_records_to_original(trade_result.get("records", []), edits)
-    if any(int(row["function_end_offset"]) > len(trade_source) for row in mapped):
-        raise AssertionError("TradeMind repaired offsets were not mapped to original source")
+    if repair_id or edits:
+        raise AssertionError("TradeMind must remain an explicit manual-review exclusion")
     logging.info("Internal self-test: PASS")
 
 
@@ -1718,6 +1711,8 @@ def main() -> int:
         exact_original = False
         counterfactual = False
         production_applied = False
+        explicitly_excluded = False
+        manual_review_reference = ""
         repair_id = str(repair_plan.get("repair_id", ""))
         repair_description = str(repair_plan.get("description", ""))
 
@@ -1748,8 +1743,18 @@ def main() -> int:
             root_cause = "malformed_historical_source"
             counterfactual = True
             production_applied = bool(args.apply_reviewed_malformed)
-        requires_review = not production_applied
-        status = "resolved" if production_applied else "pending_review"
+        elif blob_oid == TRADEMIND_MALFORMED_BLOB:
+            method = "excluded_malformed_source"
+            root_cause = TRADEMIND_EXCLUSION_ROOT_CAUSE
+            explicitly_excluded = True
+            manual_review_reference = MANUAL_REVIEW_REFERENCE
+
+        if explicitly_excluded:
+            requires_review = False
+            status = "excluded_after_manual_review"
+        else:
+            requires_review = not production_applied
+            status = "resolved" if production_applied else "pending_review"
 
         extracted = [record for record in records if record.get("extraction_status") == "success"]
         docstring_only = [
@@ -1800,6 +1805,8 @@ def main() -> int:
                 "exact_original_source": exact_original,
                 "counterfactual_repair": counterfactual,
                 "production_applied": production_applied,
+                "explicitly_excluded": explicitly_excluded,
+                "manual_review_reference": manual_review_reference,
                 "eligible_function_count": len(records),
                 "extractable_function_count": len(extracted),
                 "docstring_only_function_count": len(docstring_only),
@@ -1813,6 +1820,8 @@ def main() -> int:
                     if exact_original
                     else "Diagnostic AST boundaries come from a reviewed repair; all hashes and token counts use the original historical source."
                     if counterfactual
+                    else TRADEMIND_EXCLUSION_NOTE
+                    if explicitly_excluded
                     else "No approved recovery was found."
                 ),
             }
@@ -1827,6 +1836,8 @@ def main() -> int:
             "exact_original": exact_original,
             "counterfactual": counterfactual,
             "production_applied": production_applied,
+            "explicitly_excluded": explicitly_excluded,
+            "manual_review_reference": manual_review_reference,
             "repair_id": repair_id,
         }
 
@@ -1853,7 +1864,13 @@ def main() -> int:
             "recovery_method": analysis["method"],
             "parser_used": analysis["parser_used"],
             "parser_version": analysis["parser_version"],
-            "recovery_confidence": "exact_original_source" if analysis["exact_original"] else "reviewed_diagnostic_repair",
+            "recovery_confidence": (
+                "exact_original_source"
+                if analysis["exact_original"]
+                else "manual_review_exclusion"
+                if analysis["explicitly_excluded"]
+                else "reviewed_diagnostic_repair"
+            ),
             "counterfactual_repair": analysis["counterfactual"],
             "diagnostic_repair_id": analysis["repair_id"],
             "production_applied": production_applied,
@@ -1893,7 +1910,14 @@ def main() -> int:
             key: value if production_applied else 0 for key, value in diagnostic.items()
         }
         metric_resolved = production_applied
-        status = "resolved" if metric_resolved else "pending_review"
+        explicitly_excluded = bool(analysis["explicitly_excluded"])
+        status = (
+            "resolved"
+            if metric_resolved
+            else "excluded_after_manual_review"
+            if explicitly_excluded
+            else "pending_review"
+        )
         note = (
             "Recovered exactly from the original source with Python 3.13."
             if analysis["method"] == "python313_ast_exact"
@@ -1903,6 +1927,8 @@ def main() -> int:
             if production_applied and analysis["counterfactual"]
             else "Reviewed malformed-source diagnostic is available but production application is pending."
             if analysis["counterfactual"]
+            else TRADEMIND_EXCLUSION_NOTE
+            if explicitly_excluded
             else "No recovery was available."
         )
         file_resolution_rows.append(
@@ -1923,6 +1949,8 @@ def main() -> int:
                 "counterfactual_repair": analysis["counterfactual"],
                 "diagnostic_repair_id": analysis["repair_id"],
                 "production_applied": production_applied,
+                "explicitly_excluded": explicitly_excluded,
+                "manual_review_reference": analysis["manual_review_reference"],
                 "diagnostic_function_count_all_delta": diagnostic["function_count_all"],
                 "diagnostic_function_count_extracted_delta": diagnostic["function_count_extracted"],
                 "diagnostic_function_count_100_200_delta": diagnostic["function_count_100_200"],
@@ -1963,6 +1991,8 @@ def main() -> int:
         "d01b_recovery_methods": "",
         "d01b_affected_file_occurrences": 0,
         "d01b_resolved_file_occurrences": 0,
+        "d01b_excluded_file_occurrences": 0,
+        "d01b_unclassified_unresolved_file_occurrences": 0,
         "d01b_unresolved_file_occurrences": 0,
         "d01b_python313_exact_file_occurrences": 0,
         "d01b_malformed_diagnostic_file_occurrences": 0,
@@ -1972,6 +2002,8 @@ def main() -> int:
         "token_py_100_200_partial_after_d01b": pd.NA,
         "diagnostic_token_py_100_200_after_d01b": pd.NA,
         "failed_python_file_count_after_d01b": pd.NA,
+        "d01b_explicit_exclusion_reason": "",
+        "d01b_manual_review_reference": "",
         "d01b_resolution_note": "",
     }
     for column, default in d01b_extra_defaults.items():
@@ -2018,13 +2050,24 @@ def main() -> int:
         }
         affected_count = len(group)
         resolved_count = int(group["metric_impact_resolved"].map(bool_value).sum())
-        unresolved_count = affected_count - resolved_count
-        available = unresolved_count == 0
-        status = "resolved_after_d01b" if available else "partial_needs_review_after_d01b"
-        decision = "resolved_full" if available else "pending_review"
+        excluded_count = int(group["explicitly_excluded"].map(bool_value).sum())
+        unclassified_unresolved_count = affected_count - resolved_count - excluded_count
+        unresolved_count = unclassified_unresolved_count
+        available = unresolved_count == 0 and excluded_count == 0
+        if available:
+            status = "resolved_after_d01b"
+            decision = "resolved_full"
+        elif excluded_count > 0 and unresolved_count == 0:
+            status = "excluded_malformed_source_after_d01b"
+            decision = "excluded_malformed_source"
+        else:
+            status = "partial_needs_review_after_d01b"
+            decision = "pending_review"
         methods = " | ".join(sorted(set(group["recovery_method"].astype(str))))
         note = (
             f"resolved_files={resolved_count}/{affected_count}; "
+            f"excluded_files={excluded_count}; "
+            f"unclassified_unresolved_files={unclassified_unresolved_count}; "
             f"applied_token_delta={applied_deltas['token_py_100_200']}; "
             f"diagnostic_token_delta={diagnostic_deltas['token_py_100_200']}"
         )
@@ -2038,6 +2081,8 @@ def main() -> int:
             "metric_available_before_d01b": bool_value(result_row["metric_available"]),
             "affected_file_occurrences": affected_count,
             "resolved_file_occurrences": resolved_count,
+            "excluded_file_occurrences": excluded_count,
+            "unclassified_unresolved_file_occurrences": unclassified_unresolved_count,
             "unresolved_file_occurrences": unresolved_count,
             "python313_exact_file_occurrences": int(group["recovery_method"].eq("python313_ast_exact").sum()),
             "malformed_diagnostic_file_occurrences": int(group["counterfactual_repair"].map(bool_value).sum()),
@@ -2063,6 +2108,8 @@ def main() -> int:
         resolved_results.loc[mask, "d01b_recovery_methods"] = methods
         resolved_results.loc[mask, "d01b_affected_file_occurrences"] = affected_count
         resolved_results.loc[mask, "d01b_resolved_file_occurrences"] = resolved_count
+        resolved_results.loc[mask, "d01b_excluded_file_occurrences"] = excluded_count
+        resolved_results.loc[mask, "d01b_unclassified_unresolved_file_occurrences"] = unclassified_unresolved_count
         resolved_results.loc[mask, "d01b_unresolved_file_occurrences"] = unresolved_count
         resolved_results.loc[mask, "d01b_python313_exact_file_occurrences"] = correction["python313_exact_file_occurrences"]
         resolved_results.loc[mask, "d01b_malformed_diagnostic_file_occurrences"] = correction["malformed_diagnostic_file_occurrences"]
@@ -2071,7 +2118,10 @@ def main() -> int:
         resolved_results.loc[mask, "d01b_token_py_100_200_applied_delta"] = applied_deltas["token_py_100_200"]
         resolved_results.loc[mask, "token_py_100_200_partial_after_d01b"] = production_after["token_py_100_200"]
         resolved_results.loc[mask, "diagnostic_token_py_100_200_after_d01b"] = diagnostic_after["token_py_100_200"]
-        resolved_results.loc[mask, "failed_python_file_count_after_d01b"] = unresolved_count
+        resolved_results.loc[mask, "failed_python_file_count_after_d01b"] = unresolved_count + excluded_count
+        if excluded_count:
+            resolved_results.loc[mask, "d01b_explicit_exclusion_reason"] = TRADEMIND_EXCLUSION_ROOT_CAUSE
+            resolved_results.loc[mask, "d01b_manual_review_reference"] = MANUAL_REVIEW_REFERENCE
         resolved_results.loc[mask, "d01b_resolution_note"] = note
         resolved_results.loc[mask, "snapshot_status"] = status
         resolved_results.loc[mask, "resolution_decision"] = decision
@@ -2091,6 +2141,10 @@ def main() -> int:
     corrections = pd.DataFrame(correction_rows)
     unresolved_files = file_resolutions[
         ~file_resolutions["metric_impact_resolved"].map(bool_value)
+        & ~file_resolutions["explicitly_excluded"].map(bool_value)
+    ].copy()
+    excluded_files = file_resolutions[
+        file_resolutions["explicitly_excluded"].map(bool_value)
     ].copy()
     unresolved_frame = pd.DataFrame(
         [
@@ -2109,6 +2163,24 @@ def main() -> int:
                 "resolution_note": row["resolution_note"],
             }
             for _, row in unresolved_files.iterrows()
+        ]
+    )
+    exclusion_frame = pd.DataFrame(
+        [
+            {
+                "snapshot_key": row["snapshot_key"],
+                "dataset_source": row["dataset_source"],
+                "repo_name": row["repo_name"],
+                "commit_sha": row["commit_sha"],
+                "path": row["path"],
+                "blob_oid": row["blob_oid"],
+                "recovery_method": row["recovery_method"],
+                "root_cause": row["root_cause"],
+                "resolution_status": row["resolution_status"],
+                "resolution_note": row["resolution_note"],
+                "manual_review_reference": row["manual_review_reference"],
+            }
+            for _, row in excluded_files.iterrows()
         ]
     )
     decisions = corrections[
@@ -2133,11 +2205,29 @@ def main() -> int:
         issue_occurrences["blob_oid"].nunique(),
         "pass" if len(blob_review) == issue_occurrences["blob_oid"].nunique() else "fail",
     )
+    resolved_occurrences = int(file_resolutions["metric_impact_resolved"].map(bool_value).sum())
+    excluded_occurrences = int(file_resolutions["explicitly_excluded"].map(bool_value).sum())
+    add_qc(
+        "file_occurrences_classified",
+        resolved_occurrences + excluded_occurrences + len(unresolved_frame),
+        len(file_resolutions),
+        "pass" if resolved_occurrences + excluded_occurrences + len(unresolved_frame) == len(file_resolutions) else "fail",
+    )
     add_qc(
         "file_occurrences_resolved",
-        int(file_resolutions["metric_impact_resolved"].map(bool_value).sum()),
-        len(file_resolutions),
-        "pass" if unresolved_frame.empty else "warn",
+        resolved_occurrences,
+        len(file_resolutions) - excluded_occurrences,
+        "pass" if resolved_occurrences == len(file_resolutions) - excluded_occurrences and unresolved_frame.empty else "warn",
+    )
+    expected_excluded_occurrences = int(
+        issue_occurrences["blob_oid"].astype(str).isin(EXCLUDED_MALFORMED_BLOBS).sum()
+    )
+    add_qc(
+        "explicitly_excluded_file_occurrences",
+        excluded_occurrences,
+        expected_excluded_occurrences,
+        "pass" if excluded_occurrences == expected_excluded_occurrences else "fail",
+        "TradeMind is excluded after documented manual source review when present in the selected scope.",
     )
     add_qc(
         "python313_exact_blobs",
@@ -2146,12 +2236,22 @@ def main() -> int:
         "pass",
         "Exact Python 3.13 recovery uses the unmodified historical blob.",
     )
+    selected_blob_ids = set(issue_occurrences["blob_oid"].astype(str))
     malformed_rows = blob_review[blob_review["counterfactual_repair"].map(bool_value)]
+    expected_diagnostic_blobs = APPROVED_MALFORMED_DIAGNOSTIC_BLOBS & selected_blob_ids
     add_qc(
-        "known_malformed_blobs_only",
+        "approved_malformed_diagnostic_blobs_only",
         sorted(malformed_rows["blob_oid"].astype(str).tolist()),
-        sorted(KNOWN_MALFORMED_BLOBS),
-        "pass" if set(malformed_rows["blob_oid"].astype(str)).issubset(KNOWN_MALFORMED_BLOBS) else "fail",
+        sorted(expected_diagnostic_blobs),
+        "pass" if set(malformed_rows["blob_oid"].astype(str)) == expected_diagnostic_blobs else "fail",
+    )
+    excluded_blob_rows = blob_review[blob_review["explicitly_excluded"].map(bool_value)]
+    expected_excluded_blobs = EXCLUDED_MALFORMED_BLOBS & selected_blob_ids
+    add_qc(
+        "manual_review_excluded_blobs",
+        sorted(excluded_blob_rows["blob_oid"].astype(str).tolist()),
+        sorted(expected_excluded_blobs),
+        "pass" if set(excluded_blob_rows["blob_oid"].astype(str)) == expected_excluded_blobs else "fail",
     )
     exact_counterfactual = blob_review[
         blob_review["recovery_method"].isin(["python312_ast_exact", "python313_ast_exact"])
@@ -2181,7 +2281,7 @@ def main() -> int:
         len(unresolved_frame),
         0,
         "pass" if unresolved_frame.empty else "warn",
-        "Use --apply-reviewed-malformed only after accepting the two explicit diagnostic repairs.",
+        "Approved recoverable cases are applied; irrecoverable malformed sources are recorded separately as explicit exclusions.",
     )
     qc = pd.DataFrame(qc_rows)
 
@@ -2206,15 +2306,32 @@ def main() -> int:
     add_summary("implementation", "python313", python313_meta["python_version"])
     add_summary("definition", "token_definition", TOKEN_DEFINITION)
     add_summary("definition", "apply_reviewed_malformed", int(args.apply_reviewed_malformed))
+    add_summary("definition", "manual_review_reference", MANUAL_REVIEW_REFERENCE)
     add_summary("input", "unresolved_file_occurrences", len(issue_occurrences))
     add_summary("input", "unique_unresolved_blobs", issue_occurrences["blob_oid"].nunique())
     add_summary("result", "python313_exact_blobs", int(blob_review["recovery_method"].eq("python313_ast_exact").sum()))
     add_summary("result", "malformed_diagnostic_blobs", int(blob_review["counterfactual_repair"].map(bool_value).sum()))
-    add_summary("result", "resolved_file_occurrences", int(file_resolutions["metric_impact_resolved"].map(bool_value).sum()))
+    add_summary("result", "resolved_file_occurrences", resolved_occurrences)
+    add_summary("result", "excluded_file_occurrences", excluded_occurrences)
+    add_summary("result", "unclassified_unresolved_file_occurrences", len(unresolved_frame))
     add_summary("result", "unresolved_file_occurrences", len(unresolved_frame))
     add_summary("result", "available_snapshots_before", available_before)
     add_summary("result", "available_snapshots_after", available_after)
+    excluded_snapshots_after = int(
+        resolved_results["resolution_decision"].fillna("").astype(str).eq("excluded_malformed_source").sum()
+    )
+    excluded_repo_months_after = int(
+        pd.to_numeric(
+            resolved_results.loc[
+                resolved_results["resolution_decision"].fillna("").astype(str).eq("excluded_malformed_source"),
+                "repo_month_rows",
+            ],
+            errors="coerce",
+        ).fillna(0).sum()
+    )
     add_summary("result", "available_repo_months_after", repo_months_after)
+    add_summary("result", "excluded_snapshots_after", excluded_snapshots_after)
+    add_summary("result", "excluded_repo_months_after", excluded_repo_months_after)
     add_summary("result", "diagnostic_token_py_100_200_delta", int(file_resolutions["diagnostic_token_py_100_200_delta"].sum()))
     add_summary("result", "applied_token_py_100_200_delta", int(file_resolutions["applied_token_py_100_200_delta"].sum()))
     add_summary("result", "recovered_function_detail_rows", len(recovered_detail_frame))
@@ -2231,14 +2348,16 @@ def main() -> int:
     save_dataframe(resolved_results, args.resolved_snapshot_results_output)
     save_dataframe(decisions, args.resolution_decisions_output)
     save_dataframe(unresolved_frame, args.unresolved_output, UNRESOLVED_COLUMNS)
+    save_dataframe(exclusion_frame, args.exclusion_output, EXCLUSION_COLUMNS)
     save_dataframe(qc, args.qc_output, QC_COLUMNS)
     save_dataframe(summary, args.summary_output, SUMMARY_COLUMNS)
 
     logging.info(
-        "Completed run-x-d01b-v1: blobs=%d; file_occurrences=%d; resolved=%d; unresolved=%d; available_snapshots=%d/%d; applied_token_delta=%d",
+        "Completed run-x-d01b-v2: blobs=%d; file_occurrences=%d; resolved=%d; excluded=%d; unresolved=%d; available_snapshots=%d/%d; applied_token_delta=%d",
         issue_occurrences["blob_oid"].nunique(),
         len(file_resolutions),
-        int(file_resolutions["metric_impact_resolved"].map(bool_value).sum()),
+        resolved_occurrences,
+        excluded_occurrences,
         len(unresolved_frame),
         available_after,
         len(resolved_results),

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # ============================================================
-# run-x-d01b v1: Resolve Python 3.13 and malformed-source cases
+# run-x-d01b v2: Resolve Python 3.13 and malformed-source cases
 # ============================================================
 #
 # Purpose:
@@ -14,15 +14,17 @@ set -euo pipefail
 # Recovery order:
 #   1. Parse the original historical blob with Python 3.12 AST.
 #   2. If Python 3.12 fails, parse the same unmodified blob with Python 3.13.
-#   3. If both exact parsers fail, run one of the two reviewed blob-specific
-#      diagnostic repairs for ericyuegu/hal or yagami1997/TradeMind.
-#   4. Always calculate hashes and literal-space token counts from the
-#      original historical source, never from the repaired source.
+#   3. If both exact parsers fail for the reviewed HAL blob, use its approved
+#      diagnostic mask while calculating all hashes and tokens from the
+#      original historical source.
+#   4. Record the manually reviewed TradeMind blob as an explicit malformed-
+#      source exclusion; do not keep it as unclassified unresolved input.
 #
 # Production policy:
 #   Python 3.13 exact recovery is applied automatically because the original
-#   source is not modified. Reviewed malformed-source diagnostics are not
-#   production-applied unless APPLY_REVIEWED_MALFORMED=1 is explicitly set.
+#   source is not modified. The reviewed HAL diagnostic has been approved and
+#   is production-applied by default in v2. TradeMind remains metric-unavailable
+#   but is finalized as an explicit manual-review exclusion.
 #
 # Inputs:
 #   repo_x02/run-x-d01/model_c_token_py_snapshot_manifest.csv
@@ -38,6 +40,7 @@ set -euo pipefail
 #   repo_x02/run-x-d01b/model_c_token_py_snapshot_results_resolved.csv
 #   repo_x02/run-x-d01b/model_c_token_py_resolution_decisions.csv
 #   repo_x02/run-x-d01b/model_c_token_py_unresolved_after_d01b.csv
+#   repo_x02/run-x-d01b/model_c_token_py_excluded_after_manual_review.csv
 #   repo_x02/run-x-d01b/model_c_token_py_resolution_qc.csv
 #   repo_x02/tmp/run-x-d01b/model_c_token_py_resolution_summary.csv
 #
@@ -47,8 +50,11 @@ set -euo pipefail
 # One-blob smoke test:
 #   LIMIT=1 bash proc_sh_x02/run-x-d01b-resolve-python313-and-malformed.sh
 #
-# Apply the two reviewed malformed-source diagnostics after reviewing D01b:
-#   APPLY_REVIEWED_MALFORMED=1 \
+# Final approved run (HAL correction is enabled by default):
+#   bash proc_sh_x02/run-x-d01b-resolve-python313-and-malformed.sh
+#
+# Diagnostic-only override that does not apply the HAL correction:
+#   APPLY_REVIEWED_MALFORMED=0 FAIL_ON_UNRESOLVED=0 \
 #     bash proc_sh_x02/run-x-d01b-resolve-python313-and-malformed.sh
 #
 # Optional overrides:
@@ -57,12 +63,12 @@ set -euo pipefail
 #   PYTHON313_BIN=/home/user1-system12/miniconda3/envs/agcparse313/bin/python
 #   BODY_STORE_ROOT=/absolute/path/to/py-fun-body
 #   BODY_SAVE_SCOPE=all|qualifying
-#   APPLY_REVIEWED_MALFORMED=0|1
+#   APPLY_REVIEWED_MALFORMED=0|1  # default: 1
 #   REPO_NAME=owner/repository
 #   BLOB_OID=<40-character-oid>
 #   LIMIT=0
 #   DRY_RUN=0|1
-#   FAIL_ON_UNRESOLVED=0|1
+#   FAIL_ON_UNRESOLVED=0|1        # default: 1
 #   SKIP_SELF_TEST=0|1
 #   GIT_TIMEOUT_SECONDS=300
 #   WORKER_TIMEOUT_SECONDS=600
@@ -76,7 +82,7 @@ cd "${PROJECT_ROOT}"
 export PROJECT_ROOT
 
 RUN_PREFIX="run-x-d01b"
-IMPLEMENTATION_VERSION="v1"
+IMPLEMENTATION_VERSION="v2"
 RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_DIR="${LOG_DIR:-logs}"
@@ -105,17 +111,18 @@ SNAPSHOT_CORRECTIONS_OUTPUT="${SNAPSHOT_CORRECTIONS_OUTPUT:-${MAIN_OUTPUT_DIR}/m
 RESOLVED_SNAPSHOT_RESULTS_OUTPUT="${RESOLVED_SNAPSHOT_RESULTS_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_token_py_snapshot_results_resolved.csv}"
 RESOLUTION_DECISIONS_OUTPUT="${RESOLUTION_DECISIONS_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_token_py_resolution_decisions.csv}"
 UNRESOLVED_OUTPUT="${UNRESOLVED_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_token_py_unresolved_after_d01b.csv}"
+EXCLUSION_OUTPUT="${EXCLUSION_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_token_py_excluded_after_manual_review.csv}"
 QC_OUTPUT="${QC_OUTPUT:-${MAIN_OUTPUT_DIR}/model_c_token_py_resolution_qc.csv}"
 SUMMARY_OUTPUT="${SUMMARY_OUTPUT:-${TMP_OUTPUT_DIR}/model_c_token_py_resolution_summary.csv}"
 
 BODY_STORE_ROOT="${BODY_STORE_ROOT:-/home/user1-system12/project-workspace/ai_code_complexity_study_python/py-fun-body}"
 BODY_SAVE_SCOPE="${BODY_SAVE_SCOPE:-all}"
-APPLY_REVIEWED_MALFORMED="${APPLY_REVIEWED_MALFORMED:-0}"
+APPLY_REVIEWED_MALFORMED="${APPLY_REVIEWED_MALFORMED:-1}"
 REPO_NAME="${REPO_NAME:-}"
 BLOB_OID="${BLOB_OID:-}"
 LIMIT="${LIMIT:-0}"
 DRY_RUN="${DRY_RUN:-0}"
-FAIL_ON_UNRESOLVED="${FAIL_ON_UNRESOLVED:-0}"
+FAIL_ON_UNRESOLVED="${FAIL_ON_UNRESOLVED:-1}"
 SKIP_SELF_TEST="${SKIP_SELF_TEST:-0}"
 GIT_TIMEOUT_SECONDS="${GIT_TIMEOUT_SECONDS:-300}"
 WORKER_TIMEOUT_SECONDS="${WORKER_TIMEOUT_SECONDS:-600}"
@@ -198,6 +205,7 @@ if [[ -f "${BLOB_REVIEW_OUTPUT}" && -s "${BLOB_REVIEW_OUTPUT}" ]]; then
     "${RESOLVED_SNAPSHOT_RESULTS_OUTPUT}" \
     "${RESOLUTION_DECISIONS_OUTPUT}" \
     "${UNRESOLVED_OUTPUT}" \
+    "${EXCLUSION_OUTPUT}" \
     "${QC_OUTPUT}" \
     "${SUMMARY_OUTPUT}"; do
     if [[ -f "${output_file}" ]]; then
@@ -257,6 +265,7 @@ COMMAND=(
   --resolved-snapshot-results-output "${RESOLVED_SNAPSHOT_RESULTS_OUTPUT}"
   --resolution-decisions-output "${RESOLUTION_DECISIONS_OUTPUT}"
   --unresolved-output "${UNRESOLVED_OUTPUT}"
+  --exclusion-output "${EXCLUSION_OUTPUT}"
   --qc-output "${QC_OUTPUT}"
   --summary-output "${SUMMARY_OUTPUT}"
   --python312-bin "${PYTHON312_BIN}"
@@ -301,6 +310,7 @@ for output_file in \
   "${RESOLVED_SNAPSHOT_RESULTS_OUTPUT}" \
   "${RESOLUTION_DECISIONS_OUTPUT}" \
   "${UNRESOLVED_OUTPUT}" \
+  "${EXCLUSION_OUTPUT}" \
   "${QC_OUTPUT}" \
   "${SUMMARY_OUTPUT}"; do
   if [[ ! -f "${output_file}" ]]; then
@@ -317,8 +327,11 @@ done
   echo "Summary preview:"
   head -n 50 "${SUMMARY_OUTPUT}"
   echo
-  echo "Remaining unresolved preview:"
+  echo "Remaining unclassified unresolved preview:"
   head -n 20 "${UNRESOLVED_OUTPUT}"
+  echo
+  echo "Explicit manual-review exclusion preview:"
+  head -n 20 "${EXCLUSION_OUTPUT}"
   echo
   echo "============================================================"
   echo "${RUN_LABEL} completed."
@@ -329,13 +342,15 @@ done
   echo "Snapshot corrections:           ${SNAPSHOT_CORRECTIONS_OUTPUT}"
   echo "Resolved snapshot results:      ${RESOLVED_SNAPSHOT_RESULTS_OUTPUT}"
   echo "Unresolved after D01b:          ${UNRESOLVED_OUTPUT}"
+  echo "Manual-review exclusions:       ${EXCLUSION_OUTPUT}"
   echo "QC output:                      ${QC_OUTPUT}"
   echo "Summary output:                 ${SUMMARY_OUTPUT}"
   echo "Log file:                       ${LOG_FILE}"
-  if [[ "${APPLY_REVIEWED_MALFORMED}" == "1" ]]; then
-    echo "Next step:                      verify full resolution, then prepare the repo-month panel"
+  UNRESOLVED_COUNT="$(awk 'END { print (NR > 0 ? NR - 1 : 0) }' "${UNRESOLVED_OUTPUT}")"
+  if [[ "${UNRESOLVED_COUNT}" == "0" ]]; then
+    echo "Next step:                      prepare the repo-month panel with one documented snapshot exclusion"
   else
-    echo "Next step:                      review two malformed diagnostics before optional production application"
+    echo "Next step:                      review remaining unclassified unresolved rows before panel preparation"
   fi
   echo "============================================================"
 } | tee -a "${LOG_FILE}"
