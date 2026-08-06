@@ -1,608 +1,131 @@
+============================================================
+run-x-b02-v3: prepare Python added-lines DiD panels
+Started:                         2026-08-06 13:46:14 CDT
+Project root:                    /home/user1-system12/project-workspace/ai_code_complexity_study_python/ai-code-complexity-study
+Python:                          python (Python 3.11.15)
+cloc:                            cloc
+Implementation version:          v3
+Added-lines collector:           proc_script_x01/collect_python_added_lines.py
+Collector SHA256:                28d542bd72ff6ac296b9efb9bc50de74eae653f629a3223ccfe2cdc83a686380
+cloc analysis program:           proc_script_x01/compute_python_ncloc_cloc.py
+cloc program SHA256:             47edf131591cce8e6a32d17d3817626453a96ccccc129765dfabc7cd5df5eff7
+Panel builder:                   proc_script_x01/prepare_python_added_lines_did_panels.py
+Panel builder SHA256:            48a48b29ca88d68b6e559f8e7b51c4922f2461652e8efed345268f465d34e820
+Base Model A panel:              repo_x01/run-x-a05/velocity_did_panel_model_a.csv
+Snapshot manifest:               repo_x01/run-x-a05/velocity_did_model_c_snapshot_manifest.csv
+Existing SonarQube results:      repo_x01/run-x-b01-sonarqube/model_c_ncloc_py_sonarqube_snapshot_results.csv
+Primary raw outcome:             lines_added_py
+Primary transformed outcome:     log_lines_added_py
+Analysis timezone:               America/Chicago
+History ref:                     HEAD
+History tip policy:              resolve once to frozen SHA per repository
+Model A reconciliation:          warning-only reference drift audit
+Repository selection:            start=1; limit=0; source=all; repo=all
+Snapshot selection:              start=1; limit=0
+Partial run:                     0
+Strict expected counts:          1
+Analysis again:                  0
+Self-test only:                  0
+Python added-lines output:       repo_x01/run-x-b02/python-added-lines/python_added_lines_repo_month.csv
+cloc snapshot output:            repo_x01/run-x-b02/python-ncloc-cloc/python_ncloc_cloc_snapshot_results.csv
+cloc file-count audit:           repo_x01/run-x-b02/python-ncloc-cloc/python_ncloc_cloc_file_count_audit.csv
+SonarQube DiD panel:             repo_x01/run-x-b02/panels/velocity_did_panel_python_added_lines_sonarqube.csv
+cloc DiD panel:                  repo_x01/run-x-b02/panels/velocity_did_panel_python_added_lines_cloc.csv
+Common sample:                   repo_x01/run-x-b02/panels/velocity_did_panel_python_added_lines_common_sample.csv
+Panel QC:                        repo_x01/run-x-b02/panels/python_added_lines_panel_qc.csv
+Log file:                        logs/run-x-b02-v3-prepare-python-added-lines-did-panel-20260806-134614.log
+============================================================
 
-======================================================================
-Case 01 / 16
-Blob: 14568e4e6d7958ae0d7bb1c84bce10f469aa597a
-======================================================================
-blob_oid                                                                          14568e4e6d7958ae0d7bb1c84bce10f469aa597a
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    75501
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1312)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        223
-indexed_named_function_headers                                                                                         261
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 69)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
+** Step 1: Validate Python added-lines implementation
+------------------------------------------------------------
+Command: python proc_script_x01/collect_python_added_lines.py --self-test
 
-======================================================================
-Case 02 / 16
-Blob: 1b3636ab38e901b74604da842eb54a6a66adfb53
-======================================================================
-blob_oid                                                                          1b3636ab38e901b74604da842eb54a6a66adfb53
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    79593
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1312)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        231
-indexed_named_function_headers                                                                                         272
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 69)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
+2026-08-06 13:46:15,040 [INFO] Self-test PASS: numstat, raw diff, rename, binary, and path policies
 
-======================================================================
-Case 03 / 16
-Blob: 349d655d924d4b5194c15aa6244751f1ff98ace1
-======================================================================
-blob_oid                                                                          349d655d924d4b5194c15aa6244751f1ff98ace1
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    59133
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1163)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        193
-indexed_named_function_headers                                                                                         223
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 63)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
+** Step 2: Validate cloc NCLOC implementation
+------------------------------------------------------------
+Command: python proc_script_x01/compute_python_ncloc_cloc.py --self-test
 
-======================================================================
-Case 04 / 16
-Blob: 73613c6951ca4bb5855cbae01bb6e3551b248bf4
-======================================================================
-blob_oid                                                                          73613c6951ca4bb5855cbae01bb6e3551b248bf4
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    68419
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1309)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        214
-indexed_named_function_headers                                                                                         248
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 66)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
+2026-08-06 13:46:15,306 [INFO] Self-test PASS: cloc CSV parser and Python path policy
 
-======================================================================
-Case 05 / 16
-Blob: 765f77c6d84bee9d31df4a5bcd86ec3fbb611339
-======================================================================
-blob_oid                                                                          765f77c6d84bee9d31df4a5bcd86ec3fbb611339
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    86430
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1404)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        240
-indexed_named_function_headers                                                                                         282
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 71)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
+** Step 3: Compile panel builder
+------------------------------------------------------------
+Command: python -m py_compile proc_script_x01/prepare_python_added_lines_did_panels.py
 
-======================================================================
-Case 06 / 16
-Blob: 85af8f7f0e69888d747e260e869b05d9c67d629c
-======================================================================
-blob_oid                                                                          85af8f7f0e69888d747e260e869b05d9c67d629c
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    53631
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1100)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        181
-indexed_named_function_headers                                                                                         207
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 63)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
 
-======================================================================
-Case 07 / 16
-Blob: 9e6b9c6359392c560b0ed5139c7dc4b5fa86c071
-======================================================================
-blob_oid                                                                          9e6b9c6359392c560b0ed5139c7dc4b5fa86c071
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    55800
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1148)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        188
-indexed_named_function_headers                                                                                         216
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 63)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
+** Step 4: Collect monthly Python added lines
+------------------------------------------------------------
+Command: python proc_script_x01/collect_python_added_lines.py --panel-file repo_x01/run-x-a05/velocity_did_panel_model_a.csv --repo-month-output repo_x01/run-x-b02/python-added-lines/python_added_lines_repo_month.csv --commit-output repo_x01/run-x-b02/python-added-lines/python_added_lines_commit.csv --file-output repo_x01/run-x-b02/python-added-lines/python_added_lines_file.csv --issues-output repo_x01/run-x-b02/python-added-lines/python_added_lines_issues.csv --reconciliation-output repo_x01/run-x-b02/python-added-lines/python_added_lines_reconciliation.csv --qc-output repo_x01/run-x-b02/python-added-lines/python_added_lines_qc.csv --summary-output repo_x01/tmp/run-x-b02/python_added_lines_summary.csv --cache-dir repo_x01/tmp/run-x-b02/python-added-lines-repo-cache --analysis-timezone America/Chicago --history-ref HEAD --git-timeout-seconds 300 --start-repo-order 1 --limit-repos 0 --dataset-source '' --repo-name '' --progress-every-repos 5 --progress-every-commits 250 --expected-panel-rows 1954 --expected-repositories 167 --expected-treatment-rows 914 --expected-control-rows 1040 --expected-treatment-repositories 63 --expected-control-repositories 104 --log-level INFO --strict-expected-counts
 
-======================================================================
-Case 08 / 16
-Blob: 9f6e89558dcd738b4b05860f9a2696c8957ccd05
-======================================================================
-blob_oid                                                                          9f6e89558dcd738b4b05860f9a2696c8957ccd05
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    52811
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1096)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        180
-indexed_named_function_headers                                                                                         206
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 62)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 09 / 16
-Blob: c8cc049329150f0743a920006a87ca13da020c1c
-======================================================================
-blob_oid                                                                          c8cc049329150f0743a920006a87ca13da020c1c
-representative_repo_name                                                                                   atopile/atopile
-representative_path                                                                               src/faebryk/libs/util.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    76385
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                            invalid syntax (util.py, line 1312)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        225
-indexed_named_function_headers                                                                                         263
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 69)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 10 / 16
-Blob: 9512baaad8dfb8bf7e2bd89be5378d2ce4c09df4
-======================================================================
-blob_oid                                                                          9512baaad8dfb8bf7e2bd89be5378d2ce4c09df4
-representative_repo_name                                                                                     ericyuegu/hal
-representative_path                                                                      hal/training/models/gpt_cached.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                     8807
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                         expected ':' (gpt_cached.py, line 116)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                          8
-indexed_named_function_headers                                                                                           7
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                               error:SyntaxError:invalid syntax (<blob>, line 23)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 11 / 16
-Blob: 2348337c2b41c2152a78dbac927601a648eabe62
-======================================================================
-blob_oid                                                                          2348337c2b41c2152a78dbac927601a648eabe62
-representative_repo_name                                                                                  getsentry/sentry
-representative_path                                                                         src/sentry/api/event_search.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    60985
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                     invalid syntax (event_search.py, line 598)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        110
-indexed_named_function_headers                                                                                         115
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                              error:SyntaxError:invalid syntax (<blob>, line 213)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 12 / 16
-Blob: 380bf15b62c7348223e5eeb03cf435302be79344
-======================================================================
-blob_oid                                                                          380bf15b62c7348223e5eeb03cf435302be79344
-representative_repo_name                                                                                  getsentry/sentry
-representative_path                                                                         src/sentry/api/event_search.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        2
-affected_snapshots                                                                                                       2
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    60380
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                     invalid syntax (event_search.py, line 590)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        108
-indexed_named_function_headers                                                                                         113
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                              error:SyntaxError:invalid syntax (<blob>, line 205)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 13 / 16
-Blob: 64f3fe81c81fb9b4bf587cdab13d12ba3f2d263e
-======================================================================
-blob_oid                                                                          64f3fe81c81fb9b4bf587cdab13d12ba3f2d263e
-representative_repo_name                                                                                  getsentry/sentry
-representative_path                                                                         src/sentry/api/event_search.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    61115
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                     invalid syntax (event_search.py, line 599)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        111
-indexed_named_function_headers                                                                                         116
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                              error:SyntaxError:invalid syntax (<blob>, line 213)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 14 / 16
-Blob: 9b2605e2e75a9d6fed6a645a195d4c401cda8669
-======================================================================
-blob_oid                                                                          9b2605e2e75a9d6fed6a645a195d4c401cda8669
-representative_repo_name                                                                                  getsentry/sentry
-representative_path                                                                         src/sentry/api/event_search.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    60349
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                     invalid syntax (event_search.py, line 590)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        108
-indexed_named_function_headers                                                                                         113
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                              error:SyntaxError:invalid syntax (<blob>, line 205)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 15 / 16
-Blob: e4e06bb6d4177c75f0a173d04a7371f044c4f2e1
-======================================================================
-blob_oid                                                                          e4e06bb6d4177c75f0a173d04a7371f044c4f2e1
-representative_repo_name                                                                                  getsentry/sentry
-representative_path                                                                         src/sentry/api/event_search.py
-issue_stages                                                                                                raw_file_parse
-issue_types                                                                                                    SyntaxError
-issue_occurrences                                                                                                        1
-affected_snapshots                                                                                                       1
-affected_paths                                                                                                           1
-source_byte_count                                                                                                    61237
-source_encoding                                                                                                      utf-8
-python312_ast_status                                                                                                 error
-python312_ast_error_type                                                                                       SyntaxError
-python312_ast_error_message                                                     invalid syntax (event_search.py, line 603)
-tokenizer_complete                                                                                                    True
-tokenizer_error_type                                                                                                      
-tokenizer_error_message                                                                                                   
-regex_named_function_candidates                                                                                        111
-indexed_named_function_headers                                                                                         116
-eligible_function_count                                                                                                  0
-extractable_function_count                                                                                               0
-docstring_only_function_count                                                                                            0
-qualifying_function_count                                                                                                0
-token_py_all_function_bodies                                                                                             0
-token_py_100_200                                                                                                         0
-recovery_method                                                                                                 unresolved
-root_cause                                                                                            template_placeholder
-python2_validation_status                                              error:SyntaxError:invalid syntax (<blob>, line 213)
-counterfactual_repair_applied                                                                                        False
-counterfactual_repair_description                                                                                         
-resolution_status                                                                                           pending_review
-auto_applied                                                                                                         False
-requires_review                                                                                                       True
-notes                              Original historical source is never rewritten; token counts use original raw body text.
-
-======================================================================
-Case 16 / 16
-Blob: d9b802fdd9ff8575ac2e32ec8bf619dbc5a91582
-======================================================================
-blob_oid                                                                                              d9b802fdd9ff8575ac2e32ec8bf619dbc5a91582
-representative_repo_name                                                                                                  yagami1997/TradeMind
-representative_path                                                             project_management/reference/stock_analyzer_original_backup.py
-issue_stages                                                                                                                    raw_file_parse
-issue_types                                                                                                                   IndentationError
-issue_occurrences                                                                                                                            1
-affected_snapshots                                                                                                                           1
-affected_paths                                                                                                                               1
-source_byte_count                                                                                                                        89736
-source_encoding                                                                                                                          utf-8
-python312_ast_status                                                                                                                     error
-python312_ast_error_type                                                                                                      IndentationError
-python312_ast_error_message        expected an indented block after 'else' statement on line 112 (stock_analyzer_original_backup.py, line 113)
-tokenizer_complete                                                                                                                       False
-tokenizer_error_type                                                                                                          IndentationError
-tokenizer_error_message                                              unindent does not match any outer indentation level (<string>, line 1805)
-regex_named_function_candidates                                                                                                             16
-indexed_named_function_headers                                                                                                              14
-eligible_function_count                                                                                                                      0
-extractable_function_count                                                                                                                   0
-docstring_only_function_count                                                                                                                0
-qualifying_function_count                                                                                                                    0
-token_py_all_function_bodies                                                                                                                 0
-token_py_100_200                                                                                                                             0
-recovery_method                                                                                                                     unresolved
-root_cause                                                                                                                template_placeholder
-python2_validation_status                                                                   error:SyntaxError:invalid syntax (<blob>, line 23)
-counterfactual_repair_applied                                                                                                            False
-counterfactual_repair_description                                                                                                             
-resolution_status                                                                                                               pending_review
-auto_applied                                                                                                                             False
-requires_review                                                                                                                           True
-notes                                                  Original historical source is never rewritten; token counts use original raw body text.
+2026-08-06 13:46:15,618 [INFO] Repository 1/167: 2019211474/DL-NASA-SOH-CNN-BILSTM-Attention (15 panel months)
+2026-08-06 13:46:15,651 [INFO] Repository 2/167: AkariAsai/ScholarQABench (10 panel months)
+2026-08-06 13:46:16,049 [INFO] Repository 3/167: ArpiarSaundersLab/annsql (9 panel months)
+2026-08-06 13:46:16,709 [INFO] Repository 4/167: BalancerMaxis/multisig-ops (20 panel months)
+2026-08-06 13:46:19,055 [INFO] BalancerMaxis/multisig-ops: processed 250/6137 requested commits
+2026-08-06 13:46:20,304 [INFO] BalancerMaxis/multisig-ops: processed 500/6137 requested commits
+2026-08-06 13:46:21,591 [INFO] BalancerMaxis/multisig-ops: processed 750/6137 requested commits
+2026-08-06 13:46:22,862 [INFO] BalancerMaxis/multisig-ops: processed 1000/6137 requested commits
+2026-08-06 13:46:24,183 [INFO] BalancerMaxis/multisig-ops: processed 1250/6137 requested commits
+2026-08-06 13:46:25,610 [INFO] BalancerMaxis/multisig-ops: processed 1500/6137 requested commits
+2026-08-06 13:46:26,914 [INFO] BalancerMaxis/multisig-ops: processed 1750/6137 requested commits
+2026-08-06 13:46:28,204 [INFO] BalancerMaxis/multisig-ops: processed 2000/6137 requested commits
+2026-08-06 13:46:29,460 [INFO] BalancerMaxis/multisig-ops: processed 2250/6137 requested commits
+2026-08-06 13:46:30,780 [INFO] BalancerMaxis/multisig-ops: processed 2500/6137 requested commits
+2026-08-06 13:46:32,744 [INFO] BalancerMaxis/multisig-ops: processed 2750/6137 requested commits
+2026-08-06 13:46:34,091 [INFO] BalancerMaxis/multisig-ops: processed 3000/6137 requested commits
+2026-08-06 13:46:35,498 [INFO] BalancerMaxis/multisig-ops: processed 3250/6137 requested commits
+2026-08-06 13:46:37,272 [INFO] BalancerMaxis/multisig-ops: processed 3500/6137 requested commits
+2026-08-06 13:46:38,549 [INFO] BalancerMaxis/multisig-ops: processed 3750/6137 requested commits
+2026-08-06 13:46:39,832 [INFO] BalancerMaxis/multisig-ops: processed 4000/6137 requested commits
+2026-08-06 13:46:41,151 [INFO] BalancerMaxis/multisig-ops: processed 4250/6137 requested commits
+2026-08-06 13:46:42,454 [INFO] BalancerMaxis/multisig-ops: processed 4500/6137 requested commits
+2026-08-06 13:46:43,965 [INFO] BalancerMaxis/multisig-ops: processed 4750/6137 requested commits
+2026-08-06 13:46:45,392 [INFO] BalancerMaxis/multisig-ops: processed 5000/6137 requested commits
+2026-08-06 13:46:47,070 [INFO] BalancerMaxis/multisig-ops: processed 5250/6137 requested commits
+2026-08-06 13:46:48,797 [INFO] BalancerMaxis/multisig-ops: processed 5500/6137 requested commits
+2026-08-06 13:46:50,612 [INFO] BalancerMaxis/multisig-ops: processed 5750/6137 requested commits
+2026-08-06 13:46:52,429 [INFO] BalancerMaxis/multisig-ops: processed 6000/6137 requested commits
+2026-08-06 13:46:53,605 [INFO] Repository 5/167: BiancoChiu/iOSRealRun-cli-18 (17 panel months)
+2026-08-06 13:46:53,747 [INFO] Progress: repositories=5/167; rate=472.08/hour; eta_hours=0.34
+2026-08-06 13:46:53,747 [INFO] Repository 6/167: C4NU/Paddie (15 panel months)
+2026-08-06 13:46:54,215 [INFO] Repository 7/167: DakeQQ/YOLO-Depth-Estimation-for-Android (14 panel months)
+2026-08-06 13:46:55,250 [INFO] DakeQQ/YOLO-Depth-Estimation-for-Android: processed 250/510 requested commits
+2026-08-06 13:46:56,727 [INFO] DakeQQ/YOLO-Depth-Estimation-for-Android: processed 500/510 requested commits
+2026-08-06 13:46:56,793 [INFO] Repository 8/167: Drchip61/Dual_SAM (10 panel months)
+2026-08-06 13:46:56,950 [INFO] Repository 9/167: EURAC-EEBgroup/brick-llm (9 panel months)
+2026-08-06 13:46:57,500 [INFO] Repository 10/167: Envious-Data/Env-KB (4 panel months)
+2026-08-06 13:46:57,606 [INFO] Progress: repositories=10/167; rate=857.39/hour; eta_hours=0.18
+2026-08-06 13:46:57,606 [INFO] Repository 11/167: Event-AHU/OpenEvDET (7 panel months)
+2026-08-06 13:46:58,261 [INFO] Repository 12/167: FFY0/AdaKV (13 panel months)
+2026-08-06 13:46:58,862 [INFO] Repository 13/167: FaceAdapter/Face-Adapter (1 panel months)
+2026-08-06 13:46:59,134 [INFO] Repository 14/167: FlipperPA/peregrine (12 panel months)
+2026-08-06 13:46:59,167 [INFO] Repository 15/167: FolhaSP/mosaico (9 panel months)
+2026-08-06 13:46:59,715 [INFO] Progress: repositories=15/167; rate=1224.56/hour; eta_hours=0.12
+2026-08-06 13:46:59,715 [INFO] Repository 16/167: GispoCoding/qgis-venv-creator (2 panel months)
+2026-08-06 13:46:59,807 [INFO] Repository 17/167: Hack-a-Day/2024-Supercon-8-Add-On-Badge (6 panel months)
+2026-08-06 13:47:00,822 [INFO] Repository 18/167: IBM/mt-rag-benchmark (5 panel months)
+2026-08-06 13:47:01,557 [INFO] Repository 19/167: ITSpecialist111/ai_automation_suggester (9 panel months)
+2026-08-06 13:47:02,367 [INFO] Repository 20/167: Jieqianyu/SGN (9 panel months)
+2026-08-06 13:47:02,407 [INFO] Progress: repositories=20/167; rate=1538.82/hour; eta_hours=0.10
+2026-08-06 13:47:02,407 [INFO] Repository 21/167: JustinSparrrow/IOOI-EmotionEgg (1 panel months)
+2026-08-06 13:47:02,423 [INFO] Repository 22/167: LGro/PyAPSI (4 panel months)
+2026-08-06 13:47:02,448 [INFO] Repository 23/167: LuneMods/KCD2-Blender-Toolkit (2 panel months)
+2026-08-06 13:47:02,768 [INFO] Repository 24/167: MIT-Emerging-Talent/ET6-edXtras (3 panel months)
+2026-08-06 13:47:03,079 [INFO] Repository 25/167: MalevichAI/malevich (11 panel months)
+2026-08-06 13:47:04,284 [INFO] MalevichAI/malevich: processed 250/549 requested commits
+2026-08-06 13:47:05,424 [INFO] MalevichAI/malevich: processed 500/549 requested commits
+2026-08-06 13:47:05,714 [INFO] Progress: repositories=25/167; rate=1796.54/hour; eta_hours=0.08
+2026-08-06 13:47:05,714 [INFO] Repository 26/167: MrTimonM/Arichain-Bot (1 panel months)
+2026-08-06 13:47:05,765 [INFO] Repository 27/167: NVIDIA/cuEquivariance (10 panel months)
+2026-08-06 13:47:06,333 [INFO] Repository 28/167: NiceRingNode/LGGPT (7 panel months)
+2026-08-06 13:47:07,001 [INFO] Repository 29/167: OSU-NLP-Group/HippoRAG (16 panel months)
+2026-08-06 13:47:10,989 [INFO] Repository 30/167: PennyLaneAI/catalyst (20 panel months)
+2026-08-06 13:47:12,765 [INFO] PennyLaneAI/catalyst: processed 250/1189 requested commits
+2026-08-06 13:47:14,081 [INFO] PennyLaneAI/catalyst: processed 500/1189 requested commits
+2026-08-06 13:47:15,265 [INFO] PennyLaneAI/catalyst: processed 750/1189 requested commits
+2026-08-06 13:47:16,518 [INFO] PennyLaneAI/catalyst: processed 1000/1189 requested commits
+2026-08-06 13:47:17,520 [INFO] Progress: repositories=30/167; rate=1744.69/hour; eta_hours=0.08
+2026-08-06 13:47:17,520 [INFO] Repository 31/167: PiotrMachowski/Home-Assistant-custom-components-TGE (13 panel months)
+2026-08-06 13:47:17,628 [INFO] Repository 32/167: PromtEngineer/localGPT (19 panel months)
+2026-08-06 13:47:18,263 [INFO] Repository 33/167: R0uter/ss.conf-for-surge (7 panel months)
+2026-08-06 13:47:18,305 [INFO] Repository 34/167: Retmon403/cs2_cheats_for_python (15 panel months)
