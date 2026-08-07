@@ -1,477 +1,160 @@
-repo_x01/run-x-b03
-├── cloc
-│   ├── plots
-│   │   ├── velocity_python_added_lines_cloc_dynamic_effects.pdf
-│   │   ├── velocity_python_added_lines_cloc_dynamic_effects.png
-│   │   ├── velocity_python_ncloc_cloc_dynamic_effects.pdf
-│   │   └── velocity_python_ncloc_cloc_dynamic_effects.png
-│   ├── velocity_python_added_lines_cloc_cohort_support.csv
-│   ├── velocity_python_added_lines_cloc_diagnostics.csv
-│   ├── velocity_python_added_lines_cloc_dynamic_effects.csv
-│   ├── velocity_python_added_lines_cloc_dynamic_results.rds
-│   ├── velocity_python_added_lines_cloc_event_support.csv
-│   ├── velocity_python_added_lines_cloc_first_stage_models.rds
-│   ├── velocity_python_added_lines_cloc_legacy_flag_audit.csv
-│   ├── velocity_python_added_lines_cloc_pretrend_checks.csv
-│   ├── velocity_python_added_lines_cloc_pretrend_summary.csv
-│   ├── velocity_python_added_lines_cloc_report.html
-│   ├── velocity_python_added_lines_cloc_run_metadata.csv
-│   ├── velocity_python_added_lines_cloc_sample_summary.csv
-│   ├── velocity_python_added_lines_cloc_static_effects.csv
-│   ├── velocity_python_added_lines_cloc_static_results.rds
-│   ├── velocity_python_ncloc_cloc_cohort_support.csv
-│   ├── velocity_python_ncloc_cloc_diagnostics.csv
-│   ├── velocity_python_ncloc_cloc_dynamic_effects.csv
-│   ├── velocity_python_ncloc_cloc_dynamic_results.rds
-│   ├── velocity_python_ncloc_cloc_event_support.csv
-│   ├── velocity_python_ncloc_cloc_first_stage_models.rds
-│   ├── velocity_python_ncloc_cloc_legacy_flag_audit.csv
-│   ├── velocity_python_ncloc_cloc_pretrend_checks.csv
-│   ├── velocity_python_ncloc_cloc_pretrend_summary.csv
-│   ├── velocity_python_ncloc_cloc_report.html
-│   ├── velocity_python_ncloc_cloc_run_metadata.csv
-│   ├── velocity_python_ncloc_cloc_sample_summary.csv
-│   ├── velocity_python_ncloc_cloc_static_effects.csv
-│   └── velocity_python_ncloc_cloc_static_results.rds
-├── comparison
-│   ├── covariate_sensitivity
-│   │   ├── plots
-│   │   │   ├── velocity_python_added_lines_covariate_sensitivity_primary_dynamic_effects.pdf
-│   │   │   └── velocity_python_added_lines_covariate_sensitivity_primary_dynamic_effects.png
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_dynamic_differences.csv
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_dynamic_effects.csv
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_pretrend_checks.csv
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_pretrend_summary.csv
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_primary_event_minus2.csv
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_primary_summary.csv
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_qc.csv
-│   │   ├── velocity_python_added_lines_covariate_sensitivity_static_differences.csv
-│   │   └── velocity_python_added_lines_covariate_sensitivity_static_effects.csv
-│   ├── no_covariates
-│   │   ├── plots
-│   │   │   ├── velocity_python_added_lines_backend_no_covariates_dynamic_effects.pdf
-│   │   │   └── velocity_python_added_lines_backend_no_covariates_dynamic_effects.png
-│   │   ├── velocity_python_added_lines_backend_no_covariates_dynamic_differences.csv
-│   │   ├── velocity_python_added_lines_backend_no_covariates_dynamic_effects.csv
-│   │   ├── velocity_python_added_lines_backend_no_covariates_panel_alignment_qc.csv
-│   │   ├── velocity_python_added_lines_backend_no_covariates_pretrend_checks.csv
-│   │   ├── velocity_python_added_lines_backend_no_covariates_pretrend_summary.csv
-│   │   ├── velocity_python_added_lines_backend_no_covariates_static_differences.csv
-│   │   ├── velocity_python_added_lines_backend_no_covariates_static_effects.csv
-│   │   ├── velocity_python_added_lines_outcome_robustness_no_covariates_dynamic_differences.csv
-│   │   ├── velocity_python_added_lines_outcome_robustness_no_covariates_pretrend_summary.csv
-│   │   └── velocity_python_added_lines_outcome_robustness_no_covariates_static_differences.csv
-│   ├── plots
-│   │   ├── velocity_python_added_lines_backend_dynamic_effects.pdf
-│   │   ├── velocity_python_added_lines_backend_dynamic_effects.png
-│   │   ├── velocity_python_ncloc_backend_dynamic_effects.pdf
-│   │   └── velocity_python_ncloc_backend_dynamic_effects.png
-│   ├── python_ncloc_adjusted
-│   │   ├── plots
-│   │   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_dynamic_effects.pdf
-│   │   │   └── velocity_python_added_lines_backend_python_ncloc_adjusted_dynamic_effects.png
-│   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_dynamic_differences.csv
-│   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_dynamic_effects.csv
-│   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_panel_alignment_qc.csv
-│   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_pretrend_checks.csv
-│   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_pretrend_summary.csv
-│   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_static_differences.csv
-│   │   ├── velocity_python_added_lines_backend_python_ncloc_adjusted_static_effects.csv
-│   │   ├── velocity_python_added_lines_outcome_robustness_python_ncloc_adjusted_dynamic_differences.csv
-│   │   ├── velocity_python_added_lines_outcome_robustness_python_ncloc_adjusted_pretrend_summary.csv
-│   │   └── velocity_python_added_lines_outcome_robustness_python_ncloc_adjusted_static_differences.csv
-│   ├── timing_sensitivity
-│   │   ├── plots
-│   │   │   ├── velocity_python_added_lines_timing_sensitivity_primary_dynamic_effects.pdf
-│   │   │   ├── velocity_python_added_lines_timing_sensitivity_primary_dynamic_effects.png
-│   │   │   ├── velocity_python_added_lines_timing_sensitivity_primary_recorded_clock_effects.pdf
-│   │   │   └── velocity_python_added_lines_timing_sensitivity_primary_recorded_clock_effects.png
-│   │   ├── velocity_python_added_lines_timing_sensitivity_dynamic_effects.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_event_support.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_pretrend_checks.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_pretrend_summary.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_primary_key_terms.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_primary_recorded_minus2_anchor.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_primary_summary.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_qc.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_recorded_clock_dynamic_effects.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_sample_summaries.csv
-│   │   ├── velocity_python_added_lines_timing_sensitivity_static_differences_vs_recorded.csv
-│   │   └── velocity_python_added_lines_timing_sensitivity_static_effects.csv
-│   ├── velocity_python_added_lines_backend_dynamic_differences.csv
-│   ├── velocity_python_added_lines_backend_dynamic_effects.csv
-│   ├── velocity_python_added_lines_backend_panel_alignment_qc.csv
-│   ├── velocity_python_added_lines_backend_pretrend_checks.csv
-│   ├── velocity_python_added_lines_backend_pretrend_summary.csv
-│   ├── velocity_python_added_lines_backend_static_differences.csv
-│   ├── velocity_python_added_lines_backend_static_effects.csv
-│   ├── velocity_python_added_lines_outcome_robustness_dynamic_differences.csv
-│   ├── velocity_python_added_lines_outcome_robustness_pretrend_summary.csv
-│   ├── velocity_python_added_lines_outcome_robustness_static_differences.csv
-│   ├── velocity_python_ncloc_backend_dynamic_differences.csv
-│   ├── velocity_python_ncloc_backend_dynamic_effects.csv
-│   ├── velocity_python_ncloc_backend_panel_alignment_qc.csv
-│   ├── velocity_python_ncloc_backend_pretrend_checks.csv
-│   ├── velocity_python_ncloc_backend_pretrend_summary.csv
-│   ├── velocity_python_ncloc_backend_static_differences.csv
-│   └── velocity_python_ncloc_backend_static_effects.csv
-├── sonarqube
-│   ├── plots
-│   │   ├── velocity_python_added_lines_sonarqube_dynamic_effects.pdf
-│   │   ├── velocity_python_added_lines_sonarqube_dynamic_effects.png
-│   │   ├── velocity_python_ncloc_sonarqube_dynamic_effects.pdf
-│   │   └── velocity_python_ncloc_sonarqube_dynamic_effects.png
-│   ├── velocity_python_added_lines_sonarqube_cohort_support.csv
-│   ├── velocity_python_added_lines_sonarqube_diagnostics.csv
-│   ├── velocity_python_added_lines_sonarqube_dynamic_effects.csv
-│   ├── velocity_python_added_lines_sonarqube_dynamic_results.rds
-│   ├── velocity_python_added_lines_sonarqube_event_support.csv
-│   ├── velocity_python_added_lines_sonarqube_first_stage_models.rds
-│   ├── velocity_python_added_lines_sonarqube_legacy_flag_audit.csv
-│   ├── velocity_python_added_lines_sonarqube_pretrend_checks.csv
-│   ├── velocity_python_added_lines_sonarqube_pretrend_summary.csv
-│   ├── velocity_python_added_lines_sonarqube_report.html
-│   ├── velocity_python_added_lines_sonarqube_run_metadata.csv
-│   ├── velocity_python_added_lines_sonarqube_sample_summary.csv
-│   ├── velocity_python_added_lines_sonarqube_static_effects.csv
-│   ├── velocity_python_added_lines_sonarqube_static_results.rds
-│   ├── velocity_python_ncloc_sonarqube_cohort_support.csv
-│   ├── velocity_python_ncloc_sonarqube_diagnostics.csv
-│   ├── velocity_python_ncloc_sonarqube_dynamic_effects.csv
-│   ├── velocity_python_ncloc_sonarqube_dynamic_results.rds
-│   ├── velocity_python_ncloc_sonarqube_event_support.csv
-│   ├── velocity_python_ncloc_sonarqube_first_stage_models.rds
-│   ├── velocity_python_ncloc_sonarqube_legacy_flag_audit.csv
-│   ├── velocity_python_ncloc_sonarqube_pretrend_checks.csv
-│   ├── velocity_python_ncloc_sonarqube_pretrend_summary.csv
-│   ├── velocity_python_ncloc_sonarqube_report.html
-│   ├── velocity_python_ncloc_sonarqube_run_metadata.csv
-│   ├── velocity_python_ncloc_sonarqube_sample_summary.csv
-│   ├── velocity_python_ncloc_sonarqube_static_effects.csv
-│   └── velocity_python_ncloc_sonarqube_static_results.rds
-└── specs
-    ├── no_covariates
-    │   ├── cloc
-    │   │   ├── plots
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.pdf
-    │   │   │   └── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.png
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_cohort_support.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_diagnostics.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_results.rds
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_event_support.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_first_stage_models.rds
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_legacy_flag_audit.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_checks.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_summary.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_report.html
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_run_metadata.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_sample_summary.csv
-    │   │   ├── velocity_python_added_lines_cloc_no_covariates_static_effects.csv
-    │   │   └── velocity_python_added_lines_cloc_no_covariates_static_results.rds
-    │   └── sonarqube
-    │       ├── plots
-    │       │   ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.pdf
-    │       │   └── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.png
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_cohort_support.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_diagnostics.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_results.rds
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_event_support.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_first_stage_models.rds
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_legacy_flag_audit.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_checks.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_summary.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_report.html
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_run_metadata.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_sample_summary.csv
-    │       ├── velocity_python_added_lines_sonarqube_no_covariates_static_effects.csv
-    │       └── velocity_python_added_lines_sonarqube_no_covariates_static_results.rds
-    ├── python_ncloc_adjusted
-    │   ├── cloc
-    │   │   ├── plots
-    │   │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.pdf
-    │   │   │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.png
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_cohort_support.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_diagnostics.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_results.rds
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_event_support.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_first_stage_models.rds
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_legacy_flag_audit.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_checks.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_summary.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_report.html
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_run_metadata.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_sample_summary.csv
-    │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_effects.csv
-    │   │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_results.rds
-    │   └── sonarqube
-    │       ├── plots
-    │       │   ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.pdf
-    │       │   └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.png
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_cohort_support.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_diagnostics.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_results.rds
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_event_support.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_first_stage_models.rds
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_legacy_flag_audit.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_checks.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_summary.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_report.html
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_run_metadata.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_sample_summary.csv
-    │       ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_effects.csv
-    │       └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_results.rds
-    ├── recorded_t
-    │   ├── no_covariates
-    │   │   ├── cloc
-    │   │   │   ├── plots
-    │   │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.pdf
-    │   │   │   │   └── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.png
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_cohort_support.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_common_support_audit.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_diagnostics.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_results.rds
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_event_support.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_first_stage_models.rds
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_legacy_flag_audit.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_checks.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_summary.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_report.html
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_run_metadata.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_sample_summary.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_static_effects.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_static_results.rds
-    │   │   │   └── velocity_python_added_lines_cloc_no_covariates_timing_shift_audit.csv
-    │   │   └── sonarqube
-    │   │       ├── plots
-    │   │       │   ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.pdf
-    │   │       │   └── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.png
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_cohort_support.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_common_support_audit.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_diagnostics.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_results.rds
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_event_support.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_first_stage_models.rds
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_legacy_flag_audit.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_checks.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_summary.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_report.html
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_run_metadata.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_sample_summary.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_static_effects.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_static_results.rds
-    │   │       └── velocity_python_added_lines_sonarqube_no_covariates_timing_shift_audit.csv
-    │   └── python_ncloc_adjusted
-    │       ├── cloc
-    │       │   ├── plots
-    │       │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.pdf
-    │       │   │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.png
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_cohort_support.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_common_support_audit.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_diagnostics.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_results.rds
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_event_support.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_first_stage_models.rds
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_legacy_flag_audit.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_checks.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_summary.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_report.html
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_run_metadata.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_sample_summary.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_effects.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_results.rds
-    │       │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_timing_shift_audit.csv
-    │       └── sonarqube
-    │           ├── plots
-    │           │   ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.pdf
-    │           │   └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.png
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_cohort_support.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_common_support_audit.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_diagnostics.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_results.rds
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_event_support.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_first_stage_models.rds
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_legacy_flag_audit.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_checks.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_summary.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_report.html
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_run_metadata.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_sample_summary.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_effects.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_results.rds
-    │           └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_timing_shift_audit.csv
-    ├── t_minus_1
-    │   ├── no_covariates
-    │   │   ├── cloc
-    │   │   │   ├── plots
-    │   │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.pdf
-    │   │   │   │   └── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.png
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_cohort_support.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_common_support_audit.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_diagnostics.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_results.rds
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_event_support.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_first_stage_models.rds
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_legacy_flag_audit.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_checks.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_summary.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_report.html
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_run_metadata.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_sample_summary.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_static_effects.csv
-    │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_static_results.rds
-    │   │   │   └── velocity_python_added_lines_cloc_no_covariates_timing_shift_audit.csv
-    │   │   └── sonarqube
-    │   │       ├── plots
-    │   │       │   ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.pdf
-    │   │       │   └── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.png
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_cohort_support.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_common_support_audit.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_diagnostics.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_results.rds
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_event_support.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_first_stage_models.rds
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_legacy_flag_audit.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_checks.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_summary.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_report.html
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_run_metadata.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_sample_summary.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_static_effects.csv
-    │   │       ├── velocity_python_added_lines_sonarqube_no_covariates_static_results.rds
-    │   │       └── velocity_python_added_lines_sonarqube_no_covariates_timing_shift_audit.csv
-    │   └── python_ncloc_adjusted
-    │       ├── cloc
-    │       │   ├── plots
-    │       │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.pdf
-    │       │   │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.png
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_cohort_support.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_common_support_audit.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_diagnostics.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_results.rds
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_event_support.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_first_stage_models.rds
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_legacy_flag_audit.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_checks.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_summary.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_report.html
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_run_metadata.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_sample_summary.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_effects.csv
-    │       │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_results.rds
-    │       │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_timing_shift_audit.csv
-    │       └── sonarqube
-    │           ├── plots
-    │           │   ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.pdf
-    │           │   └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.png
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_cohort_support.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_common_support_audit.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_diagnostics.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_results.rds
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_event_support.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_first_stage_models.rds
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_legacy_flag_audit.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_checks.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_summary.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_report.html
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_run_metadata.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_sample_summary.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_effects.csv
-    │           ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_results.rds
-    │           └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_timing_shift_audit.csv
-    └── t_minus_2
-        ├── no_covariates
-        │   ├── cloc
-        │   │   ├── plots
-        │   │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.pdf
-        │   │   │   └── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.png
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_cohort_support.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_common_support_audit.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_diagnostics.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_effects.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_dynamic_results.rds
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_event_support.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_first_stage_models.rds
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_legacy_flag_audit.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_checks.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_pretrend_summary.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_report.html
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_run_metadata.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_sample_summary.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_static_effects.csv
-        │   │   ├── velocity_python_added_lines_cloc_no_covariates_static_results.rds
-        │   │   └── velocity_python_added_lines_cloc_no_covariates_timing_shift_audit.csv
-        │   └── sonarqube
-        │       ├── plots
-        │       │   ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.pdf
-        │       │   └── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.png
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_cohort_support.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_common_support_audit.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_diagnostics.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_effects.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_dynamic_results.rds
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_event_support.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_first_stage_models.rds
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_legacy_flag_audit.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_checks.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_pretrend_summary.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_report.html
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_run_metadata.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_sample_summary.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_static_effects.csv
-        │       ├── velocity_python_added_lines_sonarqube_no_covariates_static_results.rds
-        │       └── velocity_python_added_lines_sonarqube_no_covariates_timing_shift_audit.csv
-        └── python_ncloc_adjusted
-            ├── cloc
-            │   ├── plots
-            │   │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.pdf
-            │   │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.png
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_cohort_support.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_common_support_audit.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_diagnostics.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_effects.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_dynamic_results.rds
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_event_support.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_first_stage_models.rds
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_legacy_flag_audit.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_checks.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_pretrend_summary.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_report.html
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_run_metadata.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_sample_summary.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_effects.csv
-            │   ├── velocity_python_added_lines_cloc_python_ncloc_adjusted_static_results.rds
-            │   └── velocity_python_added_lines_cloc_python_ncloc_adjusted_timing_shift_audit.csv
-            └── sonarqube
-                ├── plots
-                │   ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.pdf
-                │   └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.png
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_cohort_support.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_common_support_audit.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_diagnostics.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_effects.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_dynamic_results.rds
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_event_support.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_first_stage_models.rds
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_legacy_flag_audit.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_checks.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_pretrend_summary.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_report.html
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_run_metadata.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_sample_summary.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_effects.csv
-                ├── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_static_results.rds
-                └── velocity_python_added_lines_sonarqube_python_ncloc_adjusted_timing_shift_audit.csv
-
-58 directories, 416 files
+00sapo_taskcheck
+2019211474_DL-NASA-SOH-CNN-BILSTM-Attention
+4mritGiri_NumberTracker
+666wcy_ARPT-Bot
+adelatour11_androidtvbackground
+ahmetozlu_color_recognition
+aio-libs_aiohttp
+aj47_100x-orchestrator
+AkariAsai_ScholarQABench
+AlexIoannides_pyspark-example-project
+ali-bahrainian_RAG_best_practices
+anujshah1003_Tensorboard-own-image-data-image-features-embedding-visualization
+ArpiarSaundersLab_annsql
+autti_abraham
+aws_nova-act
+aws-samples_aws-dms-cdc-data-pipeline
+baaivision_EVE
+BalancerMaxis_multisig-ops
+bannsec_stegoVeritas
+believethehype_nostrdvm
+Benzauber_convert-commander
+BiancoChiu_iOSRealRun-cli-18
+bobokun_actualtap-py
+bropines_chrome-lens-py
+C4NU_Paddie
+caffeinedoom_reconthing
+caiyuanhao1998_HDR-GS
+chenjie_PyTorch-CIFAR-10-autoencoder
+Cherecho_Triangular-arbitrage
+chrisyy2003_nonebot-plugin-gpt3
+Chuffnugget_volcano_integration
+Cjy-CN_PUBGRecognizeAndGunpress
+crate_devrel-pdf-rag-chatbot
+cyb3rfortr3ss_ByDeF
+DakeQQ_YOLO-Depth-Estimation-for-Android
+davidhandsome86_LLM_RAG
+daxa-ai_pebblo
+dimatura_pypcd
+djeada_Kurs-Podstaw-Pythona
+dottxt-ai_prompts
+Drchip61_Dual_SAM
+dromara_domain-admin
+dymmond_edgy
+emresen20_Pau-Bilgisayar-nots
+Envious-Data_Env-KB
+ergrelet_unlicense
+esxr_langgraph-mcp
+EURAC-EEBgroup_brick-llm
+Event-AHU_OpenEvDET
+evermoving_SystemCaptioner
+FaceAdapter_Face-Adapter
+FFY0_AdaKV
+FlipperPA_peregrine
+FMInference_FlexiGen
+FolhaSP_mosaico
+GispoCoding_qgis-venv-creator
+golemfoundation_octant
+Hack-a-Day_2024-Supercon-8-Add-On-Badge
+harvard-edge_QuaRL
+HelpingAI_Webscout
+IBM_mt-rag-benchmark
+infected4098_Wave-U-Mamba
+itsKayWat_MindfulShift-2025
+ITSpecialist111_ai_automation_suggester
+jacebrowning_datafiles
+jfcrenshaw_pzflow
+jgwak_GSDN
+Jieqianyu_SGN
+jinli99_iShapEditing
+joereynolds_reap-get
+jrowellfx_lsseq
+JustinSparrrow_IOOI-EmotionEgg
+jyjblrd_SelfDrivingCar
+kangtegong_pyftrace
+Khrylx_PyTorch-RL
+krishpranav_socialosint
+kuleshov-group_caduceus
+lancedb_lancedb
+LGro_PyAPSI
+liangchundong_HGNN-AC
+LinJing517_micropython-deauth
+linuxacademy_content-gitops
+loml13yyy_AtlassianConfluence-RCE
+loml13yyy_yyGRPU8
+LonamiWebs_Telebackup
+LuneMods_KCD2-Blender-Toolkit
+Makopolo_megascan_houdini20.0_USD_plugin
+MalevichAI_malevich
+markmelnic_stealthenium
+microsoft_AzureTRE
+microsoft_semantic-link-labs
+MingSun-Tse_LightAvatar-TensorFlow
+MIT-Emerging-Talent_ET6-edXtras
+monero-project_meta
+MrTimonM_Arichain-Bot
+neuml_rag
+nhw649_EOV-Seg
+NiceRingNode_LGGPT
+ninareyes1_Simple-Digital-Clock
+NVIDIA_cuEquivariance
+odoo_industry
+omkarcloud_amazon-scraper
+OSU-NLP-Group_HippoRAG
+oval-group_smooth-topk
+PennyLaneAI_catalyst
+peter279k_cdc-data-mirror
+PhilNad_robot-arm-kinematic-calibration
+pieces-app_cli-agent
+PiotrMachowski_Home-Assistant-custom-components-TGE
+plurai-ai_intellagent
+popey_sbommage
+PromtEngineer_localGPT
+python-ring-doorbell_python-ring-doorbell
+qiboteam_qibojit
+R0uter_ss.conf-for-surge
+rachtsy_KPCA_code
+Retmon403_cs2_cheats_for_python
+RobinWu218_ToST
+ruiqini_NTFields
+sakomws_ai-workshop
+saucer-man_qq_msg_decode
+Scholar01_sd-webui-bg-mask
+Scrapybara_scrapybara-playground
+SEU-ProactiveSecurity-Group_LLM-PD
+Simatwa_free-proxies
+slopp_30_days_of_dagster
+snowzjx_ns3-load-balance
+stakewise_v3-operator
+surajt97_Train_Delay_Prediction
+taylorwilsdon_open-webui-tools
+The-Compiler_pytest-vw
+thefatedefeater_V2ray-Config
+TheFocusedCoder_api-agent
+thegreenwebfoundation_admin-portal
+The-WhiteRabbit_dnfm_server
+TianxingChen_RoboTwin
+tranceitionalMynd_spy-reaper
+tusgino_llm-code-reviewer
+viktoriasemaan_sa-ai-agent
+VirtualFlow_VFVS
+vonssy_BlockBitsApp-BOT
+vonssy_DreamerQuests-BOT
+vortezwohl_Bhakti
+Wang-ML-Lab_unified-continual-learning
+wasilukm_hoymiles-mqtt
+weaviate_t2v-transformers-models
+weizequan_TASHR
+william-sy_TesyLocal
+xinsir6_ControlNetPlus
+xnl-h4ck3r_getSubsidiaries
+YangDi666_UNIK
+yihozhang_most-influential-pl-papers
+yoongi43_music_audio_enhancement_conformer
+yousseb_meld
+ysj9909_SHViT
+zeyangsha_De-Fake
+zhang-xr_FirmLLM
+zhipeixu_FakeShield
+zhou19830318_xiaozhi_micropython
+zju3dv_ready_to_react
