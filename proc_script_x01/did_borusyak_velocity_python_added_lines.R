@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # ============================================================
-# run-x-b03 v2: Borusyak DiD for Python added-lines velocity
+# run-x-b03 v3: Borusyak DiD covariate sensitivity for Python added-lines velocity
 # ============================================================
 #
 # Purpose:
@@ -14,9 +14,18 @@
 #   - robustness: log_lines_added_py_source_no_tests
 #   - robustness: log_lines_added_py_all
 #
-# Python-NCLOC first stage:
-#   outcome ~ log_age + ncloc + log_contributors + log_stars + log_issues
-#             | repo_id + time_index
+# First-stage sensitivity specifications:
+#   - python_ncloc_adjusted:
+#       outcome ~ log_age + ncloc + log_contributors + log_stars + log_issues
+#                 | repo_id + time_index
+#   - no_covariates:
+#       outcome ~ 1 | repo_id + time_index
+#
+# The no-covariate specification is the immediate robustness check for
+# contemporaneous post-treatment covariate conditioning. A repository-fixed
+# baseline NCLOC level is not added here because repository fixed effects absorb
+# time-invariant repository-level covariates; a baseline-size trend interaction
+# would be a different estimand and should be evaluated separately if needed.
 #
 # Treatment definition:
 #   Absorbing intent-to-treat timing based only on event_index and time_index.
@@ -30,9 +39,11 @@
 #   - event month -1 is the omitted reference;
 #   - standard errors are clustered by repository.
 #
-# Backend mode fits all four outcomes for one NCLOC backend. Comparison mode
-# verifies exact same-sample alignment, compares SonarQube versus cloc for each
-# outcome, and compares each robustness outcome against the primary outcome.
+# Backend mode fits all four outcomes for one NCLOC backend and one covariate
+# specification. Backend comparison mode verifies exact same-sample alignment
+# between SonarQube and cloc within a covariate specification. Covariate
+# comparison mode contrasts python_ncloc_adjusted with no_covariates while
+# holding backend, outcome, treatment timing, and sample fixed.
 # This script does not call any prior experiment script.
 # ============================================================
 
@@ -204,9 +215,9 @@ extract_effect_table <- function(result, outcome_name, confidence_level, term_ty
   table
 }
 
-fit_first_stage_diagnostic <- function(data, outcome, first_stage_formula) {
+fit_first_stage_diagnostic <- function(data, outcome, first_stage_formula_text) {
   untreated <- data[absorbing_treated == 0L]
-  formula <- stats::as.formula(sprintf("%s ~ log_age + ncloc + log_contributors + log_stars + log_issues | repo_id + time_index", outcome))
+  formula <- stats::as.formula(sprintf("%s %s", outcome, first_stage_formula_text))
   captured <- capture_evaluation(
     fixest::feols(
       formula,
@@ -554,6 +565,10 @@ run_backend_comparison <- function(args) {
   expected_primary_metadata <- "log_lines_added_py_source"
   expected_robustness_metadata <- "log_lines_added_py_no_merge|log_lines_added_py_source_no_tests|log_lines_added_py_all"
   expected_velocity_version <- "v4"
+  covariate_spec <- tolower(require_arg(args, "covariate_spec"))
+  if (!covariate_spec %in% c("python_ncloc_adjusted", "no_covariates")) {
+    abortf("--covariate-spec must be python_ncloc_adjusted or no_covariates: %s", covariate_spec)
+  }
   sonarqube_input_file <- normalizePath(require_arg(args, "sonarqube_input_file"), mustWork = TRUE)
   cloc_input_file <- normalizePath(require_arg(args, "cloc_input_file"), mustWork = TRUE)
   sonarqube_output_dir <- normalizePath(require_arg(args, "sonarqube_output_dir"), mustWork = TRUE)
@@ -569,9 +584,9 @@ run_backend_comparison <- function(args) {
   dir.create(plot_dir, recursive = TRUE, showWarnings = FALSE)
   ensure_parent_dir(comparison_summary_output)
 
-  sq_prefix <- "velocity_python_added_lines_sonarqube"
-  cloc_prefix <- "velocity_python_added_lines_cloc"
-  comparison_prefix <- "velocity_python_added_lines_backend"
+  sq_prefix <- paste0("velocity_python_added_lines_sonarqube_", covariate_spec)
+  cloc_prefix <- paste0("velocity_python_added_lines_cloc_", covariate_spec)
+  comparison_prefix <- paste0("velocity_python_added_lines_backend_", covariate_spec)
 
   input_paths <- list(
     sonarqube_static = file.path(sonarqube_output_dir, paste0(sq_prefix, "_static_effects.csv")),
@@ -673,6 +688,14 @@ run_backend_comparison <- function(args) {
   cloc_pretrend_checks <- data.table::fread(input_paths$cloc_pretrend_checks)
   sq_pretrend_summary <- data.table::fread(input_paths$sonarqube_pretrend_summary)
   cloc_pretrend_summary <- data.table::fread(input_paths$cloc_pretrend_summary)
+
+  for (table in list(sq_static, sq_dynamic, sq_pretrend_checks, sq_pretrend_summary,
+                     cloc_static, cloc_dynamic, cloc_pretrend_checks, cloc_pretrend_summary)) {
+    validate_columns(table, c("covariate_spec"))
+    if (any(is.na(table$covariate_spec)) || any(table$covariate_spec != covariate_spec)) {
+      abortf("Backend comparison found output rows from the wrong covariate specification; expected %s.", covariate_spec)
+    }
+  }
 
   static_all <- data.table::rbindlist(list(sq_static, cloc_static), fill = TRUE, use.names = TRUE)
   dynamic_all <- data.table::rbindlist(list(sq_dynamic, cloc_dynamic), fill = TRUE, use.names = TRUE)
@@ -806,9 +829,9 @@ run_backend_comparison <- function(args) {
     pretrend_summary_all = file.path(comparison_output_dir, paste0(comparison_prefix, "_pretrend_summary.csv")),
     static_differences = file.path(comparison_output_dir, paste0(comparison_prefix, "_static_differences.csv")),
     dynamic_differences = file.path(comparison_output_dir, paste0(comparison_prefix, "_dynamic_differences.csv")),
-    outcome_static_differences = file.path(comparison_output_dir, "velocity_python_added_lines_outcome_robustness_static_differences.csv"),
-    outcome_dynamic_differences = file.path(comparison_output_dir, "velocity_python_added_lines_outcome_robustness_dynamic_differences.csv"),
-    outcome_pretrend_summary = file.path(comparison_output_dir, "velocity_python_added_lines_outcome_robustness_pretrend_summary.csv"),
+    outcome_static_differences = file.path(comparison_output_dir, paste0("velocity_python_added_lines_outcome_robustness_", covariate_spec, "_static_differences.csv")),
+    outcome_dynamic_differences = file.path(comparison_output_dir, paste0("velocity_python_added_lines_outcome_robustness_", covariate_spec, "_dynamic_differences.csv")),
+    outcome_pretrend_summary = file.path(comparison_output_dir, paste0("velocity_python_added_lines_outcome_robustness_", covariate_spec, "_pretrend_summary.csv")),
     panel_qc = file.path(comparison_output_dir, paste0(comparison_prefix, "_panel_alignment_qc.csv")),
     plot_pdf = file.path(plot_dir, paste0(comparison_prefix, "_dynamic_effects.pdf")),
     plot_png = file.path(plot_dir, paste0(comparison_prefix, "_dynamic_effects.png"))
@@ -923,8 +946,9 @@ run_backend_comparison <- function(args) {
   ggplot2::ggsave(output_paths$plot_png, plot_object, width = 12, height = 7.5, units = "in", dpi = 180, bg = "white")
 
   summary_rows <- list(
-    make_summary_row("implementation", "version", "v2"),
+    make_summary_row("implementation", "version", "v3"),
     make_summary_row("definition", "comparison", "two_ncloc_backends_by_four_python_velocity_outcomes"),
+    make_summary_row("definition", "covariate_spec", covariate_spec),
     make_summary_row("definition", "primary_outcome", primary_outcome),
     make_summary_row("definition", "robustness_outcomes", paste(robustness_outcomes, collapse = "|")),
     make_summary_row("input", "panel_rows_per_backend", nrow(sq_panel)),
@@ -989,8 +1013,330 @@ run_backend_comparison <- function(args) {
 
   log_message(
     "INFO",
-    "Completed run-x-b03-v2 comparison: static=%d; dynamic=%d; pretrend=%d; panel_rows=%d",
-    nrow(static_all), nrow(dynamic_all), nrow(pretrend_checks_all), nrow(sq_panel)
+    "Completed run-x-b03-v3 backend comparison covariate_spec=%s: static=%d; dynamic=%d; pretrend=%d; panel_rows=%d",
+    covariate_spec, nrow(static_all), nrow(dynamic_all), nrow(pretrend_checks_all), nrow(sq_panel)
+  )
+}
+
+
+run_covariate_comparison <- function(args) {
+  check_packages(c("data.table", "ggplot2"))
+
+  adjusted_sonarqube_dir <- normalizePath(require_arg(args, "adjusted_sonarqube_output_dir"), mustWork = TRUE)
+  adjusted_cloc_dir <- normalizePath(require_arg(args, "adjusted_cloc_output_dir"), mustWork = TRUE)
+  no_cov_sonarqube_dir <- normalizePath(require_arg(args, "no_covariates_sonarqube_output_dir"), mustWork = TRUE)
+  no_cov_cloc_dir <- normalizePath(require_arg(args, "no_covariates_cloc_output_dir"), mustWork = TRUE)
+  comparison_output_dir <- require_arg(args, "comparison_output_dir")
+  comparison_summary_output <- require_arg(args, "comparison_summary_output")
+  strict_expected_counts <- as_logical_arg(args, "strict_expected_counts", TRUE)
+  tolerance <- as_numeric_arg(args, "backend_equivalence_tolerance", 1e-8)
+
+  dir.create(comparison_output_dir, recursive = TRUE, showWarnings = FALSE)
+  plot_dir <- file.path(comparison_output_dir, "plots")
+  dir.create(plot_dir, recursive = TRUE, showWarnings = FALSE)
+  ensure_parent_dir(comparison_summary_output)
+
+  specs <- data.table::data.table(
+    covariate_spec = c("python_ncloc_adjusted", "no_covariates"),
+    covariate_spec_label = c("Python NCLOC adjusted", "No contemporaneous covariates")
+  )
+  outcomes <- c(
+    "log_lines_added_py_source",
+    "log_lines_added_py_no_merge",
+    "log_lines_added_py_source_no_tests",
+    "log_lines_added_py_all"
+  )
+  primary_outcome <- "log_lines_added_py_source"
+
+  entries <- list(
+    list(backend = "sonarqube", spec = "python_ncloc_adjusted", dir = adjusted_sonarqube_dir),
+    list(backend = "cloc", spec = "python_ncloc_adjusted", dir = adjusted_cloc_dir),
+    list(backend = "sonarqube", spec = "no_covariates", dir = no_cov_sonarqube_dir),
+    list(backend = "cloc", spec = "no_covariates", dir = no_cov_cloc_dir)
+  )
+
+  static_parts <- list()
+  dynamic_parts <- list()
+  pretrend_check_parts <- list()
+  pretrend_summary_parts <- list()
+
+  for (entry in entries) {
+    prefix <- paste0("velocity_python_added_lines_", entry$backend, "_", entry$spec)
+    paths <- list(
+      static = file.path(entry$dir, paste0(prefix, "_static_effects.csv")),
+      dynamic = file.path(entry$dir, paste0(prefix, "_dynamic_effects.csv")),
+      pretrend_checks = file.path(entry$dir, paste0(prefix, "_pretrend_checks.csv")),
+      pretrend_summary = file.path(entry$dir, paste0(prefix, "_pretrend_summary.csv"))
+    )
+    missing <- names(paths)[!vapply(paths, file.exists, logical(1))]
+    if (length(missing) > 0L) {
+      abortf("Covariate-comparison inputs are missing for backend=%s spec=%s: %s",
+             entry$backend, entry$spec, paste(missing, collapse = ", "))
+    }
+
+    static <- data.table::fread(paths$static)
+    dynamic <- data.table::fread(paths$dynamic)
+    pretrend_checks <- data.table::fread(paths$pretrend_checks)
+    pretrend_summary <- data.table::fread(paths$pretrend_summary)
+
+    for (table in list(static, dynamic, pretrend_checks, pretrend_summary)) {
+      validate_columns(table, c("ncloc_backend", "covariate_spec", "outcome"))
+      if (any(table$ncloc_backend != entry$backend) || any(table$covariate_spec != entry$spec)) {
+        abortf("Covariate-comparison provenance mismatch for backend=%s spec=%s", entry$backend, entry$spec)
+      }
+    }
+    static_parts[[length(static_parts) + 1L]] <- static
+    dynamic_parts[[length(dynamic_parts) + 1L]] <- dynamic
+    pretrend_check_parts[[length(pretrend_check_parts) + 1L]] <- pretrend_checks
+    pretrend_summary_parts[[length(pretrend_summary_parts) + 1L]] <- pretrend_summary
+  }
+
+  static_all <- data.table::rbindlist(static_parts, fill = TRUE, use.names = TRUE)
+  dynamic_all <- data.table::rbindlist(dynamic_parts, fill = TRUE, use.names = TRUE)
+  pretrend_checks_all <- data.table::rbindlist(pretrend_check_parts, fill = TRUE, use.names = TRUE)
+  pretrend_summary_all <- data.table::rbindlist(pretrend_summary_parts, fill = TRUE, use.names = TRUE)
+
+  data.table::setorder(static_all, ncloc_backend, covariate_spec, outcome)
+  data.table::setorder(dynamic_all, ncloc_backend, covariate_spec, outcome, event_time)
+  data.table::setorder(pretrend_checks_all, ncloc_backend, covariate_spec, outcome, event_time)
+  data.table::setorder(pretrend_summary_all, ncloc_backend, covariate_spec, outcome)
+
+  adjusted_static <- static_all[covariate_spec == "python_ncloc_adjusted", .(
+    ncloc_backend, ncloc_backend_label, outcome, outcome_label,
+    adjusted_estimate = estimate, adjusted_std_error = std.error,
+    adjusted_conf_low = conf.low, adjusted_conf_high = conf.high,
+    adjusted_p_value = p_value, adjusted_significant = significant
+  )]
+  no_cov_static <- static_all[covariate_spec == "no_covariates", .(
+    ncloc_backend, ncloc_backend_label, outcome, outcome_label,
+    no_covariates_estimate = estimate, no_covariates_std_error = std.error,
+    no_covariates_conf_low = conf.low, no_covariates_conf_high = conf.high,
+    no_covariates_p_value = p_value, no_covariates_significant = significant
+  )]
+  static_differences <- merge(
+    adjusted_static, no_cov_static,
+    by = c("ncloc_backend", "ncloc_backend_label", "outcome", "outcome_label"),
+    all = TRUE, sort = FALSE
+  )
+  static_differences[, `:=`(
+    estimate_difference_adjusted_minus_no_covariates = adjusted_estimate - no_covariates_estimate,
+    absolute_estimate_difference = abs(adjusted_estimate - no_covariates_estimate),
+    inference_note = "Descriptive paired specification difference; no standard error for the difference is estimated."
+  )]
+  data.table::setorder(static_differences, ncloc_backend, outcome)
+
+  adjusted_dynamic <- dynamic_all[covariate_spec == "python_ncloc_adjusted", .(
+    ncloc_backend, ncloc_backend_label, outcome, outcome_label, event_time, term_type,
+    adjusted_support_rows = support_rows, adjusted_support_repositories = support_repositories,
+    adjusted_estimate = estimate, adjusted_std_error = std.error,
+    adjusted_conf_low = conf.low, adjusted_conf_high = conf.high,
+    adjusted_p_value = p_value, adjusted_significant = significant
+  )]
+  no_cov_dynamic <- dynamic_all[covariate_spec == "no_covariates", .(
+    ncloc_backend, ncloc_backend_label, outcome, outcome_label, event_time, term_type,
+    no_covariates_support_rows = support_rows, no_covariates_support_repositories = support_repositories,
+    no_covariates_estimate = estimate, no_covariates_std_error = std.error,
+    no_covariates_conf_low = conf.low, no_covariates_conf_high = conf.high,
+    no_covariates_p_value = p_value, no_covariates_significant = significant
+  )]
+  dynamic_differences <- merge(
+    adjusted_dynamic, no_cov_dynamic,
+    by = c("ncloc_backend", "ncloc_backend_label", "outcome", "outcome_label", "event_time", "term_type"),
+    all = TRUE, sort = FALSE
+  )
+  dynamic_differences[, `:=`(
+    support_rows_match = adjusted_support_rows == no_covariates_support_rows,
+    support_repositories_match = adjusted_support_repositories == no_covariates_support_repositories,
+    estimate_difference_adjusted_minus_no_covariates = adjusted_estimate - no_covariates_estimate,
+    absolute_estimate_difference = abs(adjusted_estimate - no_covariates_estimate),
+    inference_note = "Descriptive paired specification difference; no standard error for the difference is estimated."
+  )]
+  data.table::setorder(dynamic_differences, ncloc_backend, outcome, event_time)
+
+  primary_static <- static_all[outcome == primary_outcome, .(
+    ncloc_backend, ncloc_backend_label, covariate_spec, covariate_spec_label,
+    outcome, outcome_label, estimate, std.error, conf.low, conf.high, p_value, significant
+  )]
+  primary_pretrend <- pretrend_summary_all[outcome == primary_outcome, .(
+    ncloc_backend, covariate_spec, all_ci_include_zero, periods_excluding_zero, minimum_p_value
+  )]
+  primary_summary <- merge(
+    primary_static, primary_pretrend,
+    by = c("ncloc_backend", "covariate_spec"), all.x = TRUE, sort = FALSE
+  )
+  data.table::setorder(primary_summary, ncloc_backend, covariate_spec)
+
+  event_minus2 <- dynamic_all[outcome == primary_outcome & event_time == -2L, .(
+    ncloc_backend, ncloc_backend_label, covariate_spec, covariate_spec_label,
+    outcome, outcome_label, event_time, estimate, std.error, conf.low, conf.high,
+    p_value, significant, ci_includes_zero, support_rows, support_repositories
+  )]
+  data.table::setorder(event_minus2, ncloc_backend, covariate_spec)
+
+  expected_static_rows <- 2L * 2L * length(outcomes)
+  event_term_count <- data.table::uniqueN(dynamic_all$event_time)
+  pretrend_term_count <- data.table::uniqueN(pretrend_checks_all$event_time)
+  expected_dynamic_rows <- 2L * 2L * length(outcomes) * event_term_count
+  expected_pretrend_check_rows <- 2L * 2L * length(outcomes) * pretrend_term_count
+  expected_pretrend_summary_rows <- 2L * 2L * length(outcomes)
+  expected_static_difference_rows <- 2L * length(outcomes)
+  expected_dynamic_difference_rows <- 2L * length(outcomes) * event_term_count
+
+  support_mismatches <- dynamic_differences[
+    is.na(support_rows_match) | is.na(support_repositories_match) |
+      support_rows_match == FALSE | support_repositories_match == FALSE,
+    .N
+  ]
+
+  no_cov_static_backend <- merge(
+    static_all[covariate_spec == "no_covariates" & ncloc_backend == "sonarqube", .(outcome, sq = estimate)],
+    static_all[covariate_spec == "no_covariates" & ncloc_backend == "cloc", .(outcome, cloc = estimate)],
+    by = "outcome", all = TRUE
+  )
+  no_cov_dynamic_backend <- merge(
+    dynamic_all[covariate_spec == "no_covariates" & ncloc_backend == "sonarqube", .(outcome, event_time, sq = estimate)],
+    dynamic_all[covariate_spec == "no_covariates" & ncloc_backend == "cloc", .(outcome, event_time, cloc = estimate)],
+    by = c("outcome", "event_time"), all = TRUE
+  )
+  no_cov_static_max_backend_diff <- if (nrow(no_cov_static_backend) == 0L) NA_real_ else max(abs(no_cov_static_backend$sq - no_cov_static_backend$cloc), na.rm = TRUE)
+  no_cov_dynamic_max_backend_diff <- if (nrow(no_cov_dynamic_backend) == 0L) NA_real_ else max(abs(no_cov_dynamic_backend$sq - no_cov_dynamic_backend$cloc), na.rm = TRUE)
+
+  qc <- data.table::data.table(
+    check_name = c(
+      "static_rows", "dynamic_rows", "pretrend_check_rows", "pretrend_summary_rows",
+      "static_difference_rows", "dynamic_difference_rows", "support_mismatches",
+      "no_covariates_static_backend_equivalence", "no_covariates_dynamic_backend_equivalence"
+    ),
+    observed = c(
+      nrow(static_all), nrow(dynamic_all), nrow(pretrend_checks_all), nrow(pretrend_summary_all),
+      nrow(static_differences), nrow(dynamic_differences), support_mismatches,
+      no_cov_static_max_backend_diff, no_cov_dynamic_max_backend_diff
+    ),
+    expected = c(
+      expected_static_rows, expected_dynamic_rows, expected_pretrend_check_rows, expected_pretrend_summary_rows,
+      expected_static_difference_rows, expected_dynamic_difference_rows, 0,
+      0, 0
+    ),
+    status = c(
+      ifelse(nrow(static_all) == expected_static_rows, "pass", "fail"),
+      ifelse(nrow(dynamic_all) == expected_dynamic_rows, "pass", "fail"),
+      ifelse(nrow(pretrend_checks_all) == expected_pretrend_check_rows, "pass", "fail"),
+      ifelse(nrow(pretrend_summary_all) == expected_pretrend_summary_rows, "pass", "fail"),
+      ifelse(nrow(static_differences) == expected_static_difference_rows, "pass", "fail"),
+      ifelse(nrow(dynamic_differences) == expected_dynamic_difference_rows, "pass", "fail"),
+      ifelse(support_mismatches == 0L, "pass", "fail"),
+      ifelse(is.finite(no_cov_static_max_backend_diff) && no_cov_static_max_backend_diff <= tolerance, "pass", "fail"),
+      ifelse(is.finite(no_cov_dynamic_max_backend_diff) && no_cov_dynamic_max_backend_diff <= tolerance, "pass", "fail")
+    ),
+    note = c(
+      "Two backends x two covariate specifications x four outcomes.",
+      "All package-native placebo and post-treatment terms.",
+      "Five placebo periods for every backend/spec/outcome combination.",
+      "One pretrend summary per backend/spec/outcome.",
+      "Adjusted versus no-covariate static comparison within backend/outcome.",
+      "Adjusted versus no-covariate dynamic comparison within backend/outcome/event time.",
+      "Treatment support must be identical across covariate specifications.",
+      sprintf("With no covariates, NCLOC backend is unused; estimates should match within tolerance %.3g.", tolerance),
+      sprintf("With no covariates, NCLOC backend is unused; estimates should match within tolerance %.3g.", tolerance)
+    )
+  )
+  if (strict_expected_counts && any(qc$status == "fail")) {
+    abortf("Covariate sensitivity QC failed: %s", paste(qc[status == "fail", check_name], collapse = ", "))
+  }
+
+  prefix <- "velocity_python_added_lines_covariate_sensitivity"
+  output_paths <- list(
+    static_all = file.path(comparison_output_dir, paste0(prefix, "_static_effects.csv")),
+    dynamic_all = file.path(comparison_output_dir, paste0(prefix, "_dynamic_effects.csv")),
+    pretrend_checks_all = file.path(comparison_output_dir, paste0(prefix, "_pretrend_checks.csv")),
+    pretrend_summary_all = file.path(comparison_output_dir, paste0(prefix, "_pretrend_summary.csv")),
+    static_differences = file.path(comparison_output_dir, paste0(prefix, "_static_differences.csv")),
+    dynamic_differences = file.path(comparison_output_dir, paste0(prefix, "_dynamic_differences.csv")),
+    primary_summary = file.path(comparison_output_dir, paste0(prefix, "_primary_summary.csv")),
+    event_minus2 = file.path(comparison_output_dir, paste0(prefix, "_primary_event_minus2.csv")),
+    qc = file.path(comparison_output_dir, paste0(prefix, "_qc.csv")),
+    plot_pdf = file.path(plot_dir, paste0(prefix, "_primary_dynamic_effects.pdf")),
+    plot_png = file.path(plot_dir, paste0(prefix, "_primary_dynamic_effects.png"))
+  )
+
+  write_csv(static_all, output_paths$static_all)
+  write_csv(dynamic_all, output_paths$dynamic_all)
+  write_csv(pretrend_checks_all, output_paths$pretrend_checks_all)
+  write_csv(pretrend_summary_all, output_paths$pretrend_summary_all)
+  write_csv(static_differences, output_paths$static_differences)
+  write_csv(dynamic_differences, output_paths$dynamic_differences)
+  write_csv(primary_summary, output_paths$primary_summary)
+  write_csv(event_minus2, output_paths$event_minus2)
+  write_csv(qc, output_paths$qc)
+
+  plot_data <- dynamic_all[outcome == primary_outcome & event_time >= -6L & event_time <= 6L]
+  plot_data[, spec_display := factor(covariate_spec_label, levels = c("Python NCLOC adjusted", "No contemporaneous covariates"))]
+  plot_object <- ggplot2::ggplot(
+    plot_data,
+    ggplot2::aes(x = event_time, y = estimate, shape = spec_display, linetype = spec_display)
+  ) +
+    ggplot2::geom_errorbar(
+      ggplot2::aes(ymin = conf.low, ymax = conf.high),
+      width = 0.25,
+      position = ggplot2::position_dodge(width = 0.30)
+    ) +
+    ggplot2::geom_point(size = 1.8, position = ggplot2::position_dodge(width = 0.30)) +
+    ggplot2::geom_line(position = ggplot2::position_dodge(width = 0.30)) +
+    ggplot2::geom_hline(yintercept = 0, linetype = "dashed") +
+    ggplot2::geom_vline(xintercept = -0.5, linetype = "dashed") +
+    ggplot2::scale_x_continuous(breaks = seq.int(-6L, 6L, by = 1L)) +
+    ggplot2::coord_cartesian(xlim = c(-6.5, 6.5)) +
+    ggplot2::labs(
+      x = "Months Relative to Cursor Adoption",
+      y = "Treatment Effect",
+      shape = "First-stage specification",
+      linetype = "First-stage specification",
+      caption = "Primary outcome only; same repository-month sample and treatment timing within each NCLOC backend."
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position = "bottom",
+      panel.grid.major.x = ggplot2::element_blank(),
+      panel.grid.minor.x = ggplot2::element_blank(),
+      plot.caption = ggplot2::element_text(hjust = 0.5, size = 9)
+    ) +
+    ggplot2::facet_wrap(~ncloc_backend_label, nrow = 1)
+
+  ggplot2::ggsave(output_paths$plot_pdf, plot_object, width = 11, height = 5.5, units = "in", bg = "white")
+  ggplot2::ggsave(output_paths$plot_png, plot_object, width = 11, height = 5.5, units = "in", dpi = 180, bg = "white")
+
+  summary_rows <- list(
+    make_summary_row("implementation", "version", "v3"),
+    make_summary_row("definition", "comparison", "python_ncloc_adjusted_vs_no_covariates"),
+    make_summary_row("definition", "primary_outcome", primary_outcome),
+    make_summary_row("definition", "covariate_specs", paste(specs$covariate_spec, collapse = "|")),
+    make_summary_row("definition", "backend_equivalence_tolerance", tolerance),
+    make_summary_row("output", "static_rows", nrow(static_all)),
+    make_summary_row("output", "dynamic_rows", nrow(dynamic_all)),
+    make_summary_row("output", "pretrend_check_rows", nrow(pretrend_checks_all)),
+    make_summary_row("output", "static_difference_rows", nrow(static_differences)),
+    make_summary_row("output", "dynamic_difference_rows", nrow(dynamic_differences)),
+    make_summary_row("qc", "support_mismatches", support_mismatches),
+    make_summary_row("qc", "no_covariates_static_backend_max_abs_difference", no_cov_static_max_backend_diff),
+    make_summary_row("qc", "no_covariates_dynamic_backend_max_abs_difference", no_cov_dynamic_max_backend_diff),
+    make_summary_row("artifact", "primary_dynamic_plot_pdf", output_paths$plot_pdf),
+    make_summary_row("artifact", "primary_dynamic_plot_png", output_paths$plot_png)
+  )
+  for (idx in seq_len(nrow(primary_summary))) {
+    row <- primary_summary[idx]
+    metric_prefix <- paste(row$ncloc_backend, row$covariate_spec, sep = "__")
+    summary_rows[[length(summary_rows) + 1L]] <- make_summary_row("primary_static", paste0(metric_prefix, "__estimate"), row$estimate)
+    summary_rows[[length(summary_rows) + 1L]] <- make_summary_row("primary_static", paste0(metric_prefix, "__p_value"), row$p_value)
+    summary_rows[[length(summary_rows) + 1L]] <- make_summary_row("primary_pretrend", paste0(metric_prefix, "__all_ci_include_zero"), row$all_ci_include_zero)
+    summary_rows[[length(summary_rows) + 1L]] <- make_summary_row("primary_pretrend", paste0(metric_prefix, "__periods_excluding_zero"), row$periods_excluding_zero)
+    summary_rows[[length(summary_rows) + 1L]] <- make_summary_row("primary_pretrend", paste0(metric_prefix, "__minimum_p_value"), row$minimum_p_value)
+  }
+  write_csv(data.table::rbindlist(summary_rows, fill = TRUE, use.names = TRUE), comparison_summary_output)
+
+  log_message(
+    "INFO",
+    "Completed run-x-b03-v3 covariate comparison: static=%d; dynamic=%d; pretrend_checks=%d; paired_static=%d; paired_dynamic=%d",
+    nrow(static_all), nrow(dynamic_all), nrow(pretrend_checks_all), nrow(static_differences), nrow(dynamic_differences)
   )
 }
 
@@ -1001,7 +1347,11 @@ if (mode == "compare") {
   run_backend_comparison(args)
   quit(save = "no", status = 0L)
 }
-if (mode != "backend") abortf("--mode must be backend or compare: %s", mode)
+if (mode == "covariate_compare") {
+  run_covariate_comparison(args)
+  quit(save = "no", status = 0L)
+}
+if (mode != "backend") abortf("--mode must be backend, compare, or covariate_compare: %s", mode)
 
 backend <- tolower(require_arg(args, "backend"))
 if (!backend %in% c("sonarqube", "cloc")) {
@@ -1009,14 +1359,35 @@ if (!backend %in% c("sonarqube", "cloc")) {
 }
 backend_label <- if (backend == "sonarqube") "SonarQube" else "cloc"
 backend_metric <- if (backend == "sonarqube") "ncloc_py_sonarqube" else "ncloc_py_cloc"
-artifact_prefix <- paste0("velocity_python_added_lines_", backend)
+covariate_spec <- tolower(require_arg(args, "covariate_spec"))
+covariate_specs <- list(
+  python_ncloc_adjusted = list(
+    label = "Python NCLOC adjusted",
+    first_stage_formula = ~ log_age + ncloc + log_contributors + log_stars + log_issues | repo_id + time_index,
+    first_stage_formula_text = "~ log_age + ncloc + log_contributors + log_stars + log_issues | repo_id + time_index",
+    model_fields = c("log_age", "ncloc", "log_contributors", "log_stars", "log_issues")
+  ),
+  no_covariates = list(
+    label = "No contemporaneous covariates",
+    first_stage_formula = ~ 1 | repo_id + time_index,
+    first_stage_formula_text = "~ 1 | repo_id + time_index",
+    model_fields = character()
+  )
+)
+if (!covariate_spec %in% names(covariate_specs)) {
+  abortf("--covariate-spec must be python_ncloc_adjusted or no_covariates: %s", covariate_spec)
+}
+covariate_spec_label <- covariate_specs[[covariate_spec]]$label
+first_stage_formula <- covariate_specs[[covariate_spec]]$first_stage_formula
+first_stage_formula_text <- covariate_specs[[covariate_spec]]$first_stage_formula_text
+artifact_prefix <- paste0("velocity_python_added_lines_", backend, "_", covariate_spec)
 
 input_file <- normalizePath(require_arg(args, "input_file"), mustWork = TRUE)
 output_dir <- require_arg(args, "output_dir")
 summary_output <- require_arg(args, "summary_output")
 html_output <- args$html_output
 if (is.null(html_output) || !nzchar(as.character(html_output))) {
-  html_output <- file.path(output_dir, paste0("velocity_python_added_lines_", backend, "_report.html"))
+  html_output <- file.path(output_dir, paste0("velocity_python_added_lines_", backend, "_", covariate_spec, "_report.html"))
 }
 html_output <- as.character(html_output)
 script_path <- args$script_path
@@ -1192,11 +1563,11 @@ timing_errors <- panel[
 ]
 if (nrow(timing_errors) > 0L) abortf("Found %d normalized event-time errors.", nrow(timing_errors))
 
-model_fields <- c(
+outcome_model_fields <- c(
   "log_lines_added_py_source", "log_lines_added_py_no_merge",
-  "log_lines_added_py_source_no_tests", "log_lines_added_py_all",
-  "log_age", "ncloc", "log_contributors", "log_stars", "log_issues"
+  "log_lines_added_py_source_no_tests", "log_lines_added_py_all"
 )
+model_fields <- c(outcome_model_fields, covariate_specs[[covariate_spec]]$model_fields)
 missing_model_rows <- panel[!stats::complete.cases(panel[, ..model_fields])]
 if (nrow(missing_model_rows) > 0L) abortf("Found %d rows with missing Python-NCLOC model fields.", nrow(missing_model_rows))
 
@@ -1256,6 +1627,9 @@ write_csv(cohort_support, paths$cohort_support)
 sample_summary <- data.table::rbindlist(list(
   make_summary_row("definition", "ncloc_backend", backend),
   make_summary_row("definition", "ncloc_backend_metric", backend_metric),
+  make_summary_row("definition", "covariate_spec", covariate_spec),
+  make_summary_row("definition", "covariate_spec_label", covariate_spec_label),
+  make_summary_row("definition", "first_stage_formula", first_stage_formula_text),
   make_summary_row("definition", "primary_outcome", expected_primary_metadata),
   make_summary_row("definition", "robustness_outcomes", expected_robustness_metadata),
   make_summary_row("definition", "python_velocity_metric_version", expected_velocity_version),
@@ -1294,8 +1668,6 @@ outcome_labels <- c(
 )
 primary_outcome <- "log_lines_added_py_source"
 robustness_outcomes <- setdiff(outcomes, primary_outcome)
-first_stage_formula <- ~ log_age + ncloc + log_contributors + log_stars + log_issues | repo_id + time_index
-
 static_tables <- list()
 dynamic_tables <- list()
 pretrend_check_tables <- list()
@@ -1311,6 +1683,9 @@ add_diagnostic <- function(outcome, model_type, status, elapsed, warnings = char
     ncloc_backend = backend,
     ncloc_backend_label = backend_label,
     ncloc_backend_metric = backend_metric,
+    covariate_spec = covariate_spec,
+    covariate_spec_label = covariate_spec_label,
+    first_stage_formula = first_stage_formula_text,
     outcome = outcome,
     model_type = model_type,
     status = status,
@@ -1337,8 +1712,8 @@ for (outcome in outcomes) {
     abortf("Missing outcome label for: %s", as.character(outcome))
   }
 
-  log_message("INFO", "Fitting first-stage diagnostic for %s", outcome)
-  first_stage_capture <- fit_first_stage_diagnostic(panel, outcome, first_stage_formula)
+  log_message("INFO", "Fitting first-stage diagnostic for %s under %s", outcome, covariate_spec)
+  first_stage_capture <- fit_first_stage_diagnostic(panel, outcome, first_stage_formula_text)
   if (first_stage_capture$error) {
     error_text <- first_stage_capture$value$message
     add_diagnostic(outcome, "first_stage", "failed", first_stage_capture$elapsed, first_stage_capture$warnings, error_text)
@@ -1361,7 +1736,7 @@ for (outcome in outcomes) {
     extra = sprintf("nobs=%d; prediction_na_all=%d; prediction_na_treated=%d", stats::nobs(first_stage_capture$value), prediction_na_all, prediction_na_treated)
   )
 
-  log_message("INFO", "Running static did_imputation for %s", outcome)
+  log_message("INFO", "Running static did_imputation for %s under %s", outcome, covariate_spec)
   static_capture <- run_did_model(panel, outcome, first_stage_formula, horizon = NULL, pretrends = NULL)
   if (static_capture$error) {
     error_text <- static_capture$value$message
@@ -1382,6 +1757,9 @@ for (outcome in outcomes) {
     ncloc_backend = backend,
     ncloc_backend_label = backend_label,
     ncloc_backend_metric = backend_metric,
+    covariate_spec = covariate_spec,
+    covariate_spec_label = covariate_spec_label,
+    first_stage_formula = first_stage_formula_text,
     outcome_label = outcome_label_value,
     outcome_role = ifelse(outcome == primary_outcome, "primary", "robustness"),
     term_type = "static_att",
@@ -1394,7 +1772,7 @@ for (outcome in outcomes) {
   static_tables[[outcome]] <- static_table
   add_diagnostic(outcome, "static", "success", static_capture$elapsed, static_capture$warnings, result_terms = nrow(static_table))
 
-  log_message("INFO", "Running dynamic did_imputation for %s", outcome)
+  log_message("INFO", "Running dynamic did_imputation for %s under %s", outcome, covariate_spec)
   dynamic_capture <- run_did_model(panel, outcome, first_stage_formula, horizon = dynamic_horizon_values, pretrends = pretrend_values)
   if (dynamic_capture$error) {
     error_text <- dynamic_capture$value$message
@@ -1425,6 +1803,9 @@ for (outcome in outcomes) {
     ncloc_backend = backend,
     ncloc_backend_label = backend_label,
     ncloc_backend_metric = backend_metric,
+    covariate_spec = covariate_spec,
+    covariate_spec_label = covariate_spec_label,
+    first_stage_formula = first_stage_formula_text,
     outcome_label = outcome_label_value,
     outcome_role = ifelse(outcome == primary_outcome, "primary", "robustness"),
     ci_includes_zero = !is.na(conf.low) & !is.na(conf.high) & conf.low <= 0 & conf.high >= 0,
@@ -1459,6 +1840,7 @@ for (outcome in outcomes) {
   pretrend_check[, check_status := data.table::fifelse(ci_includes_zero, "includes_zero", "excludes_zero")]
   pretrend_check_tables[[outcome]] <- pretrend_check[, .(
     ncloc_backend, ncloc_backend_label, ncloc_backend_metric,
+    covariate_spec, covariate_spec_label, first_stage_formula,
     outcome, outcome_label, outcome_role, event_time, term, estimate, std.error,
     conf.low, conf.high, p_value, significant, ci_includes_zero,
     check_status, support_rows, support_repositories
@@ -1469,6 +1851,9 @@ for (outcome in outcomes) {
     ncloc_backend = backend,
     ncloc_backend_label = backend_label,
     ncloc_backend_metric = backend_metric,
+    covariate_spec = covariate_spec,
+    covariate_spec_label = covariate_spec_label,
+    first_stage_formula = first_stage_formula_text,
     outcome = outcome,
     outcome_label = outcome_label_value,
     outcome_role = ifelse(outcome == primary_outcome, "primary", "robustness"),
@@ -1505,6 +1890,7 @@ pretrend_summary_output <- data.table::rbindlist(pretrend_summary_tables, fill =
 
 data.table::setcolorder(static_output, c(
   "ncloc_backend", "ncloc_backend_label", "ncloc_backend_metric",
+  "covariate_spec", "covariate_spec_label", "first_stage_formula",
   "outcome", "outcome_label", "outcome_role", "term", "term_type", "estimate", "std.error",
   "conf.low", "conf.high", "p_value", "significant",
   "exp_coefficient_change_pct", "exp_ci_low_pct", "exp_ci_high_pct",
@@ -1513,6 +1899,7 @@ data.table::setcolorder(static_output, c(
 ))
 data.table::setcolorder(dynamic_output, c(
   "ncloc_backend", "ncloc_backend_label", "ncloc_backend_metric",
+  "covariate_spec", "covariate_spec_label", "first_stage_formula",
   "outcome", "outcome_label", "outcome_role", "event_time", "term", "term_type",
   "estimate", "std.error", "conf.low", "conf.high", "p_value", "significant",
   "exp_coefficient_change_pct", "exp_ci_low_pct", "exp_ci_high_pct",
@@ -1576,6 +1963,7 @@ run_finished <- Sys.time()
 metadata <- data.table::data.table(
   metadata_key = c(
     "implementation_version", "ncloc_backend", "ncloc_backend_label", "ncloc_backend_metric",
+    "covariate_spec", "covariate_spec_label",
     "run_started", "run_finished", "runtime_seconds",
     "input_file", "input_sha256", "script_path", "script_sha256",
     "r_version", "platform", "hostname",
@@ -1587,7 +1975,7 @@ metadata <- data.table::data.table(
     "html_report", "html_self_contained", "original_rmd_alignment"
   ),
   value = c(
-    "v2", backend, backend_label, backend_metric,
+    "v3", backend, backend_label, backend_metric, covariate_spec, covariate_spec_label,
     format(run_started, "%Y-%m-%d %H:%M:%S %Z"), format(run_finished, "%Y-%m-%d %H:%M:%S %Z"),
     as.character(as.numeric(difftime(run_finished, run_started, units = "secs"))),
     input_file, sha256_file(input_file), as.character(script_path), sha256_file(as.character(script_path)),
@@ -1596,7 +1984,7 @@ metadata <- data.table::data.table(
     safe_package_version("data.table"), safe_package_version("ggplot2"),
     safe_package_version("rmarkdown"), safe_package_version("knitr"),
     as.character(rmarkdown::pandoc_version()),
-    "~ log_age + ncloc + log_contributors + log_stars + log_issues | repo_id + time_index",
+    first_stage_formula_text,
     "repo_id", primary_outcome, paste(robustness_outcomes, collapse = "|"), expected_velocity_version,
     paste(dynamic_horizon_values, collapse = ","), paste(pretrend_values, collapse = ","),
     "-1 omitted", as.character(confidence_level), html_output, "true",
@@ -1607,11 +1995,13 @@ data.table::setnames(metadata, "metadata_key", "key")
 write_csv(metadata, paths$metadata)
 
 summary_rows <- list(
-  make_summary_row("implementation", "version", "v2"),
+  make_summary_row("implementation", "version", "v3"),
   make_summary_row("definition", "ncloc_backend", backend),
   make_summary_row("definition", "ncloc_backend_metric", backend_metric),
+  make_summary_row("definition", "covariate_spec", covariate_spec),
+  make_summary_row("definition", "covariate_spec_label", covariate_spec_label),
   make_summary_row("definition", "treatment_timing", "absorbing_first_adoption", "Uses event_index and time_index; legacy monthly usage flags are audit-only."),
-  make_summary_row("definition", "first_stage", "log_age+ncloc+log_contributors+log_stars+log_issues|repo_id+time_index"),
+  make_summary_row("definition", "first_stage", first_stage_formula_text),
   make_summary_row("definition", "cluster", "repo_id"),
   make_summary_row("definition", "primary_outcome", primary_outcome),
   make_summary_row("definition", "robustness_outcomes", paste(robustness_outcomes, collapse = "|")),
@@ -1669,8 +2059,8 @@ html_result <- render_html_report(
   control_repos = control_repos,
   untreated_rows = untreated_rows,
   treated_rows = treated_rows,
-  first_stage_formula = "~ log_age + ncloc + log_contributors + log_stars + log_issues | repo_id + time_index",
-  implementation_version = "v2",
+  first_stage_formula = first_stage_formula_text,
+  implementation_version = "v3",
   backend_key = backend,
   backend_label = backend_label,
   backend_metric = backend_metric
@@ -1689,6 +2079,6 @@ data.table::setnames(html_metadata, "metadata_key", "key")
 metadata <- data.table::rbindlist(list(metadata, html_metadata), use.names = TRUE, fill = TRUE)
 write_csv(metadata, paths$metadata)
 
-log_message("INFO", "Completed run-x-b03-v2 backend=%s: %d static effects, %d package-native dynamic/pretrend terms, %d pretrend checks, and 1 HTML report",
-            backend,
+log_message("INFO", "Completed run-x-b03-v3 backend=%s covariate_spec=%s: %d static effects, %d package-native dynamic/pretrend terms, %d pretrend checks, and 1 HTML report",
+            backend, covariate_spec,
             nrow(static_output), nrow(dynamic_output), nrow(pretrend_check_output))
