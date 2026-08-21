@@ -45,10 +45,10 @@ from typing import Iterable
 import numpy as np
 import pandas as pd
 
-IMPLEMENTATION_VERSION = "v4"
+IMPLEMENTATION_VERSION = "v8"
 ML_METRIC = "file_ml_agc_share_space_by_token_weighted"
 STRICT_OPERATOR = ">"
-DEFAULT_THRESHOLDS = (0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
+DEFAULT_THRESHOLDS = (0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 PRIMARY_THRESHOLD = 0.50
 FILE_KEYS = ("snapshot_id", "relative_path", "file_sha256")
 

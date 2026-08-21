@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # ============================================================
-# run-x-e03 v7: low-range ML-threshold sensitivity for dynamic panel GMM
+# run-x-e03 v8: low-range ML-threshold sensitivity for dynamic panel GMM
 # ============================================================
 #
 # Purpose:
@@ -182,7 +182,7 @@ input_file <- normalizePath(require_arg(args, "input_file"), mustWork=TRUE)
 reference_coefficients_file <- normalizePath(require_arg(args, "reference_coefficients_file"), mustWork=TRUE)
 output_dir <- require_arg(args, "output_dir")
 script_path <- if (is.null(args$script_path)) NA_character_ else as.character(args$script_path)
-implementation_version <- if (is.null(args$implementation_version)) "v7" else as.character(args$implementation_version)
+implementation_version <- if (is.null(args$implementation_version)) "v8" else as.character(args$implementation_version)
 confidence_level <- as_numeric_arg(args, "confidence_level", 0.95)
 expected_rows_per_threshold <- as_integer_arg(args, "expected_rows_per_threshold", 1954L)
 expected_active_rows <- as_integer_arg(args, "expected_active_rows", 1631L)
@@ -217,9 +217,9 @@ required <- c(
 validate_columns(panel_long, required)
 
 thresholds <- sort(unique(as.numeric(panel_long$ml_threshold)))
-expected_thresholds <- c(0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50)
-if (length(thresholds) != 9L || any(abs(thresholds - expected_thresholds) > 1e-12)) {
-  abortf("Expected threshold grid 0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50; found %s", paste(thresholds, collapse=","))
+expected_thresholds <- c(0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50)
+if (length(thresholds) != 10L || any(abs(thresholds - expected_thresholds) > 1e-12)) {
+  abortf("Expected threshold grid 0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50; found %s", paste(thresholds, collapse=","))
 }
 if (nrow(panel_long) != expected_rows_per_threshold * length(thresholds)) abortf("Unexpected long panel row count")
 

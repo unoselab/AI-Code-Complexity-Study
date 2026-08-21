@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # ============================================================
-# run-x-e03 v7: low-range ML threshold sensitivity dynamic-panel GMM
+# run-x-e03 v8: low-range ML threshold sensitivity dynamic-panel GMM
 # ============================================================
 #
 # Purpose:
@@ -12,7 +12,7 @@ set -euo pipefail
 #
 # Pipeline:
 #   1. Reaggregate canonical D02 SonarQube file burden using continuous A04
-#      file-level ML scores at all nine thresholds.
+#      file-level ML scores at all ten thresholds.
 #   2. Require threshold 0.50 to reproduce frozen D05 repo-month quality
 #      outcomes exactly.
 #   3. Fit the exact same E03-v2 two-step difference-GMM at every threshold.
@@ -28,7 +28,7 @@ cd "${PROJECT_ROOT}"
 export PROJECT_ROOT
 
 RUN_PREFIX="run-x-e03"
-IMPLEMENTATION_VERSION="v7"
+IMPLEMENTATION_VERSION="v8"
 RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}-threshold-sensitivity-low"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_DIR="${LOG_DIR:-logs}"
@@ -45,9 +45,9 @@ B06_FILE="${B06_FILE:-repo_x01/run-x-b06/panels/quality_did_panel_python_sonarqu
 D05_REFERENCE_FILE="${D05_REFERENCE_FILE:-repo_x01/run-x-d05/quality_ml_fun_repo_month_panel.csv.gz}"
 E03_REFERENCE_COEFFICIENTS="${E03_REFERENCE_COEFFICIENTS:-repo_x01/run-x-e03/dynamic_panel_gmm_ml_coefficients.csv}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-repo_x01/run-x-e03-threshold-sensitivity-low}"
+OUTPUT_DIR="${OUTPUT_DIR:-repo_x01/run-x-e03-threshold-sensitivity-low-v8}"
 THRESHOLD_PANEL="${OUTPUT_DIR}/ml_gmm_threshold_repo_month_panel.csv.gz"
-THRESHOLDS="${THRESHOLDS:-0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50}"
+THRESHOLDS="${THRESHOLDS:-0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50}"
 CONFIDENCE_LEVEL="${CONFIDENCE_LEVEL:-0.95}"
 REFERENCE_TOLERANCE="${REFERENCE_TOLERANCE:-1e-10}"
 
@@ -129,7 +129,7 @@ BUILD_COMMAND=(
 
 {
   echo
-  echo "** Step 1: Reaggregate ML-localized quality at nine thresholds"
+  echo "** Step 1: Reaggregate ML-localized quality at ten thresholds"
   echo "------------------------------------------------------------"
   printf 'Command:'; printf ' %q' "${BUILD_COMMAND[@]}"; printf '\n\n'
 } | tee -a "${LOG_FILE}"
