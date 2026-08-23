@@ -1,19 +1,19 @@
 #!/usr/bin/env Rscript
 
 # ============================================================
-# run-x-e03 v8: low-range ML-threshold sensitivity for dynamic panel GMM
+# run-x-g08 v2: ML file-composition threshold sensitivity for dynamic panel GMM
 # ============================================================
 #
 # Purpose:
 #   Re-estimate the frozen E03 ML-localized Quality_t -> Velocity_{t+1}
 #   dynamic-panel GMM across a prespecified sensitivity grid of strict file-level
-#   ML composition thresholds: 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, and 0.50.
+#   ML file-composition thresholds: 21 cutoffs from 0.10 to 0.90 by 0.04.
 #
 # Scientific guardrails:
-#   - 0.50 remains the frozen primary threshold.
+#   - 0.50 remains the primary file-composition threshold.
 #   - Every threshold is reported; no p-value-based threshold selection.
 #   - The GMM specification is identical at every threshold.
-#   - The 0.50 estimate must reproduce the frozen E03-v2 primary result.
+#   - The 0.50 estimate must reproduce the validated E03-v2 primary result.
 #
 # Model:
 #   Velocity_t ~ Velocity_{t-1} + MLQuality_{t-1} + treatment_t + controls_t
@@ -139,7 +139,7 @@ extract_coefficients <- function(summary_object, threshold_id, threshold, confid
     threshold_id=threshold_id,
     threshold=threshold,
     primary_analysis=as.integer(abs(threshold - 0.50) < 1e-12),
-    model="ml_quality_to_velocity",
+    model="ml_threshold_quality_to_velocity",
     direction="MLQuality_{t-1} -> Velocity_t",
     term=terms,
     estimate=estimate,
@@ -182,7 +182,7 @@ input_file <- normalizePath(require_arg(args, "input_file"), mustWork=TRUE)
 reference_coefficients_file <- normalizePath(require_arg(args, "reference_coefficients_file"), mustWork=TRUE)
 output_dir <- require_arg(args, "output_dir")
 script_path <- if (is.null(args$script_path)) NA_character_ else as.character(args$script_path)
-implementation_version <- if (is.null(args$implementation_version)) "v8" else as.character(args$implementation_version)
+implementation_version <- if (is.null(args$implementation_version)) "v2" else as.character(args$implementation_version)
 confidence_level <- as_numeric_arg(args, "confidence_level", 0.95)
 expected_rows_per_threshold <- as_integer_arg(args, "expected_rows_per_threshold", 1954L)
 expected_active_rows <- as_integer_arg(args, "expected_active_rows", 1631L)
@@ -209,7 +209,7 @@ paths <- list(
 log_message("INFO", "Reading ML threshold sensitivity panel: %s", input_file)
 panel_long <- data.table::fread(input_file, na.strings=c("", "NA", "NaN"))
 required <- c(
-  "threshold_id","ml_threshold","primary_analysis","repo_id","repo_name","dataset_source",
+  "threshold_id","ml_threshold","ml_operator","ml_metric","primary_analysis","repo_id","repo_name","dataset_source",
   "treatment_group","time_index","event_index","time_to_event","is_treatment","post_event","cursor",
   "log_lines_added_py_source","log1p_selected_issue_total","selected_issue_total","selected_file_rows",
   "log_age","ncloc_py_sonarqube","log_contributors","log_stars","log_issues"
@@ -217,11 +217,15 @@ required <- c(
 validate_columns(panel_long, required)
 
 thresholds <- sort(unique(as.numeric(panel_long$ml_threshold)))
-expected_thresholds <- c(0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50)
-if (length(thresholds) != 10L || any(abs(thresholds - expected_thresholds) > 1e-12)) {
-  abortf("Expected threshold grid 0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50; found %s", paste(thresholds, collapse=","))
+expected_thresholds <- seq(0.10, 0.90, by=0.04)
+if (length(thresholds) != 21L || any(abs(thresholds - expected_thresholds) > 1e-12)) {
+  abortf("Expected 21-point threshold grid from 0.10 to 0.90 by 0.04; found %s", paste(thresholds, collapse=","))
 }
 if (nrow(panel_long) != expected_rows_per_threshold * length(thresholds)) abortf("Unexpected long panel row count")
+if (any(as.character(panel_long$ml_operator) != ">")) abortf("G08 requires strict ML file-composition operator >")
+if (any(as.character(panel_long$ml_metric) != "file_ml_agc_share_space_by_token_weighted")) abortf("Unexpected ML file metric in G08 input")
+expected_primary_flag <- as.integer(abs(as.numeric(panel_long$ml_threshold) - 0.50) <= 1e-12)
+if (any(as.integer(panel_long$primary_analysis) != expected_primary_flag)) abortf("G08 primary_analysis flag is inconsistent with threshold 0.50")
 
 # Coerce numeric columns without treating pre-existing audit-only NA values as
 # fatal. This mirrors the validated E03-v2 contract: controls may legitimately
@@ -335,7 +339,7 @@ for (threshold in thresholds) {
   dims <- extract_dimensions(model)
   instrument <- data.table::data.table(
     threshold_id=threshold_id, threshold=threshold, primary_analysis=as.integer(abs(threshold-0.50)<1e-12),
-    model="ml_quality_to_velocity", collapse=FALSE, instrument_specification="lag(velocity,2)",
+    model="ml_threshold_quality_to_velocity", collapse=FALSE, instrument_specification="lag(velocity,2)",
     minimum_calendar_support_rows=nrow(active), minimum_calendar_support_repositories=data.table::uniqueN(active$repo_id),
     stats_nobs=dims$stats_nobs, active_gmm_repositories=data.table::uniqueN(active$repo_id),
     instrument_count=dims$instrument_count, instrument_ratio_denominator=data.table::uniqueN(active$repo_id),
@@ -378,11 +382,11 @@ qc <- data.table::rbindlist(qc_all, use.names=TRUE, fill=TRUE)
 primary_summary <- coefficients[is_primary_interaction_term==TRUE, .(threshold_id,threshold,primary_analysis,estimate,std_error,conf_low,conf_high,p_value,significant)]
 data.table::setorder(primary_summary, threshold)
 
-# Frozen E03-v2 reproduction gate at threshold 0.50.
+# Validated E03-v2 reproduction gate at the primary 0.50 cutoff.
 reference <- data.table::fread(reference_coefficients_file, na.strings=c("","NA","NaN"))
 validate_columns(reference, c("sample_spec","mapping_spec","term","estimate","std_error","p_value","is_primary_interaction_term"))
 ref <- reference[sample_spec=="full_sample" & mapping_spec=="all_ml_files" & bool_to_int(is_primary_interaction_term)==1L]
-if (nrow(ref) != 1L) abortf("Expected exactly one frozen E03-v2 primary ML-quality coefficient")
+if (nrow(ref) != 1L) abortf("Expected exactly one validated E03-v2 primary ML-quality coefficient")
 new <- primary_summary[abs(threshold-0.50)<1e-12]
 reproduction <- data.table::data.table(
   metric=c("estimate","std_error","p_value"),
@@ -392,7 +396,7 @@ reproduction <- data.table::data.table(
 reproduction[, absolute_difference := abs(as.numeric(e03_v2)-as.numeric(threshold_current))]
 reproduction[, tolerance := reference_tolerance]
 reproduction[, status := ifelse(absolute_difference <= reference_tolerance,"pass","fail")]
-if (any(reproduction$status=="fail")) abortf("0.50 GMM estimate failed frozen E03-v2 reproduction")
+if (any(reproduction$status=="fail")) abortf("0.50 GMM estimate failed E03-v2 reproduction")
 
 failed <- qc[status=="fail"]
 if (nrow(failed)) abortf("Threshold GMM QC contains %d hard failures", nrow(failed))
@@ -413,7 +417,7 @@ metadata <- data.table::data.table(
     "R","data.table","plm"),
   value=c(implementation_version,input_file,sha256_file(input_file),reference_coefficients_file,sha256_file(reference_coefficients_file),format(Sys.time(),"%Y-%m-%d %H:%M:%S %Z"),
     paste(sprintf("%.2f",thresholds),collapse=","),"0.50",">","file_ml_agc_share_space_by_token_weighted","log1p_selected_issue_total","log_lines_added_py_source",
-    "twoways; twosteps; difference GMM; lag(velocity,2); collapse=FALSE","report all thresholds; do not select threshold by GMM significance",
+    "twoways; twosteps; difference GMM; lag(velocity,2); collapse=FALSE","file-level token-weighted AGC-share cutoff sensitivity; function-level SVM boundary unchanged; report all thresholds; do not select threshold by GMM significance",
     R.version.string,as.character(utils::packageVersion("data.table")),as.character(utils::packageVersion("plm")))
 )
 write_csv(metadata, paths$metadata)
