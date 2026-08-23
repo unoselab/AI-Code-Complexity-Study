@@ -40,7 +40,7 @@ from typing import Iterable
 import numpy as np
 import pandas as pd
 
-IMPLEMENTATION_VERSION = "v1"
+IMPLEMENTATION_VERSION = "v3"
 EXPERIMENT_NAME = "run-x-d07-build-ml-threshold-quality-burden-panel"
 ML_METRIC = "file_ml_agc_share_space_by_token_weighted"
 PRIMARY_THRESHOLD = 0.50
@@ -55,19 +55,34 @@ MISSING_SHA_SENTINEL = "__MISSING_FILE_SHA256__"
 
 # Output name -> accepted D02 source column names.
 BURDEN_SOURCES = {
+    # D02 production schema uses sonar_issue_type_* for issue types and
+    # sonar_issue_with_*_impact for Clean Code impact classifications.
+    # Older aliases remain as fallbacks so the builder can audit compatible
+    # development fixtures without changing the standardized D07 output names.
     "selected_issue_total": ("sonar_issue_total", "issue_total"),
-    "selected_issue_code_smell": ("sonar_issue_code_smell", "issue_code_smell", "code_smell"),
-    "selected_issue_bug": ("sonar_issue_bug", "issue_bug", "bug"),
-    "selected_issue_vulnerability": ("sonar_issue_vulnerability", "issue_vulnerability", "vulnerability"),
-    "selected_issue_high_severity": ("sonar_issue_high_severity", "issue_high_severity", "high_severity"),
+    "selected_issue_code_smell": (
+        "sonar_issue_type_code_smell", "sonar_issue_code_smell", "issue_code_smell", "code_smell"
+    ),
+    "selected_issue_bug": (
+        "sonar_issue_type_bug", "sonar_issue_bug", "issue_bug", "bug"
+    ),
+    "selected_issue_vulnerability": (
+        "sonar_issue_type_vulnerability", "sonar_issue_vulnerability", "issue_vulnerability", "vulnerability"
+    ),
+    "selected_issue_high_severity": (
+        "sonar_issue_high_severity", "issue_high_severity", "high_severity"
+    ),
     "selected_issue_maintainability_impact": (
-        "sonar_issue_maintainability_impact", "issue_maintainability_impact", "maintainability_impact"
+        "sonar_issue_with_maintainability_impact", "sonar_issue_maintainability_impact",
+        "issue_maintainability_impact", "maintainability_impact"
     ),
     "selected_issue_reliability_impact": (
-        "sonar_issue_reliability_impact", "issue_reliability_impact", "reliability_impact"
+        "sonar_issue_with_reliability_impact", "sonar_issue_reliability_impact",
+        "issue_reliability_impact", "reliability_impact"
     ),
     "selected_issue_security_impact": (
-        "sonar_issue_security_impact", "issue_security_impact", "security_impact"
+        "sonar_issue_with_security_impact", "sonar_issue_security_impact",
+        "issue_security_impact", "security_impact"
     ),
 }
 
@@ -345,6 +360,7 @@ def main() -> None:
         abort("A04 has duplicate historical file keys")
 
     burden_columns = resolve_burden_columns(d02)
+    print("Resolved D02 burden columns: " + ", ".join(f"{out}<-{src}" for out, src in burden_columns.items()))
     for source_column in burden_columns.values():
         d02[source_column] = pd.to_numeric(d02[source_column], errors="raise")
         if (d02[source_column] < 0).any():
@@ -649,7 +665,7 @@ def main() -> None:
     qc.to_csv(output_checks, index=False)
 
     summary = pd.DataFrame([
-        ("script_version", "run-x-d07-v1"),
+        ("script_version", f"run-x-d07-{IMPLEMENTATION_VERSION}"),
         ("status", "PASS"),
         ("ml_metric", ML_METRIC),
         ("quality_semantics", "unresolved_sonarqube_issue_stock_at_historical_snapshot"),
@@ -688,6 +704,7 @@ def main() -> None:
         "scope_excluded_repo_ids": [int(value) for value in excluded_repo_ids],
         "function_level_classifier_boundary": "unchanged",
         "density_computed": False,
+        "resolved_d02_burden_columns": burden_columns,
         "downstream_experiment": "run-x-d08",
         "selection_policy": "thresholds are sensitivity specifications; never choose a threshold using downstream DiD significance",
     }

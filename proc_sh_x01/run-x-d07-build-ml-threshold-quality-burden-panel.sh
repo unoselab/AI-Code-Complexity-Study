@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ============================================================
-# run-x-d07 v1: build ML-threshold x SonarQube burden panel
+# run-x-d07 v2: build ML-threshold x SonarQube burden panel
 # ============================================================
 #
 # Purpose:
@@ -41,7 +41,7 @@ PROJECT_ROOT="${PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 cd "${PROJECT_ROOT}"
 
 RUN_PREFIX="run-x-d07"
-IMPLEMENTATION_VERSION="v1"
+IMPLEMENTATION_VERSION="v3"
 RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 LOG_DIR="${LOG_DIR:-logs}"
