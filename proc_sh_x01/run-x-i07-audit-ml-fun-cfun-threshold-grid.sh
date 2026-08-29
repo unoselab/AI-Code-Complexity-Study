@@ -6,8 +6,8 @@
 # experiment shell script.
 #
 # Versioned delivery files:
-#   proc_script_x01/audit_ml_fun_cfun_threshold_grid-v1.py
-#   proc_sh_x01/run-x-i07-audit-ml-fun-cfun-threshold-grid-v1.sh
+#   proc_script_x01/audit_ml_fun_cfun_threshold_grid-v2.py
+#   proc_sh_x01/run-x-i07-audit-ml-fun-cfun-threshold-grid-v2.sh
 #
 # Canonical runtime copies after deployment:
 #   proc_script_x01/audit_ml_fun_cfun_threshold_grid.py
@@ -26,6 +26,7 @@
 #   Grid:   0.10, 0.14, ..., 0.50, ..., 0.86, 0.90 (21 points)
 #   Primary threshold: 0.50
 #   Decision rule: combined ML AGC share > threshold (strict)
+#   Boundary implementation: exact integer AGC-token / total-token comparison.
 #   Equality is never selected.
 #   The grid is reused from the finalized FUN ML threshold-sensitivity design;
 #   it is not calibrated from I06, SonarQube, or any treatment-effect result.
@@ -78,7 +79,7 @@ cd "${PROJECT_ROOT}"
 export PROJECT_ROOT
 
 RUN_PREFIX="run-x-i07"
-IMPLEMENTATION_VERSION="v1"
+IMPLEMENTATION_VERSION="v2"
 RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}"
 RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
 
@@ -91,6 +92,7 @@ LOG_DIR="${LOG_DIR:-logs}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_LABEL}-audit-ml-fun-cfun-threshold-grid-${RUN_TS}.log}"
 RUN_SELF_TEST="${RUN_SELF_TEST:-1}"
 STRICT_EXPECTED_COUNTS="${STRICT_EXPECTED_COUNTS:-1}"
+OVERWRITE="${OVERWRITE:-0}"
 
 EXPECTED_FILE_ROWS="494592"
 EXPECTED_PREPARED_ROWS="494332"
@@ -118,7 +120,16 @@ if [[ "${PYTHON_MAJOR_MINOR}" != "3.11" ]]; then
   exit 2
 fi
 
-mkdir -p "${OUTPUT_DIR}" "${LOG_DIR}"
+mkdir -p "${LOG_DIR}"
+if [[ -d "${OUTPUT_DIR}" && -n "$(find "${OUTPUT_DIR}" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]]; then
+  if [[ "${OVERWRITE}" != "1" ]]; then
+    echo "ERROR: output directory is not empty: ${OUTPUT_DIR}" >&2
+    echo "Set OVERWRITE=1 only when intentionally replacing I07-v1 with corrected I07-v2." >&2
+    exit 1
+  fi
+  rm -rf "${OUTPUT_DIR}"
+fi
+mkdir -p "${OUTPUT_DIR}"
 PY_SCRIPT_SHA256="$(sha256sum "${PY_SCRIPT}" | awk '{print $1}')"
 I06_INPUT_SHA256="$(sha256sum "${I06_INPUT_FILE}" | awk '{print $1}')"
 I06_SUMMARY_SHA256="$(sha256sum "${I06_SUMMARY_FILE}" | awk '{print $1}')"

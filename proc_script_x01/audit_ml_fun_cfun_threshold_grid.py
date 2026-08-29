@@ -36,9 +36,11 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 
-SCRIPT_VERSION = "run-x-i07-v1"
+SCRIPT_VERSION = "run-x-i07-v2"
 EXPECTED_I06_VERSION = "run-x-i06-v1"
 METRIC_COLUMN = "file_ml_fun_cfun_agc_share_space_by_token_weighted"
+NUMERATOR_COLUMN = "ml_fun_cfun_agc_space_by_tokens"
+DENOMINATOR_COLUMN = "ml_fun_cfun_space_by_tokens_total"
 STATUS_COLUMN = "file_ml_fun_cfun_agc_status"
 PRIMARY_FLAG_COLUMN = "file_ml_fun_cfun_agc_like_primary"
 PRIMARY_THRESHOLD_COLUMN = "file_ml_fun_cfun_agc_primary_threshold"
@@ -71,8 +73,8 @@ REQUIRED_COLUMNS = {
     "ml_fun_cfun_occurrences_total",
     "ml_fun_cfun_agc_occurrences",
     "ml_fun_cfun_hwc_occurrences",
-    "ml_fun_cfun_space_by_tokens_total",
-    "ml_fun_cfun_agc_space_by_tokens",
+    DENOMINATOR_COLUMN,
+    NUMERATOR_COLUMN,
     METRIC_COLUMN,
     WARNING_COLUMN,
     PRIMARY_FLAG_COLUMN,
@@ -201,9 +203,11 @@ def parse_bool01(value: Any, label: str, allow_blank: bool = False) -> int | Non
         if allow_blank:
             return None
         raise ValueError(f"Missing 0/1 value for {label}")
-    if text not in {"0", "1"}:
-        raise ValueError(f"Invalid 0/1 value for {label}: {text!r}")
-    return int(text)
+    if text in {"0", "0.0"}:
+        return 0
+    if text in {"1", "1.0"}:
+        return 1
+    raise ValueError(f"Invalid 0/1 value for {label}: {text!r}")
 
 
 def sha256_file(path: Path) -> str:
@@ -471,6 +475,15 @@ def analyze(
         if not (Decimal("0") <= score <= Decimal("1")):
             score_range_failures += 1
 
+        numerator = parse_int(row[NUMERATOR_COLUMN], f"row {total_rows} {NUMERATOR_COLUMN}")
+        denominator = parse_int(row[DENOMINATOR_COLUMN], f"row {total_rows} {DENOMINATOR_COLUMN}")
+        assert numerator is not None and denominator is not None
+        if denominator <= 0 or numerator < 0 or numerator > denominator:
+            raise ValueError(
+                f"Invalid combined token numerator/denominator at row {total_rows}: "
+                f"{numerator}/{denominator}"
+            )
+
         warning = parse_bool01(row[WARNING_COLUMN], f"row {total_rows} mapping warning", allow_blank=True) or 0
         if warning:
             warning_eligible_total += 1
@@ -482,16 +495,19 @@ def analyze(
         distribution_values[("procedure_presence", presence)].append(score_float)
 
         input_primary_flag = parse_bool01(row[PRIMARY_FLAG_COLUMN], f"row {total_rows} primary flag")
-        recomputed_primary = 1 if score > PRIMARY_THRESHOLD else 0
+        recomputed_primary = 1 if numerator * 100 > denominator * 50 else 0
         if input_primary_flag != recomputed_primary:
             primary_flag_mismatches += 1
 
         for index, threshold in enumerate(thresholds):
-            if score == threshold:
+            threshold_percent = int(threshold * 100)
+            left = numerator * 100
+            right = denominator * threshold_percent
+            if left == right:
                 ties[index] += 1
                 group_ties[dataset][index] += 1
                 group_ties[presence][index] += 1
-            if score <= threshold:
+            if left <= right:
                 continue
             selected[index] += 1
             group_selected[dataset][index] += 1
@@ -650,7 +666,10 @@ def run_self_test() -> None:
         base = {column: "" for column in fields}
         rows = []
 
-        def row(index: int, dataset: str, presence: str, status: str, score: str, warning: str = "0") -> dict[str, str]:
+        def row(
+            index: int, dataset: str, presence: str, status: str, score: str,
+            warning: str = "0", numerator: int | None = None, denominator: int | None = None,
+        ) -> dict[str, str]:
             item = dict(base)
             item.update(
                 {
@@ -667,8 +686,10 @@ def run_self_test() -> None:
                     "ml_fun_cfun_occurrences_total": "1" if status == "scored" else "0",
                     "ml_fun_cfun_agc_occurrences": "1" if score and Decimal(score) > Decimal("0.5") else "0",
                     "ml_fun_cfun_hwc_occurrences": "0" if score and Decimal(score) > Decimal("0.5") else "1" if status == "scored" else "0",
-                    "ml_fun_cfun_space_by_tokens_total": "100" if status == "scored" else "0",
-                    "ml_fun_cfun_agc_space_by_tokens": str(int(Decimal(score) * 100)) if score else "0",
+                    DENOMINATOR_COLUMN: str(denominator if denominator is not None else (100 if status == "scored" else 0)),
+                    NUMERATOR_COLUMN: str(
+                        numerator if numerator is not None else (int(Decimal(score) * 100) if score else 0)
+                    ),
                     METRIC_COLUMN: score,
                     WARNING_COLUMN: warning,
                     PRIMARY_FLAG_COLUMN: "1" if score and Decimal(score) > PRIMARY_THRESHOLD else "0" if status == "scored" else "",
@@ -684,8 +705,11 @@ def run_self_test() -> None:
                 row(1, "control", "fun_only", "scored", "0.60"),
                 row(2, "treatment", "fun_and_class_method", "scored", "0.50", "1"),
                 row(3, "treatment", "class_method_only", "scored", "0.20"),
-                row(4, "treatment", "neither", "no_ml_fun_cfun", ""),
-                row(5, "control", "neither", "file_not_prepared", ""),
+                # I06 may serialize the binary float 0.1 as 0.10000000000000001.
+                # Exact token arithmetic must still treat 10/100 as a tie at 0.10.
+                row(4, "control", "fun_only", "scored", "0.10000000000000001", numerator=10, denominator=100),
+                row(5, "treatment", "neither", "no_ml_fun_cfun", ""),
+                row(6, "control", "neither", "file_not_prepared", ""),
             ]
         )
         atomic_csv(rows, input_file, fields)
@@ -703,12 +727,15 @@ def run_self_test() -> None:
         if result["hard_failures"] != 0:
             raise AssertionError(f"Self-test hard failures: {result['checks']}")
         accounting = result["accounting"]
-        if accounting["eligible_rows"] != 3:
+        if accounting["eligible_rows"] != 4:
             raise AssertionError(accounting)
         if accounting["primary_selected_rows"] != 1:
             raise AssertionError(accounting)
         if accounting["primary_exact_ties"] != 1:
             raise AssertionError(accounting)
+        low_row = next(row for row in result["global_rows"] if row["threshold_id"] == "ml_t10")
+        if int(low_row["ties_at_threshold"]) != 1 or int(low_row["selected_file_rows"]) != 3:
+            raise AssertionError(low_row)
         if len(result["specs"]) != 21:
             raise AssertionError("Threshold grid must have 21 points")
     print("SELF-TEST PASS")
