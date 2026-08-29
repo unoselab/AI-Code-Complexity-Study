@@ -40,6 +40,9 @@ set -euo pipefail
 #   - Dynamic effects event 0:+6.
 #   - Placebo/pretrend terms event -6:-2.
 #   - Event -1 omitted.
+#
+# Run:
+# OVERWRITE=1 bash proc_sh_x01/run-x-h06-did-borusyak-ml-cfun-quality.sh
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
