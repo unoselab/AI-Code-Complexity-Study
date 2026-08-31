@@ -1,160 +1,319 @@
-00sapo_taskcheck
-2019211474_DL-NASA-SOH-CNN-BILSTM-Attention
-4mritGiri_NumberTracker
-666wcy_ARPT-Bot
-adelatour11_androidtvbackground
-ahmetozlu_color_recognition
-aio-libs_aiohttp
-aj47_100x-orchestrator
-AkariAsai_ScholarQABench
-AlexIoannides_pyspark-example-project
-ali-bahrainian_RAG_best_practices
-anujshah1003_Tensorboard-own-image-data-image-features-embedding-visualization
-ArpiarSaundersLab_annsql
-autti_abraham
-aws_nova-act
-aws-samples_aws-dms-cdc-data-pipeline
-baaivision_EVE
-BalancerMaxis_multisig-ops
-bannsec_stegoVeritas
-believethehype_nostrdvm
-Benzauber_convert-commander
-BiancoChiu_iOSRealRun-cli-18
-bobokun_actualtap-py
-bropines_chrome-lens-py
-C4NU_Paddie
-caffeinedoom_reconthing
-caiyuanhao1998_HDR-GS
-chenjie_PyTorch-CIFAR-10-autoencoder
-Cherecho_Triangular-arbitrage
-chrisyy2003_nonebot-plugin-gpt3
-Chuffnugget_volcano_integration
-Cjy-CN_PUBGRecognizeAndGunpress
-crate_devrel-pdf-rag-chatbot
-cyb3rfortr3ss_ByDeF
-DakeQQ_YOLO-Depth-Estimation-for-Android
-davidhandsome86_LLM_RAG
-daxa-ai_pebblo
-dimatura_pypcd
-djeada_Kurs-Podstaw-Pythona
-dottxt-ai_prompts
-Drchip61_Dual_SAM
-dromara_domain-admin
-dymmond_edgy
-emresen20_Pau-Bilgisayar-nots
-Envious-Data_Env-KB
-ergrelet_unlicense
-esxr_langgraph-mcp
-EURAC-EEBgroup_brick-llm
-Event-AHU_OpenEvDET
-evermoving_SystemCaptioner
-FaceAdapter_Face-Adapter
-FFY0_AdaKV
-FlipperPA_peregrine
-FMInference_FlexiGen
-FolhaSP_mosaico
-GispoCoding_qgis-venv-creator
-golemfoundation_octant
-Hack-a-Day_2024-Supercon-8-Add-On-Badge
-harvard-edge_QuaRL
-HelpingAI_Webscout
-IBM_mt-rag-benchmark
-infected4098_Wave-U-Mamba
-itsKayWat_MindfulShift-2025
-ITSpecialist111_ai_automation_suggester
-jacebrowning_datafiles
-jfcrenshaw_pzflow
-jgwak_GSDN
-Jieqianyu_SGN
-jinli99_iShapEditing
-joereynolds_reap-get
-jrowellfx_lsseq
-JustinSparrrow_IOOI-EmotionEgg
-jyjblrd_SelfDrivingCar
-kangtegong_pyftrace
-Khrylx_PyTorch-RL
-krishpranav_socialosint
-kuleshov-group_caduceus
-lancedb_lancedb
-LGro_PyAPSI
-liangchundong_HGNN-AC
-LinJing517_micropython-deauth
-linuxacademy_content-gitops
-loml13yyy_AtlassianConfluence-RCE
-loml13yyy_yyGRPU8
-LonamiWebs_Telebackup
-LuneMods_KCD2-Blender-Toolkit
-Makopolo_megascan_houdini20.0_USD_plugin
-MalevichAI_malevich
-markmelnic_stealthenium
-microsoft_AzureTRE
-microsoft_semantic-link-labs
-MingSun-Tse_LightAvatar-TensorFlow
-MIT-Emerging-Talent_ET6-edXtras
-monero-project_meta
-MrTimonM_Arichain-Bot
-neuml_rag
-nhw649_EOV-Seg
-NiceRingNode_LGGPT
-ninareyes1_Simple-Digital-Clock
-NVIDIA_cuEquivariance
-odoo_industry
-omkarcloud_amazon-scraper
-OSU-NLP-Group_HippoRAG
-oval-group_smooth-topk
-PennyLaneAI_catalyst
-peter279k_cdc-data-mirror
-PhilNad_robot-arm-kinematic-calibration
-pieces-app_cli-agent
-PiotrMachowski_Home-Assistant-custom-components-TGE
-plurai-ai_intellagent
-popey_sbommage
-PromtEngineer_localGPT
-python-ring-doorbell_python-ring-doorbell
-qiboteam_qibojit
-R0uter_ss.conf-for-surge
-rachtsy_KPCA_code
-Retmon403_cs2_cheats_for_python
-RobinWu218_ToST
-ruiqini_NTFields
-sakomws_ai-workshop
-saucer-man_qq_msg_decode
-Scholar01_sd-webui-bg-mask
-Scrapybara_scrapybara-playground
-SEU-ProactiveSecurity-Group_LLM-PD
-Simatwa_free-proxies
-slopp_30_days_of_dagster
-snowzjx_ns3-load-balance
-stakewise_v3-operator
-surajt97_Train_Delay_Prediction
-taylorwilsdon_open-webui-tools
-The-Compiler_pytest-vw
-thefatedefeater_V2ray-Config
-TheFocusedCoder_api-agent
-thegreenwebfoundation_admin-portal
-The-WhiteRabbit_dnfm_server
-TianxingChen_RoboTwin
-tranceitionalMynd_spy-reaper
-tusgino_llm-code-reviewer
-viktoriasemaan_sa-ai-agent
-VirtualFlow_VFVS
-vonssy_BlockBitsApp-BOT
-vonssy_DreamerQuests-BOT
-vortezwohl_Bhakti
-Wang-ML-Lab_unified-continual-learning
-wasilukm_hoymiles-mqtt
-weaviate_t2v-transformers-models
-weizequan_TASHR
-william-sy_TesyLocal
-xinsir6_ControlNetPlus
-xnl-h4ck3r_getSubsidiaries
-YangDi666_UNIK
-yihozhang_most-influential-pl-papers
-yoongi43_music_audio_enhancement_conformer
-yousseb_meld
-ysj9909_SHViT
-zeyangsha_De-Fake
-zhang-xr_FirmLLM
-zhipeixu_FakeShield
-zhou19830318_xiaozhi_micropython
-zju3dv_ready_to_react
+{
+    "paging": {
+        "pageIndex": 1,
+        "pageSize": 500,
+        "total": 18
+    },
+    "baseComponent": {
+        "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e",
+        "name": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e",
+        "qualifier": "TRK",
+        "measures": []
+    },
+    "components": [
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:app_window/__init__.py",
+            "name": "__init__.py",
+            "qualifier": "FIL",
+            "path": "app_window/__init__.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "ncloc",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:user_config/__init__.py",
+            "name": "__init__.py",
+            "qualifier": "FIL",
+            "path": "user_config/__init__.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "ncloc",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:webp/__init__.py",
+            "name": "__init__.py",
+            "qualifier": "FIL",
+            "path": "webp/__init__.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "ncloc",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:option_window/__init__.py",
+            "name": "__init__.py",
+            "qualifier": "FIL",
+            "path": "option_window/__init__.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "ncloc",
+                    "value": "5"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:caption_format_converter.py",
+            "name": "caption_format_converter.py",
+            "qualifier": "FIL",
+            "path": "caption_format_converter.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "61",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "153"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:exif_module.py",
+            "name": "exif_module.py",
+            "qualifier": "FIL",
+            "path": "exif_module.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "34",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "182"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:option_window/exif_option_window.py",
+            "name": "exif_option_window.py",
+            "qualifier": "FIL",
+            "path": "option_window/exif_option_window.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "41",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "239"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:option_window/information_window.py",
+            "name": "information_window.py",
+            "qualifier": "FIL",
+            "path": "option_window/information_window.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "3",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "27"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:main.py",
+            "name": "main.py",
+            "qualifier": "FIL",
+            "path": "main.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "1",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "11"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:model_name_mapper.py",
+            "name": "model_name_mapper.py",
+            "qualifier": "FIL",
+            "path": "model_name_mapper.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "11",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "33"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:resize_module.py",
+            "name": "resize_module.py",
+            "qualifier": "FIL",
+            "path": "resize_module.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "6",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "19"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:option_window/resize_option_window.py",
+            "name": "resize_option_window.py",
+            "qualifier": "FIL",
+            "path": "option_window/resize_option_window.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "4",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "55"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:user_config/user_config.py",
+            "name": "user_config.py",
+            "qualifier": "FIL",
+            "path": "user_config/user_config.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "16",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "69"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:watermark_module.py",
+            "name": "watermark_module.py",
+            "qualifier": "FIL",
+            "path": "watermark_module.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "5",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "24"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:option_window/watermark_option_window.py",
+            "name": "watermark_option_window.py",
+            "qualifier": "FIL",
+            "path": "option_window/watermark_option_window.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "3",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "16"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:webp/webp_module.py",
+            "name": "webp_module.py",
+            "qualifier": "FIL",
+            "path": "webp/webp_module.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "52",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "166"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:option_window/webp_option_window.py",
+            "name": "webp_option_window.py",
+            "qualifier": "FIL",
+            "path": "option_window/webp_option_window.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "16",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "111"
+                }
+            ]
+        },
+        {
+            "key": "b01_ncloc_py_sonarqube_v2_control_C4NU_Paddie_46fe27201a0a_6e91e6279a6e:app_window/webp_window.py",
+            "name": "webp_window.py",
+            "qualifier": "FIL",
+            "path": "app_window/webp_window.py",
+            "language": "py",
+            "measures": [
+                {
+                    "metric": "cognitive_complexity",
+                    "value": "76",
+                    "bestValue": false
+                },
+                {
+                    "metric": "ncloc",
+                    "value": "341"
+                }
+            ]
+        }
+    ]
+}
