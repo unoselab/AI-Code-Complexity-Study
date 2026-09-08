@@ -1,0 +1,404 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# ============================================================================
+# run-x-l03 v1: build frozen-threshold NPR RF/CM x SonarQube burden panels
+# ============================================================================
+#
+# This wrapper is a standalone adaptation of the validated l01/I04 panel-
+# construction workflow plus the historical RF (D03) and CM (H03) scope logic.
+# It does not call any prior shell wrapper.
+#
+# Delivery filenames keep the version suffix:
+#   proc_script_x01/build_sc2_npr_rf_cm_threshold_quality_burden_panel-v1.py
+#   proc_sh_x01/run-x-l03-build-npr-rf-cm-threshold-quality-burden-panel-v1.sh
+#
+# Canonical server filenames remove the version suffix:
+#   proc_script_x01/build_sc2_npr_rf_cm_threshold_quality_burden_panel.py
+#   proc_sh_x01/run-x-l03-build-npr-rf-cm-threshold-quality-burden-panel.sh
+#
+# Inputs:
+#   C05 file-level NPR x unresolved SonarQube burden table. The same frozen C05
+#   table contains continuous RF, CM, and combined RF+CM NPR measurements.
+#   C02 v3 frozen RF threshold specification/audit/summary.
+#   C03 v1 frozen CM threshold specification/audit/summary.
+#   B06 authoritative 1,954-row SonarQube quality DiD base panel.
+#
+# RF definition:
+#   metric   = file_npr_fun_space_by_token_weighted
+#   eligible = finite(metric)
+#   selected = eligible AND metric > threshold
+#
+# CM definition:
+#   metric   = file_npr_cfun_space_by_token_weighted
+#   eligible = finite(metric)
+#   selected = eligible AND metric > threshold
+#
+# Frozen threshold contract shared by RF and CM:
+#   primary = 1.515059
+#   21-point primary-centered grid = primary +/- 0.50 in 0.05 increments
+#   legacy anchor = 1.5183
+#   prior-paper primary anchor = 1.571637
+#   total threshold records = 23
+#   comparison operator = strict >
+#
+# Sample specifications for each localization scope:
+#   full_sample
+#   exclude_scope_mismatch_repos
+#
+# The two sensitivity repositories are derived from the frozen C05 explicit
+# outside-C04 scope-exclusion artifact. Thresholds and exclusions are frozen
+# before any causal effect estimation.
+#
+# Outputs:
+#   One long RF/CM threshold x sample x repo-month panel for l04 DiD.
+#   Threshold, timing, sample, outcome, QC, summary, and metadata audit files.
+#
+# Deliberate boundary:
+#   l03 does not rebuild the combined RF+CM panel. The frozen l01 v2 panel and
+#   l02 v1 combined-scope DiD remain authoritative for RF+CM.
+#
+# Computational scope:
+#   CPU-only aggregation. No GPU/LLM inference, NPR rescoring, perturbation
+#   generation, SonarQube rescan, density construction, or DiD estimation.
+#
+# Full run:
+#   bash proc_sh_x01/run-x-l03-build-npr-rf-cm-threshold-quality-burden-panel.sh
+#
+# Self-test only:
+#   SELF_TEST_ONLY=1 bash proc_sh_x01/run-x-l03-build-npr-rf-cm-threshold-quality-burden-panel.sh
+# ============================================================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
+cd "${PROJECT_ROOT}"
+export PROJECT_ROOT
+
+RUN_PREFIX="run-x-l03"
+IMPLEMENTATION_VERSION="v1"
+RUN_LABEL="${RUN_PREFIX}-${IMPLEMENTATION_VERSION}"
+RUN_TS="${RUN_TS:-$(date +%Y%m%d-%H%M%S)}"
+LOG_DIR="${LOG_DIR:-logs/run-x-l03}"
+LOG_FILE="${LOG_FILE:-${LOG_DIR}/${RUN_LABEL}-build-npr-rf-cm-threshold-quality-burden-panel-${RUN_TS}.log}"
+
+PYTHON_BIN="${PYTHON_BIN:-python}"
+ANALYSIS_SCRIPT="${ANALYSIS_SCRIPT:-proc_script_x01/build_sc2_npr_rf_cm_threshold_quality_burden_panel.py}"
+
+# Detector-side frozen artifacts live in the neighboring detect_code_gpt
+# workspace after migration from r158 to server 173. Keep that workspace
+# read-only. Every path can be overridden independently for reproducibility.
+DETECT_CODE_GPT_ROOT="${DETECT_CODE_GPT_ROOT:-../../detect_code_gpt}"
+C05_ROOT="${C05_ROOT:-${DETECT_CODE_GPT_ROOT}/output/snapshot_npr/run-x-c05/file-quality-burden-v1}"
+C02_ROOT="${C02_ROOT:-${DETECT_CODE_GPT_ROOT}/output/snapshot_npr/run-x-c02/fun-threshold-v3}"
+C03_ROOT="${C03_ROOT:-${DETECT_CODE_GPT_ROOT}/output/snapshot_npr/run-x-c03/cfun-threshold-v1}"
+
+C05_FILE="${C05_FILE:-${C05_ROOT}/python_fun_cfun_file_quality_burden.csv.gz}"
+C05_SUMMARY_FILE="${C05_SUMMARY_FILE:-${C05_ROOT}/python_fun_cfun_file_quality_summary.csv}"
+C05_CHECKS_FILE="${C05_CHECKS_FILE:-${C05_ROOT}/python_fun_cfun_file_quality_checks.csv}"
+C05_OUTSIDE_SCOPE_FILE="${C05_OUTSIDE_SCOPE_FILE:-${C05_ROOT}/python_sonarqube_issue_files_outside_c04.csv}"
+B06_PANEL_FILE="${B06_PANEL_FILE:-repo_x01/run-x-b06/panels/quality_did_panel_python_sonarqube.csv}"
+
+RF_THRESHOLD_SUMMARY_FILE="${RF_THRESHOLD_SUMMARY_FILE:-${C02_ROOT}/summary.json}"
+RF_THRESHOLD_SPEC_FILE="${RF_THRESHOLD_SPEC_FILE:-${C02_ROOT}/fun_npr_threshold_spec.csv}"
+RF_THRESHOLD_AUDIT_FILE="${RF_THRESHOLD_AUDIT_FILE:-${C02_ROOT}/fun_npr_threshold_audit.csv}"
+CM_THRESHOLD_SUMMARY_FILE="${CM_THRESHOLD_SUMMARY_FILE:-${C03_ROOT}/summary.json}"
+CM_THRESHOLD_SPEC_FILE="${CM_THRESHOLD_SPEC_FILE:-${C03_ROOT}/cfun_npr_threshold_spec.csv}"
+CM_THRESHOLD_AUDIT_FILE="${CM_THRESHOLD_AUDIT_FILE:-${C03_ROOT}/cfun_npr_threshold_audit.csv}"
+
+OUTPUT_DIR="${OUTPUT_DIR:-repo_x01/run-x-l03/npr-rf-cm-threshold-quality-burden-v1}"
+PANEL_OUTPUT="${PANEL_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_threshold_repo_month_panel.csv.gz}"
+GLOBAL_AUDIT_OUTPUT="${GLOBAL_AUDIT_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_threshold_global_audit.csv}"
+TIMING_AUDIT_OUTPUT="${TIMING_AUDIT_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_threshold_by_treatment_timing.csv}"
+SAMPLE_SUMMARY_OUTPUT="${SAMPLE_SUMMARY_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_threshold_sample_summary.csv}"
+SCOPE_SENSITIVITY_OUTPUT="${SCOPE_SENSITIVITY_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_scope_sensitivity_spec.csv}"
+OUTCOME_SPEC_OUTPUT="${OUTCOME_SPEC_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_outcome_spec.csv}"
+CHECKS_OUTPUT="${CHECKS_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_threshold_checks.csv}"
+SUMMARY_OUTPUT="${SUMMARY_OUTPUT:-${OUTPUT_DIR}/quality_npr_rf_cm_threshold_summary.csv}"
+METADATA_OUTPUT="${METADATA_OUTPUT:-${OUTPUT_DIR}/metadata.json}"
+
+STRICT_EXPECTED_COUNTS="${STRICT_EXPECTED_COUNTS:-1}"
+SELF_TEST_ONLY="${SELF_TEST_ONLY:-0}"
+
+for boolean_name in STRICT_EXPECTED_COUNTS SELF_TEST_ONLY; do
+  boolean_value="${!boolean_name}"
+  if [[ "${boolean_value}" != "0" && "${boolean_value}" != "1" ]]; then
+    echo "ERROR: ${boolean_name} must be 0 or 1." >&2
+    exit 1
+  fi
+done
+
+if ! command -v "${PYTHON_BIN}" >/dev/null 2>&1; then
+  echo "ERROR: Python executable not found: ${PYTHON_BIN}" >&2
+  exit 1
+fi
+if [[ ! -f "${ANALYSIS_SCRIPT}" ]]; then
+  echo "ERROR: required l03 Python program not found: ${ANALYSIS_SCRIPT}" >&2
+  exit 1
+fi
+
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+PYTHON_VERSION="$("${PYTHON_BIN}" --version 2>&1)"
+SCRIPT_SHA256="$(sha256sum "${ANALYSIS_SCRIPT}" | awk '{print $1}')"
+START_EPOCH="$(date +%s)"
+
+{
+  echo "============================================================================"
+  echo "${RUN_LABEL}: build frozen-threshold NPR RF/CM x SonarQube burden panels"
+  echo "Started:                         $(date '+%a %b %d %I:%M:%S %p %Z %Y')"
+  echo "Project root:                    ${PROJECT_ROOT}"
+  echo "Python:                          $(command -v "${PYTHON_BIN}") (${PYTHON_VERSION})"
+  echo "Python script:                   ${ANALYSIS_SCRIPT}"
+  echo "Python script SHA256:            ${SCRIPT_SHA256}"
+  echo "C05 file-level burden:           ${C05_FILE}"
+  echo "C05 summary:                     ${C05_SUMMARY_FILE}"
+  echo "C05 hard-QC table:               ${C05_CHECKS_FILE}"
+  echo "C05 outside-C04 scope:           ${C05_OUTSIDE_SCOPE_FILE}"
+  echo "B06 quality panel:               ${B06_PANEL_FILE}"
+  echo "C02 RF threshold summary:        ${RF_THRESHOLD_SUMMARY_FILE}"
+  echo "C02 RF threshold spec:           ${RF_THRESHOLD_SPEC_FILE}"
+  echo "C02 RF threshold audit:          ${RF_THRESHOLD_AUDIT_FILE}"
+  echo "C03 CM threshold summary:        ${CM_THRESHOLD_SUMMARY_FILE}"
+  echo "C03 CM threshold spec:           ${CM_THRESHOLD_SPEC_FILE}"
+  echo "C03 CM threshold audit:          ${CM_THRESHOLD_AUDIT_FILE}"
+  echo "Output directory:                ${OUTPUT_DIR}"
+  echo "RF NPR metric:                   file_npr_fun_space_by_token_weighted"
+  echo "CM NPR metric:                   file_npr_cfun_space_by_token_weighted"
+  echo "Comparison operator:             strict >"
+  echo "Primary threshold:               1.515059"
+  echo "Threshold specifications:        21 grid + legacy + prior-primary = 23/scope"
+  echo "Localization scopes:             RF + CM (combined RF+CM remains frozen in l01/l02)"
+  echo "Sample specifications:           full + exclude_scope_mismatch_repos"
+  echo "Quality outcome:                 selected-file unresolved issue stock"
+  echo "GPU/LLM scoring:                 none"
+  echo "Perturbation generation:         none"
+  echo "SonarQube rescan:                none"
+  echo "DiD estimation:                  none"
+  echo "Density:                         not computed"
+  echo "Strict expected counts:          ${STRICT_EXPECTED_COUNTS}"
+  echo "Log file:                        ${LOG_FILE}"
+  echo "============================================================================"
+} | tee "${LOG_FILE}"
+
+run_command_logged() {
+  local step_title="$1"
+  shift
+  local -a command=("$@")
+  {
+    echo
+    echo "** ${step_title}"
+    echo "----------------------------------------------------------------------------"
+    printf 'Command:'
+    printf ' %q' "${command[@]}"
+    printf '\n\n'
+  } | tee -a "${LOG_FILE}"
+  "${command[@]}" 2>&1 | tee -a "${LOG_FILE}"
+}
+
+run_command_logged \
+  "Step 1: Run l03 structural self-test" \
+  "${PYTHON_BIN}" "${ANALYSIS_SCRIPT}" --self-test
+
+run_command_logged \
+  "Step 2: Compile l03 Python program" \
+  "${PYTHON_BIN}" -m py_compile "${ANALYSIS_SCRIPT}"
+
+if [[ "${SELF_TEST_ONLY}" == "1" ]]; then
+  echo "${RUN_LABEL} self-tests completed successfully." | tee -a "${LOG_FILE}"
+  exit 0
+fi
+
+REQUIRED_INPUTS=(
+  "${C05_FILE}"
+  "${C05_SUMMARY_FILE}"
+  "${C05_CHECKS_FILE}"
+  "${C05_OUTSIDE_SCOPE_FILE}"
+  "${B06_PANEL_FILE}"
+  "${RF_THRESHOLD_SUMMARY_FILE}"
+  "${RF_THRESHOLD_SPEC_FILE}"
+  "${RF_THRESHOLD_AUDIT_FILE}"
+  "${CM_THRESHOLD_SUMMARY_FILE}"
+  "${CM_THRESHOLD_SPEC_FILE}"
+  "${CM_THRESHOLD_AUDIT_FILE}"
+)
+for required_input in "${REQUIRED_INPUTS[@]}"; do
+  if [[ ! -f "${required_input}" ]]; then
+    echo "ERROR: required input not found: ${required_input}" | tee -a "${LOG_FILE}" >&2
+    exit 1
+  fi
+done
+
+{
+  echo
+  echo "** Step 3: Freeze input provenance"
+  echo "----------------------------------------------------------------------------"
+  echo "C05 file SHA256:                 $(sha256sum "${C05_FILE}" | awk '{print $1}')"
+  echo "C05 summary SHA256:              $(sha256sum "${C05_SUMMARY_FILE}" | awk '{print $1}')"
+  echo "C05 checks SHA256:               $(sha256sum "${C05_CHECKS_FILE}" | awk '{print $1}')"
+  echo "C05 outside scope SHA256:        $(sha256sum "${C05_OUTSIDE_SCOPE_FILE}" | awk '{print $1}')"
+  echo "B06 panel SHA256:                $(sha256sum "${B06_PANEL_FILE}" | awk '{print $1}')"
+  echo "C02 RF summary SHA256:           $(sha256sum "${RF_THRESHOLD_SUMMARY_FILE}" | awk '{print $1}')"
+  echo "C02 RF threshold spec SHA256:    $(sha256sum "${RF_THRESHOLD_SPEC_FILE}" | awk '{print $1}')"
+  echo "C02 RF threshold audit SHA256:   $(sha256sum "${RF_THRESHOLD_AUDIT_FILE}" | awk '{print $1}')"
+  echo "C03 CM summary SHA256:           $(sha256sum "${CM_THRESHOLD_SUMMARY_FILE}" | awk '{print $1}')"
+  echo "C03 CM threshold spec SHA256:    $(sha256sum "${CM_THRESHOLD_SPEC_FILE}" | awk '{print $1}')"
+  echo "C03 CM threshold audit SHA256:   $(sha256sum "${CM_THRESHOLD_AUDIT_FILE}" | awk '{print $1}')"
+} | tee -a "${LOG_FILE}"
+
+L03_COMMAND=(
+  "${PYTHON_BIN}"
+  "${ANALYSIS_SCRIPT}"
+  --c05-file "${C05_FILE}"
+  --c05-summary-file "${C05_SUMMARY_FILE}"
+  --c05-checks-file "${C05_CHECKS_FILE}"
+  --c05-outside-scope-file "${C05_OUTSIDE_SCOPE_FILE}"
+  --b06-panel-file "${B06_PANEL_FILE}"
+  --rf-threshold-summary-file "${RF_THRESHOLD_SUMMARY_FILE}"
+  --rf-threshold-spec-file "${RF_THRESHOLD_SPEC_FILE}"
+  --rf-threshold-audit-file "${RF_THRESHOLD_AUDIT_FILE}"
+  --cm-threshold-summary-file "${CM_THRESHOLD_SUMMARY_FILE}"
+  --cm-threshold-spec-file "${CM_THRESHOLD_SPEC_FILE}"
+  --cm-threshold-audit-file "${CM_THRESHOLD_AUDIT_FILE}"
+  --panel-output "${PANEL_OUTPUT}"
+  --global-audit-output "${GLOBAL_AUDIT_OUTPUT}"
+  --timing-audit-output "${TIMING_AUDIT_OUTPUT}"
+  --sample-summary-output "${SAMPLE_SUMMARY_OUTPUT}"
+  --scope-sensitivity-output "${SCOPE_SENSITIVITY_OUTPUT}"
+  --outcome-spec-output "${OUTCOME_SPEC_OUTPUT}"
+  --checks-output "${CHECKS_OUTPUT}"
+  --summary-output "${SUMMARY_OUTPUT}"
+  --metadata-output "${METADATA_OUTPUT}"
+)
+if [[ "${STRICT_EXPECTED_COUNTS}" == "1" ]]; then
+  L03_COMMAND+=(--strict-expected-counts)
+fi
+
+run_command_logged \
+  "Step 4: Aggregate frozen C02/C03 thresholds and C05 burden to RF/CM repo-month outcomes" \
+  "${L03_COMMAND[@]}"
+
+EXPECTED_OUTPUTS=(
+  "${PANEL_OUTPUT}"
+  "${GLOBAL_AUDIT_OUTPUT}"
+  "${TIMING_AUDIT_OUTPUT}"
+  "${SAMPLE_SUMMARY_OUTPUT}"
+  "${SCOPE_SENSITIVITY_OUTPUT}"
+  "${OUTCOME_SPEC_OUTPUT}"
+  "${CHECKS_OUTPUT}"
+  "${SUMMARY_OUTPUT}"
+  "${METADATA_OUTPUT}"
+)
+for output_file in "${EXPECTED_OUTPUTS[@]}"; do
+  if [[ ! -s "${output_file}" ]]; then
+    echo "ERROR: expected output missing or empty: ${output_file}" | tee -a "${LOG_FILE}" >&2
+    exit 1
+  fi
+done
+
+if grep -qi ',fail,' "${CHECKS_OUTPUT}" || grep -qi ',fail$' "${CHECKS_OUTPUT}"; then
+  echo "ERROR: l03 QC file contains failed checks." | tee -a "${LOG_FILE}" >&2
+  cat "${CHECKS_OUTPUT}" | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+
+GLOBAL_LINES="$(wc -l < "${GLOBAL_AUDIT_OUTPUT}")"
+TIMING_LINES="$(wc -l < "${TIMING_AUDIT_OUTPUT}")"
+SAMPLE_LINES="$(wc -l < "${SAMPLE_SUMMARY_OUTPUT}")"
+SCOPE_LINES="$(wc -l < "${SCOPE_SENSITIVITY_OUTPUT}")"
+OUTCOME_LINES="$(wc -l < "${OUTCOME_SPEC_OUTPUT}")"
+CHECK_LINES="$(wc -l < "${CHECKS_OUTPUT}")"
+SUMMARY_LINES="$(wc -l < "${SUMMARY_OUTPUT}")"
+LONG_PANEL_ROWS="$(awk -F, '$1=="long_panel_rows" {print $2}' "${SUMMARY_OUTPUT}")"
+PANEL_LINES="$(gzip -cd "${PANEL_OUTPUT}" | wc -l)"
+EXPECTED_PANEL_LINES="$((LONG_PANEL_ROWS + 1))"
+
+if [[ "${LONG_PANEL_ROWS}" -ne 177974 ]]; then
+  echo "ERROR: expected 177974 long-panel rows; observed ${LONG_PANEL_ROWS}." | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+if [[ "${GLOBAL_LINES}" -ne 93 ]]; then
+  echo "ERROR: expected 93 lines in global audit; observed ${GLOBAL_LINES}." | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+if [[ "${TIMING_LINES}" -ne 461 ]]; then
+  echo "ERROR: expected 461 lines in treatment-timing audit; observed ${TIMING_LINES}." | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+if [[ "${SAMPLE_LINES}" -ne 5 || "${SCOPE_LINES}" -ne 3 || "${OUTCOME_LINES}" -ne 9 ]]; then
+  echo "ERROR: unexpected sample/scope/outcome line counts: sample=${SAMPLE_LINES}, scope=${SCOPE_LINES}, outcome=${OUTCOME_LINES}." | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+if [[ "${CHECK_LINES}" -ne 68 ]]; then
+  echo "ERROR: expected 68 lines in QC checks; observed ${CHECK_LINES}." | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+if [[ "${SUMMARY_LINES}" -ne 31 ]]; then
+  echo "ERROR: expected 31 lines in summary; observed ${SUMMARY_LINES}." | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+if [[ "${PANEL_LINES}" -ne "${EXPECTED_PANEL_LINES}" ]]; then
+  echo "ERROR: compressed panel line count mismatch: observed=${PANEL_LINES}, expected=${EXPECTED_PANEL_LINES}." | tee -a "${LOG_FILE}" >&2
+  exit 1
+fi
+
+{
+  echo
+  echo "** Step 5: Output checks"
+  echo "----------------------------------------------------------------------------"
+  echo "Long panel rows:                 ${LONG_PANEL_ROWS}"
+  echo "Long panel lines:                ${PANEL_LINES} including header"
+  echo "Global audit:                    ${GLOBAL_LINES} lines including header"
+  echo "Timing audit:                    ${TIMING_LINES} lines including header"
+  echo "Sample summary:                  ${SAMPLE_LINES} lines including header"
+  echo "Scope sensitivity:               ${SCOPE_LINES} lines including header"
+  echo "Outcome spec:                    ${OUTCOME_LINES} lines including header"
+  echo "QC checks:                       ${CHECK_LINES} lines including header"
+  echo "Summary:                         ${SUMMARY_LINES} lines including header"
+  echo
+  echo "Sample support:"
+  cat "${SAMPLE_SUMMARY_OUTPUT}"
+  echo
+  echo "Scope-sensitivity repositories:"
+  cat "${SCOPE_SENSITIVITY_OUTPUT}"
+  echo
+  echo "Primary and prior-primary global audit:"
+  awk -F, 'NR==1 || $3=="primary" || $3=="prior_primary_1571637"' "${GLOBAL_AUDIT_OUTPUT}"
+  echo
+  echo "QC checks:"
+  cat "${CHECKS_OUTPUT}"
+  echo
+  echo "Summary:"
+  cat "${SUMMARY_OUTPUT}"
+} | tee -a "${LOG_FILE}"
+
+END_EPOCH="$(date +%s)"
+ELAPSED_SECONDS="$((END_EPOCH - START_EPOCH))"
+printf -v ELAPSED_HMS '%02d:%02d:%02d' "$((ELAPSED_SECONDS / 3600))" "$(((ELAPSED_SECONDS % 3600) / 60))" "$((ELAPSED_SECONDS % 60))"
+
+{
+  echo
+  echo "============================================================================"
+  echo "${RUN_LABEL} execution summary"
+  echo "Completed:                       $(date '+%a %b %d %I:%M:%S %p %Z %Y')"
+  echo "Elapsed:                         ${ELAPSED_HMS}"
+  echo "Status:                          PASS"
+  echo "Localization scopes:             RF + CM"
+  echo "Thresholds per scope:            23"
+  echo "Sample specifications per scope: 2"
+  echo "Long panel rows:                 ${LONG_PANEL_ROWS}"
+  echo "Primary threshold:               1.515059"
+  echo "Hard QC failures:                0"
+  echo "Output directory:                ${OUTPUT_DIR}"
+  echo "Long l04 input panel:            ${PANEL_OUTPUT}"
+  echo "Global threshold audit:          ${GLOBAL_AUDIT_OUTPUT}"
+  echo "Treatment-timing audit:          ${TIMING_AUDIT_OUTPUT}"
+  echo "Sample summary:                  ${SAMPLE_SUMMARY_OUTPUT}"
+  echo "Scope sensitivity spec:          ${SCOPE_SENSITIVITY_OUTPUT}"
+  echo "Outcome specification:           ${OUTCOME_SPEC_OUTPUT}"
+  echo "QC checks:                       ${CHECKS_OUTPUT}"
+  echo "Summary:                         ${SUMMARY_OUTPUT}"
+  echo "Metadata:                        ${METADATA_OUTPUT}"
+  echo "Log file:                        ${LOG_FILE}"
+  echo "Next:                            l04 Borusyak DiD for RF and CM; retain frozen l02 for RF+CM"
+  echo "============================================================================"
+} | tee -a "${LOG_FILE}"
