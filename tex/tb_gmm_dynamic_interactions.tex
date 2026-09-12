@@ -1,0 +1,53 @@
+\begin{table}[!t]
+\centering
+\scriptsize
+\caption{Dynamic-panel GMM estimates of velocity--quality associations for $\Fpy$ and $\FpyLocalized{d}{s}{\tau_d}$. $p_{\mathrm{S}}$, $p_{\mathrm{AR1}}$, and $p_{\mathrm{AR2}}$ denote Sargan and Arellano--Bond test $p$-values.}
+\label{tab:gmm-dynamic-interactions}
+{\color{blue}
+\begin{tabular}{@{}llrrrrrr@{}}
+\textbf{Quality burden}
+& \textbf{Direction}
+& $\boldsymbol{\hat{\gamma}}$
+& \textbf{SE}
+& $\boldsymbol{p}$
+& $\boldsymbol{p}_{\mathrm{S}}$
+& $\boldsymbol{p}_{\mathrm{AR1}}$
+& $\boldsymbol{p}_{\mathrm{AR2}}$ \\
+\midrule
+
+$Q^{\mathrm{all}}$
+& $V_t \rightarrow Q_t$
+& 0.061 & 0.043 & .154 & .308 & .163 & .953 \\
+
+$Q^{\mathrm{all}}$
+& $Q_{t-1} \rightarrow V_t$
+& \textbf{-1.215} & 0.408 & \textbf{.003} & .304 & $<.001$ & .878 \\
+
+\addlinespace
+$Q^{(\text{\tiny NPR},\text{\tiny RF})}$
+& $Q_{t-1} \rightarrow V_t$
+& \textbf{-0.788} & 0.218 & $\boldsymbol{<.001}$ & .317 & $<.001$ & .777 \\
+
+$Q^{(\text{\tiny NPR},\text{\tiny CM})}$
+& $Q_{t-1} \rightarrow V_t$
+& \textbf{-0.372} & 0.145 & \textbf{.010} & .256 & $<.001$ & .740 \\
+
+$Q^{(\text{\tiny NPR},\text{\tiny RF{+}CM})}$
+& $Q_{t-1} \rightarrow V_t$
+& \textbf{-0.843} & 0.216 & $\boldsymbol{<.001}$ & .277 & $<.001$ & .931 \\
+
+\addlinespace
+$Q^{(\text{\tiny ML},\text{\tiny RF})}$
+& $Q_{t-1} \rightarrow V_t$
+& -0.146 & 0.308 & .635 & .280 & $<.001$ & .599 \\
+
+$Q^{(\text{\tiny ML},\text{\tiny CM})}$
+& $Q_{t-1} \rightarrow V_t$
+& \textbf{-0.533} & 0.223 & \textbf{.017} & .332 & $<.001$ & .680 \\
+
+$Q^{(\text{\tiny ML},\text{\tiny RF{+}CM})}$
+& $Q_{t-1} \rightarrow V_t$
+& \textbf{-0.481} & 0.238 & \textbf{.043} & .321 & $<.001$ & .649 \\
+\end{tabular}
+}
+\end{table}
