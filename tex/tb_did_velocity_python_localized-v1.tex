@@ -1,0 +1,25 @@
+\begin{table}[!t]
+\centering
+\scriptsize
+\caption{Effects of Cursor adoption on log-transformed monthly Python source additions across $\Fpy$ and $\FpyLocalized{d}{s}{\tau_d}$. Localized rows identify $(d,s)$. Percentage changes are $\Delta\%=100(e^{\mathrm{ATT}}-1)$. Parentheses report repository-clustered SEs; $\checkmark$ and $\times$ denote statistical significance and insignificance at the 5\% level, respectively.}
+\label{tb:did-velocity-python}
+{\setlength{\tabcolsep}{1pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}l|cc|cc@{}}
+\tableheader{Files} & \tableheader{FECS ATT} & \tableheader{$\Delta\%$}
+& \tableheader{FEOS ATT} & \tableheader{$\Delta\%$} \\
+\midrule
+$\Fpy$ & $0.574^{\dagger}\,(\times)\,(0.308)$ & $+77.6\%$ & $1.100^{**}\,(\checkmark)\,(0.383)$ & $+200.4\%$ \\
+\addlinespace
+$(\text{\tiny NPR},\text{\tiny RF})$ & $0.525^{\dagger}\,(\times)\,(0.306)$ & $+69.1\%$ & $0.766^{**}\,(\checkmark)\,(0.292)$ & $+115.2\%$ \\
+$(\text{\tiny NPR},\text{\tiny CM})$ & $0.117\,(\times)\,(0.274)$ & $+12.4\%$ & $0.338\,(\times)\,(0.278)$ & $+40.2\%$ \\
+$(\text{\tiny NPR},\text{\tiny RF{+}CM})$ & $0.419\,(\times)\,(0.313)$ & $+52.1\%$ & $0.667^{*}\,(\checkmark)\,(0.311)$ & $+94.8\%$ \\
+\addlinespace
+$(\text{\tiny ML},\text{\tiny RF})$ & $0.591^{*}\,(\checkmark)\,(0.285)$ & $+80.7\%$ & $0.791^{**}\,(\checkmark)\,(0.292)$ & $+120.6\%$ \\
+$(\text{\tiny ML},\text{\tiny CM})$ & $0.262\,(\times)\,(0.294)$ & $+29.9\%$ & $0.461^{\dagger}\,(\times)\,(0.278)$ & $+58.6\%$ \\
+$(\text{\tiny ML},\text{\tiny RF{+}CM})$ & $0.322\,(\times)\,(0.314)$ & $+38.0\%$ & $0.556^{\dagger}\,(\times)\,(0.306)$ & $+74.3\%$ \\
+\end{tabular}
+}
+}
+\vspace{-.1in}
+\end{table}
